@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="News and media background">
+  <defs>
+    <linearGradient id="bgNews" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#102845"/>
+      <stop offset="45%" stop-color="#0b63b6"/>
+      <stop offset="75%" stop-color="#cf2f3b"/>
+      <stop offset="100%" stop-color="#2e9e57"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bgNews)"/>
+  <rect x="145" y="145" width="1310" height="610" rx="38" fill="#f8fbff" opacity="0.15"/>
+  <circle cx="390" cy="455" r="98" fill="#FFD700"/>
+  <rect x="560" y="315" width="700" height="28" rx="14" fill="#f8fbff"/>
+  <rect x="560" y="367" width="555" height="24" rx="12" fill="#f8fbff" opacity="0.92"/>
+  <rect x="560" y="416" width="620" height="24" rx="12" fill="#f8fbff" opacity="0.84"/>
+  <rect x="560" y="465" width="470" height="24" rx="12" fill="#f8fbff" opacity="0.76"/>
+  <rect x="560" y="514" width="360" height="24" rx="12" fill="#f8fbff" opacity="0.68"/>
+</svg>

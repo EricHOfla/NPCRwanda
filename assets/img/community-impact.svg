@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Community impact illustration">
+  <rect width="1200" height="900" fill="#F8FAFC"/>
+  <circle cx="180" cy="200" r="120" fill="#4CAF50" opacity="0.2"/>
+  <circle cx="1020" cy="240" r="120" fill="#0072C6" opacity="0.2"/>
+  <rect x="140" y="560" width="920" height="160" rx="80" fill="#0033A0" opacity="0.9"/>
+  <circle cx="360" cy="420" r="70" fill="#FFD700"/>
+  <circle cx="600" cy="420" r="70" fill="#E53935"/>
+  <circle cx="840" cy="420" r="70" fill="#4CAF50"/>
+  <rect x="300" y="490" width="120" height="130" rx="50" fill="#FFD700"/>
+  <rect x="540" y="490" width="120" height="130" rx="50" fill="#E53935"/>
+  <rect x="780" y="490" width="120" height="130" rx="50" fill="#4CAF50"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="90" viewBox="0 0 260 90" role="img" aria-label="African Paralympic Committee placeholder logo">
+  <rect width="260" height="90" rx="14" fill="#F8FAFC"/>
+  <rect x="16" y="16" width="58" height="58" rx="14" fill="#4CAF50"/>
+  <path d="M30 54c6-12 16-20 30-24" stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <text x="90" y="40" font-family="Sora, sans-serif" font-size="16" font-weight="700" fill="#0F172A">APC</text>
+  <text x="90" y="62" font-family="Source Sans 3, sans-serif" font-size="12" fill="#64748B">African Paralympic</text>
+</svg>

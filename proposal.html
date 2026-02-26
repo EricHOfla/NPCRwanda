@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Frontend Website Redesign Proposal – NPC Rwanda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+            color: #222;
+            background: #f7f7f9;
+        }
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 18px 45px rgba(15,23,42,0.12);
+        }
+        h1, h2, h3 {
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #111827;
+        }
+        h1 {
+            font-size: 1.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        h2 {
+            font-size: 1.35rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.35rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+        }
+        p {
+            margin: 0.4rem 0 0.8rem;
+        }
+        ul {
+            margin: 0.3rem 0 0.9rem 1.5rem;
+        }
+        li {
+            margin-bottom: 0.3rem;
+        }
+        .meta {
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+        .title-block {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .title-block h1 {
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            font-size: 1.05rem;
+            color: #4b5563;
+        }
+        .strong {
+            font-weight: 600;
+        }
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .section-label {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.82rem;
+            color: #6b7280;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="title-block">
+        <div class="section-label">Project Proposal</div>
+        <h1>Frontend Website Redesign – National Paralympic Committee of Rwanda</h1>
+        <p class="subtitle">Modern, accessible, and professional UI using HTML, CSS, and Bootstrap</p>
+        <p class="meta">
+            Prepared by: [Your Name] &nbsp; | &nbsp; Position: [Your Position] &nbsp; | &nbsp; Date: [Insert Date]
+        </p>
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <p>
+        This proposal recommends a complete <span class="strong">frontend redesign</span> of the National Paralympic Committee of Rwanda (NPC Rwanda)
+        website using modern HTML, CSS, and Bootstrap.
+    </p>
+    <p>
+        The goal is to create a <span class="strong">professional, accessible, and internationally competitive interface</span> that:
+    </p>
+    <ul>
+        <li>Represents NPC Rwanda with the same standard as other National Paralympic Committees.</li>
+        <li>Better serves persons with disabilities, including visually impaired users, through strong accessibility practices.</li>
+        <li>Improves navigation, visual design, and content structure while keeping the implementation scope <span class="strong">frontend only</span> in this phase.</li>
+    </ul>
+    <p>
+        This phase focuses on UI/UX and responsive layout and will be built so it can later be connected to any backend or CMS.
+    </p>
+
+    <h2>2. Why This Frontend Project Is Important</h2>
+
+    <h3>2.1 Professional Image &amp; International Standards</h3>
+    <ul>
+        <li>NPC Rwanda represents the country at continental and global level.</li>
+        <li>The current interface looks like a basic template: repeated content, inconsistent layout, and non-polished English.</li>
+        <li>A redesigned UI will bring us visually closer to the International Paralympic Committee and African Paralympic Committee standards.</li>
+    </ul>
+
+    <h3>2.2 Accessibility &amp; Inclusion</h3>
+    <ul>
+        <li>As a Paralympic body, the website must be a practical example of inclusion.</li>
+        <li>The current frontend lacks full screen reader optimization, semantic structure, and ARIA labels.</li>
+        <li>The new frontend will be intentionally designed to better serve visually impaired and keyboard-only users, following WCAG principles.</li>
+    </ul>
+
+    <h3>2.3 Transparency &amp; Trust</h3>
+    <ul>
+        <li>Donors, partners, and international federations expect easy access to governance structure, policies, annual and financial reports, and strategic plans.</li>
+        <li>The redesign will create clear, well-structured pages that present this information in a professional way, even if documents are simple PDFs at first.</li>
+    </ul>
+
+    <h2>3. Objectives of the Project (Frontend Scope)</h2>
+    <ul>
+        <li>Redesign the full visual interface using a modern, consistent design system.</li>
+        <li>Reorganize content to remove repetition and present information clearly.</li>
+        <li>Implement a responsive layout that works across desktop, tablet, and mobile.</li>
+        <li>Integrate accessibility best practices for visually impaired users.</li>
+        <li>Create a clear structure for key sections: Sports, Athletes, News, Governance &amp; Transparency, Partners, Contact.</li>
+        <li>Ensure the frontend is clean, maintainable HTML/CSS/Bootstrap, ready for future backend/CMS integration.</li>
+    </ul>
+
+    <h2>4. Design System &amp; UX Direction</h2>
+
+    <h3>4.1 Color Palette (Aligned with Logo)</h3>
+    <ul>
+        <li>Primary Blue: <span class="strong">#0072C6</span> – stripe in the sun, main brand color</li>
+        <li>Accent Yellow: <span class="strong">#FFD700</span> – the sun, key call-to-action highlight</li>
+        <li>Accent Green: <span class="strong">#4CAF50</span> – ground/leaf, secondary banners and sections</li>
+        <li>Paralympic Red: <span class="strong">#E53935</span> – small accents for alerts or emphasis</li>
+        <li>Background White: <span class="strong">#FFFFFF</span> – clean base that makes the logo stand out</li>
+        <li>Text Black: <span class="strong">#000000</span> – primary text and headings for readability</li>
+    </ul>
+
+    <h3>4.2 Typography</h3>
+    <ul>
+        <li>Headings: Poppins or Montserrat – bold, modern, highly readable.</li>
+        <li>Body: Open Sans or Roboto – clean, international standard.</li>
+        <li>Buttons: Uppercase, semi-bold, clear calls to action.</li>
+    </ul>
+
+    <h3>4.3 Layout Principles</h3>
+    <ul>
+        <li>Max content width: 1200px container on desktop.</li>
+        <li>8px spacing system with generous white space.</li>
+        <li>Rounded corners (8–12px) and soft shadows for cards.</li>
+        <li>Smooth hover animations on buttons, cards, and navigation.</li>
+        <li>Fully responsive using Bootstrap grid and utilities.</li>
+    </ul>
+
+    <h2>5. Page &amp; Component Structure (Deliverables)</h2>
+
+    <h3>5.1 Homepage</h3>
+    <p>The homepage will include:</p>
+    <ul>
+        <li><span class="strong">Sticky Navigation Bar</span> with logo, main sections (Home, About, Sports, Athletes, News, Governance, Contact) and a highlighted “Donate” button.</li>
+        <li><span class="strong">Hero Section (80vh)</span> with a background image of Paralympic athletes, headline “Empowering Ability. Inspiring Rwanda.”, mission subtext, and buttons “Learn More” and “Become a Partner”.</li>
+        <li><span class="strong">About Preview</span> with a two-column layout (image + short summary) and a “Read More” link to the About page.</li>
+        <li><span class="strong">Sports Programs</span> grid with four cards for key disciplines such as Sitting Volleyball, Wheelchair Basketball, Amputee Football, and Para Athletics.</li>
+        <li><span class="strong">Featured Athletes</span> section with athlete cards (photo, sport, achievements, “View Profile” button).</li>
+        <li><span class="strong">Latest News</span> cards with image, date, title, summary, and “Read more” links.</li>
+        <li><span class="strong">Governance &amp; Transparency Preview</span> with icons/tiles for Board Members, Annual Reports, Policies, and Strategic Plan.</li>
+        <li><span class="strong">Partners</span> logo strip with grayscale-to-color hover effect.</li>
+        <li><span class="strong">Call to Action</span> full-width green band: “Support Inclusive Sports in Rwanda” with “Donate Now” and “Volunteer” buttons.</li>
+        <li><span class="strong">Footer</span> with About, Quick Links, Governance, Contact and a small “Admin Login” link (instead of public webmail).</li>
+    </ul>
+
+    <h3>5.2 About Page</h3>
+    <ul>
+        <li>History of NPC Rwanda.</li>
+        <li>Vision &amp; Mission.</li>
+        <li>Leadership (Board Members grid with roles and optional photos).</li>
+        <li>Strategic Objectives presented in a clear bullet or block format.</li>
+    </ul>
+
+    <h3>5.3 Athletes Page</h3>
+    <ul>
+        <li>Filter area (layout only in this phase): by sport, gender, achievement.</li>
+        <li>Athlete cards: photo, name, sport, classification, medal count.</li>
+        <li>Individual athlete profile template with biography, achievements timeline, photos/videos, and sponsors area.</li>
+    </ul>
+
+    <h3>5.4 News Page</h3>
+    <ul>
+        <li>Search bar layout.</li>
+        <li>Category filter (buttons or dropdown).</li>
+        <li>News listing cards with basic pagination UI.</li>
+    </ul>
+
+    <h3>5.5 Governance Page</h3>
+    <ul>
+        <li>Organizational structure layout or diagram.</li>
+        <li>Download blocks for Policies, Financial Reports, and Constitution (PDF).</li>
+        <li>Simple, document-style layout for easy reading.</li>
+    </ul>
+
+    <h3>5.6 Contact Page</h3>
+    <ul>
+        <li>Contact form (name, email, subject, message) – frontend only.</li>
+        <li>Map embed placeholder.</li>
+        <li>Office address, phone, email, and social media links.</li>
+    </ul>
+
+    <h2>6. Accessibility &amp; UX Enhancements</h2>
+    <ul>
+        <li>Semantic HTML with proper headings, lists, and landmark elements (header, nav, main, footer).</li>
+        <li>Alt text for all meaningful images to support screen readers.</li>
+        <li>ARIA labels for buttons, navigation, and interactive elements where appropriate.</li>
+        <li>Full keyboard navigation support with visible focus states.</li>
+        <li>High color contrast between text and background, aligned with WCAG contrast ratios.</li>
+        <li>Consistent font sizes and line heights for readability.</li>
+        <li>Optional layout for a “Listen to this page” button for future text-to-speech integration.</li>
+    </ul>
+
+    <h2>7. Technology Stack (Frontend Only)</h2>
+    <ul>
+        <li><span class="strong">HTML5</span> for semantic structure and clean markup.</li>
+        <li><span class="strong">CSS3</span> for custom styling following the design system.</li>
+        <li><span class="strong">Bootstrap 5</span> for responsive grid, components, and utilities.</li>
+        <li>Optional minimal JavaScript (vanilla) for interactions such as menu toggles and simple sliders.</li>
+    </ul>
+    <p>
+        No backend framework (Laravel, WordPress, React, etc.) is required in this phase; however, the frontend will be built
+        to integrate easily with a future backend or CMS.
+    </p>
+
+    <h2>8. Implementation Plan &amp; Timeline</h2>
+    <p>Total estimated duration: <span class="strong">6 weeks</span> (adjustable based on priorities).</p>
+    <ul>
+        <li><span class="strong">Week 1 – Discovery &amp; Content Cleanup:</span> review current content, remove duplication, define final page structure, approve sitemap and navigation.</li>
+        <li><span class="strong">Week 2 – UI Design &amp; Wireframes:</span> create static wireframes/mockups for key pages and approve colors, typography, and component style.</li>
+        <li><span class="strong">Weeks 3–4 – Frontend Development:</span> build main pages in HTML/CSS/Bootstrap, implement navigation, hero, cards, grids, and responsive behavior.</li>
+        <li><span class="strong">Week 5 – Accessibility &amp; Polish:</span> add ARIA attributes, alt text placeholders, focus styles, check contrast and readability, refine spacing and hover states.</li>
+        <li><span class="strong">Week 6 – Review, Testing &amp; Handover:</span> cross-browser testing, content proofing, and handover of final code and basic documentation.</li>
+    </ul>
+
+    <h2>9. Risks &amp; Mitigation</h2>
+    <ul>
+        <li><span class="strong">Content readiness:</span> some governance or transparency documents may not be finalized.
+            <br />Mitigation: use placeholders and clear "Coming Soon" areas; the structure will be ready once documents are approved.</li>
+        <li><span class="strong">Image quality:</span> lack of high-quality athlete photos.
+            <br />Mitigation: use temporary images until official media is available, then replace easily.</li>
+        <li><span class="strong">Future backend integration:</span> backend decisions may come later.
+            <br />Mitigation: use clean, modular HTML/CSS so any backend (WordPress, Laravel, Headless CMS) can plug in later.</li>
+    </ul>
+
+    <h2>10. Expected Benefits</h2>
+
+    <h3>10.1 For NPC Rwanda</h3>
+    <ul>
+        <li>Stronger professional and international online presence.</li>
+        <li>Improved trust from partners, donors, and federations.</li>
+        <li>Clear structure for governance and transparency.</li>
+    </ul>
+
+    <h3>10.2 For Athletes</h3>
+    <ul>
+        <li>Professional athlete profiles that can be shared with media and partners.</li>
+        <li>Greater recognition of achievements and sports.</li>
+    </ul>
+
+    <h3>10.3 For Partners &amp; Donors</h3>
+    <ul>
+        <li>Easy access to reports, policies, and strategic plans.</li>
+        <li>Confidence in NPC Rwanda’s organization and communication.</li>
+    </ul>
+
+    <h3>10.4 For the Public &amp; Persons with Disabilities</h3>
+    <ul>
+        <li>Easier access to information on programs and opportunities.</li>
+        <li>More inclusive experience, especially for visually impaired users.</li>
+    </ul>
+
+    <h2>11. Conclusion &amp; Approval Request</h2>
+    <p>
+        This frontend redesign is a focused, achievable project that will significantly improve NPC Rwanda’s digital image
+        without requiring heavy backend investment at this stage.
+    </p>
+    <p>
+        By approving this project, management enables:
+    </p>
+    <ul>
+        <li>A modern, professional, and accessible public interface.</li>
+        <li>A strong foundation that can later be extended with backend functionalities (CMS, admin dashboard, etc.).</li>
+        <li>A website that truly reflects NPC Rwanda’s mission, values, and international role.</li>
+    </ul>
+    <p>
+        <span class="strong">I respectfully request approval to proceed with this frontend (HTML, CSS, Bootstrap) redesign phase for the National Paralympic Committee of Rwanda website.</span>
+    </p>
+</div>
+</body>
+</html>

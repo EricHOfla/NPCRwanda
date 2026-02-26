@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="90" viewBox="0 0 260 90" role="img" aria-label="World ParaVolley placeholder logo">
+  <rect width="260" height="90" rx="14" fill="#F8FAFC"/>
+  <rect x="16" y="16" width="58" height="58" rx="14" fill="#0072C6"/>
+  <circle cx="48" cy="36" r="10" fill="#FFD700"/>
+  <path d="M28 60c8-6 20-6 32 0" stroke="#FFD700" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <text x="90" y="40" font-family="Sora, sans-serif" font-size="16" font-weight="700" fill="#0F172A">WPV</text>
+  <text x="90" y="62" font-family="Source Sans 3, sans-serif" font-size="12" fill="#64748B">World ParaVolley</text>
+</svg>

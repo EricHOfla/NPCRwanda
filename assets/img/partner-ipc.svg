@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="90" viewBox="0 0 260 90" role="img" aria-label="International Paralympic Committee placeholder logo">
+  <rect width="260" height="90" rx="14" fill="#F8FAFC"/>
+  <circle cx="45" cy="45" r="28" fill="#E53935" opacity="0.9"/>
+  <circle cx="45" cy="45" r="14" fill="#FFD700"/>
+  <text x="90" y="40" font-family="Sora, sans-serif" font-size="16" font-weight="700" fill="#0F172A">IPC</text>
+  <text x="90" y="62" font-family="Source Sans 3, sans-serif" font-size="12" fill="#64748B">International Paralympic</text>
+</svg>

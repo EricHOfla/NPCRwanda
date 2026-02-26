@@ -1,0 +1,26 @@
+{
+  "jobs": [
+    {
+      "id": "program-officer",
+      "expired": false,
+      "deadline_iso": "2026-03-30",
+      "title_key": "phrase.Program Officer (Inclusive Sports)",
+      "type_key": "phrase.Full Time",
+      "location_deadline_key": "phrase.Kigali, Rwanda · Application deadline: 30 March 2026",
+      "description_key": "phrase.Support planning and delivery of para-sport programs across districts, with a strong focus on inclusion and athlete pathways.",
+      "apply_label_key": "phrase.Apply for This Role",
+      "apply_subject": "Application - Program Officer"
+    },
+    {
+      "id": "communications-media-officer",
+      "expired": false,
+      "deadline_iso": "2026-04-12",
+      "title_key": "phrase.Communications and Media Officer",
+      "type_key": "phrase.Full Time",
+      "location_deadline_key": "phrase.Kigali, Rwanda · Application deadline: 12 April 2026",
+      "description_key": "phrase.Lead storytelling, website updates, and social media communication to increase visibility of athletes and programs.",
+      "apply_label_key": "phrase.Apply for This Role",
+      "apply_subject": "Application - Communications Officer"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "social": {
+    "x_timeline_url": "https://twitter.com/npc_rwanda",
+    "facebook_page_url": "https://www.facebook.com/npcrwanda/",
+    "x_fallback_posts": [
+      {
+        "title_key": "phrase.NPC Rwanda updates on athlete development and community inclusion",
+        "link": "https://twitter.com/npc_rwanda"
+      },
+      {
+        "title_key": "phrase.New announcements on competitions and events",
+        "link": "https://twitter.com/npc_rwanda"
+      },
+      {
+        "title_key": "phrase.Latest governance and program highlights",
+        "link": "https://twitter.com/npc_rwanda"
+      }
+    ]
+  },
+  "items": [
+    {
+      "title_key": "phrase.Goalball Championship 2024: A Call for Visibility and Support for Rwanda’s Blind Athletes",
+      "image": "assets/img/curated/news-goalball.jpg",
+      "link": "news-goalball.html",
+      "cta_key": "phrase.View More",
+      "alt_key": "phrase.Goalball championship feature"
+    },
+    {
+      "title_key": "phrase.A Celebration of Unity: Rwanda’s Sitting Volleyball Team Faces France in the 2024 International Paralympic Committee Championships",
+      "image": "assets/img/curated/news-volleyball.jpg",
+      "link": "news-volleyball.html",
+      "cta_key": "phrase.View More",
+      "alt_key": "phrase.Sitting volleyball series"
+    },
+    {
+      "title_key": "phrase.Celebrating Inclusivity: Boccia Players Unite at Petit Stadium",
+      "image": "assets/img/curated/news-boccia.jpg",
+      "link": "news-boccia.html",
+      "cta_key": "phrase.View More",
+      "alt_key": "phrase.Boccia showcase"
+    },
+    {
+      "title_key": "phrase.Understanding Disabilities in Parapowerlifting: A Look Ahead to the 2024 Championship in Rwanda",
+      "image": "assets/img/curated/news-community.jpg",
+      "link": "news-community-talent.html",
+      "cta_key": "phrase.View More",
+      "alt_key": "phrase.Community talent development"
+    }
+  ]
+}

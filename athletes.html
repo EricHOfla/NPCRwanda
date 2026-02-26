@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="phrase.Athletes | NPC Rwanda">Athletes | NPC Rwanda</title>
+    <meta name="description"
+        content="Meet the incredible athletes representing Rwanda in Paralympic sports. Courage, skill, and excellence."
+        data-i18n-content="phrase.Meet the incredible athletes representing Rwanda in Paralympic sports. Courage, skill, and excellence.">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body data-active="athletes.html" data-nav="solid">
+
+    <div data-include="components/header.html"></div>
+
+    <!-- Page Header -->
+    <header class="py-5 text-white bg-contain"
+        style="background: linear-gradient(rgba(229,57,53,0.7), rgba(0,114,198,0.75), rgba(76,175,80,0.72)), url('assets/img/curated/athletes-hero.jpg'); background-size: cover; background-position: center;">
+        <div class="container py-4">
+            <h1 class="text-white mb-2" data-aos="fade-up" data-i18n="phrase.Our Athletes">Our Athletes</h1>
+            <nav aria-label="breadcrumb" data-i18n-aria-label="phrase.breadcrumb" data-aos="fade-up" data-aos-delay="100">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="index.html" class="text-white text-decoration-none" data-i18n="nav.home">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active text-white opacity-75" aria-current="page" data-i18n="nav.athletes">Athletes</li>
+                </ol>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- Athletes Directory -->
+        <section id="athlete-directory">
+            <div class="container">
+                <!-- Filters -->
+                <div class="row mb-5" data-aos="fade-up">
+                    <div class="col-lg-12">
+                        <div class="bg-white p-4 rounded-4 shadow-soft">
+                            <form class="row g-3 align-items-center">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted" data-i18n="phrase.Filter by Sport">Filter by Sport</label>
+                                    <select class="form-select border-0 bg-light">
+                                        <option selected data-i18n="phrase.All Sports">All Sports</option>
+                                        <option data-i18n="phrase.Sitting Volleyball">Sitting Volleyball</option>
+                                        <option data-i18n="phrase.Wheelchair Basketball">Wheelchair Basketball</option>
+                                        <option data-i18n="phrase.Amputee Football">Amputee Football</option>
+                                        <option data-i18n="phrase.Para Athletics">Para Athletics</option>
+                                        <option data-i18n="phrase.Para-Badminton">Para-Badminton</option>
+                                        <option data-i18n="phrase.Boccia">Boccia</option>
+                                        <option data-i18n="phrase.Goalball">Goalball</option>
+                                        <option data-i18n="phrase.Para Powerlifting">Para Powerlifting</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted" data-i18n="phrase.Filter by Category">Filter by Category</label>
+                                    <select class="form-select border-0 bg-light">
+                                        <option selected data-i18n="phrase.All Categories">All Categories</option>
+                                        <option data-i18n="phrase.National Team">National Team</option>
+                                        <option data-i18n="phrase.Emerging Talent">Emerging Talent</option>
+                                        <option data-i18n="phrase.Paralympians">Paralympians</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="button" class="btn btn-primary w-100" data-i18n="phrase.Apply Filters">Apply Filters</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Athlete Grid -->
+                <div class="row g-4">
+                    <!-- Athlete 1 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-1.svg" alt="Jean de Dieu Kundineza portrait" data-i18n-alt="phrase.Jean de Dieu Kundineza portrait">
+                            </div>
+                            <h3>Jean de Dieu Kundineza</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Sitting Volleyball">Sitting Volleyball</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.National Team">National Team</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3">T-56</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.A dedicated team player with extensive experience at national and continental level.">A dedicated team player with extensive experience at national and continental level.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                    <!-- Athlete 2 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-2.svg" alt="Liliane Mukobwankawe portrait" data-i18n-alt="phrase.Liliane Mukobwankawe portrait">
+                            </div>
+                            <h3>Liliane Mukobwankawe</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Sitting Volleyball">Sitting Volleyball</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.Captain">Captain</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3">T-56</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.Leading the women’s national team with a record of strong regional performances.">Leading the women’s national team with a record of strong regional performances.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                    <!-- Athlete 3 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-3.svg" alt="Hermas Muvunyi portrait" data-i18n-alt="phrase.Hermas Muvunyi portrait">
+                            </div>
+                            <h3>Hermas Muvunyi</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Para Athletics">Para Athletics</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.Paralympian">Paralympian</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3">T-46</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.World-class sprinter and multi-time African champion in the T46 400m and 800m events.">World-class sprinter and multi-time African champion in the T46 400m and 800m events.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                    <!-- Athlete 4 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-4.svg" alt="Emmanuel Niyomugabo portrait" data-i18n-alt="phrase.Emmanuel Niyomugabo portrait">
+                            </div>
+                            <h3>Emmanuel Niyomugabo</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Wheelchair Basketball">Wheelchair Basketball</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.National Team">National Team</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3">Forward</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.Known for accuracy, court vision, and disciplined defense.">Known for accuracy, court vision, and disciplined defense.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                    <!-- Athlete 5 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-5.svg" alt="Claudine Bazubagira portrait" data-i18n-alt="phrase.Claudine Bazubagira portrait">
+                            </div>
+                            <h3>Claudine Bazubagira</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Para Powerlifting">Para Powerlifting</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.National Team">National Team</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3" data-i18n="phrase.Under 55kg">Under 55kg</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.A rising talent in para powerlifting, recognized for strength and discipline.">A rising talent in para powerlifting, recognized for strength and discipline.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                    <!-- Athlete 6 -->
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="custom-card athlete-card p-4">
+                            <div class="athlete-thumb">
+                                <img src="assets/img/avatar-6.svg" alt="Clementine Umutoni portrait" data-i18n-alt="phrase.Clementine Umutoni portrait">
+                            </div>
+                            <h3>Clementine Umutoni</h3>
+                            <p class="text-accent-green fw-bold" data-i18n="phrase.Sitting Volleyball">Sitting Volleyball</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3" data-i18n="phrase.Emerging">Emerging</span>
+                                <span class="badge bg-yellow text-dark rounded-pill px-3" data-i18n="phrase.Setter">Setter</span>
+                            </div>
+                            <p class="small text-muted mb-4" data-i18n="phrase.One of the youngest talents in the women’s national team, with strong development potential.">One of the youngest talents in the women’s national team, with strong development potential.</p>
+                            <a href="#" class="btn btn-outline-primary w-100" data-i18n="phrase.View Full Profile">View Full Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="mt-5" aria-label="Athlete pagination" data-i18n-aria-label="phrase.Athlete pagination">
+                    <ul class="pagination justify-content-center border-0">
+                        <li class="page-item disabled"><a class="page-link border-0 bg-light rounded-3 me-2" href="#"
+                                tabindex="-1" data-i18n="phrase.Previous">Previous</a></li>
+                        <li class="page-item active"><a class="page-link border-0 rounded-3 me-2" href="#"
+                                style="background: var(--primary-blue);">1</a></li>
+                        <li class="page-item"><a class="page-link border-0 bg-light text-dark rounded-3 me-2"
+                                href="#">2</a></li>
+                        <li class="page-item"><a class="page-link border-0 bg-light text-dark rounded-3 me-2"
+                                href="#">3</a></li>
+                        <li class="page-item"><a class="page-link border-0 bg-light text-dark rounded-3"
+                                href="#" data-i18n="phrase.Next">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    </main>
+
+    <div data-include="components/footer.html"></div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="assets/js/site.js"></script>
+    <!-- Accessibility Menu JS -->
+</body>
+
+</html>

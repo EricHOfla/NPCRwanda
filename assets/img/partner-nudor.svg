@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="90" viewBox="0 0 260 90" role="img" aria-label="NUDOR placeholder logo">
+  <rect width="260" height="90" rx="14" fill="#F8FAFC"/>
+  <rect x="16" y="16" width="58" height="58" rx="14" fill="#0033A0"/>
+  <circle cx="45" cy="40" r="10" fill="#FFD700"/>
+  <path d="M29 60h32" stroke="#FFD700" stroke-width="5" stroke-linecap="round"/>
+  <text x="90" y="40" font-family="Sora, sans-serif" font-size="16" font-weight="700" fill="#0F172A">NUDOR</text>
+  <text x="90" y="62" font-family="Source Sans 3, sans-serif" font-size="12" fill="#64748B">Disability Organizations</text>
+</svg>

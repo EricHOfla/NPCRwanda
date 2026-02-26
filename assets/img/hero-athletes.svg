@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Inclusive para-sport hero background">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0033A0"/>
+      <stop offset="45%" stop-color="#0072C6"/>
+      <stop offset="100%" stop-color="#4CAF50"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.2" cy="0.2" r="0.5">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#sun)"/>
+  <path d="M0 720c220-60 420-90 700-60 220 25 420 90 900 40v200H0z" fill="#0F172A" opacity="0.55"/>
+  <path d="M0 780c280-70 520-80 820-30 230 40 420 70 780 10v160H0z" fill="#0033A0" opacity="0.65"/>
+  <g opacity="0.9">
+    <circle cx="1040" cy="420" r="70" fill="#F8FAFC"/>
+    <rect x="980" y="480" width="120" height="190" rx="50" fill="#F8FAFC"/>
+    <circle cx="1220" cy="500" r="40" fill="#F8FAFC"/>
+    <rect x="1185" y="540" width="70" height="140" rx="32" fill="#F8FAFC"/>
+  </g>
+  <g opacity="0.8">
+    <rect x="240" y="360" width="220" height="12" rx="6" fill="#FFD700"/>
+    <rect x="240" y="390" width="140" height="12" rx="6" fill="#FFD700"/>
+    <rect x="240" y="420" width="170" height="12" rx="6" fill="#FFD700"/>
+  </g>
+</svg>
