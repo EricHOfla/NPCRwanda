@@ -1,0 +1,304 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Athlete {
+  id        String   @id @default(uuid())
+  name      String
+  sport     String
+  status    String   @default("Active") // e.g. "Active", "Inactive"
+  country   String   @default("Rwanda")
+  avatar    String
+  desc      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model NewsArticle {
+  id        String   @id @default(uuid())
+  title     String
+  date      String
+  category  String
+  status    String   @default("Draft") // e.g. "Published", "Draft"
+  img       String
+  desc      String
+  content   String   @default("") @db.Text
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+}
+
+model Career {
+  id         String   @id @default(uuid())
+  title      String
+  location   String
+  applicants Int      @default(0)
+  status     String   @default("Open") // e.g. "Open", "Closed"
+  desc       String
+  slug       String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  date      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([read])
+}
+
+model SportDiscipline {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  img       String
+  desc      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model Leader {
+  id         String   @id @default(uuid())
+  name       String
+  role       String
+  desc       String   @db.Text
+  avatar     String
+  committee  String   @default("Board of Directors")
+  email      String?
+  phone      String?
+  impairment String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SystemComponent {
+  id        String   @id @default(uuid())
+  title     String
+  desc      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VolunteerApplication {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  interest  String
+  skills    String
+  details   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([read])
+}
+
+model DonationInquiry {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  category    String
+  supportType String
+  details     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([read])
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model GovernanceDocument {
+  id        String   @id @default(uuid())
+  title     String
+  desc      String
+  fileUrl   String   @default("#")
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GovernancePolicy {
+  id        String   @id @default(uuid())
+  title     String
+  desc      String
+  fileUrl   String   @default("#")
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        String
+  endDate     String   @default("")
+  location    String
+  category    String   @default("National")
+  status      String   @default("Upcoming") // "Upcoming", "Ongoing", "Completed", "Cancelled"
+  img         String   @default("sports-hero.jpg")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+}
+
+model Partner {
+  id        String   @id @default(uuid())
+  name      String
+  logo      String   // filename in /assets/img/
+  website   String   @default("")
+  category  String   @default("Government Sector")
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+}
+
+model SiteContent {
+  id        String   @id @default(uuid())
+  key       String   @unique  // e.g. "hero.title", "about.vision", "about.mission", "about.history"
+  value     String   @db.Text
+  type      String   @default("text")  // "text" | "html" | "image"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model ContactInfo {
+  id        String   @id @default(uuid())
+  address   String
+  phone     String
+  email     String
+  mapUrl    String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SocialLink {
+  id        String   @id @default(uuid())
+  platform  String   // "facebook" | "twitter" | "instagram" | "youtube" | "linkedin"
+  url       String
+  icon      String   // Font Awesome class
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MediaAsset {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String   // e.g. "/uploads/some-image.jpg"
+  fileSize  Int
+  mimeType  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NpcAssociation {
+  id         String   @id @default(uuid())
+  name       String
+  acronym    String
+  desc       String   @db.Text
+  activities String[]
+  icon       String
+  order      Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model NpcClub {
+  id        String   @id @default(uuid())
+  name      String
+  location  String
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NpcFederation {
+  id        String   @id @default(uuid())
+  name      String
+  logo      String
+  website   String?
+  role      String
+  desc      String   @db.Text
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DpscoContact {
+  id          String   @id @default(uuid())
+  province    String
+  district    String
+  coordinator String
+  phone       String
+  email       String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([province])
+}
