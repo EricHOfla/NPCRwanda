@@ -98,7 +98,7 @@ export const Header: React.FC = () => {
             />
             <div className="brand-text">
               <span className="d-block fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1.1rem', lineHeight: 1 }}>
-                NPC RWANDA - AUTO DEPLOY
+                NPC RWANDA
               </span>
               <small className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
                 PARALYMPIC COMMITTEE
