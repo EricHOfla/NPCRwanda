@@ -20,12 +20,14 @@ export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ childre
       const AOS = mod.default;
       AOS.init({
         once: true,
-        offset: 120,
-        duration: 600,
+        offset: 60,
+        duration: 500,
         easing: 'ease-in-out',
+        disable: 'mobile', // Disable on mobile to prevent hidden elements
       });
+      AOS.refresh();
     });
-  }, []);
+  }, [pathname]);
 
   return (
     <DataProvider>
