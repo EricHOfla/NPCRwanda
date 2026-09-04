@@ -224,12 +224,13 @@ img {
    4. NAVBAR
    ────────────────────────────── */
 .topbar {
-    background: linear-gradient(90deg, var(--agitos-red) 0%, var(--primary-blue) 50%, var(--accent-green) 100%);
+    background: #0F223D;
     color: var(--white);
     font-size: 0.82rem;
     padding: 0.45rem 0;
     position: relative;
     z-index: 1031;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .topbar-link {
@@ -334,14 +335,6 @@ img {
     background: rgba(255, 255, 255, 0.98) !important;
 }
 
-.navbar.scrolled {
-    padding: 0.5rem 0;
-    background: rgba(255, 255, 255, 0.97) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-}
 
 .navbar-brand img {
     height: 50px;
@@ -349,13 +342,14 @@ img {
 }
 
 .nav-link {
-    color: var(--text-dark) !important;
+    color: #1E293B !important;
     font-weight: 600;
-    font-size: 0.95rem;
-    margin: 0 6px;
-    padding: 0.5rem 12px !important;
+    font-size: 0.875rem;
+    margin: 0 4px;
+    padding: 0.55rem 12px !important;
     position: relative;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.4px;
+    transition: color 0.2s ease;
 }
 
 .nav-link::after {
@@ -364,16 +358,16 @@ img {
     bottom: 0;
     left: 12px;
     right: 12px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--agitos-red), var(--primary-blue), var(--accent-green));
-    border-radius: 3px;
+    height: 2px;
+    background: #0072C6;
+    border-radius: 2px;
     transform: scaleX(0);
     transform-origin: center;
-    transition: var(--transition);
+    transition: transform 0.22s ease;
 }
 
 .nav-link:hover {
-    color: var(--primary-blue) !important;
+    color: #0072C6 !important;
 }
 
 .nav-link:hover::after,
@@ -382,14 +376,14 @@ img {
 }
 
 .nav-link.active {
-    color: var(--primary-blue) !important;
+    color: #0072C6 !important;
 }
 
 /* Main navbar dropdowns */
 .navbar .dropdown-menu {
-    border: 1px solid #E8EDF5;
+    border: 1px solid #E2E8F0;
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0,0,0,0.04);
     padding: 8px;
     animation: dropdownFade 0.18s ease;
     min-width: 230px;
@@ -403,9 +397,9 @@ img {
 .navbar .dropdown-item {
     border-radius: 8px;
     padding: 9px 14px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text-dark);
+    color: #1E293B;
     transition: background 0.15s ease, color 0.15s ease;
     display: flex;
     align-items: center;
@@ -413,19 +407,27 @@ img {
 
 .navbar .dropdown-item:hover,
 .navbar .dropdown-item:focus {
-    background: #EFF6FF;
-    color: var(--primary-blue);
+    background: #F0F7FF;
+    color: #0072C6;
 }
 
+/* Unified icon color in all dropdown items */
 .navbar .dropdown-item i {
     width: 18px;
     text-align: center;
     flex-shrink: 0;
+    color: #94A3B8;
+    transition: color 0.15s ease;
+}
+
+.navbar .dropdown-item:hover i,
+.navbar .dropdown-item:focus i {
+    color: #0072C6;
 }
 
 .navbar .dropdown-divider {
     margin: 6px 4px;
-    border-top-color: #E8EDF5;
+    border-top-color: #E2E8F0;
 }
 
 /* Dropdown toggle caret: hide default Bootstrap pseudo-element arrow on link toggles */
@@ -434,7 +436,15 @@ img {
     display: none;
 }
 
-/* Donate button */
+/* Scrolled state — subtle depth */
+.navbar.scrolled {
+    padding: 0.5rem 0;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.07);
+}
 .btn-donate {
     background: linear-gradient(135deg, var(--agitos-red), var(--accent-yellow));
     color: var(--text-dark);
@@ -1148,9 +1158,25 @@ footer ul li {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     margin-top: 50px;
     padding-top: 25px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     font-size: 0.88rem;
     color: #777;
+}
+
+.footer-login-link {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.footer-login-link:hover {
+    color: rgba(255,255,255,0.7);
 }
 
 .footer-accessibility-link {
@@ -1484,21 +1510,23 @@ button:focus-visible,
     }
 
     .navbar-collapse {
-        background: var(--white);
-        padding: 1rem;
-        border-radius: var(--border-radius);
-        margin-top: 0.5rem;
-        box-shadow: var(--shadow-medium);
+        background: #fff;
+        padding: 0.75rem 0.5rem 1rem;
+        border-radius: 0 0 12px 12px;
+        margin-top: 0;
+        border-top: 1px solid #E2E8F0;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
     .nav-link {
-        padding: 0.75rem 12px !important;
+        padding: 0.65rem 14px !important;
         margin: 0;
         border-radius: 8px;
+        font-size: 0.9rem;
     }
 
     .nav-link:hover {
-        background: rgba(0, 114, 198, 0.05);
+        background: #F0F7FF;
     }
 
     .nav-link::after {

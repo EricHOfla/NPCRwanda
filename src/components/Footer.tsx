@@ -94,6 +94,11 @@ export const Footer: React.FC = () => {
                   {t('footer.system_directory')}
                 </Link>
               </li>
+              <li className="mb-2">
+                <Link href="/login">
+                  Login
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -146,6 +151,7 @@ export const Footer: React.FC = () => {
           <p className="mb-0">
             &copy; <span id="year">{new Date().getFullYear()}</span> <span>{t('footer.rights')}</span>
           </p>
+          <Link href="/login" className="footer-login-link">Admin Login</Link>
         </div>
       </div>
     </footer>

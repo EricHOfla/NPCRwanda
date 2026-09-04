@@ -9,10 +9,18 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const { lang, setLang, t } = useTranslation();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     // Dynamic import of bootstrap JS on client side for dropdowns
     import('bootstrap/dist/js/bootstrap.bundle.min.js');
+  }, []);
+
+  // Scroll detection — adds .scrolled class for shadow/blur effect
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Automatically close mobile navbar whenever the route/pathname changes
@@ -109,7 +117,7 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Main Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-0" id="main-nav">
+      <nav className={`navbar navbar-expand-lg navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
         <div className="container border-0">
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <img
@@ -338,11 +346,7 @@ export const Header: React.FC = () => {
               </li>
 
             </ul>
-            <div className="nav-buttons d-flex align-items-center gap-2">
-              <Link href="/login" className="btn btn-login-nav btn-sm px-3 fw-bold" onClick={closeMobileMenu}>
-                <i className="fas fa-lock me-1"></i> Login
-              </Link>
-            </div>
+
           </div>
         </div>
       </nav>
