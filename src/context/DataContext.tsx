@@ -1081,8 +1081,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       body: formData,
     });
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Upload failed');
+      let errorMsg = `Upload failed (${res.status})`;
+      try {
+        const err = await res.json();
+        errorMsg = err.error || err.message || errorMsg;
+      } catch {
+        const text = await res.text();
+        errorMsg = text.length > 150 ? `Server returned error (${res.status})` : text;
+      }
+      throw new Error(errorMsg);
     }
     const data = await res.json();
     setMediaAssets(prev => [data, ...prev]);
@@ -1096,8 +1103,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       setMediaAssets(prev => prev.filter(m => m.id !== id));
     } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to delete asset');
+      let errorMsg = 'Failed to delete asset';
+      try {
+        const err = await res.json();
+        errorMsg = err.error || err.message || errorMsg;
+      } catch {
+        errorMsg = `Server error (${res.status})`;
+      }
+      alert(errorMsg);
     }
   };
 

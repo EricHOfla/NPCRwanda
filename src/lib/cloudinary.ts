@@ -46,13 +46,15 @@ export function buildCloudinaryFolder(category: string = 'site', entity?: string
 }
 
 /**
- * Uploads a file buffer directly to Cloudinary with structured folders
+ * Uploads a file buffer directly to Cloudinary using Base64 Data URI for maximum speed and stability.
  * @param buffer - File data in memory
+ * @param mimeType - File mime type
  * @param category - Category folder ('athletes' | 'news' | 'events' | 'partners' | 'leaders' | 'site')
  * @param entity - Optional subfolder/entity identifier (e.g. 'athlete-1', 'article-1')
  */
 export async function uploadToCloudinary(
   buffer: Buffer,
+  mimeType: string = 'image/jpeg',
   category: string = 'site',
   entity?: string
 ): Promise<CloudinaryUploadResult> {
@@ -60,27 +62,20 @@ export async function uploadToCloudinary(
     ? category
     : buildCloudinaryFolder(category, entity);
 
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: 'auto',
-      },
-      (error, result) => {
-        if (error || !result) {
-          return reject(error || new Error('Upload to Cloudinary failed'));
-        }
-        resolve({
-          url: result.secure_url,
-          public_id: result.public_id,
-          bytes: result.bytes,
-          format: result.format,
-        });
-      }
-    );
+  const base64Data = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-    uploadStream.end(buffer);
+  const result = await cloudinary.uploader.upload(base64Data, {
+    folder,
+    resource_type: 'auto',
+    timeout: 30000,
   });
+
+  return {
+    url: result.secure_url,
+    public_id: result.public_id,
+    bytes: result.bytes,
+    format: result.format,
+  };
 }
 
 export { cloudinary };

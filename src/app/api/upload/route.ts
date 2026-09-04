@@ -4,6 +4,9 @@ import { uploadToCloudinary } from '@/lib/cloudinary';
 import fs from 'fs/promises';
 import path from 'path';
 
+export const maxDuration = 60; // 60 seconds max execution
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -17,17 +20,18 @@ export async function POST(request: Request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const mimeType = file.type || 'image/jpeg';
 
     let fileUrl: string;
 
-    // Try Cloudinary upload first with the structured hierarchy
+    // Try Cloudinary upload first
     try {
-      const cloudinaryResult = await uploadToCloudinary(buffer, category, entity);
+      const cloudinaryResult = await uploadToCloudinary(buffer, mimeType, category, entity);
       fileUrl = cloudinaryResult.url;
-    } catch (cloudErr) {
-      console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr);
+    } catch (cloudErr: any) {
+      console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr?.message || cloudErr);
 
-      // Fallback to local storage if Cloudinary fails
+      // Fallback to local storage if Cloudinary is unreachable
       const uploadDir = path.join(process.cwd(), 'public', 'uploads');
       await fs.mkdir(uploadDir, { recursive: true });
 
@@ -46,13 +50,13 @@ export async function POST(request: Request) {
         filename: file.name,
         url: fileUrl,
         fileSize: buffer.length,
-        mimeType: file.type || 'application/octet-stream',
+        mimeType: mimeType,
       },
     });
 
     return NextResponse.json(media);
-  } catch (error) {
-    console.error('File upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+  } catch (error: any) {
+    console.error('File upload route error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to upload file' }, { status: 500 });
   }
 }
