@@ -47,12 +47,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return translated !== undefined ? translated : key;
   };
 
-  // Prevent flash of default language if user preferred another
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
-      <div style={{ visibility: isHydrated ? 'visible' : 'hidden' }}>
-        {children}
-      </div>
+      {children}
     </LanguageContext.Provider>
   );
 };
