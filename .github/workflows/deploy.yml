@@ -1,3 +1,4 @@
+```yaml
 name: Deploy NPCRwanda
 
 on:
@@ -17,17 +18,36 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           command_timeout: 15m
+
           script: |
             set -e
+
             cd /var/www/NPCRwanda
+
+            echo "📥 Pulling latest code..."
             git pull origin main
-            npm install
+
+            echo "📦 Installing dependencies..."
+            npm ci
+
+            echo "🔧 Generating Prisma Client..."
             npx prisma generate
+
+            echo "🏗️ Building Next.js..."
             npm run build
-            chmod 755 /var /var/www || true
-            chmod -R a+rX /var/www/NPCRwanda || true
-            chmod -R 777 /var/www/NPCRwanda/.next /var/www/NPCRwanda/public || true
+
+            echo "🔐 Fixing permissions..."
+            chmod -R a+rX /var/www/NPCRwanda
+
+            echo "♻️ Restarting PM2..."
             pm2 delete NPCRwanda || true
             pm2 start ecosystem.config.js
-            pm2 save || true
-            systemctl reload nginx || nginx -s reload || true
+
+            echo "💾 Saving PM2..."
+            pm2 save
+
+            echo "🔄 Reloading Nginx..."
+            systemctl reload nginx
+
+            echo "✅ Deployment completed successfully!"
+```
