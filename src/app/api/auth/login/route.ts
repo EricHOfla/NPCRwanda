@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { signJWT } from '@/lib/auth';
+import { ensureDefaultAdmin } from '@/lib/adminSeed';
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +15,9 @@ export async function POST(request: Request) {
     if (!password || password.length < 6) {
       return NextResponse.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
     }
+
+    // Automatically seed default admin if no admin exists in the database
+    await ensureDefaultAdmin();
 
     // Fetch user from DB
     let user;
