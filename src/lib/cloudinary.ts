@@ -15,14 +15,51 @@ export interface CloudinaryUploadResult {
 }
 
 /**
- * Uploads a file buffer directly to Cloudinary
+ * Builds standard Cloudinary folder path adhering to:
+ * npc-rwanda/
+ * ├── athletes/
+ * │   └── <athlete-id-or-name>/
+ * ├── news/
+ * │   └── <article-id-or-slug>/
+ * ├── events/
+ * │   └── <event-id-or-slug>/
+ * ├── partners/
+ * ├── leaders/
+ * └── site/
+ */
+export function buildCloudinaryFolder(category: string = 'site', entity?: string): string {
+  const root = 'npc-rwanda';
+  const cleanCategory = category.trim().toLowerCase().replace(/^\/+|\/+$/g, '') || 'site';
+
+  if (entity && entity.trim()) {
+    const cleanEntity = entity
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    return `${root}/${cleanCategory}/${cleanEntity}`;
+  }
+
+  return `${root}/${cleanCategory}`;
+}
+
+/**
+ * Uploads a file buffer directly to Cloudinary with structured folders
  * @param buffer - File data in memory
- * @param folder - Cloudinary folder name (defaults to 'npcrwanda')
+ * @param category - Category folder ('athletes' | 'news' | 'events' | 'partners' | 'leaders' | 'site')
+ * @param entity - Optional subfolder/entity identifier (e.g. 'athlete-1', 'article-1')
  */
 export async function uploadToCloudinary(
   buffer: Buffer,
-  folder: string = 'npcrwanda'
+  category: string = 'site',
+  entity?: string
 ): Promise<CloudinaryUploadResult> {
+  const folder = category.startsWith('npc-rwanda')
+    ? category
+    : buildCloudinaryFolder(category, entity);
+
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {

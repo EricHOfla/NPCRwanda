@@ -12,14 +12,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    const category = (formData.get('folder') as string) || (formData.get('category') as string) || 'site';
+    const entity = (formData.get('entity') as string) || '';
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     let fileUrl: string;
 
-    // Try Cloudinary upload first
+    // Try Cloudinary upload first with the structured hierarchy
     try {
-      const cloudinaryResult = await uploadToCloudinary(buffer, 'npcrwanda');
+      const cloudinaryResult = await uploadToCloudinary(buffer, category, entity);
       fileUrl = cloudinaryResult.url;
     } catch (cloudErr) {
       console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr);

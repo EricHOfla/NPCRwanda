@@ -233,7 +233,7 @@ interface DataContextType {
   mediaAssets: MediaAsset[];
   fetchMediaAssets: () => Promise<void>;
   fetchProtectedData: () => Promise<void>;
-  uploadMediaFile: (file: File) => Promise<MediaAsset>;
+  uploadMediaFile: (file: File, category?: string, entity?: string) => Promise<MediaAsset>;
   deleteMediaAsset: (id: string) => Promise<void>;
   
   // Athlete Actions
@@ -1069,9 +1069,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const uploadMediaFile = async (file: File): Promise<MediaAsset> => {
+  const uploadMediaFile = async (file: File, category: string = 'site', entity?: string): Promise<MediaAsset> => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('category', category);
+    if (entity) {
+      formData.append('entity', entity);
+    }
     const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData,

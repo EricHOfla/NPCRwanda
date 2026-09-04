@@ -100,7 +100,9 @@ interface CMSImageFieldProps {
   value: string;
   onChange: (url: string) => void;
   openMediaSelector: (callback: (url: string) => void) => void;
-  uploadMediaFile: (file: File) => Promise<MediaAsset>;
+  uploadMediaFile: (file: File, category?: string, entity?: string) => Promise<MediaAsset>;
+  category?: 'athletes' | 'news' | 'events' | 'partners' | 'leaders' | 'site' | string;
+  entity?: string;
 }
 
 const CMSImageField: React.FC<CMSImageFieldProps> = ({
@@ -109,6 +111,8 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
   onChange,
   openMediaSelector,
   uploadMediaFile,
+  category = 'site',
+  entity,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -118,7 +122,7 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
     if (!file) return;
     setUploading(true);
     try {
-      const asset = await uploadMediaFile(file);
+      const asset = await uploadMediaFile(file, category, entity);
       onChange(asset.url);
       alert('Image uploaded and selected successfully!');
     } catch (err: any) {
@@ -2834,7 +2838,15 @@ export default function DashboardPage() {
                               </select>
                             </div>
                             <div className="col-md-12">
-                              <CMSImageField label="Photo URL" value={leaderForm.avatar} onChange={(url) => setLeaderForm({ ...leaderForm, avatar: url })} openMediaSelector={openMediaSelector} uploadMediaFile={uploadMediaFile} />
+                              <CMSImageField 
+                                label="Photo URL" 
+                                value={leaderForm.avatar} 
+                                onChange={(url) => setLeaderForm({ ...leaderForm, avatar: url })} 
+                                openMediaSelector={openMediaSelector} 
+                                uploadMediaFile={uploadMediaFile} 
+                                category="leaders" 
+                                entity={leaderForm.name || 'leader'} 
+                              />
                             </div>
                             <div className="col-md-12">
                               <label className="form-label small fw-bold">Bio Description</label>
@@ -2938,8 +2950,15 @@ export default function DashboardPage() {
                               </select>
                             </div>
                             <div className="col-md-4">
-                              <label className="form-label small fw-bold">Avatar Filename</label>
-                              <input type="text" className="form-control" value={athleteForm.avatar} onChange={e => setAthleteForm({ ...athleteForm, avatar: e.target.value })} />
+                              <CMSImageField 
+                                label="Athlete Avatar / Photo" 
+                                value={athleteForm.avatar} 
+                                onChange={(url) => setAthleteForm({ ...athleteForm, avatar: url })} 
+                                openMediaSelector={openMediaSelector} 
+                                uploadMediaFile={uploadMediaFile} 
+                                category="athletes" 
+                                entity={athleteForm.name || 'athlete'} 
+                              />
                             </div>
                             <div className="col-md-12">
                               <label className="form-label small fw-bold">Description / Achievements</label>
@@ -3164,6 +3183,8 @@ export default function DashboardPage() {
                                 onChange={(url) => setNewsForm({ ...newsForm, img: url })}
                                 openMediaSelector={openMediaSelector}
                                 uploadMediaFile={uploadMediaFile}
+                                category="news"
+                                entity={newsForm.slug || newsForm.title || 'article'}
                               />
                             </div>
                             <div className="col-md-12">
@@ -3404,6 +3425,8 @@ export default function DashboardPage() {
                                 onChange={(url) => setEventForm({ ...eventForm, img: url })}
                                 openMediaSelector={openMediaSelector}
                                 uploadMediaFile={uploadMediaFile}
+                                category="events"
+                                entity={eventForm.title || 'event'}
                               />
                             </div>
                             <div className="col-md-6 d-flex align-items-center">
@@ -3897,6 +3920,8 @@ export default function DashboardPage() {
                               onChange={(url) => setPartnerForm({ ...partnerForm, logo: url })}
                               openMediaSelector={openMediaSelector}
                               uploadMediaFile={uploadMediaFile}
+                              category="partners"
+                              entity={partnerForm.name || 'partner'}
                             />
                           </div>
                           <div className="col-md-3">
@@ -4452,7 +4477,15 @@ export default function DashboardPage() {
                     <div className="col-md-6"><label className="form-label small fw-bold">Role</label><input type="text" className="form-control" required value={fedForm.role} onChange={e => setFedForm({ ...fedForm, role: e.target.value })} /></div>
                     <div className="col-md-6"><label className="form-label small fw-bold">Website</label><input type="text" className="form-control" value={fedForm.website} onChange={e => setFedForm({ ...fedForm, website: e.target.value })} /></div>
                     <div className="col-md-6">
-                       <CMSImageField label="Federation Logo" value={fedForm.logo} onChange={(url) => setFedForm({ ...fedForm, logo: url })} openMediaSelector={openMediaSelector} uploadMediaFile={uploadMediaFile} />
+                        <CMSImageField 
+                          label="Federation Logo" 
+                          value={fedForm.logo} 
+                          onChange={(url) => setFedForm({ ...fedForm, logo: url })} 
+                          openMediaSelector={openMediaSelector} 
+                          uploadMediaFile={uploadMediaFile} 
+                          category="partners"
+                          entity={fedForm.name || 'federation'}
+                        />
                     </div>
                     <div className="col-12"><label className="form-label small fw-bold">Description</label><textarea className="form-control" required value={fedForm.desc} onChange={e => setFedForm({ ...fedForm, desc: e.target.value })} rows={3}></textarea></div>
                     <div className="col-12"><button type="submit" className="btn btn-primary btn-sm px-4">Save Federation</button></div>
