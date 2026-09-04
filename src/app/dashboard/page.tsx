@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
+import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 import {
   useData,
   Athlete,
@@ -302,6 +303,7 @@ export default function DashboardPage() {
     volunteers,
     donations,
     partners,
+    siteContent,
     siteContentList,
     contactInfo,
     socialLinks,
@@ -546,7 +548,7 @@ export default function DashboardPage() {
   const [contentFormValue, setContentFormValue] = useState('');
 
   const [contentSubTab, setContentSubTab] = useState<'hero' | 'about' | 'stats' | 'advanced'>('hero');
-  const [siteForm, setSiteForm] = useState<Record<string, string>>({});
+  const [siteForm, setSiteForm] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
 
   // Inbox Modal Detail states
   const [activeMessage, setActiveMessage] = useState<ContactMessage | null>(null);
@@ -705,14 +707,21 @@ export default function DashboardPage() {
   }, [contactInfo]);
 
   useEffect(() => {
+    const initial: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
     if (siteContentList && siteContentList.length > 0) {
-      const initial: Record<string, string> = {};
       siteContentList.forEach(c => {
-        initial[c.key] = c.value;
+        if (c.value !== undefined && c.value !== null && c.value !== '') {
+          initial[c.key] = c.value;
+        }
       });
-      setSiteForm(initial);
     }
-  }, [siteContentList]);
+    if (siteContent && typeof siteContent === 'object') {
+      Object.keys(siteContent).forEach(k => {
+        if (siteContent[k]) initial[k] = siteContent[k];
+      });
+    }
+    setSiteForm(initial);
+  }, [siteContentList, siteContent]);
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -1045,15 +1054,23 @@ export default function DashboardPage() {
     setContentFormValue('');
   };
 
+  const [pageSaving, setPageSaving] = useState(false);
+
   const handleSectionSave = async (keys: string[]) => {
+    setPageSaving(true);
     try {
       await Promise.all(
-        keys.map(k => saveSiteContent(k, siteForm[k] || ''))
+        keys.map(k => {
+          const val = siteForm[k] !== undefined ? siteForm[k] : (DEFAULT_SITE_CONTENT[k] || '');
+          return saveSiteContent(k, val);
+        })
       );
-      alert('Section content saved to database successfully!');
+      alert('Page content saved to database successfully!');
     } catch (err) {
       console.error(err);
-      alert('Error updating some section values.');
+      alert('Error saving some content values. Please check your connection.');
+    } finally {
+      setPageSaving(false);
     }
   };
 
@@ -1936,9 +1953,10 @@ export default function DashboardPage() {
                             handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
                           }
                         }}
+                        disabled={pageSaving}
                         className="btn btn-sm btn-primary fw-semibold px-4"
                       >
-                        <i className="fas fa-save me-1" /> Save Page Content
+                        <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-1`} /> {pageSaving ? 'Saving...' : 'Save Page Content'}
                       </button>
                     )}
                   </div>
@@ -2100,6 +2118,49 @@ export default function DashboardPage() {
                             style={{ maxHeight: '180px', objectFit: 'cover' }}
                             alt="" 
                           />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeEditPage === 'npc-background' && (
+                    <div className="border rounded bg-white overflow-hidden shadow p-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                      <div className="text-center py-4 bg-light mb-4 rounded">
+                        <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
+                        <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
+                      </div>
+
+                      <div className="p-3 border rounded mb-4" style={{ background: '#f8fafc' }}>
+                        <h5 className="fw-bold text-dark mb-2">Governing Board & Management</h5>
+                        <p className="small text-muted mb-3">{siteForm['background.governingText'] || ''}</p>
+                        <h5 className="fw-bold text-dark mb-2">Theory of Change</h5>
+                        <p className="small text-muted mb-0">{siteForm['background.tocText'] || ''}</p>
+                      </div>
+
+                      <div className="row g-3 mb-4">
+                        <div className="col-md-6">
+                          <div className="p-3 border rounded h-100 bg-white shadow-sm border-success">
+                            <span className="badge bg-success mb-2">STRENGTHS</span>
+                            <pre className="small text-dark mb-0 font-monospace" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{siteForm['background.strengths'] || ''}</pre>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="p-3 border rounded h-100 bg-white shadow-sm border-warning">
+                            <span className="badge bg-warning text-dark mb-2">WEAKNESSES</span>
+                            <pre className="small text-dark mb-0 font-monospace" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{siteForm['background.weaknesses'] || ''}</pre>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="p-3 border rounded h-100 bg-white shadow-sm border-primary">
+                            <span className="badge bg-primary mb-2">OPPORTUNITIES</span>
+                            <pre className="small text-dark mb-0 font-monospace" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{siteForm['background.opportunities'] || ''}</pre>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="p-3 border rounded h-100 bg-white shadow-sm border-danger">
+                            <span className="badge bg-danger mb-2">THREATS</span>
+                            <pre className="small text-dark mb-0 font-monospace" style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{siteForm['background.threats'] || ''}</pre>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2614,6 +2675,22 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Bottom Save Action Bar */}
+                      <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
+                        <div>
+                          <span className="fw-bold text-dark d-block">Save Home Page Changes</span>
+                          <span className="small text-muted">All hero, statistics, impact snapshot, and about preview details will update live on the site.</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          disabled={pageSaving}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc'])}
+                          className="btn btn-primary fw-bold px-4 py-2"
+                        >
+                          <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -2712,6 +2789,22 @@ export default function DashboardPage() {
                           ))}
                         </div>
                       </div>
+
+                      {/* Bottom Save Action Bar */}
+                      <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
+                        <div>
+                          <span className="fw-bold text-dark d-block">Save About Us Changes</span>
+                          <span className="small text-muted">All vision, mission, history, core values, and strategic plan objectives will update live on the site.</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          disabled={pageSaving}
+                          onClick={() => handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth'])}
+                          className="btn btn-primary fw-bold px-4 py-2"
+                        >
+                          <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save About Us Content'}
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -2776,6 +2869,22 @@ export default function DashboardPage() {
                             <textarea className="form-control text-sm" rows={4} value={siteForm['background.pillar4'] || ''} onChange={e => setSiteForm({ ...siteForm, 'background.pillar4': e.target.value })} placeholder="Pillar 4 Objectives..." />
                           </div>
                         </div>
+                      </div>
+
+                      {/* Bottom Save Action Bar */}
+                      <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
+                        <div>
+                          <span className="fw-bold text-dark d-block">Save NPC Background Changes</span>
+                          <span className="small text-muted">All Theory of Change, SWOT analysis parameters, and 4 pillar objectives will update live on the site.</span>
+                        </div>
+                        <button 
+                          type="button" 
+                          disabled={pageSaving}
+                          onClick={() => handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4'])}
+                          className="btn btn-primary fw-bold px-4 py-2"
+                        >
+                          <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save NPC Background Content'}
+                        </button>
                       </div>
                     </div>
                   )}

@@ -13,13 +13,7 @@ const siteContentSchema = z.object({
 export async function GET() {
   try {
     const contents = await prisma.siteContent.findMany();
-    // Convert array to a simpler key-value object map as well
-    const map: Record<string, string> = {};
-    contents.forEach(c => {
-      map[c.key] = c.value;
-    });
-
-    return NextResponse.json({ list: contents, map });
+    return NextResponse.json(contents);
   } catch (error) {
     console.error('Fetch site content error:', error);
     return NextResponse.json({ error: 'Failed to fetch site content' }, { status: 500 });

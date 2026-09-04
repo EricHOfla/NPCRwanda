@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 
 // Type definitions matching Prisma schema
 export interface Athlete {
@@ -369,7 +370,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [governancePolicies, setGovernancePolicies] = useState<GovernancePolicy[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [siteContent, setSiteContent] = useState<Record<string, string>>({});
+  const [siteContent, setSiteContent] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
   const [siteContentList, setSiteContentList] = useState<SiteContent[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
@@ -434,14 +435,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setFederations(fedRes);
         setDpscoContacts(dpscoRes);
 
-        if (Array.isArray(contentRes)) {
-          setSiteContentList(contentRes);
-          const map: Record<string, string> = {};
-          contentRes.forEach((c: SiteContent) => {
+        const contentList: SiteContent[] = Array.isArray(contentRes)
+          ? contentRes
+          : Array.isArray(contentRes?.list)
+          ? contentRes.list
+          : [];
+        setSiteContentList(contentList);
+        const map: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
+        contentList.forEach((c: SiteContent) => {
+          if (c.value !== undefined && c.value !== null) {
             map[c.key] = c.value;
-          });
-          setSiteContent(map);
+          }
+        });
+        if (contentRes?.map && typeof contentRes.map === 'object') {
+          Object.assign(map, contentRes.map);
         }
+        setSiteContent(map);
       } catch (err) {
         console.error('Error fetching public data:', err);
       } finally {
