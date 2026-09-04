@@ -16,6 +16,11 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 15m
           script: |
+            set -e
             cd /var/www/NPCRwanda
-            /var/www/NPCRwanda/deploy.sh
+            git pull origin main
+            npm ci --omit=dev
+            npm run build
+            pm2 restart NPCRwanda || pm2 start npm --name NPCRwanda -- start
