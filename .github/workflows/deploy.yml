@@ -19,8 +19,3 @@ jobs:
           script: |
             cd /var/www/NPCRwanda
             /var/www/NPCRwanda/deploy.sh
-            npx prisma db push || true
-            if [ -f /var/www/NPCRwanda/scripts/one-time-seed.js ]; then
-              echo "Running one-time remote database seed..."
-              node scripts/one-time-seed.js
-            fi
