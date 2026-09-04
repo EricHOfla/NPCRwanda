@@ -526,9 +526,10 @@
                 .accessibility-menu {
                     position: fixed;
                     top: auto;
-                    bottom: 18px;
-                    left: 50%;
-                    transform: translateX(-50%);
+                    bottom: 20px;
+                    right: 16px;
+                    left: auto;
+                    transform: none;
                 }
             }
         `;

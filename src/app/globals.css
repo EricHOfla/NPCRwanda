@@ -1734,29 +1734,34 @@ footer {
 
 @media (max-width: 768px) {
     .accessibility-menu {
+        position: fixed;
         top: auto;
-        bottom: 24px;
-        right: 12px;
+        bottom: 20px;
+        right: 16px;
+        left: auto;
+        transform: none;
         flex-direction: column-reverse;
         align-items: flex-end;
+        z-index: 9999;
     }
 
     .accessibility-toggle {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
 
     .accessibility-panel {
         position: fixed;
-        left: 16px;
         right: 16px;
-        bottom: 84px;
+        left: auto;
+        bottom: 78px;
         top: auto;
-        width: auto;
-        max-width: 360px;
-        margin: 0 auto;
-        height: min(480px, calc(100dvh - 100px));
-        max-height: calc(100dvh - 100px);
+        width: min(340px, calc(100vw - 32px));
+        max-width: 340px;
+        margin: 0;
+        height: min(480px, calc(100dvh - 96px));
+        max-height: calc(100dvh - 96px);
         padding: 1.1rem;
         border-radius: 14px;
     }
@@ -1764,31 +1769,33 @@ footer {
 
 @media (max-width: 480px) {
     .accessibility-menu {
-        bottom: 18px;
-        right: 8px;
+        bottom: 16px;
+        right: 14px;
+        left: auto;
+        transform: none;
     }
 
     .accessibility-toggle {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 46px;
     }
 
     .accessibility-panel {
-        left: 8px;
-        right: 8px;
+        right: 12px;
+        left: auto;
         bottom: 70px;
-        width: auto;
-        max-width: calc(100vw - 16px);
+        width: min(320px, calc(100vw - 24px));
+        max-width: calc(100vw - 24px);
         height: min(460px, calc(100dvh - 84px));
         max-height: calc(100dvh - 84px);
         padding: 0.9rem;
     }
 
     .accessibility-actions button {
-        flex: 1 1 105px;
+        flex: 1 1 95px;
         font-size: 0.74rem !important;
         padding: 0.45rem 0.35rem !important;
-        min-height: 40px;
+        min-height: 38px;
     }
 }
 
@@ -2061,15 +2068,7 @@ body.accessibility-center-text {
     clip: rect(0, 0, 0, 0);
     border: 0;
 }
-@media (max-width: 768px) {
-    .accessibility-menu {
-        position: fixed;
-        top: auto;
-        bottom: 18px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-}
+
 
 /* ── Admin Dashboard Sidebar Scrollbar ── */
 .dashboard-sidebar-nav::-webkit-scrollbar {
