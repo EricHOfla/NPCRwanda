@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '../context/LanguageContext';
@@ -8,11 +8,33 @@ import { useTranslation } from '../context/LanguageContext';
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const { lang, setLang, t } = useTranslation();
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   useEffect(() => {
-    // Dynamic import of bootstrap JS on client side
+    // Dynamic import of bootstrap JS on client side for dropdowns
     import('bootstrap/dist/js/bootstrap.bundle.min.js');
   }, []);
+
+  // Automatically close mobile navbar whenever the route/pathname changes
+  useEffect(() => {
+    setIsNavOpen(false);
+  }, [pathname]);
+
+  const closeMobileMenu = () => {
+    setIsNavOpen(false);
+  };
+
+  const handleNavContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = (e.target as HTMLElement).closest('a, button');
+    // If it's a dropdown toggle button, let it expand/collapse its sub-menu on mobile
+    if (target && target.classList.contains('dropdown-toggle')) {
+      return;
+    }
+    // Any navigating link clicked closes the navbar immediately
+    if (target && (target.tagName === 'A' || target.classList.contains('dropdown-item') || target.classList.contains('nav-link') || target.classList.contains('btn'))) {
+      setIsNavOpen(false);
+    }
+  };
 
   const isActive = (href: string) => {
     if (href === '/' || href === '/index.html') {
@@ -76,10 +98,10 @@ export const Header: React.FC = () => {
                 </li>
               </ul>
             </div>
-            <Link href="/volunteer" className="topbar-link">
+            <Link href="/volunteer" className="topbar-link" onClick={closeMobileMenu}>
               {t('common.volunteer')}
             </Link>
-            <Link href="/donate" className="topbar-link">
+            <Link href="/donate" className="topbar-link" onClick={closeMobileMenu}>
               {t('common.donate')}
             </Link>
           </div>
@@ -89,7 +111,7 @@ export const Header: React.FC = () => {
       {/* Main Navbar */}
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-0" id="main-nav">
         <div className="container border-0">
-          <Link href="/" className="navbar-brand d-flex align-items-center">
+          <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <img
               src="/assets/img/logo.png"
               alt={t('phrase.NPC Rwanda Logo')}
@@ -107,23 +129,22 @@ export const Header: React.FC = () => {
           </Link>
 
           <button
-            className="navbar-toggler border-0"
+            className={`navbar-toggler border-0 ${!isNavOpen ? 'collapsed' : ''}`}
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
+            onClick={() => setIsNavOpen(prev => !prev)}
             aria-controls="navbarNav"
-            aria-expanded="false"
+            aria-expanded={isNavOpen}
             aria-label={t('phrase.Toggle navigation')}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          <div className="collapse navbar-collapse" id="navbarNav">
+          <div className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`} id="navbarNav" onClick={handleNavContainerClick}>
             <ul className="navbar-nav mx-auto">
 
               {/* Home */}
               <li className="nav-item">
-                <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+                <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.home')}
                 </Link>
               </li>
@@ -142,31 +163,31 @@ export const Header: React.FC = () => {
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
                   <li>
-                    <Link href="/about#history" className="dropdown-item">
+                    <Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-landmark me-2 text-primary opacity-75"></i>
                       {t('phrase.Our History') || 'Our History'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/about#vision-mission" className="dropdown-item">
+                    <Link href="/about#vision-mission" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-eye me-2 text-primary opacity-75"></i>
                       {t('phrase.Our Vision') || 'Vision & Mission'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/npc-background" className="dropdown-item">
+                    <Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-circle-info me-2 text-primary opacity-75"></i>
                       NPC Background & SWOT
                     </Link>
                   </li>
                   <li>
-                    <Link href="/leaders" className="dropdown-item">
+                    <Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-users me-2 text-primary opacity-75"></i>
                       {t('phrase.Our Leadership') || 'Our Leadership'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/about#core-values" className="dropdown-item">
+                    <Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-heart me-2 text-primary opacity-75"></i>
                       {t('phrase.Core Values') || 'Core Values'}
                     </Link>
@@ -176,14 +197,14 @@ export const Header: React.FC = () => {
 
               {/* Sports */}
               <li className="nav-item">
-                <Link href="/sports" className={`nav-link ${isActive('/sports') ? 'active' : ''}`}>
+                <Link href="/sports" className={`nav-link ${isActive('/sports') ? 'active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.sports')}
                 </Link>
               </li>
 
               {/* Athletes */}
               <li className="nav-item">
-                <Link href="/athletes" className={`nav-link ${isActive('/athletes') ? 'active' : ''}`}>
+                <Link href="/athletes" className={`nav-link ${isActive('/athletes') ? 'active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.athletes')}
                 </Link>
               </li>
@@ -202,19 +223,19 @@ export const Header: React.FC = () => {
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="governanceMenu">
                   <li>
-                    <Link href="/governance" className="dropdown-item">
+                    <Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-shield-alt me-2 text-primary opacity-75"></i>
                       {t('phrase.Governance & Transparency') || 'Governance & Transparency'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/leaders" className="dropdown-item">
+                    <Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-users me-2 text-primary opacity-75"></i>
                       {t('phrase.Our Leadership') || 'Leaders'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/system" className="dropdown-item">
+                    <Link href="/system" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-sitemap me-2 text-primary opacity-75"></i>
                       {t('system.page_title') || 'System Directory'}
                     </Link>
@@ -236,25 +257,25 @@ export const Header: React.FC = () => {
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="membersMenu">
                   <li>
-                    <Link href="/partners" className="dropdown-item">
+                    <Link href="/partners" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-handshake me-2 text-primary opacity-75"></i>
                       {t('nav.partners') || 'Partners'}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/members/associations" className="dropdown-item">
+                    <Link href="/members/associations" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-users me-2 text-primary opacity-75"></i>
                       NPC Associations
                     </Link>
                   </li>
                   <li>
-                    <Link href="/members/federations" className="dropdown-item">
+                    <Link href="/members/federations" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-medal me-2 text-primary opacity-75"></i>
                       NPC Federations
                     </Link>
                   </li>
                   <li>
-                    <Link href="/members/dpsco" className="dropdown-item">
+                    <Link href="/members/dpsco" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-map-marker-alt me-2 text-primary opacity-75"></i>
                       DPSCO Contacts
                     </Link>
@@ -276,32 +297,32 @@ export const Header: React.FC = () => {
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="publicationsMenu">
                   <li>
-                    <Link href="/announcements" className="dropdown-item">
+                    <Link href="/announcements" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-bullhorn me-2 text-primary opacity-75"></i>
                       Announcements
                     </Link>
                   </li>
                   <li>
-                    <Link href="/news" className="dropdown-item">
+                    <Link href="/news" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-newspaper me-2 text-primary opacity-75"></i>
                       {t('nav.news')}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/events" className="dropdown-item">
+                    <Link href="/events" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-calendar-alt me-2 text-primary opacity-75"></i>
                       {t('nav.events')}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/resources" className="dropdown-item">
+                    <Link href="/resources" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-folder-open me-2 text-primary opacity-75"></i>
                       Resources & Files
                     </Link>
                   </li>
                   <li><hr className="dropdown-divider" /></li>
                   <li>
-                    <Link href="/careers" className="dropdown-item">
+                    <Link href="/careers" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-briefcase me-2 text-primary opacity-75"></i>
                       Careers & Positions
                     </Link>
@@ -311,14 +332,14 @@ export const Header: React.FC = () => {
 
               {/* Contact */}
               <li className="nav-item">
-                <Link href="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`}>
+                <Link href="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.contact')}
                 </Link>
               </li>
 
             </ul>
             <div className="nav-buttons d-flex align-items-center gap-2">
-              <Link href="/login" className="btn btn-login-nav btn-sm px-3 fw-bold">
+              <Link href="/login" className="btn btn-login-nav btn-sm px-3 fw-bold" onClick={closeMobileMenu}>
                 <i className="fas fa-lock me-1"></i> Login
               </Link>
             </div>
