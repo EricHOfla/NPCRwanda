@@ -21,10 +21,11 @@ jobs:
             set -e
             cd /var/www/NPCRwanda
             git pull origin main
-            npm ci
+            npm install
             npx prisma generate
             npm run build
-            chmod 755 /var/www /var/www/NPCRwanda || true
+            chmod 755 /var /var/www || true
+            chmod -R a+rX /var/www/NPCRwanda || true
             chmod -R 777 /var/www/NPCRwanda/.next /var/www/NPCRwanda/public || true
             pm2 delete NPCRwanda || true
             pm2 start ecosystem.config.js
