@@ -911,7 +911,7 @@ export default function DashboardPage() {
   const handleCareerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const slugValue = careerForm.slug || careerForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    await addCareer({ ...careerForm, slug: slugValue });
+    await addCareer({ ...careerForm, slug: slugValue, applicants: 0 });
     setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '' });
     setCareerFormOpen(false);
   };
