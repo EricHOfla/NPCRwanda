@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -14,19 +15,27 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save folder path
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadDir, { recursive: true });
+    let fileUrl: string;
 
-    // Generate unique name to prevent collisions
-    const timestamp = Date.now();
-    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const uniqueFilename = `${timestamp}_${sanitizedFilename}`;
-    const filePath = path.join(uploadDir, uniqueFilename);
+    // Try Cloudinary upload first
+    try {
+      const cloudinaryResult = await uploadToCloudinary(buffer, 'npcrwanda');
+      fileUrl = cloudinaryResult.url;
+    } catch (cloudErr) {
+      console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr);
 
-    await fs.writeFile(filePath, buffer);
+      // Fallback to local storage if Cloudinary fails
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      await fs.mkdir(uploadDir, { recursive: true });
 
-    const fileUrl = `/uploads/${uniqueFilename}`;
+      const timestamp = Date.now();
+      const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const uniqueFilename = `${timestamp}_${sanitizedFilename}`;
+      const filePath = path.join(uploadDir, uniqueFilename);
+
+      await fs.writeFile(filePath, buffer);
+      fileUrl = `/uploads/${uniqueFilename}`;
+    }
 
     // Save record to DB
     const media = await prisma.mediaAsset.create({
@@ -34,7 +43,7 @@ export async function POST(request: Request) {
         filename: file.name,
         url: fileUrl,
         fileSize: buffer.length,
-        mimeType: file.type,
+        mimeType: file.type || 'application/octet-stream',
       },
     });
 
