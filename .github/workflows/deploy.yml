@@ -25,8 +25,8 @@ jobs:
             npx prisma generate
             npm run build
             chmod 755 /var/www /var/www/NPCRwanda || true
-            chmod -R 755 /var/www/NPCRwanda/.next /var/www/NPCRwanda/public || true
+            chmod -R 777 /var/www/NPCRwanda/.next /var/www/NPCRwanda/public || true
             pm2 delete NPCRwanda || true
-            pm2 start npm --name NPCRwanda -- start
+            pm2 start ecosystem.config.js
             pm2 save || true
             systemctl reload nginx || nginx -s reload || true
