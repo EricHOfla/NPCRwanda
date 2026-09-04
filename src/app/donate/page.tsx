@@ -45,31 +45,26 @@ export default function DonatePage() {
   return (
     <main id="main-content">
       {/* Page Header */}
-      <header
-        className="py-5 text-white bg-contain"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(15, 37, 63, 0.9), rgba(0, 114, 198, 0.85)), url('/assets/img/curated/about-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-4">
-          <h1 className="text-white mb-2" data-aos="fade-up">
-            {t('common.donate') || 'Donate'}
-          </h1>
-          <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="100">
-            <ol className="breadcrumb mb-0">
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
               <li className="breadcrumb-item">
-                <Link href="/" className="text-white text-decoration-none">
-                  {t('nav.home')}
+                <Link href="/">
+                  Home
                 </Link>
               </li>
-              <li className="breadcrumb-item active text-white opacity-75" aria-current="page">
+              <li className="breadcrumb-item active" aria-current="page">
                 {t('common.donate')}
               </li>
             </ol>
           </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">
+            {t('common.donate') || 'Donate'}
+          </h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Support para-athletes and expand inclusive sports opportunities across Rwanda.
+          </p>
         </div>
       </header>
 

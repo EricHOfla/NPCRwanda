@@ -55,29 +55,27 @@ export default function EventsPage() {
   return (
     <main id="main-content">
       {/* Hero */}
-      <header
-        className="py-5 text-white"
-        style={{
-          background: "linear-gradient(rgba(229,57,53,0.72), rgba(0,114,198,0.75), rgba(76,175,80,0.7)), url('/assets/img/curated/sports-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-4">
-          <span className="badge text-uppercase fw-bold mb-3" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', letterSpacing: '1px', fontSize: '0.75rem' }}>
-            <i className="fas fa-calendar-alt me-2"></i>Events Calendar
-          </span>
-          <h1 className="text-white mb-2" data-aos="fade-up">Events &amp; Competitions</h1>
-          <p className="text-white opacity-75 mb-3" data-aos="fade-up" data-aos-delay="100" style={{ maxWidth: '560px' }}>
-            Stay up to date with NPC Rwanda national, regional, and international sports events, training camps, and conferences.
-          </p>
-          <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="150">
-            <ol className="breadcrumb mb-0">
-              <li className="breadcrumb-item"><Link href="/" className="text-white text-decoration-none">{t('nav.home')}</Link></li>
-              <li className="breadcrumb-item"><Link href="/news" className="text-white text-decoration-none">{t('nav.news')}</Link></li>
-              <li className="breadcrumb-item active text-white opacity-75" aria-current="page">Events</li>
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item">
+                <Link href="/news">
+                  {t('nav.news')}
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Events</li>
             </ol>
           </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">Events &amp; Competitions</h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Stay up to date with NPC Rwanda national, regional, and international sports events, training camps, and conferences.
+          </p>
         </div>
       </header>
 

@@ -33,15 +33,22 @@ export default function SportsPage() {
 
   return (
     <main id="main-content">
-      <header className="py-5 text-white bg-contain" style={{ backgroundImage: "url('/assets/img/curated/sports-hero.jpg')" }}>
+      <header className="page-header">
         <div className="container">
-          <h1 className="text-white" data-aos="fade-up">{t('phrase.Our Sports Programs')}</h1>
-          <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="100">
-            <ol className="breadcrumb mb-0">
-              <li className="breadcrumb-item"><Link href="/" className="text-white text-decoration-none">{t('nav.home')}</Link></li>
-              <li className="breadcrumb-item active text-white opacity-75" aria-current="page">{t('phrase.Sports')}</li>
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/" className="text-decoration-none">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">{t('phrase.Sports')}</li>
             </ol>
           </nav>
+          <h1 className="text-white mb-2" data-aos="fade-up" data-aos-delay="50">{t('phrase.Our Sports Programs')}</h1>
+          <p className="lead" data-aos="fade-up" data-aos-delay="100">
+            Explore the diverse para-sports disciplines we manage and support across Rwanda.
+          </p>
         </div>
       </header>
 

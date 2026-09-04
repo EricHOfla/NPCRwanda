@@ -42,31 +42,26 @@ export default function GovernancePage() {
   return (
     <main id="main-content">
       {/* Page Header */}
-      <header
-        className="py-5 text-white bg-contain"
-        style={{
-          background:
-            "linear-gradient(rgba(229,57,53,0.72), rgba(0,114,198,0.75), rgba(76,175,80,0.7)), url('/assets/img/curated/governance-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-4">
-          <h1 className="text-white mb-2" data-aos="fade-up">
-            {t('phrase.Governance & Transparency')}
-          </h1>
-          <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="100">
-            <ol className="breadcrumb mb-0">
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
               <li className="breadcrumb-item">
-                <Link href="/" className="text-white text-decoration-none">
-                  {t('nav.home')}
+                <Link href="/">
+                  Home
                 </Link>
               </li>
-              <li className="breadcrumb-item active text-white opacity-75" aria-current="page">
+              <li className="breadcrumb-item active" aria-current="page">
                 {t('phrase.Governance')}
               </li>
             </ol>
           </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">
+            {t('phrase.Governance & Transparency')}
+          </h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Our commitment to accountability, integrity, and ethical leadership in Paralympic sports.
+          </p>
         </div>
       </header>
 

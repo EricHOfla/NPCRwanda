@@ -52,36 +52,24 @@ export default function LeadersPage() {
 
   return (
     <main id="main-content">
-      <header
-        className="py-5 text-white bg-contain"
-        style={{
-          background:
-            "linear-gradient(rgba(11,99,182,0.78), rgba(46,158,87,0.72)), url('/assets/img/curated/governance-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-4">
-          <span className="badge text-uppercase fw-bold mb-3" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', letterSpacing: '1px', fontSize: '0.75rem' }}>
-            <i className="fas fa-users me-2" aria-hidden="true"></i>Leadership
-          </span>
-          <h1 className="text-white mb-2" data-aos="fade-up">{t('phrase.Our Leadership')}</h1>
-          <p className="text-white opacity-75 mb-3" style={{ maxWidth: '620px' }}>
-            Meet the leaders guiding NPC Rwanda governance, athlete development, and institutional strategy.
-          </p>
-          <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="100">
-            <ol className="breadcrumb mb-0">
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
               <li className="breadcrumb-item">
-                <Link href="/" className="text-white text-decoration-none">{t('nav.home')}</Link>
+                <Link href="/">
+                  Home
+                </Link>
               </li>
-              <li className="breadcrumb-item">
-                <Link href="/governance" className="text-white text-decoration-none">{t('nav.governance')}</Link>
-              </li>
-              <li className="breadcrumb-item active text-white opacity-75" aria-current="page">
+              <li className="breadcrumb-item active" aria-current="page">
                 {t('phrase.Our Leadership')}
               </li>
             </ol>
           </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">{t('phrase.Our Leadership')}</h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Meet the leaders guiding NPC Rwanda governance, athlete development, and institutional strategy.
+          </p>
         </div>
       </header>
 

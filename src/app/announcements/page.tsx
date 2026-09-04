@@ -36,21 +36,21 @@ export default function AnnouncementsPage() {
   return (
     <main id="main-content">
       {/* Hero */}
-      <header
-        className="py-5 text-white"
-        style={{
-          background: "linear-gradient(rgba(10,30,80,0.72), rgba(0,114,198,0.65)), url('/assets/img/curated/news-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-3">
-          <span className="badge text-uppercase fw-bold mb-3" style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', letterSpacing: '1px', fontSize: '0.75rem' }}>
-            <i className="fas fa-bullhorn me-2"></i>Announcements
-          </span>
-          <h1 className="text-white mb-2" data-aos="fade-up">Latest Announcements & Updates</h1>
-          <p className="text-white opacity-75 mb-3" data-aos="fade-up" data-aos-delay="100" style={{ maxWidth: '520px' }}>
-            Stay informed with the latest announcements, notices, and important updates from NPC Rwanda.
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Announcements</li>
+            </ol>
+          </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">Latest Announcements &amp; Updates</h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Stay informed with official announcements, notices, and important updates from NPC Rwanda.
           </p>
         </div>
       </header>

@@ -606,17 +606,103 @@ img {
 .page-header,
 header.py-5 {
     position: relative;
-    overflow: hidden;
+    background: #F8FAFC !important;
+    padding: 3.25rem 0 2.75rem !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.page-header::before,
+header.py-5::before,
+.page-header::after,
+header.py-5::after {
+    display: none !important;
+}
+
+.page-header .container,
+header.py-5 .container {
+    position: relative;
+    z-index: 1;
 }
 
 .page-header h1,
-header.py-5 h1 {
-    font-size: 2.8rem;
-    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+header.py-5 h1,
+.page-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: #0F223D !important;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0.35rem 0 0.5rem;
+    text-shadow: none !important;
+    -webkit-text-fill-color: initial !important;
+    background: none !important;
 }
 
-.breadcrumb-item+.breadcrumb-item::before {
-    color: rgba(255, 255, 255, 0.6) !important;
+.page-header p.lead,
+header.py-5 p.opacity-75,
+header.py-5 p.lead,
+.page-subtitle {
+    color: #475569 !important;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 620px;
+    margin-top: 0.35rem;
+    margin-bottom: 0;
+    text-shadow: none !important;
+}
+
+/* ── Clean Unified Breadcrumbs ── */
+header.py-5 .breadcrumb,
+.page-header .breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+    margin: 0 0 0.4rem;
+    border: none;
+    box-shadow: none;
+    list-style: none;
+}
+
+header.py-5 .breadcrumb-item,
+.page-header .breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+header.py-5 .breadcrumb-item a,
+.page-header .breadcrumb-item a {
+    color: #64748B !important;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+header.py-5 .breadcrumb-item a:hover,
+.page-header .breadcrumb-item a:hover {
+    color: #0072C6 !important;
+    text-decoration: none;
+}
+
+header.py-5 .breadcrumb-item+.breadcrumb-item::before,
+.page-header .breadcrumb-item+.breadcrumb-item::before {
+    content: "/" !important;
+    color: #CBD5E1 !important;
+    font-size: 0.78rem;
+    line-height: 1;
+    padding: 0 8px;
+    font-weight: 400;
+}
+
+header.py-5 .breadcrumb-item.active,
+.page-header .breadcrumb-item.active {
+    color: #0072C6 !important;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 1 !important;
 }
 
 /* ──────────────────────────────

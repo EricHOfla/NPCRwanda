@@ -112,20 +112,22 @@ export default function NpcBackgroundPage() {
   return (
     <main id="main-content" style={{ background: '#FAFBFD' }}>
       {/* Page Header */}
-      <header
-        className="py-5 text-white"
-        style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-        <div className="container py-4 text-center">
-          <span className="badge bg-primary text-white text-uppercase fw-bold mb-3 px-3 py-2" style={{ letterSpacing: '1px' }}>
-            Governance & Strategy
-          </span>
-          <h1 className="text-white fw-bold mb-2">NPC Background & Objectives</h1>
-          <p className="text-white opacity-75 mx-auto mb-0" style={{ maxWidth: '680px' }}>
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                NPC Background
+              </li>
+            </ol>
+          </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">NPC Background &amp; Objectives</h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
             Explore the historical background, strategic plan pillars, swot analysis, and structures guiding the Paralympic Movement in Rwanda.
           </p>
         </div>

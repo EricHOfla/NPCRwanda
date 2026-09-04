@@ -68,21 +68,25 @@ export default function DpscoContactsPage() {
   return (
     <main id="main-content">
       {/* Page Header */}
-      <header
-        className="py-5 text-white"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(15, 37, 63, 0.95), rgba(0, 114, 198, 0.9)), url('/assets/img/curated/governance-hero.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="container py-4 text-center text-md-start">
-          <h1 className="text-white mb-2" data-aos="fade-up">
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                DPSCO
+              </li>
+            </ol>
+          </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">
             DPSCO Contacts
           </h1>
-          <p className="lead mb-0 text-white opacity-75" data-aos="fade-up" data-aos-delay="100">
-            District Paralympic Sport Committees across the 30 districts of Rwanda.
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
+            District Paralympic Sport Committees across all 30 districts of Rwanda.
           </p>
         </div>
       </header>

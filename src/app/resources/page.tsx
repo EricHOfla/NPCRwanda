@@ -40,20 +40,20 @@ export default function ResourcesPage() {
   return (
     <main id="main-content" style={{ background: '#FAFBFD' }}>
       {/* Page Header */}
-      <header
-        className="py-5 text-white"
-        style={{
-          background: 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-        <div className="container py-4 text-center">
-          <span className="badge bg-white text-primary text-uppercase fw-bold mb-3 px-3 py-2" style={{ letterSpacing: '1px' }}>
-            Publications & Files
-          </span>
-          <h1 className="text-white fw-bold mb-2">Publications & Resources</h1>
-          <p className="text-white opacity-75 mx-auto mb-0" style={{ maxWidth: '640px' }}>
+      <header className="page-header">
+        <div className="container">
+          <nav aria-label="breadcrumb" data-aos="fade-up">
+            <ol className="breadcrumb mb-2">
+              <li className="breadcrumb-item">
+                <Link href="/">
+                  Home
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Resources</li>
+            </ol>
+          </nav>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">Publications &amp; Resources</h1>
+          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
             Browse and download official statutes, policy manuals, strategic reports, and resources published by NPC Rwanda.
           </p>
         </div>
