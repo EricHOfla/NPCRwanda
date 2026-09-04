@@ -5,10 +5,10 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: npc_rwanda_db
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -16,23 +16,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: npc_rwanda_web
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: "postgresql://postgres:postgres_password@db:5432/npc_rwanda_db?schema=public"
-      JWT_SECRET: "npc_rwanda_super_secret_jwt_key_2026_remera"
-      PORT: 3000
-    depends_on:
-      db:
-        condition: service_healthy
 
 volumes:
   postgres_data:
