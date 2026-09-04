@@ -18,3 +18,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             /var/www/NPCRwanda/deploy.sh
+            if [ -f /var/www/NPCRwanda/scripts/one-time-seed.js ]; then
+              echo "Running one-time remote database seed..."
+              cd /var/www/NPCRwanda && node scripts/one-time-seed.js || true
+            fi
