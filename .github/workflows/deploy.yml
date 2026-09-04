@@ -1,4 +1,4 @@
-```yaml
+
 name: Deploy NPCRwanda
 
 on:
@@ -50,4 +50,4 @@ jobs:
             systemctl reload nginx
 
             echo "✅ Deployment completed successfully!"
-```
+
