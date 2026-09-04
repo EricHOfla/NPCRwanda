@@ -1,28 +1,37 @@
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
-const { PrismaClient, Role } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { Role } from '@prisma/client';
 
-const prisma = new PrismaClient();
+export async function GET(request: Request) {
+  return handleSeed(request);
+}
 
-async function runOneTimeSeed() {
-  console.log('--- Checking Remote Database for Initial Seed ---');
+export async function POST(request: Request) {
+  return handleSeed(request);
+}
 
+async function handleSeed(request: Request) {
   try {
-    const existingUsers = await prisma.user.count();
-    const isForced = process.env.FORCE_SEED === 'true';
+    const { searchParams } = new URL(request.url);
+    const force = searchParams.get('force') === 'true';
 
-    if (existingUsers > 0 && !isForced) {
-      console.log('Remote database already contains data. Skipping seed to protect live data.');
-      cleanupSelf();
-      return;
+    const existingUsers = await prisma.user.count();
+    const existingAthletes = await prisma.athlete.count();
+
+    if ((existingUsers > 0 || existingAthletes > 0) && !force) {
+      return NextResponse.json({
+        status: 'already_seeded',
+        message: 'Database already has data. Pass ?force=true if you wish to overwrite.',
+        counts: {
+          users: existingUsers,
+          athletes: existingAthletes,
+        },
+      });
     }
 
-    console.log('Remote database is empty. Starting one-time seed...');
-
-    // 1. Clean existing records if forced
-    if (isForced) {
+    // 1. If force is requested, clean up
+    if (force) {
       await prisma.user.deleteMany({});
       await prisma.athlete.deleteMany({});
       await prisma.newsArticle.deleteMany({});
@@ -68,7 +77,6 @@ async function runOneTimeSeed() {
         role: Role.EDITOR,
       },
     });
-    console.log('✓ Users created');
 
     // 3. Athletes
     const athletes = [
@@ -83,12 +91,9 @@ async function runOneTimeSeed() {
       { name: 'Therese Habimana', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: '/assets/img/avatars/habimana-t.jpg', desc: 'Defensive specialist for women sitting volleyball. Known for net coverage and strategic positioning.' },
       { name: 'David Munyankindi', sport: 'Goalball', status: 'Active', country: 'Rwanda', avatar: '/assets/img/avatars/munyankindi-d.jpg', desc: 'Men goalball captain with 8+ years of competitive experience. Leading national male goalball program.' },
     ];
-    for (const athlete of athletes) {
-      await prisma.athlete.create({ data: athlete });
-    }
-    console.log('✓ Athletes created');
+    for (const a of athletes) await prisma.athlete.create({ data: a });
 
-    // 4. News Articles
+    // 4. News
     const news = [
       { 
         title: 'Goalball Championship: Elevating Visibility and Support', 
@@ -181,10 +186,7 @@ async function runOneTimeSeed() {
         slug: 'gold-certification' 
       },
     ];
-    for (const article of news) {
-      await prisma.newsArticle.create({ data: article });
-    }
-    console.log('✓ News articles created');
+    for (const n of news) await prisma.newsArticle.create({ data: n });
 
     // 5. Careers
     const careers = [
@@ -199,34 +201,9 @@ async function runOneTimeSeed() {
       { title: 'Classification Assistant', location: 'Kigali', applicants: 3, status: 'Open', desc: 'Support international classification panel. Assist in athlete classification assessments. Requires sports science background and IPC training certification.', slug: 'classification-assistant' },
       { title: 'Groundskeeper - Training Facilities', location: 'Kigali', applicants: 7, status: 'Open', desc: 'Maintain and manage NPC Rwanda training facilities. Ensure equipment is in optimal condition and facilities are accessible to all athletes.', slug: 'groundskeeper' },
     ];
-    for (const career of careers) {
-      await prisma.career.create({ data: career });
-    }
-    console.log('✓ Careers created');
+    for (const c of careers) await prisma.career.create({ data: c });
 
-    // 6. Contact Messages, Volunteers, Donations
-    const contacts = [
-      { name: 'Alain Bizimungu', email: 'alain@minisports.gov.rw', subject: 'Ministry Sponsorship Inquiry', message: 'Hello, we would like to discuss possible government funding for the 2026 Paralympic Games preparation program. Can we schedule a meeting?', date: 'Jul 2026', read: false },
-      { name: 'Marie Uwase', email: 'marie.uwase@gmail.com', subject: 'Volunteer Application', message: 'Hi there, I am a physiotherapist student wishing to volunteer in the athlete support clinics during the upcoming national championship.', date: 'Jul 2026', read: true },
-      { name: 'Robert Niyonsenga', email: 'robert@rwandatv.rw', subject: 'Media Partnership Request', message: 'Dear NPC team, we represent Rwanda TV wishing to provide live coverage of the sitting volleyball championship next month.', date: 'Jun 2026', read: false },
-      { name: 'Juliana Habimana', email: 'juliana@businessrwanda.com', subject: 'Corporate Sponsorship Proposal', message: 'Greetings, our company is interested in sponsoring the para-athletics development program. What are the partnership opportunities?', date: 'Jun 2026', read: true },
-    ];
-    for (const c of contacts) await prisma.contactMessage.create({ data: c });
-
-    const volunteersList = [
-      { name: 'Marie Uwase', email: 'marie.uwase@gmail.com', interest: 'Medical & Rehabilitation', skills: 'Physiotherapy student, First Aid certified', details: 'I would like to volunteer in athlete support clinics during national events.', read: false },
-      { name: 'Jean Paul Habineza', email: 'jp.habineza@yahoo.fr', interest: 'Event Coordination', skills: 'Event logistics, IT support, Bilingual (FR/EN)', details: 'Eager to assist with organizing regional tournaments and athlete registration.', read: true },
-    ];
-    for (const v of volunteersList) await prisma.volunteerApplication.create({ data: v });
-
-    const donationsList = [
-      { name: 'Juliana Habimana', email: 'juliana@businessrwanda.com', category: 'Corporate Sponsorship', supportType: 'Financial Grant', details: 'Interested in sponsoring the Para Athletics national development program with annual grant.', read: false },
-      { name: 'Kigali Sports Supplies Ltd', email: 'info@kigalisports.rw', category: 'Equipment Partner', supportType: 'Equipment Donation', details: 'We wish to donate 10 specialized wheelchairs and sitting volleyball gear for district clubs.', read: true },
-    ];
-    for (const d of donationsList) await prisma.donationInquiry.create({ data: d });
-    console.log('✓ Inquiries & messages created');
-
-    // 7. Sports Disciplines
+    // 6. Sports Disciplines
     const sports = [
       { slug: 'sitting-volleyball', title: 'Sitting Volleyball', img: 'https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=800&h=450&fit=crop', desc: "Rwanda's flagship discipline with strong continental and international performances. Both men's and women's teams competing at elite levels." },
       { slug: 'wheelchair-basketball', title: 'Wheelchair Basketball', img: 'https://images.unsplash.com/photo-1546519638-68711109d298?w=800&h=450&fit=crop', desc: 'A fast, tactical team sport building resilience and high-performance skills. Growing league with multiple district teams.' },
@@ -237,10 +214,9 @@ async function runOneTimeSeed() {
       { slug: 'powerlifting', title: 'Para Powerlifting', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=450&fit=crop', desc: 'Competitive strength sport with athletes from across disability categories. District championships developing talent pipeline.' },
       { slug: 'swimming', title: 'Para Swimming', img: 'https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?w=800&h=450&fit=crop', desc: 'Swimming for athletes with physical and visual impairments. Pool access expanding in major regions.' },
     ];
-    for (const sport of sports) await prisma.sportDiscipline.create({ data: sport });
-    console.log('✓ Sports disciplines created');
+    for (const s of sports) await prisma.sportDiscipline.create({ data: s });
 
-    // 8. Leadership
+    // 7. Leadership
     const leadership = [
       { avatar: 'avatar-4.svg', name: 'MUREMA Jean Baptiste', role: 'Chairperson', desc: 'Leads the NPC Governing Board with physical impairment representation. Oversees general sports strategy and representation.', committee: 'Board of Directors', impairment: 'Physical' },
       { avatar: 'avatar-4.svg', name: 'Esperance Kanyange', role: '1st Vice-Chairperson', desc: 'First Vice-Chairperson in charge of Competition and Sports Development. Guides athletic programming.', committee: 'Board of Directors', impairment: 'Physical' },
@@ -266,49 +242,16 @@ async function runOneTimeSeed() {
       { avatar: 'avatar-4.svg', name: 'Francoise UWINKUNDA', role: 'Accountant Assistant', desc: 'Assists with payroll tracking, receipt indexing, and office expense reports.', committee: 'Staff Team', email: 'uwifanny@npcrwanda.org', phone: '+250784828986' },
       { avatar: 'avatar-4.svg', name: 'Joy MIREMBE', role: 'Receptionist & Interpreter', desc: 'Handles front desk communications, general inquiries, and sign/verbal language translation.', committee: 'Staff Team', email: 'mirejo@npcrwanda.org', phone: '+250789285370' },
     ];
-    for (const leader of leadership) await prisma.leader.create({ data: leader });
-    console.log('✓ Leadership created');
+    for (const l of leadership) await prisma.leader.create({ data: l });
 
-    // 9. System Components & Settings
-    const systemComponents = [
-      { title: 'system.npc_background', desc: 'system.npc_background_desc' },
-      { title: 'system.board_members', desc: 'system.board_members_desc' },
-      { title: 'system.audit_committees', desc: 'system.audit_committees_desc' },
-      { title: 'system.conflict_resolution_committees', desc: 'system.conflict_resolution_committees_desc' },
-      { title: 'system.schedule_plan', desc: 'system.schedule_plan_desc' },
-      { title: 'system.publication', desc: 'system.publication_desc' },
-      { title: 'system.sports', desc: 'system.sports_desc' },
-      { title: 'system.npc_federations', desc: 'system.npc_federations_desc' },
-      { title: 'system.events', desc: 'system.events_desc' },
-      { title: 'system.dpsco_contacts', desc: 'system.dpsco_contacts_desc' },
-      { title: 'system.npc_associations', desc: 'system.npc_associations_desc' },
-      { title: 'system.resources', desc: 'system.resources_desc' },
-      { title: 'system.social_media', desc: 'system.social_media_desc' },
-      { title: 'system.staff', desc: 'system.staff_desc' },
-    ];
-    for (const comp of systemComponents) await prisma.systemComponent.create({ data: comp });
-
-    const settings = [
-      { key: 'siteName', value: 'National Paralympic Committee of Rwanda' },
-      { key: 'contactEmail', value: 'info@npcrwanda.org' },
-      { key: 'contactPhone', value: '+250 788 123 456' },
-      { key: 'address', value: 'Amahoro Stadium, Remera, Kigali, Rwanda' },
-      { key: 'facebook', value: 'https://facebook.com/npcrwanda' },
-      { key: 'twitter', value: 'https://twitter.com/npcrwanda' },
-      { key: 'instagram', value: 'https://instagram.com/npcrwanda' },
-      { key: 'logo', value: '/assets/img/logo.png' },
-      { key: 'favicon', value: '/assets/img/favicon.ico' },
-    ];
-    for (const setting of settings) await prisma.systemSetting.create({ data: setting });
-
-    // 10. Governance
+    // 8. Governance & Policies
     const govDocs = [
       { title: 'NPC Rwanda Constitution', desc: 'Foundational governance and operational mandate.', fileUrl: '#', order: 1 },
       { title: 'Strategic Plan 2024-2028', desc: 'Long-term priorities, targets, and delivery roadmap.', fileUrl: '#', order: 2 },
       { title: 'Annual Report 2023', desc: 'Review of programs, outcomes, and impact.', fileUrl: '#', order: 3 },
       { title: 'Financial Audit 2023', desc: 'Independent financial reporting and assurance.', fileUrl: '#', order: 4 },
     ];
-    for (const doc of govDocs) await prisma.governanceDocument.create({ data: doc });
+    for (const d of govDocs) await prisma.governanceDocument.create({ data: d });
 
     const govPolicies = [
       { title: 'Safeguarding Policy', desc: 'Safeguarding standards for athletes, coaches, and staff.', fileUrl: '#', order: 1 },
@@ -316,10 +259,9 @@ async function runOneTimeSeed() {
       { title: 'Selection Criteria', desc: 'Clear criteria for national team selection.', fileUrl: '#', order: 3 },
       { title: 'Classification Rules', desc: 'Classification standards for fair competition.', fileUrl: '#', order: 4 },
     ];
-    for (const policy of govPolicies) await prisma.governancePolicy.create({ data: policy });
-    console.log('✓ Governance docs and policies created');
+    for (const p of govPolicies) await prisma.governancePolicy.create({ data: p });
 
-    // 11. Partners
+    // 9. Partners
     const partners = [
       { name: 'Ministry of Sports', logo: 'https://npcrwanda.org/wp-content/uploads/2024/12/Coat_of_arms_of_Rwanda.svg', website: 'https://www.minisports.gov.rw/', category: 'Government Sector', order: 1, active: true },
       { name: 'Special Guarantee Fund', logo: 'https://npcrwanda.org/wp-content/uploads/2025/01/special-guarantee-fund-1.svg', website: 'https://www.ikigega.rw', category: 'Government Sector', order: 2, active: true },
@@ -338,7 +280,7 @@ async function runOneTimeSeed() {
     ];
     for (const p of partners) await prisma.partner.create({ data: p });
 
-    // 12. Contact Info & Social
+    // 10. Contact Info & Social
     await prisma.contactInfo.create({
       data: {
         address: 'Amahoro National Stadium, Remera, Kigali, Rwanda',
@@ -356,7 +298,7 @@ async function runOneTimeSeed() {
     ];
     for (const s of socialLinks) await prisma.socialLink.create({ data: s });
 
-    // 13. Events
+    // 11. Events
     const eventsList = [
       { title: 'National Paralympic Games 2026', description: 'Annual national competition bringing together para-athletes from all 30 districts of Rwanda.', date: '2026-08-15', endDate: '2026-08-20', location: 'Amahoro National Stadium, Kigali', category: 'National', status: 'Upcoming', img: '/assets/img/curated/event-paralympic-games.jpg', featured: true },
       { title: 'IPC Athletics Grand Prix', description: 'International athletics competition featuring Rwanda para-athletes competing in track and field events.', date: '2026-09-10', endDate: '2026-09-12', location: 'Kigali, Rwanda', category: 'International', status: 'Upcoming', img: '/assets/img/curated/event-athletics-grandprix.jpg', featured: true },
@@ -367,7 +309,7 @@ async function runOneTimeSeed() {
     ];
     for (const e of eventsList) await prisma.event.create({ data: e });
 
-    // 14. Site Content
+    // 12. Site Content
     const contents = [
       { key: 'hero.image', value: '/assets/img/curated/home-hero.jpg', type: 'image' },
       { key: 'hero.kicker', value: "RWANDA'S PARALYMPIC PRIDE", type: 'text' },
@@ -419,7 +361,7 @@ async function runOneTimeSeed() {
     ];
     for (const c of contents) await prisma.siteContent.create({ data: c });
 
-    // 15. Associations, Clubs, Federations, DPSCO Contacts
+    // 13. Associations, Clubs, Federations, DPSCO Contacts
     const associations = [
       { name: 'Rwanda Para-Athletics Federation (RPAF)', acronym: 'RPAF', desc: 'Oversees track and field events for para-athletes, coordinating training camps, selection meets, and national representation.', activities: ['Track & Field events', 'Wheelchair racing', 'Javelin, Discus, & Shot Put'], icon: 'fa-running', order: 1, active: true },
       { name: 'Rwanda Sitting Volleyball Association (RSVA)', acronym: 'RSVA', desc: "Governs sitting volleyball league matches, training clinics, and prepares the national men's and women's teams for global para-championships.", activities: ['National leagues', 'International tournaments', 'Referee and coach clinics'], icon: 'fa-volleyball-ball', order: 2, active: true },
@@ -455,26 +397,12 @@ async function runOneTimeSeed() {
     ];
     for (const d of dpscoContacts) await prisma.dpscoContact.create({ data: d });
 
-    console.log('\n--- One-Time Remote Database Seed Finished Successfully ---');
-    cleanupSelf();
-  } catch (error) {
-    console.error('Error during one-time seed:', error);
-  } finally {
-    await prisma.$disconnect();
+    return NextResponse.json({
+      success: true,
+      message: 'Database seeded successfully with all initial records!',
+    });
+  } catch (error: any) {
+    console.error('API Seed Error:', error);
+    return NextResponse.json({ error: error.message || 'Seeding failed' }, { status: 500 });
   }
 }
-
-function cleanupSelf() {
-  try {
-    const filePath = __filename;
-    if (fs.existsSync(filePath)) {
-      console.log(`[Self-Cleanup] Removing seed file: ${filePath}`);
-      fs.unlinkSync(filePath);
-      console.log('✓ Seed file successfully deleted from remote filesystem.');
-    }
-  } catch (err) {
-    console.warn('[Self-Cleanup] Notice: Could not remove seed file automatically:', err.message);
-  }
-}
-
-runOneTimeSeed();
