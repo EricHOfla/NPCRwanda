@@ -1289,7 +1289,24 @@ button:focus-visible,
    ────────────────────────────── */
 @media (max-width: 991px) {
     .topbar {
-        display: none;
+        display: block;
+        padding: 0.35rem 0;
+        font-size: 0.78rem;
+    }
+
+    .topbar .container {
+        gap: 6px 12px !important;
+        justify-content: space-between;
+    }
+
+    .topbar-link {
+        font-size: 0.75rem;
+    }
+
+    .topbar .lang-switcher .dropdown-toggle {
+        height: 24px !important;
+        width: 52px !important;
+        font-size: 0.7rem;
     }
 
     .navbar-collapse {
