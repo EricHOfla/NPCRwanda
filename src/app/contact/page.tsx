@@ -7,7 +7,14 @@ import { useData } from '@/context/DataContext';
 
 export default function ContactPage() {
   const { t } = useTranslation();
-  const { addContactMessage } = useData();
+  const { addContactMessage, contactInfo, socialLinks, systemSettings } = useData();
+
+  const address = systemSettings.address || contactInfo?.address || 'Amahoro Stadium, Kigali';
+  const phone = systemSettings.contactPhone || contactInfo?.phone || '+250 788 672 739';
+  const contactEmail = systemSettings.contactEmail || contactInfo?.email || 'info@npcrwanda.org';
+  const configuredSocialLinks = socialLinks
+    .filter(s => s.active)
+    .map(s => ({ ...s, url: systemSettings[s.platform] || s.url }));
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -85,9 +92,7 @@ export default function ContactPage() {
                 <div>
                   <h4 className="h6 fw-bold mb-1">{t('phrase.Our Office')}</h4>
                   <p className="small text-muted mb-0">
-                    <span>{t('phrase.Amahoro National Stadium, NPC Rwanda Office')}</span>
-                    <br />
-                    <span>{t('phrase.Remera, Kigali, Rwanda')}</span>
+                    {address}
                   </p>
                 </div>
               </div>
@@ -101,7 +106,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="h6 fw-bold mb-1">{t('phrase.Phone Number')}</h4>
-                  <p className="small text-muted mb-0">+250 788 400 887</p>
+                  <p className="small text-muted mb-0">{phone}</p>
                 </div>
               </div>
 
@@ -114,41 +119,18 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="h6 fw-bold mb-1">{t('phrase.Email Address')}</h4>
-                  <p className="small text-muted mb-0">info@npcrwanda.org</p>
+                  <p className="small text-muted mb-0">{contactEmail}</p>
                 </div>
               </div>
 
               <div className="mt-5">
                 <h4 className="h6 fw-bold mb-3">{t('phrase.Connect With Us')}</h4>
                 <div className="social-links d-flex gap-3">
-                  <a
-                    href="#"
-                    className="btn btn-primary rounded-circle"
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <i className="fab fa-facebook-f" />
-                  </a>
-                  <a
-                    href="#"
-                    className="btn btn-primary rounded-circle"
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <i className="fab fa-twitter" />
-                  </a>
-                  <a
-                    href="#"
-                    className="btn btn-primary rounded-circle"
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <i className="fab fa-instagram" />
-                  </a>
-                  <a
-                    href="#"
-                    className="btn btn-primary rounded-circle"
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <i className="fab fa-youtube" />
-                  </a>
+                  {configuredSocialLinks.map(s => (
+                    <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary rounded-circle" aria-label={s.platform} style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <i className={`fab ${s.icon}`} />
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>

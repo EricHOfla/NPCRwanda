@@ -7,15 +7,19 @@ import { useData } from '../context/DataContext';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
-  const { contactInfo, socialLinks, siteContent } = useData();
+  const { contactInfo, socialLinks, siteContent, systemSettings } = useData();
 
   const getSiteText = (key: string, fallback: string) => {
     return siteContent[key] || fallback;
   };
 
-  const address = contactInfo?.address || 'Amahoro National Stadium, Remera, Kigali, Rwanda';
-  const phone = contactInfo?.phone || '+250 788 400 887';
-  const email = contactInfo?.email || 'info@npcrwanda.org';
+  const address = systemSettings.address || contactInfo?.address || 'Amahoro Stadium, Kigali';
+  const phone = systemSettings.contactPhone || contactInfo?.phone || '+250 788 672 739';
+  const email = systemSettings.contactEmail || contactInfo?.email || 'info@npcrwanda.org';
+  const siteName = systemSettings.siteName || 'National Paralympic Committee of Rwanda';
+  const configuredSocialLinks = socialLinks
+    .filter(s => s.active)
+    .map(s => ({ ...s, url: systemSettings[s.platform] || s.url }));
   const footerDesc = getSiteText('footer.description', t('phrase.The National Paralympic Committee of Rwanda is dedicated to the development of Paralympic sports and fostering inclusion for persons with disabilities through the power of athletic excellence.'));
 
   return (
@@ -31,15 +35,15 @@ export const Footer: React.FC = () => {
                 className="me-2"
                 style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
               />
-              <h5 className="mb-0">NPC RWANDA</h5>
+              <h5 className="mb-0">{siteName}</h5>
             </div>
             <p className="small">
               {footerDesc}
             </p>
             {/* Social media icons dynamically loaded */}
-            {socialLinks.filter(s => s.active).length > 0 && (
+            {configuredSocialLinks.length > 0 && (
               <div className="d-flex gap-3 mt-3">
-                {socialLinks.filter(s => s.active).map(s => (
+                {configuredSocialLinks.map(s => (
                   <a 
                     key={s.id} 
                     href={s.url} 

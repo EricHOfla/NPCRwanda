@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '../context/LanguageContext';
+import { useData } from '../context/DataContext';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const { lang, setLang, t } = useTranslation();
+  const { systemSettings } = useData();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const email = systemSettings.contactEmail || 'info@npcrwanda.org';
+  const phone = systemSettings.contactPhone || '+250 788 672 739';
+  const siteName = systemSettings.siteName || 'National Paralympic Committee of Rwanda';
 
   useEffect(() => {
     // Dynamic import of bootstrap JS on client side for dropdowns
@@ -57,11 +62,11 @@ export const Header: React.FC = () => {
       <div className="topbar">
         <div className="container d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div className="d-flex flex-wrap align-items-center gap-3">
-            <a href="mailto:info@npcrwanda.org" className="topbar-link">
-              <i className="fas fa-envelope me-1" aria-hidden="true"></i> info@npcrwanda.org
+            <a href={`mailto:${email}`} className="topbar-link">
+              <i className="fas fa-envelope me-1" aria-hidden="true"></i> {email}
             </a>
-            <a href="tel:+250788400887" className="topbar-link">
-              <i className="fas fa-phone me-1" aria-hidden="true"></i> +250 788 400 887
+            <a href={`tel:${phone}`} className="topbar-link">
+              <i className="fas fa-phone me-1" aria-hidden="true"></i> {phone}
             </a>
           </div>
           <div className="d-flex flex-wrap align-items-center gap-3">
@@ -128,7 +133,7 @@ export const Header: React.FC = () => {
             />
             <div className="brand-text">
               <span className="d-block fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1.1rem', lineHeight: 1 }}>
-                NPC RWANDA
+                {siteName}
               </span>
               <small className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
                 PARALYMPIC COMMITTEE

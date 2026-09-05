@@ -231,6 +231,7 @@ interface DataContextType {
   partners: Partner[];
   siteContent: Record<string, string>;
   siteContentList: SiteContent[];
+  systemSettings: Record<string, string>;
   contactInfo: ContactInfo | null;
   socialLinks: SocialLink[];
   mediaAssets: MediaAsset[];
@@ -301,6 +302,7 @@ interface DataContextType {
 
   // Site Content & Settings Actions
   updateSiteContent: (key: string, value: string, type?: string) => Promise<void>;
+  updateSystemSettings: (settings: Record<string, string>) => void;
   updateContactInfo: (info: Omit<ContactInfo, 'id'>) => Promise<void>;
   addSocialLink: (link: Omit<SocialLink, 'id'>) => Promise<void>;
   updateSocialLink: (link: SocialLink) => Promise<void>;
@@ -372,6 +374,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [partners, setPartners] = useState<Partner[]>([]);
   const [siteContent, setSiteContent] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
   const [siteContentList, setSiteContentList] = useState<SiteContent[]>([]);
+  const [systemSettings, setSystemSettings] = useState<Record<string, string>>({});
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
@@ -396,7 +399,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const [
           athRes, newsRes, carRes, sportsRes, leadersRes,
           govDocsRes, govPolRes, eventsRes, partnersRes,
-          contentRes, contactRes, socialRes, sysCompRes,
+          contentRes, contactRes, socialRes, sysCompRes, settingsRes,
           assocRes, clubsRes, fedRes, dpscoRes
         ] = await Promise.all([
           fetch('/api/athletes').then(r => r.ok ? r.json() : []),
@@ -412,6 +415,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           fetch('/api/contact-info').then(r => r.ok ? r.json() : null),
           fetch('/api/social-links').then(r => r.ok ? r.json() : []),
           fetch('/api/system').then(r => r.ok ? r.json() : []),
+          fetch('/api/system-settings').then(r => r.ok ? r.json() : {}),
           fetch('/api/npc-associations').then(r => r.ok ? r.json() : []),
           fetch('/api/npc-clubs').then(r => r.ok ? r.json() : []),
           fetch('/api/npc-federations').then(r => r.ok ? r.json() : []),
@@ -429,6 +433,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setPartners(partnersRes);
         setContactInfo(contactRes);
         setSocialLinks(socialRes);
+        setSystemSettings(
+          settingsRes && typeof settingsRes === 'object'
+            ? (settingsRes as Record<string, string>)
+            : {}
+        );
         setSystemComponents(sysCompRes);
         setAssociations(assocRes);
         setClubs(clubsRes);
@@ -902,6 +911,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateSystemSettings = (settings: Record<string, string>) => {
+    setSystemSettings(prev => ({ ...prev, ...settings }));
+  };
+
   const updateContactInfo = async (info: Omit<ContactInfo, 'id'>) => {
     const res = await fetch('/api/contact-info', {
       method: 'POST',
@@ -911,6 +924,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setContactInfo(updated);
+      setSystemSettings(prev => ({
+        ...prev,
+        address: updated.address,
+        contactPhone: updated.phone,
+        contactEmail: updated.email,
+      }));
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update contact info');
@@ -1321,6 +1340,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         partners,
         siteContent,
         siteContentList,
+        systemSettings,
         contactInfo,
         socialLinks,
         mediaAssets,
@@ -1368,6 +1388,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatePartner,
         deletePartner,
         updateSiteContent,
+        updateSystemSettings,
         updateContactInfo,
         addSocialLink,
         updateSocialLink,

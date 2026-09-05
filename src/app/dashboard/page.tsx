@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
@@ -306,6 +306,7 @@ export default function DashboardPage() {
     siteContent,
     siteContentList,
     contactInfo,
+    updateSystemSettings,
     socialLinks,
     addAthlete,
     updateAthlete,
@@ -589,14 +590,15 @@ export default function DashboardPage() {
 
   // System Settings state
   const [sysSettings, setSysSettings] = useState<Record<string, string>>({
-    siteName: '',
-    contactEmail: '',
-    contactPhone: '',
-    address: '',
-    facebook: '',
-    twitter: '',
-    instagram: ''
+    siteName: 'National Paralympic Committee of Rwanda',
+    contactEmail: 'info@npcrwanda.org',
+    contactPhone: '+250 788 672 739',
+    address: 'Amahoro Stadium, Kigali',
+    facebook: 'https://facebook.com/npcrwanda',
+    twitter: 'https://twitter.com/npcrwanda',
+    instagram: 'https://instagram.com/npcrwanda'
   });
+  const [savedSysSettings, setSavedSysSettings] = useState<Record<string, string>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMsg, setSettingsMsg] = useState('');
 
@@ -678,13 +680,50 @@ export default function DashboardPage() {
     }
   };
 
-  // Fetch settings on mount
-  useEffect(() => {
-    fetch('/api/system-settings')
-      .then(r => (r.ok ? r.json() : {}))
-      .then(data => setSysSettings(prev => ({ ...prev, ...data })))
-      .catch(() => {});
+  // Fetch system settings with fallback to contactInfo
+  const fetchSystemSettings = useCallback(async () => {
+    try {
+      const r = await fetch('/api/system-settings');
+      if (r.ok) {
+        const data = await r.json();
+        setSysSettings(prev => ({
+          ...prev,
+          siteName: data.siteName || prev.siteName || 'National Paralympic Committee of Rwanda',
+          contactEmail: data.contactEmail || prev.contactEmail || contactInfo?.email || 'info@npcrwanda.org',
+          contactPhone: data.contactPhone || prev.contactPhone || contactInfo?.phone || '+250 788 672 739',
+          address: data.address || prev.address || contactInfo?.address || 'Amahoro Stadium, Kigali',
+          facebook: data.facebook !== undefined ? data.facebook : prev.facebook,
+          twitter: data.twitter !== undefined ? data.twitter : prev.twitter,
+          instagram: data.instagram !== undefined ? data.instagram : prev.instagram,
+          ...data,
+        }));
+        setSavedSysSettings(data);
+      } else if (contactInfo) {
+        setSysSettings(prev => ({
+          ...prev,
+          contactPhone: contactInfo.phone || prev.contactPhone || '+250 788 672 739',
+          contactEmail: contactInfo.email || prev.contactEmail || 'info@npcrwanda.org',
+          address: contactInfo.address || prev.address || 'Amahoro Stadium, Kigali',
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to load system settings:', err);
+    }
+  }, [contactInfo]);
 
+  // Fetch settings on mount and when adminTab switches to settings
+  useEffect(() => {
+    fetchSystemSettings();
+  }, [fetchSystemSettings]);
+
+  useEffect(() => {
+    if (adminTab === 'settings') {
+      fetchSystemSettings();
+    }
+  }, [adminTab, fetchSystemSettings]);
+
+  // Initial mount data fetch
+  useEffect(() => {
     fetch('/api/auth/profile')
       .then(r => (r.ok ? r.json() : null))
       .then(data => {
@@ -760,16 +799,38 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setSysSettings(data.settings);
-        setSettingsMsg('Settings saved successfully!');
+        const updated = data.settings || sysSettings;
+        setSysSettings(updated);
+        setSavedSysSettings(updated);
+        updateSystemSettings(updated);
+        setSettingsMsg('Settings and contact details saved successfully!');
+
+        // Also update contactInfo state in context if available
+        if (updateContactInfo && (sysSettings.contactPhone || sysSettings.contactEmail || sysSettings.address)) {
+          updateContactInfo({
+            phone: sysSettings.contactPhone || contactInfo?.phone || '+250 788 672 739',
+            email: sysSettings.contactEmail || contactInfo?.email || 'info@npcrwanda.org',
+            address: sysSettings.address || contactInfo?.address || 'Amahoro Stadium, Kigali',
+            mapUrl: contactInfo?.mapUrl || '',
+          }).catch(() => {});
+        }
       } else {
         setSettingsMsg(data.error || 'Failed to save settings.');
       }
     } catch {
-      setSettingsMsg('An error occurred.');
+      setSettingsMsg('An error occurred while saving settings.');
     } finally {
       setSettingsSaving(false);
     }
+  };
+
+  const handleSettingsCancel = () => {
+    if (Object.keys(savedSysSettings).length > 0) {
+      setSysSettings(savedSysSettings);
+    } else {
+      fetchSystemSettings();
+    }
+    setSettingsMsg('');
   };
 
   const handleProfileSave = async (e: React.FormEvent) => {
@@ -4711,7 +4772,7 @@ export default function DashboardPage() {
                 )}
 
                 <form onSubmit={handleSettingsSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Site Name</label>
                       <input type="text" className="form-control" value={sysSettings.siteName || ''} onChange={e => setSysSettings(p => ({ ...p, siteName: e.target.value }))} placeholder="National Paralympic Committee..." required />
@@ -4722,7 +4783,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Contact Phone</label>
-                      <input type="text" className="form-control" value={sysSettings.contactPhone || ''} onChange={e => setSysSettings(p => ({ ...p, contactPhone: e.target.value }))} placeholder="+250 788 123 456" />
+                      <input type="text" className="form-control" value={sysSettings.contactPhone || ''} onChange={e => setSysSettings(p => ({ ...p, contactPhone: e.target.value }))} placeholder="+250 788 672 739" />
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Physical Address</label>
@@ -4730,11 +4791,38 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
+                  {/* Social Media Links */}
+                  <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '18px' }}>
+                    <label style={{ display: 'block', marginBottom: '12px', fontSize: '0.85rem', fontWeight: 700, color: '#1E293B' }}>
+                      <i className="fas fa-share-nodes text-primary me-2" />Social Media Profiles
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
+                          <i className="fab fa-facebook text-primary me-1" /> Facebook URL
+                        </label>
+                        <input type="text" className="form-control" value={sysSettings.facebook || ''} onChange={e => setSysSettings(p => ({ ...p, facebook: e.target.value }))} placeholder="https://facebook.com/npcrwanda" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
+                          <i className="fab fa-twitter text-info me-1" /> Twitter / X URL
+                        </label>
+                        <input type="text" className="form-control" value={sysSettings.twitter || ''} onChange={e => setSysSettings(p => ({ ...p, twitter: e.target.value }))} placeholder="https://twitter.com/npcrwanda" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
+                          <i className="fab fa-instagram text-danger me-1" /> Instagram URL
+                        </label>
+                        <input type="text" className="form-control" value={sysSettings.instagram || ''} onChange={e => setSysSettings(p => ({ ...p, instagram: e.target.value }))} placeholder="https://instagram.com/npcrwanda" />
+                      </div>
+                    </div>
+                  </div>
+
                   <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
                     <button type="submit" disabled={settingsSaving} style={{ background: '#0072C6', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 24px', fontWeight: 700, fontSize: '0.88rem', cursor: settingsSaving ? 'not-allowed' : 'pointer', opacity: settingsSaving ? 0.7 : 1 }}>
                       <i className="fas fa-floppy-disk me-2" />{settingsSaving ? 'Saving...' : 'Save Settings'}
                     </button>
-                    <button type="button" onClick={() => setSettingsMsg('')} style={{ background: '#F1F5F9', color: '#64748B', border: 'none', borderRadius: '8px', padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer' }}>Cancel</button>
+                    <button type="button" onClick={handleSettingsCancel} style={{ background: '#F1F5F9', color: '#64748B', border: 'none', borderRadius: '8px', padding: '11px 20px', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </form>
               </div>

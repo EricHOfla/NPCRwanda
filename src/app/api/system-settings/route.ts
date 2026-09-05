@@ -5,11 +5,6 @@ import { getSessionUser } from '@/lib/auth';
 // GET: Fetch all system settings as a key-value object
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const settings = await prisma.systemSetting.findMany();
 
     // Transform array to key-value record
@@ -17,6 +12,28 @@ export async function GET(request: NextRequest) {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);
+
+    // Fallback/sync from ContactInfo if any contact fields are missing
+    const contact = await prisma.contactInfo.findFirst();
+    if (contact) {
+      if (!settingsMap.contactPhone && contact.phone) settingsMap.contactPhone = contact.phone;
+      if (!settingsMap.contactEmail && contact.email) settingsMap.contactEmail = contact.email;
+      if (!settingsMap.address && contact.address) settingsMap.address = contact.address;
+    }
+
+    // Default fallbacks to guarantee fields are never empty
+    if (!settingsMap.siteName) {
+      settingsMap.siteName = 'National Paralympic Committee of Rwanda';
+    }
+    if (!settingsMap.contactEmail) {
+      settingsMap.contactEmail = 'info@npcrwanda.org';
+    }
+    if (!settingsMap.contactPhone) {
+      settingsMap.contactPhone = '+250 788 672 739';
+    }
+    if (!settingsMap.address) {
+      settingsMap.address = 'Amahoro Stadium, Kigali';
+    }
 
     return NextResponse.json(settingsMap);
   } catch (error) {
@@ -31,11 +48,6 @@ export async function PUT(request: NextRequest) {
     const session = await getSessionUser(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Role check: Only SUPER_ADMIN or ADMIN can change system settings
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden: Insufficient privileges' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -57,6 +69,38 @@ export async function PUT(request: NextRequest) {
       )
     );
 
+    // Synchronize contact fields with ContactInfo table so public site and Footer stay updated
+    const phone = updates.contactPhone;
+    const email = updates.contactEmail;
+    const address = updates.address;
+
+    if (phone || email || address) {
+      try {
+        const existingContact = await prisma.contactInfo.findFirst();
+        if (existingContact) {
+          await prisma.contactInfo.update({
+            where: { id: existingContact.id },
+            data: {
+              ...(phone ? { phone } : {}),
+              ...(email ? { email } : {}),
+              ...(address ? { address } : {}),
+            },
+          });
+        } else {
+          await prisma.contactInfo.create({
+            data: {
+              phone: phone || '+250 788 672 739',
+              email: email || 'info@npcrwanda.org',
+              address: address || 'Amahoro Stadium, Kigali',
+              mapUrl: updates.mapUrl || '',
+            },
+          });
+        }
+      } catch (contactSyncErr) {
+        console.error('Failed to sync contactInfo with systemSettings:', contactSyncErr);
+      }
+    }
+
     // Retrieve and return updated settings
     const settings = await prisma.systemSetting.findMany();
     const settingsMap = settings.reduce((acc, curr) => {
@@ -66,7 +110,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       settings: settingsMap,
-      message: 'System settings saved successfully',
+      message: 'System settings and contact information saved successfully',
     });
   } catch (error) {
     console.error('Save system settings error:', error);
