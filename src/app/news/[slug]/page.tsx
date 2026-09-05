@@ -5,11 +5,15 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 
-export default function ArticleDetailPage({ params }: { params: { slug: string } }) {
+export default function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+  const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
+    ? React.use(params as Promise<{ slug: string }>) 
+    : (params as { slug: string });
+  const slug = unwrappedParams?.slug;
   const { t } = useTranslation();
   const { news } = useData();
 
-  const article = news.find(n => n.slug === params.slug);
+  const article = news.find(n => n.slug === slug);
 
   if (!article) {
     return (
