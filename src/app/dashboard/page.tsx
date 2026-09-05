@@ -354,13 +354,16 @@ export default function DashboardPage() {
   } = useData();
 
   const [adminTab, setAdminTab] = useState<AdminTab>('overview');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [currentDateString, setCurrentDateString] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('avatar-1.svg');
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 992) {
+      setSidebarOpen(true);
+    }
     setCurrentDateString(new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
     const savedAvatar = localStorage.getItem('admin_avatar') || 'avatar-1.svg';
     setSelectedAvatar(savedAvatar);
@@ -1126,21 +1129,43 @@ export default function DashboardPage() {
   return (
     <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
       
+      {/* ── Mobile Sidebar Backdrop ── */}
+      {sidebarOpen && (
+        <div 
+          className="dashboard-sidebar-backdrop d-lg-none" 
+          onClick={() => setSidebarOpen(false)} 
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside style={{
-        width: sidebarOpen ? '260px' : '72px',
-        background: '#0F172A',
-        color: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        flexShrink: 0,
-        zIndex: 50,
-      }}>
+      <aside 
+        className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open-mobile' : ''}`}
+        style={{
+          width: sidebarOpen ? '260px' : '72px',
+          background: '#0F172A',
+          color: '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+          flexShrink: 0,
+          zIndex: 1060,
+        }}
+      >
         {/* Logo block */}
-        <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,.1)' }}>
-          <img src="/assets/img/logo.png" style={{ height: '32px', width: 'auto' }} alt="NPC Logo" />
-          {sidebarOpen && <span style={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: '0.5px' }}>NPC DASHBOARD</span>}
+        <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,.1)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+            <img src="/assets/img/logo.png" style={{ height: '32px', width: 'auto', flexShrink: 0 }} alt="NPC Logo" />
+            {sidebarOpen && <span style={{ fontWeight: 800, fontSize: '0.92rem', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>NPC DASHBOARD</span>}
+          </div>
+          <button 
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="d-lg-none btn btn-sm text-white-50 p-1"
+            style={{ background: 'none', border: 'none', fontSize: '1.2rem', lineHeight: 1 }}
+            title="Close menu"
+          >
+            <i className="fas fa-times" />
+          </button>
         </div>
 
         {/* Links Navigation */}
@@ -1171,6 +1196,9 @@ export default function DashboardPage() {
                   if (item.type === 'page') {
                     setActiveEditPage(item.pageId || null);
                     setPreviewModeEnabled(false);
+                  }
+                  if (typeof window !== 'undefined' && window.innerWidth < 992) {
+                    setSidebarOpen(false);
                   }
                 }}
                 onMouseEnter={(e) => {
@@ -1254,7 +1282,7 @@ export default function DashboardPage() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
         {/* Topbar Header */}
-        <header style={{
+        <header className="dashboard-topbar" style={{
           background: '#fff',
           borderBottom: '1px solid #E2E8F0',
           padding: '0 24px',
@@ -1264,15 +1292,20 @@ export default function DashboardPage() {
           justifyContent: 'space-between',
           flexShrink: 0,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#4A5568' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)} 
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#4A5568', padding: '6px 8px' }}
+              aria-label="Toggle navigation menu"
+            >
               <i className="fas fa-bars" />
             </button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+            <h1 className="dashboard-topbar-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
               {adminTab === 'overview' && 'Admin Overview'}
-              {adminTab === 'pages' && 'Unified Website Pages CMS'}
+              {adminTab === 'pages' && 'Website CMS Hub'}
+              {adminTab === 'members' && 'Members Directory'}
               {adminTab === 'volunteers' && 'Volunteer Applications'}
-              {adminTab === 'contacts' && 'Inbox Messages & Applications'}
+              {adminTab === 'contacts' && 'Inbox & Feedback'}
               {adminTab === 'settings' && 'System Settings'}
             </h1>
           </div>
@@ -1492,7 +1525,7 @@ export default function DashboardPage() {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <span className="small fw-semibold text-dark">{profile.name || 'Admin'}</span>
+                <span className="small fw-semibold text-dark d-none d-sm-inline">{profile.name || 'Admin'}</span>
                 <img 
                   src={`/assets/img/${selectedAvatar}`} 
                   style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', background: '#F1F5F9', border: '1px solid rgba(0,0,0,0.08)' }} 
@@ -1618,7 +1651,7 @@ export default function DashboardPage() {
         </header>
 
         {/* Content body panel */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+        <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           
           {/* ──────────────────────────────
              TAB: OVERVIEW
@@ -1627,6 +1660,7 @@ export default function DashboardPage() {
             <div>
               {/* Welcome Panel */}
               <div 
+                className="dashboard-welcome-banner"
                 style={{ 
                   background: 'linear-gradient(135deg, #0b63b6 0%, #0a3f7a 100%)',
                   borderRadius: '16px',

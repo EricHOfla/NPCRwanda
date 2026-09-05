@@ -210,6 +210,7 @@ export default function HomePage() {
                         <img 
                           src={a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`} 
                           alt={`${a.name} portrait`} 
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/avatar-1.svg'; }}
                         />
                       </div>
                       <h3>{a.name}</h3>

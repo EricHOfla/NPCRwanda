@@ -2538,4 +2538,80 @@ body.accessibility-center-text {
     background-color: rgba(255, 193, 7, 0.08) !important;
 }
 
+/* ──────────────────────────────
+   23. ADMIN DASHBOARD MOBILE RESPONSIVENESS
+   ────────────────────────────── */
+@media (max-width: 991px) {
+  .admin-dashboard-root {
+    position: relative;
+    overflow-x: hidden !important;
+  }
+
+  /* Off-canvas sidebar drawer on mobile */
+  .dashboard-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    width: 280px !important;
+    z-index: 1060 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+  }
+
+  .dashboard-sidebar.sidebar-open-mobile {
+    transform: translateX(0) !important;
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  /* Dark overlay backdrop when sidebar is open on mobile */
+  .dashboard-sidebar-backdrop {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(2px) !important;
+    z-index: 1055 !important;
+  }
+
+  /* Topbar header on mobile */
+  .dashboard-topbar {
+    padding: 0 14px !important;
+    height: 58px !important;
+  }
+
+  .dashboard-topbar-title {
+    font-size: 0.95rem !important;
+    max-width: 170px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Main content container on mobile */
+  .dashboard-main-content {
+    padding: 14px !important;
+  }
+
+  /* Mobile tables scrolling */
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Cards and overview blocks */
+  .dashboard-welcome-banner {
+    padding: 18px !important;
+  }
+
+  .dashboard-welcome-banner h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
 
