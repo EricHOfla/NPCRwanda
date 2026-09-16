@@ -99,8 +99,13 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li className="mb-2">
+                <a href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
+                  Webmail Login
+                </a>
+              </li>
+              <li className="mb-2">
                 <Link href="/login">
-                  Login
+                  Admin Login
                 </Link>
               </li>
             </ul>
@@ -155,7 +160,18 @@ export const Footer: React.FC = () => {
           <p className="mb-0">
             &copy; <span id="year">{new Date().getFullYear()}</span> <span>{t('footer.rights')}</span>
           </p>
-          <Link href="/login" className="footer-login-link">Admin Login</Link>
+          <div className="d-flex align-items-center gap-3">
+            <a 
+              href="https://webmail.npcrwanda.org/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="footer-login-link d-inline-flex align-items-center gap-1"
+            >
+              <i className="fas fa-envelope-open-text" style={{ fontSize: '0.75rem' }}></i> Webmail Login
+            </a>
+            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.75rem' }}>•</span>
+            <Link href="/login" className="footer-login-link">Admin Login</Link>
+          </div>
         </div>
       </div>
     </footer>
