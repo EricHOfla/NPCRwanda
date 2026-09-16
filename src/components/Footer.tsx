@@ -157,21 +157,9 @@ export const Footer: React.FC = () => {
 
         {/* Footer bottom */}
         <div className="footer-bottom">
-          <p className="mb-0">
+          <p className="mb-0 text-center">
             &copy; <span id="year">{new Date().getFullYear()}</span> <span>{t('footer.rights')}</span>
           </p>
-          <div className="d-flex align-items-center gap-3">
-            <a 
-              href="https://webmail.npcrwanda.org/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="footer-login-link d-inline-flex align-items-center gap-1"
-            >
-              <i className="fas fa-envelope-open-text" style={{ fontSize: '0.75rem' }}></i> Webmail Login
-            </a>
-            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.75rem' }}>•</span>
-            <Link href="/login" className="footer-login-link">Admin Login</Link>
-          </div>
         </div>
       </div>
     </footer>
