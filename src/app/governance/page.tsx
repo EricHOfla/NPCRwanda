@@ -132,10 +132,9 @@ export default function GovernancePage() {
                         </div>
                         {doc.fileUrl && doc.fileUrl !== '#' ? (
                           <a
-                            href={doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/assets/img/curated/${doc.fileUrl}`}
+                            href={`/api/download?url=${encodeURIComponent(doc.fileUrl)}&name=${encodeURIComponent(doc.title)}`}
                             className="btn btn-sm btn-outline-primary ms-3"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            download
                             style={{ whiteSpace: 'nowrap' }}
                           >
                             <i className="fas fa-download me-1"></i>
@@ -195,13 +194,12 @@ export default function GovernancePage() {
                             </div>
                             {policy.fileUrl && policy.fileUrl !== '#' ? (
                               <a
-                                href={policy.fileUrl.startsWith('http') || policy.fileUrl.startsWith('/') ? policy.fileUrl : `/assets/img/curated/${policy.fileUrl}`}
+                                href={`/api/download?url=${encodeURIComponent(policy.fileUrl)}&name=${encodeURIComponent(policy.title)}`}
                                 className="small fw-bold text-primary d-inline-flex align-items-center gap-1"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                download
                               >
                                 <span>{t('phrase.Read Policy')}</span> 
-                                <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.72rem' }} />
+                                <i className="fas fa-download" style={{ fontSize: '0.72rem' }} />
                               </a>
                             ) : (
                               <span className="small text-muted fst-italic">Document in archive</span>
