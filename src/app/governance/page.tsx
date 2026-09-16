@@ -31,6 +31,22 @@ const getDocDetails = (url: string) => {
   return { icon: 'fa-file-lines text-primary', label: 'Document' };
 };
 
+const getReliableDocUrl = (title: string, currentUrl?: string): string => {
+  if (currentUrl && currentUrl !== '#' && !currentUrl.includes('kdhllrwifaa0srmwk225')) {
+    return currentUrl;
+  }
+  const lower = (title || '').toLowerCase();
+  if (lower.includes('constitution')) return '/documents/governance/npc-rwanda-constitution.pdf';
+  if (lower.includes('strategic')) return '/documents/governance/strategic-plan-2024-2028.pdf';
+  if (lower.includes('annual')) return '/documents/governance/annual-report-2023.pdf';
+  if (lower.includes('financial') || lower.includes('audit')) return '/documents/governance/financial-audit-2023.pdf';
+  if (lower.includes('safeguard')) return '/documents/governance/safeguarding-policy.pdf';
+  if (lower.includes('anti-doping') || lower.includes('doping')) return '/documents/governance/anti-doping-regulations.pdf';
+  if (lower.includes('selection')) return '/documents/governance/selection-criteria.pdf';
+  if (lower.includes('classification')) return '/documents/governance/classification-rules.pdf';
+  return currentUrl || '#';
+};
+
 export default function GovernancePage() {
   const { t } = useTranslation();
   const [keyDocuments, setKeyDocuments] = useState<GovDoc[]>([]);
@@ -111,6 +127,7 @@ export default function GovernancePage() {
                                   doc.title.toLowerCase().includes('annual') ? 'annual-report-2023' :
                                   doc.title.toLowerCase().includes('financial') ? 'financial-audit-2023' :
                                   doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    const docUrl = getReliableDocUrl(doc.title, doc.fileUrl);
                     return (
                       <div
                         key={doc.id}
@@ -124,21 +141,23 @@ export default function GovernancePage() {
                           className="doc-icon d-flex align-items-center justify-content-center bg-light rounded-3 me-3"
                           style={{ width: '50px', height: '50px', minWidth: '50px', color: 'var(--primary-blue)' }}
                         >
-                          <i className={`fas ${getDocDetails(doc.fileUrl).icon} fa-lg`}></i>
+                          <i className={`fas ${getDocDetails(docUrl).icon} fa-lg`}></i>
                         </div>
                         <div className="flex-grow-1">
                           <h4 className="h6 mb-1">{doc.title}</h4>
                           <p className="small text-muted mb-0">{doc.desc}</p>
                         </div>
-                        {doc.fileUrl && doc.fileUrl !== '#' ? (
+                        {docUrl && docUrl !== '#' ? (
                           <a
-                            href={`/api/download?url=${encodeURIComponent(doc.fileUrl)}&name=${encodeURIComponent(doc.title)}`}
+                            href={docUrl}
+                            download={`${doc.title}.pdf`}
                             className="btn btn-sm btn-outline-primary ms-3"
-                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
                             style={{ whiteSpace: 'nowrap' }}
                           >
                             <i className="fas fa-download me-1"></i>
-                            <span>{getDocDetails(doc.fileUrl).label}</span>
+                            <span>{getDocDetails(docUrl).label}</span>
                           </a>
                         ) : (
                           <button
@@ -177,6 +196,7 @@ export default function GovernancePage() {
                                        policy.title.toLowerCase().includes('selection') ? 'selection-criteria' :
                                        policy.title.toLowerCase().includes('classification') ? 'classification-rules' :
                                        policy.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      const policyUrl = getReliableDocUrl(policy.title, policy.fileUrl);
                       return (
                         <div
                           key={policy.id}
@@ -188,15 +208,17 @@ export default function GovernancePage() {
                             <div>
                               <div className="d-flex align-items-center justify-content-between mb-2">
                                 <h5 className="h6 mb-0 fw-bold">{policy.title}</h5>
-                                <i className={`fas ${getDocDetails(policy.fileUrl).icon}`} />
+                                <i className={`fas ${getDocDetails(policyUrl).icon}`} />
                               </div>
                               <p className="small text-muted mb-3">{policy.desc}</p>
                             </div>
-                            {policy.fileUrl && policy.fileUrl !== '#' ? (
+                            {policyUrl && policyUrl !== '#' ? (
                               <a
-                                href={`/api/download?url=${encodeURIComponent(policy.fileUrl)}&name=${encodeURIComponent(policy.title)}`}
+                                href={policyUrl}
+                                download={`${policy.title}.pdf`}
                                 className="small fw-bold text-primary d-inline-flex align-items-center gap-1"
-                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <span>{t('phrase.Read Policy')}</span> 
                                 <i className="fas fa-download" style={{ fontSize: '0.72rem' }} />
