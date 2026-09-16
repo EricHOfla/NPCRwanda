@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "National Para Sports Federations | NPCRwanda",
+  title: "National Para Sports Federations | NPC Rwanda",
   description: "National sports federations affiliated with the National Paralympic Committee of Rwanda.",
   path: "/members/federations",
 });

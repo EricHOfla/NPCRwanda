@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 
 export const SITE_CONFIG = {
-  siteName: 'NPCRwanda',
+  siteName: 'NPC Rwanda (NPCRwanda)',
+  brandName: 'NPC Rwanda',
   fullName: 'National Paralympic Committee of Rwanda',
+  shortName: 'NPC Rwanda',
   siteUrl: 'https://npcrwanda.org',
-  defaultTitle: 'NPCRwanda | National Paralympic Committee of Rwanda',
-  titleTemplate: '%s | NPCRwanda',
+  defaultTitle: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
+  titleTemplate: '%s | NPC Rwanda (NPCRwanda)',
   defaultDescription:
-    'Official website of the National Paralympic Committee of Rwanda (NPC Rwanda). Dedicated to the development of Paralympic sports, empowering Rwandan para-athletes, and fostering inclusion through athletic excellence.',
+    'Official website of the National Paralympic Committee of Rwanda - NPC Rwanda (NPCRwanda). Dedicated to Paralympic sports, sitting volleyball, empowering Rwandan para-athletes, and driving national inclusion through athletic excellence.',
   defaultOgImage: 'https://npcrwanda.org/assets/img/logo.png',
   locale: 'en_RW',
   address: {
@@ -18,7 +20,7 @@ export const SITE_CONFIG = {
   },
   contact: {
     email: 'info@npcrwanda.org',
-    phone: '+250 788 400 887',
+    phone: '+250 788 672 739',
   },
   sameAs: [
     'https://facebook.com/npcrwanda',
@@ -27,6 +29,23 @@ export const SITE_CONFIG = {
     'https://youtube.com/npcrwanda',
   ],
 };
+
+export const GLOBAL_KEYWORDS = [
+  'NPC Rwanda',
+  'npc rwanda',
+  'NPCRwanda',
+  'npcrwanda',
+  'National Paralympic Committee of Rwanda',
+  'Rwanda Paralympic Committee',
+  'Comité National Paralympique du Rwanda',
+  'Paralympic Games Rwanda',
+  'Sitting Volleyball Rwanda',
+  'Para Athletics Rwanda',
+  'Para Sports Rwanda',
+  'Rwandan Paralympians',
+  'Amahoro Stadium Kigali',
+  'NPCRwanda official website',
+];
 
 export interface PageMetadataOptions {
   title: string;
@@ -77,9 +96,14 @@ export function generatePageMetadata(options: PageMetadataOptions): Metadata {
   const canonicalUrl = getAbsoluteUrl(path);
   const imageUrl = image ? getAbsoluteUrl(image) : SITE_CONFIG.defaultOgImage;
 
+  const fullTitle =
+    title.includes('NPC Rwanda') || title.includes('National Paralympic Committee')
+      ? title
+      : `${title} | NPC Rwanda`;
+
   return {
     title: {
-      absolute: title,
+      absolute: fullTitle,
     },
     description,
     alternates: {
@@ -102,10 +126,10 @@ export function generatePageMetadata(options: PageMetadataOptions): Metadata {
           },
         },
     openGraph: {
-      title,
+      title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName: SITE_CONFIG.fullName,
+      siteName: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
       locale: SITE_CONFIG.locale,
       type,
       images: [
@@ -113,7 +137,7 @@ export function generatePageMetadata(options: PageMetadataOptions): Metadata {
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: fullTitle,
         },
       ],
       ...(type === 'article'
@@ -128,13 +152,38 @@ export function generatePageMetadata(options: PageMetadataOptions): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: fullTitle,
       description,
       images: [imageUrl],
       site: '@npcrwanda',
       creator: '@npcrwanda',
     },
-    keywords: keywords.length > 0 ? keywords : undefined,
+    keywords: keywords.length > 0 ? keywords : GLOBAL_KEYWORDS,
+  };
+}
+
+/**
+ * WebSite JSON-LD Schema (Used by Google for Search Result Site Names)
+ */
+export function getWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_CONFIG.siteUrl}/#website`,
+    url: SITE_CONFIG.siteUrl,
+    name: 'NPC Rwanda',
+    alternateName: [
+      'NPCRwanda',
+      'npcrwanda',
+      'NPC Rwanda',
+      'National Paralympic Committee of Rwanda',
+      'Comité National Paralympique du Rwanda',
+      'NPC Rwanda Official Website',
+    ],
+    publisher: {
+      '@id': `${SITE_CONFIG.siteUrl}/#organization`,
+    },
+    inLanguage: ['en-RW', 'rw-RW', 'fr-RW'],
   };
 }
 
@@ -146,13 +195,21 @@ export function getOrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'SportsOrganization',
     '@id': `${SITE_CONFIG.siteUrl}/#organization`,
-    name: SITE_CONFIG.fullName,
-    alternateName: ['NPC Rwanda', 'NPCRwanda', 'National Paralympic Committee of Rwanda'],
+    name: 'National Paralympic Committee of Rwanda',
+    legalName: 'National Paralympic Committee of Rwanda',
+    alternateName: [
+      'NPC Rwanda',
+      'NPCRwanda',
+      'npcrwanda',
+      'National Paralympic Committee of Rwanda',
+      'Comité National Paralympique du Rwanda',
+      'Rwanda Paralympic Committee',
+    ],
     url: SITE_CONFIG.siteUrl,
     logo: {
       '@type': 'ImageObject',
       url: `${SITE_CONFIG.siteUrl}/assets/img/logo.png`,
-      caption: 'NPC Rwanda Logo',
+      caption: 'National Paralympic Committee of Rwanda (NPC Rwanda) Logo',
     },
     image: `${SITE_CONFIG.siteUrl}/assets/img/logo.png`,
     description: SITE_CONFIG.defaultDescription,

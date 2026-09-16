@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Official Announcements & Public Notices | NPCRwanda",
+  title: "Official Announcements & Public Notices | NPC Rwanda",
   description: "Official public notices, circulars, tenders, and official announcements from the National Paralympic Committee of Rwanda.",
   path: "/announcements",
 });

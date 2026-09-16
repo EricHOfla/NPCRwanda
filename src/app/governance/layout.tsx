@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Governance, Policies & Strategic Documents | NPCRwanda",
+  title: "Governance, Policies & Strategic Documents | NPC Rwanda",
   description: "Official governance framework, constitution, strategic plans, anti-doping policies, and compliance documents of the National Paralympic Committee of Rwanda.",
   path: "/governance",
 });

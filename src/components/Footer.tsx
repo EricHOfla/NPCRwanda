@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
             <div className="footer-logo d-flex align-items-center mb-4">
               <img
                 src={getSiteText('footer.logo', '/assets/img/logo.png')}
-                alt={t('phrase.NPC Rwanda Logo')}
+                alt="National Paralympic Committee of Rwanda - NPC Rwanda Logo"
                 className="me-2"
                 style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
               />

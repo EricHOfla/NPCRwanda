@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Executive Committee & Leadership | NPCRwanda",
+  title: "Executive Committee & Leadership | NPC Rwanda",
   description: "Meet the executive board, administrative leadership, and commissioners steering the National Paralympic Committee of Rwanda.",
   path: "/leaders",
 });

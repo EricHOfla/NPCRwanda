@@ -3,7 +3,12 @@ import { Sora, Source_Sans_3 } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import { ClientWrapper } from '@/components/ClientWrapper';
-import { SITE_CONFIG, getOrganizationJsonLd } from '@/lib/seo';
+import {
+  SITE_CONFIG,
+  GLOBAL_KEYWORDS,
+  getOrganizationJsonLd,
+  getWebSiteJsonLd,
+} from '@/lib/seo';
 
 const sora = Sora({
   variable: '--font-display',
@@ -26,22 +31,23 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.siteUrl),
   title: {
-    default: 'NPCRwanda | National Paralympic Committee of Rwanda',
-    template: '%s | NPCRwanda',
+    default: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
+    template: '%s | NPC Rwanda (NPCRwanda)',
   },
   description: SITE_CONFIG.defaultDescription,
-  applicationName: SITE_CONFIG.siteName,
+  applicationName: 'NPC Rwanda (NPCRwanda)',
+  keywords: GLOBAL_KEYWORDS,
   authors: [{ name: SITE_CONFIG.fullName, url: SITE_CONFIG.siteUrl }],
-  creator: SITE_CONFIG.fullName,
-  publisher: SITE_CONFIG.fullName,
+  creator: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
+  publisher: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
   alternates: {
     canonical: SITE_CONFIG.siteUrl,
   },
   openGraph: {
-    title: 'NPCRwanda | National Paralympic Committee of Rwanda',
+    title: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
     description: SITE_CONFIG.defaultDescription,
     url: SITE_CONFIG.siteUrl,
-    siteName: SITE_CONFIG.fullName,
+    siteName: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
     locale: SITE_CONFIG.locale,
     type: 'website',
     images: [
@@ -49,13 +55,13 @@ export const metadata: Metadata = {
         url: 'https://npcrwanda.org/assets/img/logo.png',
         width: 1200,
         height: 630,
-        alt: 'National Paralympic Committee of Rwanda Logo',
+        alt: 'National Paralympic Committee of Rwanda (NPC Rwanda) Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NPCRwanda | National Paralympic Committee of Rwanda',
+    title: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda',
     description: SITE_CONFIG.defaultDescription,
     site: '@npcrwanda',
     creator: '@npcrwanda',
@@ -73,8 +79,14 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/assets/img/logo.png',
+    icon: [
+      { url: '/assets/img/logo.png', sizes: 'any', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/assets/img/logo.png',
+    apple: [
+      { url: '/assets/img/logo.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 
@@ -84,10 +96,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const organizationSchema = getOrganizationJsonLd();
+  const websiteSchema = getWebSiteJsonLd();
 
   return (
     <html lang="en" className={`${sora.variable} ${sourceSans.variable}`}>
       <head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/logo.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/logo.png" />
+        <link rel="shortcut icon" href="/assets/img/logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/logo.png" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
           rel="stylesheet"
@@ -96,6 +113,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
       <body>

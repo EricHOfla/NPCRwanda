@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "NPC Background, Strategic Objectives & Impact | NPCRwanda",
+  title: "NPC Background, Strategic Objectives & Impact | NPC Rwanda",
   description: "In-depth background, Theory of Change, strategic pillars, and impact assessment of the Paralympic Movement in Rwanda.",
   path: "/npc-background",
 });

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Publications, Guidelines & Digital Resources | NPCRwanda",
+  title: "Publications, Guidelines & Digital Resources | NPC Rwanda",
   description: "Download official publications, sports classification rules, annual reports, media toolkits, and disability sports guidelines.",
   path: "/resources",
 });

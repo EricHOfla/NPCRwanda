@@ -127,7 +127,7 @@ export const Header: React.FC = () => {
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <img
               src="/assets/img/logo.png"
-              alt={t('phrase.NPC Rwanda Logo')}
+              alt="National Paralympic Committee of Rwanda - NPC Rwanda Logo"
               className="me-2"
               style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
             />

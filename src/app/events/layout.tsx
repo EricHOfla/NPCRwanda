@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Paralympic Events & Competitions Calendar | NPCRwanda",
+  title: "Paralympic Events & Competitions Calendar | NPC Rwanda",
   description: "Calendar of upcoming national and international Paralympic competitions, training camps, qualifiers, and community sporting events in Rwanda.",
   path: "/events",
 });

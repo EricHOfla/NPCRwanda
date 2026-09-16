@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Careers & Job Opportunities | NPCRwanda",
+  title: "Careers & Job Opportunities | NPC Rwanda",
   description: "Explore career opportunities, coaching positions, administrative roles, and internships with the National Paralympic Committee of Rwanda.",
   path: "/careers",
 });

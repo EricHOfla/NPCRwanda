@@ -15,6 +15,10 @@ export default function ContactPage() {
   const configuredSocialLinks = socialLinks
     .filter(s => s.active)
     .map(s => ({ ...s, url: systemSettings[s.platform] || s.url }));
+  const configuredMapUrl = contactInfo?.mapUrl?.trim();
+  const mapSrc = configuredMapUrl && configuredMapUrl.includes('google.com/maps/embed')
+    ? configuredMapUrl
+    : `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -252,7 +256,7 @@ export default function ContactPage() {
       <section id="location-map" className="p-0 border-top mt-5">
         <div className="ratio ratio-21x9">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5028549641776!2d30.119!3d-1.948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca688b1b88e1b%3A0xc3b446a364be22b6!2sAmahoro%20Stadium!5e0!3m2!1sen!2srw!4v1700000000000!5m2!1sen!2srw"
+            src={mapSrc}
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"

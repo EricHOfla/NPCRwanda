@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "District Paralympic Sports Committees (DPSCO) | NPCRwanda",
+  title: "District Paralympic Sports Committees (DPSCO) | NPC Rwanda",
   description: "Directory and contacts for District Paralympic Sports Committees (DPSCO) coordinating grassroots para sports across all 30 districts of Rwanda.",
   path: "/members/dpsco",
 });

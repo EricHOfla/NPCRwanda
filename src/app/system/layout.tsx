@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "System Architecture & Digital Registry | NPCRwanda",
+  title: "System Architecture & Digital Registry | NPC Rwanda",
   description: "Overview of the digital registry, platform architecture, and athlete data management system of NPCRwanda.",
   path: "/system",
 });

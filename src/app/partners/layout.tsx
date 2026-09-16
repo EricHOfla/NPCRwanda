@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Partners, Sponsors & Collaborators | NPCRwanda",
+  title: "Partners, Sponsors & Collaborators | NPC Rwanda",
   description: "Our valued government, international, and private sector partners supporting the growth and success of Para sports in Rwanda.",
   path: "/partners",
 });

@@ -4,7 +4,7 @@ import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
   title: "About Us | National Paralympic Committee of Rwanda",
-  description: "Learn about the mission, vision, values, and history of the National Paralympic Committee of Rwanda (NPCRwanda) empowering athletes with disabilities.",
+  description: "Learn about the mission, vision, values, and history of the National Paralympic Committee of Rwanda (NPC Rwanda) empowering athletes with disabilities.",
   path: "/about",
 });
 

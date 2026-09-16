@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Para Sports Programs in Rwanda | NPCRwanda",
+  title: "Para Sports Programs in Rwanda | NPC Rwanda",
   description: "Explore Paralympic sports disciplines in Rwanda including sitting volleyball, para athletics, para powerlifting, goalball, wheelchair basketball, and grassroots development.",
   path: "/sports",
 });
