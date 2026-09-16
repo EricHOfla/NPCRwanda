@@ -1160,7 +1160,8 @@ footer ul li {
     padding-top: 25px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    text-align: center;
     flex-wrap: wrap;
     gap: 0.5rem;
     font-size: 0.88rem;

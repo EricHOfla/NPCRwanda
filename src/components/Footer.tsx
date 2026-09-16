@@ -156,8 +156,8 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Footer bottom */}
-        <div className="footer-bottom">
-          <p className="mb-0 text-center">
+        <div className="footer-bottom justify-content-center text-center">
+          <p className="mb-0 text-center w-100">
             &copy; <span id="year">{new Date().getFullYear()}</span> <span>{t('footer.rights')}</span>
           </p>
         </div>
