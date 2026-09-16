@@ -26,12 +26,10 @@ export default function HomePage() {
             <div className="col-lg-7" data-aos="fade-right">
               <span className="hero-kicker mb-3">{getSiteText('hero.kicker', t("phrase.RWANDA'S PARALYMPIC PRIDE"))}</span>
               <h1>
-                <span className="d-block text-white fw-bold mb-2" style={{ fontSize: 'clamp(1.75rem, 3.8vw, 2.85rem)', lineHeight: 1.18, letterSpacing: '0.5px' }}>
-                  National Paralympic Committee of Rwanda
-                </span>
-                <span className="d-block text-warning fw-semibold" style={{ fontSize: 'clamp(1.2rem, 2.4vw, 1.85rem)' }}>
-                  NPC Rwanda (NPCRwanda) &bull; {getSiteText('hero.title1', t('phrase.Empowering Ability.'))} {getSiteText('hero.title2', t('phrase.Inspiring Rwanda.'))}
-                </span>
+                <span className="visually-hidden">National Paralympic Committee of Rwanda - NPC Rwanda (NPCRwanda)</span>
+                <span>{getSiteText('hero.title1', t('phrase.Empowering Ability.'))}</span>
+                <br />
+                <span>{getSiteText('hero.title2', t('phrase.Inspiring Rwanda.'))}</span>
               </h1>
               <p className="lead mb-4">
                 {getSiteText('hero.lead', t('phrase.We build inclusive pathways in sport and prepare elite para-athletes to represent Rwanda on the world stage. Ability comes first.'))}
