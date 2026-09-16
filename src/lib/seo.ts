@@ -23,6 +23,9 @@ export const SITE_CONFIG = {
     phone: '+250 788 672 739',
   },
   sameAs: [
+    'https://www.paralympic.org/rwanda',
+    'https://en.wikipedia.org/wiki/National_Paralympic_Committee_of_Rwanda',
+    'https://www.wikidata.org/wiki/Q16955743',
     'https://facebook.com/npcrwanda',
     'https://twitter.com/npcrwanda',
     'https://instagram.com/npcrwanda',
