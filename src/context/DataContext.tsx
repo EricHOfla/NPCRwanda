@@ -979,6 +979,84 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const uploadMediaFile = async (file: File, category: string = 'site', entity?: string): Promise<MediaAsset> => {
+    // Direct signed Cloudinary upload for large files to avoid server body limits (413)
+    const tryDirectCloudinaryUpload = async (): Promise<MediaAsset | null> => {
+      try {
+        const signRes = await fetch('/api/upload/sign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, entity }),
+        });
+        if (!signRes.ok) return null;
+        const signData = await signRes.json();
+        const { signature, timestamp, apiKey, cloudName, folder } = signData;
+        if (!signature || !cloudName) return null;
+
+        const isImg = file.type.startsWith('image/');
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        const resourceType = isImg ? 'image' : isPdf ? 'auto' : 'raw';
+
+        const cloudFormData = new FormData();
+        cloudFormData.append('file', file);
+        cloudFormData.append('api_key', apiKey);
+        cloudFormData.append('timestamp', timestamp.toString());
+        cloudFormData.append('signature', signature);
+        cloudFormData.append('folder', folder);
+
+        const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+          method: 'POST',
+          body: cloudFormData,
+        });
+
+        if (!cloudRes.ok) {
+          const cloudErr = await cloudRes.json().catch(() => ({}));
+          console.warn('Cloudinary direct upload failed:', cloudErr);
+          return null;
+        }
+
+        const cloudResult = await cloudRes.json();
+        const fileUrl = cloudResult.secure_url;
+
+        // Save media asset in DB
+        const saveRes = await fetch('/api/media', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            url: fileUrl,
+            fileSize: file.size,
+            mimeType: file.type || 'application/octet-stream',
+          }),
+        });
+
+        if (saveRes.ok) {
+          const media = await saveRes.json();
+          setMediaAssets(prev => [media, ...prev]);
+          return media;
+        }
+
+        const fallbackMedia: MediaAsset = {
+          id: `cloud-${Date.now()}`,
+          filename: file.name,
+          url: fileUrl,
+          fileSize: file.size,
+          mimeType: file.type || 'application/octet-stream',
+          createdAt: new Date().toISOString(),
+        };
+        setMediaAssets(prev => [fallbackMedia, ...prev]);
+        return fallbackMedia;
+      } catch (directErr) {
+        console.warn('Direct upload error, falling back to server route:', directErr);
+        return null;
+      }
+    };
+
+    // For files > 3.5MB, upload directly to Cloudinary to bypass server 413 limits
+    if (file.size > 3.5 * 1024 * 1024) {
+      const directAsset = await tryDirectCloudinaryUpload();
+      if (directAsset) return directAsset;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('category', category);
@@ -990,6 +1068,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       method: 'POST',
       body: formData,
     });
+
+    // If server returned 413 (Payload Too Large), fallback to direct signed upload
+    if (res.status === 413) {
+      const directAsset = await tryDirectCloudinaryUpload();
+      if (directAsset) return directAsset;
+    }
 
     const rawText = await res.text();
     let data: any = null;

@@ -29,6 +29,28 @@ export async function GET(request: Request) {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { filename, url, fileSize, mimeType } = body;
+    if (!filename || !url) {
+      return NextResponse.json({ error: 'filename and url are required' }, { status: 400 });
+    }
+    const media = await prisma.mediaAsset.create({
+      data: {
+        filename,
+        url,
+        fileSize: Number(fileSize) || 0,
+        mimeType: mimeType || 'application/octet-stream',
+      },
+    });
+    return NextResponse.json(media);
+  } catch (error: any) {
+    console.error('Create media asset error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create media asset' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

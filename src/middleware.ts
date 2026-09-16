@@ -45,8 +45,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Protected API endpoints
-  if (pathname.startsWith('/api') && !pathname.startsWith('/api/auth')) {
+  // 3. Protected API endpoints (upload routes handle their own auth to avoid middleware body buffering limits)
+  if (pathname.startsWith('/api') && !pathname.startsWith('/api/auth') && !pathname.startsWith('/api/upload')) {
     const method = request.method;
     let requiresAuth = false;
 
