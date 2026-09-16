@@ -102,9 +102,30 @@ interface CMSImageFieldProps {
   onChange: (url: string) => void;
   openMediaSelector: (callback: (url: string) => void) => void;
   uploadMediaFile: (file: File, category?: string, entity?: string) => Promise<MediaAsset>;
-  category?: 'athletes' | 'news' | 'events' | 'partners' | 'leaders' | 'site' | string;
+  category?: 'athletes' | 'news' | 'events' | 'partners' | 'leaders' | 'site' | 'governance' | string;
   entity?: string;
+  accept?: string;
+  isDocument?: boolean;
 }
+
+const isImageFilePath = (path: string) => {
+  if (!path) return false;
+  const clean = path.split('?')[0].toLowerCase();
+  return clean.endsWith('.jpg') || clean.endsWith('.jpeg') || clean.endsWith('.png') || 
+         clean.endsWith('.webp') || clean.endsWith('.gif') || clean.endsWith('.svg');
+};
+
+const getDocTypeDetails = (path: string) => {
+  if (!path || path === '#') return { icon: 'fa-file-lines', color: '#64748B', bg: '#F1F5F9', label: 'File' };
+  const clean = path.split('?')[0].toLowerCase();
+  if (clean.endsWith('.pdf')) return { icon: 'fa-file-pdf', color: '#DC2626', bg: '#FEE2E2', label: 'PDF Document' };
+  if (clean.endsWith('.doc') || clean.endsWith('.docx')) return { icon: 'fa-file-word', color: '#2563EB', bg: '#DBEAFE', label: 'Word Document' };
+  if (clean.endsWith('.xls') || clean.endsWith('.xlsx') || clean.endsWith('.csv')) return { icon: 'fa-file-excel', color: '#16A34A', bg: '#DCFCE7', label: 'Excel Spreadsheet' };
+  if (clean.endsWith('.ppt') || clean.endsWith('.pptx')) return { icon: 'fa-file-powerpoint', color: '#EA580C', bg: '#FFEDD5', label: 'PowerPoint' };
+  if (clean.endsWith('.txt') || clean.endsWith('.rtf')) return { icon: 'fa-file-lines', color: '#475569', bg: '#F1F5F9', label: 'Text File' };
+  if (clean.endsWith('.zip') || clean.endsWith('.rar')) return { icon: 'fa-file-zipper', color: '#7C3AED', bg: '#EDE9FE', label: 'Archive' };
+  return { icon: 'fa-file', color: '#0284C7', bg: '#E0F2FE', label: 'Document' };
+};
 
 const CMSImageField: React.FC<CMSImageFieldProps> = ({
   label,
@@ -114,9 +135,15 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
   uploadMediaFile,
   category = 'site',
   entity,
+  accept,
+  isDocument = false,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+
+  const fileAccept = accept || (isDocument 
+    ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.odt,.ods,.odp,image/*,application/*' 
+    : 'image/*');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,11 +152,12 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
     try {
       const asset = await uploadMediaFile(file, category, entity);
       onChange(asset.url);
-      alert('Image uploaded and selected successfully!');
+      alert(isDocument ? 'Document uploaded and selected successfully!' : 'Image uploaded and selected successfully!');
     } catch (err: any) {
       alert(err.message || 'Upload failed');
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -139,42 +167,105 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
     return `/assets/img/curated/${path}`;
   };
 
+  const isImg = isImageFilePath(value);
+  const docInfo = getDocTypeDetails(value);
+
   return (
     <div className="mb-3">
       <label className="form-label small fw-bold">{label}</label>
       
       {/* Current Preview */}
-      {value ? (
+      {value && value !== '#' ? (
         <div className="mb-2 p-2 border rounded bg-light d-flex align-items-center gap-3">
-          <img 
-            src={getFullImageUrl(value)} 
-            style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0' }} 
-            alt="Preview" 
-            onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg'; }}
-          />
+          {isImg ? (
+            <img 
+              src={getFullImageUrl(value)} 
+              style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0' }} 
+              alt="Preview" 
+              onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg'; }}
+            />
+          ) : (
+            <div 
+              style={{ 
+                width: '60px', 
+                height: '60px', 
+                borderRadius: '8px', 
+                background: docInfo.bg, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                flexShrink: 0 
+              }}
+            >
+              <i className={`fas ${docInfo.icon}`} style={{ fontSize: '1.8rem', color: docInfo.color }} />
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span className="small text-truncate d-block fw-semibold" style={{ maxWidth: '100%' }}>{value}</span>
-            <span className="xsmall text-muted d-block">Path selected</span>
+            <span className="small text-truncate d-block fw-semibold text-dark" style={{ maxWidth: '100%' }} title={value}>
+              {value}
+            </span>
+            <div className="d-flex align-items-center gap-2 mt-1">
+              <span className="badge" style={{ backgroundColor: isImg ? '#0284C7' : docInfo.color, color: '#fff', fontSize: '0.68rem' }}>
+                {isImg ? 'Image' : docInfo.label}
+              </span>
+              <a 
+                href={getFullImageUrl(value)} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="small text-primary text-decoration-none fw-semibold"
+                style={{ fontSize: '0.75rem' }}
+              >
+                <i className="fas fa-arrow-up-right-from-square me-1" /> Open / Test Link
+              </a>
+            </div>
           </div>
-          <button type="button" onClick={() => onChange('')} className="btn btn-sm btn-outline-danger py-1" title="Remove image">
+          <button type="button" onClick={() => onChange('')} className="btn btn-sm btn-outline-danger py-1" title="Remove attachment">
             <i className="fas fa-trash" />
           </button>
         </div>
+      ) : value === '#' ? (
+        <div className="mb-2 p-2 border border-warning rounded bg-warning-subtle text-dark small d-flex align-items-center justify-content-between">
+          <span className="d-flex align-items-center gap-2">
+            <i className="fas fa-circle-exclamation text-warning" />
+            <span>No file attached yet (Placeholder <code>#</code>). Upload a document below or paste a URL.</span>
+          </span>
+          <button type="button" onClick={() => onChange('')} className="btn btn-xs btn-outline-secondary py-0">Clear</button>
+        </div>
       ) : (
         <div className="mb-2 p-3 border border-dashed rounded bg-light text-center small text-muted">
-          No image selected.
+          {isDocument ? 'No document selected. Upload a document below or paste a link.' : 'No image selected.'}
         </div>
       )}
 
+      {/* Manual URL Input */}
+      <div className="input-group input-group-sm mb-2">
+        <span className="input-group-text bg-light text-muted border-end-0">
+          <i className="fas fa-link" style={{ fontSize: '0.75rem' }} />
+        </span>
+        <input 
+          type="text" 
+          className="form-control form-control-sm border-start-0 ps-1" 
+          placeholder={isDocument ? "Or paste document URL / path directly..." : "Or paste image path directly..."}
+          value={value} 
+          onChange={(e) => onChange(e.target.value)} 
+        />
+        {value && (
+          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => onChange('')} title="Clear path">
+            <i className="fas fa-times" />
+          </button>
+        )}
+      </div>
+
       {/* Actions */}
-      <div className="d-flex gap-2">
+      <div className="d-flex gap-2 flex-wrap">
         <button 
           type="button" 
           onClick={() => fileInputRef.current?.click()} 
-          className="btn btn-sm btn-outline-primary"
+          className="btn btn-sm btn-outline-primary fw-semibold"
           disabled={uploading}
         >
-          <i className="fas fa-upload me-1" /> {uploading ? 'Uploading...' : 'Upload New'}
+          <i className={`fas ${uploading ? 'fa-spinner fa-spin' : isDocument ? 'fa-file-arrow-up' : 'fa-upload'} me-1`} /> 
+          {uploading ? (isDocument ? 'Uploading Document...' : 'Uploading...') : (isDocument ? 'Upload Document' : 'Upload New')}
         </button>
         <button 
           type="button" 
@@ -185,16 +276,21 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
           }} 
           className="btn btn-sm btn-outline-secondary"
         >
-          <i className="fas fa-images me-1" /> Select from Library
+          <i className={`fas ${isDocument ? 'fa-folder-open' : 'fa-images'} me-1`} /> Select from Library
         </button>
         <input 
           type="file" 
           ref={fileInputRef} 
           onChange={handleUpload} 
-          accept="image/*" 
+          accept={fileAccept} 
           className="d-none" 
         />
       </div>
+      {isDocument && (
+        <span className="text-muted d-block mt-1" style={{ fontSize: '0.72rem' }}>
+          <i className="fas fa-check-circle text-success me-1" /> All documents allowed: PDF, Word (.doc/.docx), Excel (.xls/.xlsx), PowerPoint (.ppt/.pptx), Text, Images, etc.
+        </span>
+      )}
     </div>
   );
 };
@@ -3970,11 +4066,15 @@ export default function DashboardPage() {
                           </div>
                           <div className="col-md-8">
                             <CMSImageField 
-                              label="File Path / URL (PDF or Image)" 
+                              label="Document / Policy File (All documents allowed: PDF, Word, Excel, PPT, etc.)" 
                               value={govForm.fileUrl} 
                               onChange={(url) => setGovForm({ ...govForm, fileUrl: url })}
                               openMediaSelector={openMediaSelector}
                               uploadMediaFile={uploadMediaFile}
+                              category="governance"
+                              entity={govForm.title || 'governance-document'}
+                              accept="*/*"
+                              isDocument={true}
                             />
                           </div>
                           <div className="col-md-4 d-flex align-items-center">
@@ -4002,10 +4102,11 @@ export default function DashboardPage() {
                             <div className="custom-card p-3">
                               <h5 className="h6 fw-bold border-bottom pb-2 mb-3 text-dark"><i className="fas fa-file-pdf text-danger me-2" />Key Documents ({govDocs.length})</h5>
                               <div className="table-responsive">
-                                <table className="table table-hover table-sm mb-0">
+                                <table className="table table-hover table-sm mb-0 align-middle">
                                   <thead>
                                     <tr>
                                       <th>Title</th>
+                                      <th>File</th>
                                       <th>Order</th>
                                       <th>Actions</th>
                                     </tr>
@@ -4013,7 +4114,26 @@ export default function DashboardPage() {
                                   <tbody>
                                     {govDocs.map(d => (
                                       <tr key={d.id}>
-                                        <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '180px' }} title={d.title}>{d.title}</td>
+                                        <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '160px' }} title={d.title}>{d.title}</td>
+                                        <td>
+                                          {d.fileUrl && d.fileUrl !== '#' ? (
+                                            <a 
+                                              href={d.fileUrl.startsWith('http') || d.fileUrl.startsWith('/') ? d.fileUrl : `/assets/img/curated/${d.fileUrl}`} 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="badge bg-primary text-white text-decoration-none py-1 px-2"
+                                              style={{ fontSize: '0.68rem' }}
+                                              title={d.fileUrl}
+                                            >
+                                              <i className="fas fa-download me-1" />
+                                              {d.fileUrl.split('?')[0].split('.').pop()?.toUpperCase() || 'File'}
+                                            </a>
+                                          ) : (
+                                            <span className="badge bg-warning-subtle text-warning border border-warning" style={{ fontSize: '0.65rem' }}>
+                                              No file (#)
+                                            </span>
+                                          )}
+                                        </td>
                                         <td className="small">{d.order}</td>
                                         <td>
                                           <div className="d-flex gap-1">
@@ -4041,10 +4161,11 @@ export default function DashboardPage() {
                             <div className="custom-card p-3">
                               <h5 className="h6 fw-bold border-bottom pb-2 mb-3 text-dark"><i className="fas fa-scale-balanced text-success me-2" />Official Policies ({govPolicies.length})</h5>
                               <div className="table-responsive">
-                                <table className="table table-hover table-sm mb-0">
+                                <table className="table table-hover table-sm mb-0 align-middle">
                                   <thead>
                                     <tr>
                                       <th>Title</th>
+                                      <th>File</th>
                                       <th>Order</th>
                                       <th>Actions</th>
                                     </tr>
@@ -4052,7 +4173,26 @@ export default function DashboardPage() {
                                   <tbody>
                                     {govPolicies.map(p => (
                                       <tr key={p.id}>
-                                        <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '180px' }} title={p.title}>{p.title}</td>
+                                        <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '160px' }} title={p.title}>{p.title}</td>
+                                        <td>
+                                          {p.fileUrl && p.fileUrl !== '#' ? (
+                                            <a 
+                                              href={p.fileUrl.startsWith('http') || p.fileUrl.startsWith('/') ? p.fileUrl : `/assets/img/curated/${p.fileUrl}`} 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="badge bg-success text-white text-decoration-none py-1 px-2"
+                                              style={{ fontSize: '0.68rem' }}
+                                              title={p.fileUrl}
+                                            >
+                                              <i className="fas fa-download me-1" />
+                                              {p.fileUrl.split('?')[0].split('.').pop()?.toUpperCase() || 'File'}
+                                            </a>
+                                          ) : (
+                                            <span className="badge bg-warning-subtle text-warning border border-warning" style={{ fontSize: '0.65rem' }}>
+                                              No file (#)
+                                            </span>
+                                          )}
+                                        </td>
                                         <td className="small">{p.order}</td>
                                         <td>
                                           <div className="d-flex gap-1">
@@ -4903,6 +5043,134 @@ export default function DashboardPage() {
 
         </main>
       </div>
+
+      {/* Media & Document Library Modal */}
+      {mediaModalOpen && (
+        <div 
+          className="modal fade show d-block" 
+          tabIndex={-1} 
+          style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 9999, backdropFilter: 'blur(3px)' }}
+        >
+          <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="modal-header bg-light border-bottom px-4 py-3">
+                <div className="d-flex align-items-center gap-2">
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#E0F2FE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-folder-open text-primary" />
+                  </div>
+                  <div>
+                    <h5 className="modal-title fw-bold text-dark fs-6 mb-0">Media & Document Library</h5>
+                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>Select an existing file or document to attach</span>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setMediaModalOpen(false)} 
+                />
+              </div>
+              <div className="modal-body p-4">
+                <div className="input-group mb-3">
+                  <span className="input-group-text bg-light border-end-0">
+                    <i className="fas fa-search text-muted" />
+                  </span>
+                  <input 
+                    type="text" 
+                    className="form-control bg-light border-start-0 ps-1" 
+                    placeholder="Search files by filename or URL..."
+                    value={mediaSearch}
+                    onChange={e => setMediaSearch(e.target.value)}
+                  />
+                  {mediaSearch && (
+                    <button className="btn btn-light border" onClick={() => setMediaSearch('')}>
+                      <i className="fas fa-times text-muted" />
+                    </button>
+                  )}
+                </div>
+
+                {mediaAssets.length === 0 ? (
+                  <div className="text-center py-5 text-muted">
+                    <i className="fas fa-folder-open fa-3x mb-3 text-secondary opacity-50" />
+                    <h6 className="fw-semibold">No uploaded files in library</h6>
+                    <p className="small">Use &quot;Upload Document&quot; or &quot;Upload New&quot; to upload files directly.</p>
+                  </div>
+                ) : (
+                  <div className="row g-3" style={{ maxHeight: '420px', overflowY: 'auto' }}>
+                    {mediaAssets
+                      .filter(m => !mediaSearch || m.filename.toLowerCase().includes(mediaSearch.toLowerCase()) || m.url.toLowerCase().includes(mediaSearch.toLowerCase()))
+                      .map(m => {
+                        const isImg = isImageFilePath(m.url);
+                        const docInfo = getDocTypeDetails(m.url);
+                        return (
+                          <div key={m.id} className="col-md-4 col-sm-6">
+                            <div 
+                              className="card h-100 border shadow-sm"
+                              style={{ cursor: 'pointer', transition: 'all 0.15s ease-in-out', borderRadius: '10px', overflow: 'hidden' }}
+                              onClick={() => {
+                                if (mediaModalCallback) mediaModalCallback(m.url);
+                                setMediaModalOpen(false);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = '#0072C6';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = '#E2E8F0';
+                                e.currentTarget.style.transform = 'none';
+                              }}
+                            >
+                              {isImg ? (
+                                <img 
+                                  src={m.url} 
+                                  alt={m.filename} 
+                                  className="card-img-top" 
+                                  style={{ height: '110px', objectFit: 'cover' }}
+                                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg'; }}
+                                />
+                              ) : (
+                                <div 
+                                  className="d-flex flex-column align-items-center justify-content-center p-3"
+                                  style={{ height: '110px', background: docInfo.bg }}
+                                >
+                                  <i className={`fas ${docInfo.icon} fa-2x`} style={{ color: docInfo.color }} />
+                                  <span className="badge mt-2" style={{ backgroundColor: docInfo.color, color: '#fff', fontSize: '0.65rem' }}>
+                                    {docInfo.label}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="card-body p-2 d-flex flex-column justify-content-between bg-white">
+                                <p className="card-text small fw-semibold text-truncate mb-1 text-dark" title={m.filename}>
+                                  {m.filename}
+                                </p>
+                                <div className="d-flex justify-content-between align-items-center mt-1">
+                                  <span className="text-muted" style={{ fontSize: '0.7rem' }}>
+                                    {(m.fileSize / 1024).toFixed(1)} KB
+                                  </span>
+                                  <span className="badge bg-primary text-white" style={{ fontSize: '0.65rem' }}>
+                                    Select
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer border-top bg-light px-4 py-2">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary btn-sm px-4" 
+                  onClick={() => setMediaModalOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

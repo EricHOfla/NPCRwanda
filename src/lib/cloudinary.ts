@@ -56,7 +56,8 @@ export async function uploadToCloudinary(
   buffer: Buffer,
   mimeType: string = 'image/jpeg',
   category: string = 'site',
-  entity?: string
+  entity?: string,
+  originalFilename?: string
 ): Promise<CloudinaryUploadResult> {
   const folder = category.startsWith('npc-rwanda')
     ? category
@@ -64,11 +65,24 @@ export async function uploadToCloudinary(
 
   const base64Data = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-  const result = await cloudinary.uploader.upload(base64Data, {
+  const isImage = mimeType.startsWith('image/');
+  const isPdf = mimeType === 'application/pdf' || (originalFilename && originalFilename.toLowerCase().endsWith('.pdf'));
+
+  // Use 'image' for images, 'auto' for PDFs, and 'raw' for documents (Word, Excel, PowerPoint, archives, etc.)
+  const resourceType = isImage ? 'image' : isPdf ? 'auto' : 'raw';
+
+  const uploadOptions: Record<string, any> = {
     folder,
-    resource_type: 'auto',
-    timeout: 30000,
-  });
+    resource_type: resourceType,
+    timeout: 60000,
+  };
+
+  if (originalFilename) {
+    uploadOptions.use_filename = true;
+    uploadOptions.filename_override = originalFilename;
+  }
+
+  const result = await cloudinary.uploader.upload(base64Data, uploadOptions);
 
   return {
     url: result.secure_url,

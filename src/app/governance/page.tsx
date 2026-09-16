@@ -20,6 +20,17 @@ interface GovPolicy {
   order: number;
 }
 
+const getDocDetails = (url: string) => {
+  if (!url || url === '#') return { icon: 'fa-file-lines', label: 'Document' };
+  const clean = url.split('?')[0].toLowerCase();
+  if (clean.endsWith('.pdf')) return { icon: 'fa-file-pdf text-danger', label: 'PDF' };
+  if (clean.endsWith('.doc') || clean.endsWith('.docx')) return { icon: 'fa-file-word text-primary', label: 'DOC' };
+  if (clean.endsWith('.xls') || clean.endsWith('.xlsx') || clean.endsWith('.csv')) return { icon: 'fa-file-excel text-success', label: 'Excel' };
+  if (clean.endsWith('.ppt') || clean.endsWith('.pptx')) return { icon: 'fa-file-powerpoint text-warning', label: 'PPT' };
+  if (clean.endsWith('.png') || clean.endsWith('.jpg') || clean.endsWith('.jpeg')) return { icon: 'fa-file-image text-info', label: 'Image' };
+  return { icon: 'fa-file-lines text-primary', label: 'Document' };
+};
+
 export default function GovernancePage() {
   const { t } = useTranslation();
   const [keyDocuments, setKeyDocuments] = useState<GovDoc[]>([]);
@@ -113,22 +124,33 @@ export default function GovernancePage() {
                           className="doc-icon d-flex align-items-center justify-content-center bg-light rounded-3 me-3"
                           style={{ width: '50px', height: '50px', minWidth: '50px', color: 'var(--primary-blue)' }}
                         >
-                          <i className="fas fa-file-pdf fa-lg"></i>
+                          <i className={`fas ${getDocDetails(doc.fileUrl).icon} fa-lg`}></i>
                         </div>
                         <div className="flex-grow-1">
                           <h4 className="h6 mb-1">{doc.title}</h4>
                           <p className="small text-muted mb-0">{doc.desc}</p>
                         </div>
-                        <a
-                          href={doc.fileUrl || '#'}
-                          className="btn btn-sm btn-outline-primary ms-3"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ whiteSpace: 'nowrap' }}
-                        >
-                          <i className="fas fa-download me-1"></i>
-                          <span>{t('phrase.PDF')}</span>
-                        </a>
+                        {doc.fileUrl && doc.fileUrl !== '#' ? (
+                          <a
+                            href={doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/assets/img/curated/${doc.fileUrl}`}
+                            className="btn btn-sm btn-outline-primary ms-3"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ whiteSpace: 'nowrap' }}
+                          >
+                            <i className="fas fa-download me-1"></i>
+                            <span>{getDocDetails(doc.fileUrl).label}</span>
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-light border ms-3 text-muted"
+                            disabled
+                            style={{ whiteSpace: 'nowrap', opacity: 0.6 }}
+                          >
+                            <span>Available Soon</span>
+                          </button>
+                        )}
                       </div>
                     );
                   })
@@ -163,17 +185,27 @@ export default function GovernancePage() {
                           data-aos="zoom-in"
                           data-aos-delay={index * 100}
                         >
-                          <div className="p-3 bg-light rounded-3 border h-100" id={policyId}>
-                            <h5 className="h6 mb-2">{policy.title}</h5>
-                            <p className="small text-muted mb-2">{policy.desc}</p>
-                            <a
-                              href={policy.fileUrl || '#'}
-                              className="small fw-bold text-primary"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {t('phrase.Read Policy')}
-                            </a>
+                          <div className="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between" id={policyId}>
+                            <div>
+                              <div className="d-flex align-items-center justify-content-between mb-2">
+                                <h5 className="h6 mb-0 fw-bold">{policy.title}</h5>
+                                <i className={`fas ${getDocDetails(policy.fileUrl).icon}`} />
+                              </div>
+                              <p className="small text-muted mb-3">{policy.desc}</p>
+                            </div>
+                            {policy.fileUrl && policy.fileUrl !== '#' ? (
+                              <a
+                                href={policy.fileUrl.startsWith('http') || policy.fileUrl.startsWith('/') ? policy.fileUrl : `/assets/img/curated/${policy.fileUrl}`}
+                                className="small fw-bold text-primary d-inline-flex align-items-center gap-1"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <span>{t('phrase.Read Policy')}</span> 
+                                <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.72rem' }} />
+                              </a>
+                            ) : (
+                              <span className="small text-muted fst-italic">Document in archive</span>
+                            )}
                           </div>
                         </div>
                       );

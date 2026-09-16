@@ -20,13 +20,40 @@ export async function POST(request: Request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const mimeType = file.type || 'image/jpeg';
+
+    // Accurately determine MIME type from file.type or extension
+    const ext = path.extname(file.name || '').toLowerCase();
+    const mimeMap: Record<string, string> = {
+      '.pdf': 'application/pdf',
+      '.doc': 'application/msword',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.xls': 'application/vnd.ms-excel',
+      '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      '.ppt': 'application/vnd.ms-powerpoint',
+      '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      '.txt': 'text/plain',
+      '.csv': 'text/csv',
+      '.rtf': 'application/rtf',
+      '.odt': 'application/vnd.oasis.opendocument.text',
+      '.ods': 'application/vnd.oasis.opendocument.spreadsheet',
+      '.odp': 'application/vnd.oasis.opendocument.presentation',
+      '.zip': 'application/zip',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.webp': 'image/webp',
+      '.svg': 'image/svg+xml',
+      '.gif': 'image/gif',
+    };
+    const mimeType = (file.type && file.type !== 'application/octet-stream') 
+      ? file.type 
+      : (mimeMap[ext] || file.type || 'application/octet-stream');
 
     let fileUrl: string;
 
     // Try Cloudinary upload first
     try {
-      const cloudinaryResult = await uploadToCloudinary(buffer, mimeType, category, entity);
+      const cloudinaryResult = await uploadToCloudinary(buffer, mimeType, category, entity, file.name);
       fileUrl = cloudinaryResult.url;
     } catch (cloudErr: any) {
       console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr?.message || cloudErr);
