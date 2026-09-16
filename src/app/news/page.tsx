@@ -64,7 +64,7 @@ export default function NewsPage() {
               <div className="row g-0 custom-card overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
                 <div className="col-lg-6">
                   <img
-                    src={`/assets/img/curated/${featured.img}`}
+                    src={featured.img.startsWith('http') || featured.img.startsWith('/') ? featured.img : `/assets/img/curated/${featured.img}`}
                     alt={featured.title}
                     className="w-100 h-100"
                     style={{ objectFit: 'cover', minHeight: '300px' }}
@@ -153,7 +153,7 @@ export default function NewsPage() {
                     <div className="custom-card news-card h-100 d-flex flex-column">
                       <div className="news-img position-relative">
                         <img
-                          src={`/assets/img/curated/${article.img}`}
+                          src={article.img.startsWith('http') || article.img.startsWith('/') ? article.img : `/assets/img/curated/${article.img}`}
                           alt={article.title}
                           className="img-fluid w-100"
                           style={{ height: '200px', objectFit: 'cover' }}
