@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
   const address = systemSettings.address || contactInfo?.address || '';
   const phone = systemSettings.contactPhone || contactInfo?.phone || '';
   const email = systemSettings.contactEmail || contactInfo?.email || '';
-  const siteName = systemSettings.siteName || '';
+  const siteName = systemSettings.siteName || 'NPC Rwanda';
   const siteLogo = systemSettings.siteLogo || getSiteText('footer.logo', '/assets/img/logo.png');
   const configuredSocialLinks = socialLinks
     .filter(s => s.active)

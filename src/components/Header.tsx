@@ -14,8 +14,8 @@ export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const email = systemSettings.contactEmail || '';
   const phone = systemSettings.contactPhone || '';
-  const siteName = systemSettings.siteName || '';
-  const siteSubtitle = systemSettings.siteSubtitle || '';
+  const siteName = systemSettings.siteName || 'NPC Rwanda';
+  const siteSubtitle = systemSettings.siteSubtitle || 'PARALYMPIC COMMITTEE';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
 
   useEffect(() => {

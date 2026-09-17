@@ -374,16 +374,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [partners, setPartners] = useState<Partner[]>([]);
   const [siteContent, setSiteContent] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
   const [siteContentList, setSiteContentList] = useState<SiteContent[]>([]);
-  const [systemSettings, setSystemSettings] = useState<Record<string, string>>(() => {
-    // Instantly seed from localStorage so Header/Footer show with zero delay
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('npc_system_settings');
-        if (cached) return JSON.parse(cached) as Record<string, string>;
-      } catch { /* ignore parse errors */ }
-    }
-    return {};
-  });
+  const [systemSettings, setSystemSettings] = useState<Record<string, string>>({});
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
@@ -400,21 +391,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [dpscoContacts, setDpscoContacts] = useState<DpscoContact[]>([]);
 
   const [loading, setLoading] = useState(true);
-
-  // Fetch system-settings FIRST and independently so Header/Footer never flash
-  useEffect(() => {
-    fetch('/api/system-settings')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data && typeof data === 'object') {
-          setSystemSettings(data as Record<string, string>);
-          try {
-            localStorage.setItem('npc_system_settings', JSON.stringify(data));
-          } catch { /* ignore storage errors */ }
-        }
-      })
-      .catch(() => { /* silently fail — cached value stays */ });
-  }, []);
 
   // Fetch Public Data on mount
   useEffect(() => {
@@ -459,9 +435,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSocialLinks(socialRes);
         if (settingsRes && typeof settingsRes === 'object') {
           setSystemSettings(settingsRes as Record<string, string>);
-          try {
-            localStorage.setItem('npc_system_settings', JSON.stringify(settingsRes));
-          } catch { /* ignore */ }
         }
         setSystemComponents(sysCompRes);
         setAssociations(assocRes);
@@ -937,11 +910,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateSystemSettings = (settings: Record<string, string>) => {
-    setSystemSettings(prev => {
-      const merged = { ...prev, ...settings };
-      try { localStorage.setItem('npc_system_settings', JSON.stringify(merged)); } catch { /* ignore */ }
-      return merged;
-    });
+    setSystemSettings(prev => ({ ...prev, ...settings }));
   };
 
   const updateContactInfo = async (info: Omit<ContactInfo, 'id'>) => {
