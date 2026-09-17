@@ -1032,8 +1032,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // For files > 3.5MB, upload directly to Cloudinary to bypass server 413 limits
-    if (file.size > 3.5 * 1024 * 1024) {
+    const isDocFile = category === 'governance' || 
+                      category.toLowerCase().includes('doc') || 
+                      !file.type.startsWith('image/') || 
+                      /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt|csv|rtf|odt|ods|odp|zip|rar)$/i.test(file.name);
+
+    // For large IMAGES > 3.5MB, upload directly to Cloudinary.
+    // Documents are NEVER sent to Cloudinary — they are stored on the local system.
+    if (!isDocFile && file.size > 3.5 * 1024 * 1024) {
       const directAsset = await tryDirectCloudinaryUpload();
       if (directAsset) return directAsset;
     }

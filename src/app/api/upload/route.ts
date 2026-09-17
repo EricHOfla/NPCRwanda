@@ -55,17 +55,17 @@ export async function POST(request: NextRequest) {
       ? file.type 
       : (mimeMap[ext] || file.type || 'application/octet-stream');
 
+    const docExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.rtf', '.odt', '.ods', '.odp', '.zip', '.rar'];
+    const isDocument = category === 'governance' || 
+                       category.toLowerCase().includes('doc') || 
+                       docExtensions.includes(ext) || 
+                       (!mimeType.startsWith('image/'));
+
     let fileUrl: string;
 
-    // Try Cloudinary upload first
-    try {
-      const cloudinaryResult = await uploadToCloudinary(buffer, mimeType, category, entity, file.name);
-      fileUrl = cloudinaryResult.url;
-    } catch (cloudErr: any) {
-      console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr?.message || cloudErr);
-
-      // Fallback to local storage if Cloudinary is unreachable
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    if (isDocument) {
+      // Store documents directly on the local server so they are always downloadable without Cloudinary restrictions
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documents');
       await fs.mkdir(uploadDir, { recursive: true });
 
       const timestamp = Date.now();
@@ -74,7 +74,26 @@ export async function POST(request: NextRequest) {
       const filePath = path.join(uploadDir, uniqueFilename);
 
       await fs.writeFile(filePath, buffer);
-      fileUrl = `/uploads/${uniqueFilename}`;
+      fileUrl = `/uploads/documents/${uniqueFilename}`;
+    } else {
+      // Images: try Cloudinary first, fallback to local storage
+      try {
+        const cloudinaryResult = await uploadToCloudinary(buffer, mimeType, category, entity, file.name);
+        fileUrl = cloudinaryResult.url;
+      } catch (cloudErr: any) {
+        console.warn('Cloudinary upload failed, falling back to local storage:', cloudErr?.message || cloudErr);
+
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'images');
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        const timestamp = Date.now();
+        const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const uniqueFilename = `${timestamp}_${sanitizedFilename}`;
+        const filePath = path.join(uploadDir, uniqueFilename);
+
+        await fs.writeFile(filePath, buffer);
+        fileUrl = `/uploads/images/${uniqueFilename}`;
+      }
     }
 
     // Save record to DB

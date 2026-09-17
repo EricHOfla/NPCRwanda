@@ -33,7 +33,10 @@ const getDocDetails = (url: string) => {
 };
 
 const getReliableDocUrl = (title: string, currentUrl?: string): string => {
-  if (currentUrl && currentUrl !== '#' && !currentUrl.includes('kdhllrwifaa0srmwk225')) {
+  if (currentUrl && currentUrl !== '#' && currentUrl.startsWith('/')) {
+    return currentUrl;
+  }
+  if (currentUrl && currentUrl !== '#' && !currentUrl.includes('cloudinary.com')) {
     return currentUrl;
   }
   const lower = (title || '').toLowerCase();
