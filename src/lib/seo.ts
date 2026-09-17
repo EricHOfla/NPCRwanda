@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const SITE_CONFIG = {
-  siteName: 'NPC Rwanda (NPCRwanda)',
+  siteName: 'NPC Rwanda',
   brandName: 'NPC Rwanda',
   fullName: 'National Paralympic Committee of Rwanda',
   shortName: 'NPC Rwanda',
   siteUrl: 'https://npcrwanda.org',
-  defaultTitle: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
-  titleTemplate: '%s | NPC Rwanda (NPCRwanda)',
+  defaultTitle: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
+  titleTemplate: '%s | NPC Rwanda',
   defaultDescription:
     'Official website of the National Paralympic Committee of Rwanda - NPC Rwanda (NPCRwanda). Dedicated to Paralympic sports, sitting volleyball, empowering Rwandan para-athletes, and driving national inclusion through athletic excellence.',
   defaultOgImage: 'https://npcrwanda.org/assets/img/logo.png',

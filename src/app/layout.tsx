@@ -31,11 +31,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.siteUrl),
   title: {
-    default: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
-    template: '%s | NPC Rwanda (NPCRwanda)',
+    default: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
+    template: '%s | NPC Rwanda',
   },
   description: SITE_CONFIG.defaultDescription,
-  applicationName: 'NPC Rwanda (NPCRwanda)',
+  applicationName: 'NPC Rwanda',
   keywords: GLOBAL_KEYWORDS,
   authors: [{ name: SITE_CONFIG.fullName, url: SITE_CONFIG.siteUrl }],
   creator: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     canonical: SITE_CONFIG.siteUrl,
   },
   openGraph: {
-    title: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda | Official Website',
+    title: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
     description: SITE_CONFIG.defaultDescription,
     url: SITE_CONFIG.siteUrl,
     siteName: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NPC Rwanda (NPCRwanda) - National Paralympic Committee of Rwanda',
+    title: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
     description: SITE_CONFIG.defaultDescription,
     site: '@npcrwanda',
     creator: '@npcrwanda',
