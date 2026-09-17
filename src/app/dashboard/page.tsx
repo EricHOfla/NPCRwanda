@@ -4911,7 +4911,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Site Subtitle</label>
-                      <input type="text" className="form-control" value={sysSettings.siteSubtitle || ''} onChange={e => setSysSettings(p => ({ ...p, siteSubtitle: e.target.value }))} placeholder="PARALYMPIC COMMITTEE" />
+                      <input type="text" className="form-control" value={sysSettings.siteSubtitle || ''} onChange={e => setSysSettings(p => ({ ...p, siteSubtitle: e.target.value }))} placeholder="NATIONAL PARALYMPIC COMMITTEE OF RWANDA" />
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Contact Email</label>

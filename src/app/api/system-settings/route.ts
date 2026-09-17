@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     // Auto-seed required keys into DB if missing (runs once, then DB is source of truth)
     const seedDefaults: Record<string, string> = {
       siteName:     'NPC Rwanda',
-      siteSubtitle: 'PARALYMPIC COMMITTEE',
+      siteSubtitle: 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA',
       siteLogo:     '/assets/img/logo.png',
     };
     const missingEntries = Object.entries(seedDefaults).filter(([k]) => !settingsMap[k]);

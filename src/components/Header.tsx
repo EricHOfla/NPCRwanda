@@ -15,7 +15,7 @@ export const Header: React.FC = () => {
   const email = systemSettings.contactEmail || '';
   const phone = systemSettings.contactPhone || '';
   const siteName = systemSettings.siteName || 'NPC Rwanda';
-  const siteSubtitle = systemSettings.siteSubtitle || 'PARALYMPIC COMMITTEE';
+  const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
 
   useEffect(() => {
@@ -139,7 +139,7 @@ export const Header: React.FC = () => {
                 {siteName}
               </span>
               {siteSubtitle && (
-                <small className="text-muted text-uppercase" style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
+                <small className="text-muted text-uppercase" style={{ fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.4px' }}>
                   {siteSubtitle}
                 </small>
               )}
