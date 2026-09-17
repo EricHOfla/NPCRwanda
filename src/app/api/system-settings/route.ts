@@ -13,26 +13,12 @@ export async function GET(request: NextRequest) {
       return acc;
     }, {} as Record<string, string>);
 
-    // Fallback/sync from ContactInfo if any contact fields are missing
+    // Sync contact fields from ContactInfo table if not yet set in SystemSetting
     const contact = await prisma.contactInfo.findFirst();
     if (contact) {
       if (!settingsMap.contactPhone && contact.phone) settingsMap.contactPhone = contact.phone;
       if (!settingsMap.contactEmail && contact.email) settingsMap.contactEmail = contact.email;
       if (!settingsMap.address && contact.address) settingsMap.address = contact.address;
-    }
-
-    // Default fallbacks to guarantee fields are never empty
-    if (!settingsMap.siteName) {
-      settingsMap.siteName = 'National Paralympic Committee of Rwanda';
-    }
-    if (!settingsMap.contactEmail) {
-      settingsMap.contactEmail = 'info@npcrwanda.org';
-    }
-    if (!settingsMap.contactPhone) {
-      settingsMap.contactPhone = '+250 788 672 739';
-    }
-    if (!settingsMap.address) {
-      settingsMap.address = 'Amahoro Stadium, Kigali';
     }
 
     return NextResponse.json(settingsMap);

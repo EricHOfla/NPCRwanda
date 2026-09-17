@@ -12,9 +12,11 @@ export const Header: React.FC = () => {
   const { systemSettings } = useData();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const email = systemSettings.contactEmail || 'info@npcrwanda.org';
-  const phone = systemSettings.contactPhone || '+250 788 672 739';
-  const siteName = systemSettings.siteName || 'National Paralympic Committee of Rwanda';
+  const email = systemSettings.contactEmail || '';
+  const phone = systemSettings.contactPhone || '';
+  const siteName = systemSettings.siteName || '';
+  const siteSubtitle = systemSettings.siteSubtitle || '';
+  const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
 
   useEffect(() => {
     // Dynamic import of bootstrap JS on client side for dropdowns
@@ -126,18 +128,21 @@ export const Header: React.FC = () => {
         <div className="container border-0">
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <img
-              src="/assets/img/logo.png"
-              alt="National Paralympic Committee of Rwanda - NPC Rwanda Logo"
+              src={siteLogo}
+              alt={`${siteName} - ${siteSubtitle}`}
               className="me-2"
               style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
             />
             <div className="brand-text">
               <span className="d-block fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1.1rem', lineHeight: 1 }}>
                 {siteName}
               </span>
-              <small className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
-                PARALYMPIC COMMITTEE
-              </small>
+              {siteSubtitle && (
+                <small className="text-muted text-uppercase" style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
+                  {siteSubtitle}
+                </small>
+              )}
             </div>
           </Link>
 

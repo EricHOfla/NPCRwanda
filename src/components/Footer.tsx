@@ -13,14 +13,15 @@ export const Footer: React.FC = () => {
     return siteContent[key] || fallback;
   };
 
-  const address = systemSettings.address || contactInfo?.address || 'Amahoro Stadium, Kigali';
-  const phone = systemSettings.contactPhone || contactInfo?.phone || '+250 788 672 739';
-  const email = systemSettings.contactEmail || contactInfo?.email || 'info@npcrwanda.org';
-  const siteName = systemSettings.siteName || 'National Paralympic Committee of Rwanda';
+  const address = systemSettings.address || contactInfo?.address || '';
+  const phone = systemSettings.contactPhone || contactInfo?.phone || '';
+  const email = systemSettings.contactEmail || contactInfo?.email || '';
+  const siteName = systemSettings.siteName || '';
+  const siteLogo = systemSettings.siteLogo || getSiteText('footer.logo', '/assets/img/logo.png');
   const configuredSocialLinks = socialLinks
     .filter(s => s.active)
     .map(s => ({ ...s, url: systemSettings[s.platform] || s.url }));
-  const footerDesc = getSiteText('footer.description', t('phrase.The National Paralympic Committee of Rwanda is dedicated to the development of Paralympic sports and fostering inclusion for persons with disabilities through the power of athletic excellence.'));
+  const footerDesc = getSiteText('footer.description', '');
 
   return (
     <footer id="main-footer">
@@ -30,10 +31,11 @@ export const Footer: React.FC = () => {
           <div className="col-lg-4">
             <div className="footer-logo d-flex align-items-center mb-4">
               <img
-                src={getSiteText('footer.logo', '/assets/img/logo.png')}
-                alt="National Paralympic Committee of Rwanda - NPC Rwanda Logo"
+                src={siteLogo}
+                alt={`${siteName} Logo`}
                 className="me-2"
                 style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
               />
               <h5 className="mb-0">{siteName}</h5>
             </div>

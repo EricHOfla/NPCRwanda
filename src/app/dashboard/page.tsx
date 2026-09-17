@@ -685,15 +685,7 @@ export default function DashboardPage() {
   });
 
   // System Settings state
-  const [sysSettings, setSysSettings] = useState<Record<string, string>>({
-    siteName: 'National Paralympic Committee of Rwanda',
-    contactEmail: 'info@npcrwanda.org',
-    contactPhone: '+250 788 672 739',
-    address: 'Amahoro Stadium, Kigali',
-    facebook: 'https://facebook.com/npcrwanda',
-    twitter: 'https://twitter.com/npcrwanda',
-    instagram: 'https://instagram.com/npcrwanda'
-  });
+  const [sysSettings, setSysSettings] = useState<Record<string, string>>({});
   const [savedSysSettings, setSavedSysSettings] = useState<Record<string, string>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMsg, setSettingsMsg] = useState('');
@@ -4915,7 +4907,11 @@ export default function DashboardPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Site Name</label>
-                      <input type="text" className="form-control" value={sysSettings.siteName || ''} onChange={e => setSysSettings(p => ({ ...p, siteName: e.target.value }))} placeholder="National Paralympic Committee..." required />
+                      <input type="text" className="form-control" value={sysSettings.siteName || ''} onChange={e => setSysSettings(p => ({ ...p, siteName: e.target.value }))} placeholder="NPC Rwanda" required />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Site Subtitle</label>
+                      <input type="text" className="form-control" value={sysSettings.siteSubtitle || ''} onChange={e => setSysSettings(p => ({ ...p, siteSubtitle: e.target.value }))} placeholder="PARALYMPIC COMMITTEE" />
                     </div>
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Contact Email</label>
@@ -4928,6 +4924,11 @@ export default function DashboardPage() {
                     <div>
                       <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Physical Address</label>
                       <input type="text" className="form-control" value={sysSettings.address || ''} onChange={e => setSysSettings(p => ({ ...p, address: e.target.value }))} placeholder="Amahoro Stadium, Kigali" />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#475569' }}>Logo Path / URL</label>
+                      <input type="text" className="form-control" value={sysSettings.siteLogo || ''} onChange={e => setSysSettings(p => ({ ...p, siteLogo: e.target.value }))} placeholder="/assets/img/logo.png" />
+                      <small style={{ color: '#94A3B8', fontSize: '0.75rem' }}>Relative path or absolute URL to the logo image.</small>
                     </div>
                   </div>
 
