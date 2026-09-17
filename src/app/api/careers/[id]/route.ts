@@ -76,6 +76,16 @@ export async function PUT(
       data: result.data,
     });
 
+    if (updatedCareer.status === 'Open') {
+      const { notifySubscribers } = await import('@/lib/mailer');
+      notifySubscribers({
+        category: 'careers',
+        title: updatedCareer.title,
+        description: `${updatedCareer.desc} | Location: ${updatedCareer.location}`,
+        url: `/careers/${updatedCareer.slug}`,
+      }).catch(err => console.warn('Notification error on career update:', err));
+    }
+
     return NextResponse.json(updatedCareer);
   } catch (error) {
     console.error('Update career error:', error);

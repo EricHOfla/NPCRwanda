@@ -84,7 +84,7 @@ export async function PUT(
       data: result.data,
     });
 
-    if (existingArticle?.status !== 'Published' && updatedArticle.status === 'Published') {
+    if (updatedArticle.status === 'Published') {
       const isAnnouncement = ['announcement', 'notice', 'update', 'important'].includes((updatedArticle.category || '').toLowerCase());
       const cat = isAnnouncement ? 'announcements' : 'news';
       const targetUrl = isAnnouncement ? `/announcements/${updatedArticle.slug}` : `/news/${updatedArticle.slug}`;
