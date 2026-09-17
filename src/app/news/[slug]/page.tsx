@@ -11,9 +11,21 @@ export default function ArticleDetailPage({ params }: { params: Promise<{ slug: 
     : (params as { slug: string });
   const slug = unwrappedParams?.slug;
   const { t } = useTranslation();
-  const { news } = useData();
+  const { news, loading } = useData();
 
   const article = news.find(n => n.slug === slug);
+
+  if (loading) {
+    return (
+      <main className="py-5 text-center">
+        <div className="container py-5 my-5">
+          <i className="fas fa-spinner fa-spin text-primary fa-3x mb-3"></i>
+          <h2 className="h4 text-dark fw-bold mb-2">Loading Article...</h2>
+          <p className="text-muted small">Fetching latest content from National Paralympic Committee of Rwanda.</p>
+        </div>
+      </main>
+    );
+  }
 
   if (!article) {
     return (
