@@ -57,9 +57,25 @@ export async function getTransporter() {
         user: config.user,
         pass: config.pass,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     }),
     from: config.from,
   };
+}
+
+export async function testSmtpConnection() {
+  const mailSetup = await getTransporter();
+  if (!mailSetup) {
+    return { success: false, error: 'SMTP configuration is missing or incomplete (Host, User, or Password not set).' };
+  }
+  try {
+    await mailSetup.transporter.verify();
+    return { success: true, message: 'SMTP connection verified successfully!' };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to connect to SMTP server.' };
+  }
 }
 
 export async function sendWelcomeEmail(email: string, token?: string | null) {

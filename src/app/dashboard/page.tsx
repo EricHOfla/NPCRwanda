@@ -691,6 +691,31 @@ export default function DashboardPage() {
   const [savedSysSettings, setSavedSysSettings] = useState<Record<string, string>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMsg, setSettingsMsg] = useState('');
+  const [smtpTesting, setSmtpTesting] = useState(false);
+  const [smtpTestResult, setSmtpTestResult] = useState<{ success?: boolean; message?: string } | null>(null);
+
+  const handleTestSmtp = async () => {
+    setSmtpTesting(true);
+    setSmtpTestResult(null);
+    try {
+      await fetch('/api/system-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sysSettings),
+      });
+      const res = await fetch('/api/system-settings/test-smtp', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setSmtpTestResult({ success: true, message: data.message || 'SMTP connected successfully!' });
+      } else {
+        setSmtpTestResult({ success: false, message: data.error || 'Connection failed.' });
+      }
+    } catch (e: any) {
+      setSmtpTestResult({ success: false, message: e?.message || 'Error testing connection' });
+    } finally {
+      setSmtpTesting(false);
+    }
+  };
 
   // Admin Profile state
   const [profile, setProfile] = useState({ name: '', email: '', password: '', confirmPassword: '' });
@@ -4998,6 +5023,36 @@ export default function DashboardPage() {
                           <option value="true">Yes (Port 465 SSL)</option>
                         </select>
                       </div>
+                    </div>
+                    <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={handleTestSmtp}
+                        disabled={smtpTesting || !sysSettings.smtpHost || !sysSettings.smtpUser}
+                        style={{
+                          background: '#E0F2FE',
+                          color: '#0369A1',
+                          border: '1px solid #BAE6FD',
+                          borderRadius: '8px',
+                          padding: '8px 16px',
+                          fontWeight: 600,
+                          fontSize: '0.82rem',
+                          cursor: smtpTesting ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        <i className={`fas ${smtpTesting ? 'fa-spinner fa-spin' : 'fa-paper-plane'} me-2`} />
+                        {smtpTesting ? 'Testing Connection...' : 'Test SMTP Connection'}
+                      </button>
+                      {smtpTestResult && (
+                        <span style={{
+                          fontSize: '0.82rem',
+                          fontWeight: 600,
+                          color: smtpTestResult.success ? '#15803D' : '#B91C1C'
+                        }}>
+                          <i className={`fas ${smtpTestResult.success ? 'fa-check-circle' : 'fa-triangle-exclamation'} me-1`} />
+                          {smtpTestResult.message}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>

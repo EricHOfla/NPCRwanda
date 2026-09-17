@@ -50,15 +50,20 @@ export async function middleware(request: NextRequest) {
     const method = request.method;
     let requiresAuth = false;
 
-    const isInboxRoute =
+    const isPublicFormRoute =
       pathname.startsWith('/api/contacts') ||
       pathname.startsWith('/api/volunteers') ||
-      pathname.startsWith('/api/donations');
+      pathname.startsWith('/api/donations') ||
+      pathname === '/api/subscribers';
 
+    const isUnsubscribeRoute = pathname.startsWith('/api/subscribers/unsubscribe');
     const isSettingsRoute = pathname.startsWith('/api/system-settings');
 
-    if (isInboxRoute) {
-      // GET, PUT, DELETE require auth. POST is public (form submissions).
+    if (isUnsubscribeRoute) {
+      // Unsubscribe link from email is always public
+      requiresAuth = false;
+    } else if (isPublicFormRoute) {
+      // GET, PUT, DELETE, PATCH require auth (admin only). POST is public (form submissions).
       if (['GET', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
         requiresAuth = true;
       }
