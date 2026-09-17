@@ -302,3 +302,16 @@ model DpscoContact {
 
   @@index([province])
 }
+
+model Subscriber {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  active      Boolean  @default(true)
+  categories  String[] @default(["news", "events", "careers", "announcements"])
+  token       String?  @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+  @@index([active])
+}

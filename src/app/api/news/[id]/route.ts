@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribers } from '@/lib/mailer';
 
 // News validation update schema
 const newsUpdateSchema = z.object({
@@ -73,10 +74,29 @@ export async function PUT(
       }
     }
 
+    const existingArticle = await prisma.newsArticle.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+
     const updatedArticle = await prisma.newsArticle.update({
       where: { id },
       data: result.data,
     });
+
+    if (existingArticle?.status !== 'Published' && updatedArticle.status === 'Published') {
+      const isAnnouncement = ['announcement', 'notice', 'update', 'important'].includes((updatedArticle.category || '').toLowerCase());
+      const cat = isAnnouncement ? 'announcements' : 'news';
+      const targetUrl = isAnnouncement ? `/announcements/${updatedArticle.slug}` : `/news/${updatedArticle.slug}`;
+
+      notifySubscribers({
+        category: cat,
+        title: updatedArticle.title,
+        description: updatedArticle.desc,
+        url: targetUrl,
+        imageUrl: updatedArticle.img,
+      }).catch(err => console.warn('Notification error on news update:', err));
+    }
 
     return NextResponse.json(updatedArticle);
   } catch (error) {

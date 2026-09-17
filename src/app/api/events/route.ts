@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +76,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
     const event = await prisma.event.create({ data: result.data });
+
+    // Notify subscribers asynchronously
+    notifySubscribers({
+      category: 'events',
+      title: event.title,
+      description: `${event.description} | Location: ${event.location} | Date: ${event.date}`,
+      url: `/events#${event.id}`,
+      imageUrl: event.img,
+    }).catch(err => console.warn('Notification error on event create:', err));
+
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
     console.error('Create event error:', error);

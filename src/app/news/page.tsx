@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
+import NewsletterBox from '@/components/NewsletterBox';
 
 const CATEGORIES = ['All', 'Competition', 'Training', 'Governance', 'Community', 'International'];
 
@@ -195,6 +196,14 @@ export default function NewsPage() {
                 </Link>
               </div>
             </div>
+          </div>
+          {/* Newsletter Subscription */}
+          <div className="mt-4">
+            <NewsletterBox
+              category="news"
+              title="Subscribe to News & Stories"
+              description="Be the first to receive athlete spotlights, national team results, and official NPC Rwanda stories."
+            />
           </div>
 
         </div>

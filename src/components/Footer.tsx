@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '../context/LanguageContext';
 import { useData } from '../context/DataContext';
@@ -8,6 +8,35 @@ import { useData } from '../context/DataContext';
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
   const { contactInfo, socialLinks, siteContent, systemSettings } = useData();
+
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeMsg, setSubscribeMsg] = useState<{ text: string; success: boolean } | null>(null);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subscribeEmail) return;
+    setSubscribing(true);
+    setSubscribeMsg(null);
+    try {
+      const res = await fetch('/api/subscribers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: subscribeEmail }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscribeMsg({ text: data.message || 'Subscribed successfully!', success: true });
+        setSubscribeEmail('');
+      } else {
+        setSubscribeMsg({ text: data.error || 'Failed to subscribe', success: false });
+      }
+    } catch {
+      setSubscribeMsg({ text: 'Error connecting to server. Please try again.', success: false });
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   const getSiteText = (key: string, fallback: string) => {
     return siteContent[key] || fallback;
@@ -154,6 +183,57 @@ export const Footer: React.FC = () => {
                 <i className="fas fa-envelope me-3 text-accent-yellow"></i> {email}
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Newsletter Subscription Row */}
+        <div className="border-top border-secondary pt-4 mt-4 pb-2">
+          <div className="row align-items-center g-3">
+            <div className="col-lg-6">
+              <h5 className="mb-1 text-white fw-bold">
+                <i className="fas fa-bell me-2 text-accent-yellow"></i>Subscribe to Official Updates
+              </h5>
+              <p className="small text-white-50 mb-0">
+                Get notified automatically when we publish new Announcements, News, Events, and Careers.
+              </p>
+            </div>
+            <div className="col-lg-6">
+              <form onSubmit={handleSubscribe} className="d-flex flex-column flex-sm-row gap-2">
+                <input
+                  type="email"
+                  className="form-control form-control-sm"
+                  placeholder="Enter your email address..."
+                  value={subscribeEmail}
+                  onChange={(e) => setSubscribeEmail(e.target.value)}
+                  disabled={subscribing}
+                  required
+                  style={{ borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.9)' }}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-sm btn-primary px-3 text-nowrap fw-bold"
+                  disabled={subscribing}
+                  style={{ borderRadius: '6px' }}
+                >
+                  {subscribing ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
+                      Subscribing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-paper-plane me-1" />
+                      Subscribe
+                    </>
+                  )}
+                </button>
+              </form>
+              {subscribeMsg && (
+                <div className={`small mt-2 ${subscribeMsg.success ? 'text-success fw-bold' : 'text-danger'}`}>
+                  {subscribeMsg.text}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

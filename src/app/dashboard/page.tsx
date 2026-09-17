@@ -21,6 +21,7 @@ import {
   Event,
   MediaAsset
 } from '@/context/DataContext';
+import SubscribersTab from '@/components/SubscribersTab';
 
 // Professional Pagination Component
 const PaginationComponent: React.FC<{
@@ -89,6 +90,7 @@ type AdminTab =
   | 'partners'
   | 'site-content'
   | 'contacts'
+  | 'subscribers'
   | 'settings'
   | 'profile'
   | 'pages'
@@ -1331,6 +1333,7 @@ export default function DashboardPage() {
             { id: 'leadership', type: 'page', tabId: 'pages', pageId: 'leadership', label: 'Leadership Directory', icon: 'fa-users' },
             { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' },
             { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
+            { id: 'subscribers', type: 'tab', tabId: 'subscribers', label: 'Subscribers', icon: 'fa-bell' },
             { id: 'settings', type: 'tab', tabId: 'settings', label: 'System Settings', icon: 'fa-sliders' },
           ].map(item => {
             const isActive = item.type === 'tab'
@@ -1455,6 +1458,7 @@ export default function DashboardPage() {
               {adminTab === 'members' && 'Members Directory'}
               {adminTab === 'volunteers' && 'Volunteer Applications'}
               {adminTab === 'contacts' && 'Inbox & Feedback'}
+              {adminTab === 'subscribers' && 'Newsletter Subscribers'}
               {adminTab === 'settings' && 'System Settings'}
             </h1>
           </div>
@@ -4959,6 +4963,43 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
+
+                  {/* SMTP / Email Settings */}
+                  <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '18px' }}>
+                    <label style={{ display: 'block', marginBottom: '12px', fontSize: '0.85rem', fontWeight: 700, color: '#1E293B' }}>
+                      <i className="fas fa-envelope-open-text text-primary me-2" />Email (SMTP) Settings
+                    </label>
+                    <p style={{ fontSize: '0.78rem', color: '#94A3B8', marginBottom: '12px' }}>Configure SMTP to send email notifications to newsletter subscribers. Leave blank to disable email sending.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>SMTP Host</label>
+                        <input type="text" className="form-control" value={sysSettings.smtpHost || ''} onChange={e => setSysSettings(p => ({ ...p, smtpHost: e.target.value }))} placeholder="smtp.npcrwanda.org" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>SMTP Port</label>
+                        <input type="text" className="form-control" value={sysSettings.smtpPort || ''} onChange={e => setSysSettings(p => ({ ...p, smtpPort: e.target.value }))} placeholder="587" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>SMTP Username</label>
+                        <input type="text" className="form-control" value={sysSettings.smtpUser || ''} onChange={e => setSysSettings(p => ({ ...p, smtpUser: e.target.value }))} placeholder="info@npcrwanda.org" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>SMTP Password</label>
+                        <input type="password" className="form-control" value={sysSettings.smtpPass || ''} onChange={e => setSysSettings(p => ({ ...p, smtpPass: e.target.value }))} placeholder="••••••••" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>Sender Email (From)</label>
+                        <input type="text" className="form-control" value={sysSettings.smtpFrom || ''} onChange={e => setSysSettings(p => ({ ...p, smtpFrom: e.target.value }))} placeholder="NPC Rwanda <info@npcrwanda.org>" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>Use SSL/TLS (smtpSecure)</label>
+                        <select className="form-control" value={sysSettings.smtpSecure || 'false'} onChange={e => setSysSettings(p => ({ ...p, smtpSecure: e.target.value }))}>
+                          <option value="false">No (Port 587 STARTTLS)</option>
+                          <option value="true">Yes (Port 465 SSL)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                   <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
                     <button type="submit" disabled={settingsSaving} style={{ background: '#0072C6', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 24px', fontWeight: 700, fontSize: '0.88rem', cursor: settingsSaving ? 'not-allowed' : 'pointer', opacity: settingsSaving ? 0.7 : 1 }}>
                       <i className="fas fa-floppy-disk me-2" />{settingsSaving ? 'Saving...' : 'Save Settings'}
@@ -4968,6 +5009,14 @@ export default function DashboardPage() {
                 </form>
               </div>
             </div>
+          )}
+
+
+          {/* ──────────────────────────────
+             TAB: SUBSCRIBERS
+             ────────────────────────────── */}
+          {adminTab === 'subscribers' && (
+            <SubscribersTab />
           )}
 
           {/* ──────────────────────────────

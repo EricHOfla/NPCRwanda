@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,6 +133,21 @@ export async function POST(request: Request) {
     const newArticle = await prisma.newsArticle.create({
       data: result.data,
     });
+
+    if (newArticle.status === 'Published') {
+      const isAnnouncement = ['announcement', 'notice', 'update', 'important'].includes((newArticle.category || '').toLowerCase());
+      const cat = isAnnouncement ? 'announcements' : 'news';
+      const targetUrl = isAnnouncement ? `/announcements/${newArticle.slug}` : `/news/${newArticle.slug}`;
+
+      // Notify subscribers asynchronously
+      notifySubscribers({
+        category: cat,
+        title: newArticle.title,
+        description: newArticle.desc,
+        url: targetUrl,
+        imageUrl: newArticle.img,
+      }).catch(err => console.warn('Notification error on news publish:', err));
+    }
 
     return NextResponse.json(newArticle, { status: 201 });
   } catch (error) {

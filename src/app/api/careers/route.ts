@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,6 +124,15 @@ export async function POST(request: Request) {
         applicants: 0,
       },
     });
+
+    if (newCareer.status === 'Open') {
+      notifySubscribers({
+        category: 'careers',
+        title: newCareer.title,
+        description: `${newCareer.desc} | Location: ${newCareer.location}`,
+        url: `/careers/${newCareer.slug}`,
+      }).catch(err => console.warn('Notification error on career create:', err));
+    }
 
     return NextResponse.json(newCareer, { status: 201 });
   } catch (error) {
