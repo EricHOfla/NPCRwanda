@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useData } from '@/context/DataContext';
 
 interface ResourceItem {
   id: string;
@@ -12,24 +13,27 @@ interface ResourceItem {
 }
 
 export default function ResourcesPage() {
-  const [resources, setResources] = useState<ResourceItem[]>([]);
+  const { governanceDocs, governancePolicies, loading } = useData();
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'All' | 'Documents' | 'Policies'>('All');
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/governance-docs').then(r => r.json()),
-      fetch('/api/governance-policies').then(r => r.json())
-    ])
-      .then(([docs, policies]) => {
-        const docItems = (Array.isArray(docs) ? docs : []).map((d: any) => ({ ...d, type: 'Document' as const }));
-        const policyItems = (Array.isArray(policies) ? policies : []).map((p: any) => ({ ...p, type: 'Policy' as const }));
-        setResources([...docItems, ...policyItems]);
-      })
-      .catch((err) => console.error('Fetch resources error:', err))
-      .finally(() => setLoading(false));
-  }, []);
+  const resources: ResourceItem[] = useMemo(() => {
+    const docItems = (governanceDocs || []).map((d) => ({
+      id: d.id,
+      title: d.title,
+      desc: d.desc,
+      fileUrl: d.fileUrl,
+      type: 'Document' as const,
+    }));
+    const policyItems = (governancePolicies || []).map((p) => ({
+      id: p.id,
+      title: p.title,
+      desc: p.desc,
+      fileUrl: p.fileUrl,
+      type: 'Policy' as const,
+    }));
+    return [...docItems, ...policyItems];
+  }, [governanceDocs, governancePolicies]);
 
   const filteredResources = resources.filter(item => {
     const matchesTab = activeTab === 'All' || (activeTab === 'Documents' && item.type === 'Document') || (activeTab === 'Policies' && item.type === 'Policy');

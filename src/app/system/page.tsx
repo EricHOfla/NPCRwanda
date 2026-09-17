@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
@@ -21,32 +21,12 @@ interface GovPolicy {
 
 export default function SystemPage() {
   const { t } = useTranslation();
-  const { systemComponents } = useData();
-
-  const [docs, setDocs] = useState<GovDoc[]>([]);
-  const [policies, setPolicies] = useState<GovPolicy[]>([]);
-  const [leaders, setLeaders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { systemComponents, governanceDocs: docs, governancePolicies: policies, leaders, loading } = useData();
 
   // Unified Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalItems, setModalItems] = useState<{ name: string; role: string; desc: string; type: 'member' | 'doc'; url?: string }[]>([]);
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/governance-docs').then(r => r.ok ? r.json() : []),
-      fetch('/api/governance-policies').then(r => r.ok ? r.json() : []),
-      fetch('/api/leaders').then(r => r.ok ? r.json() : [])
-    ])
-      .then(([rDocs, rPolicies, rLeaders]) => {
-        setDocs(rDocs);
-        setPolicies(rPolicies);
-        setLeaders(rLeaders);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const getDocSlug = (title: string) => {
     const tLower = title.toLowerCase();

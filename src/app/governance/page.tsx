@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
+import { useData } from '@/context/DataContext';
 
 interface GovDoc {
   id: string;
@@ -49,22 +50,7 @@ const getReliableDocUrl = (title: string, currentUrl?: string): string => {
 
 export default function GovernancePage() {
   const { t } = useTranslation();
-  const [keyDocuments, setKeyDocuments] = useState<GovDoc[]>([]);
-  const [officialPolicies, setOfficialPolicies] = useState<GovPolicy[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/governance-docs').then(r => r.json()),
-      fetch('/api/governance-policies').then(r => r.json()),
-    ])
-      .then(([docs, policies]) => {
-        setKeyDocuments(Array.isArray(docs) ? docs : []);
-        setOfficialPolicies(Array.isArray(policies) ? policies : []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+  const { governanceDocs: keyDocuments, governancePolicies: officialPolicies, loading } = useData();
 
   return (
     <main id="main-content">

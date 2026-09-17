@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 
 // Type definitions matching Prisma schema
@@ -357,6 +357,8 @@ interface DataContextType {
   deleteNpcFederation: (id: string) => Promise<void>;
 
   loading: boolean;
+  error: string | null;
+  refetchPublicData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -391,82 +393,63 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [dpscoContacts, setDpscoContacts] = useState<DpscoContact[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch Public Data on mount
-  useEffect(() => {
-    const fetchPublicData = async () => {
-      try {
-        const [
-          athRes, newsRes, carRes, sportsRes, leadersRes,
-          govDocsRes, govPolRes, eventsRes, partnersRes,
-          contentRes, contactRes, socialRes, sysCompRes, settingsRes,
-          assocRes, clubsRes, fedRes, dpscoRes
-        ] = await Promise.all([
-          fetch('/api/athletes').then(r => r.ok ? r.json() : []),
-          fetch('/api/news').then(r => r.ok ? r.json() : []),
-          fetch('/api/careers').then(r => r.ok ? r.json() : []),
-          fetch('/api/sports').then(r => r.ok ? r.json() : []),
-          fetch('/api/leaders').then(r => r.ok ? r.json() : []),
-          fetch('/api/governance-docs').then(r => r.ok ? r.json() : []),
-          fetch('/api/governance-policies').then(r => r.ok ? r.json() : []),
-          fetch('/api/events').then(r => r.ok ? r.json() : []),
-          fetch('/api/partners').then(r => r.ok ? r.json() : []),
-          fetch('/api/site-content').then(r => r.ok ? r.json() : []),
-          fetch('/api/contact-info').then(r => r.ok ? r.json() : null),
-          fetch('/api/social-links').then(r => r.ok ? r.json() : []),
-          fetch('/api/system').then(r => r.ok ? r.json() : []),
-          fetch('/api/system-settings').then(r => r.ok ? r.json() : {}),
-          fetch('/api/npc-associations').then(r => r.ok ? r.json() : []),
-          fetch('/api/npc-clubs').then(r => r.ok ? r.json() : []),
-          fetch('/api/npc-federations').then(r => r.ok ? r.json() : []),
-          fetch('/api/dpsco-contacts').then(r => r.ok ? r.json() : []),
-        ]);
-
-        setAthletes(athRes);
-        setNews(newsRes);
-        setCareers(carRes);
-        setSports(sportsRes);
-        setLeaders(leadersRes);
-        setGovernanceDocs(govDocsRes);
-        setGovernancePolicies(govPolRes);
-        setEvents(eventsRes);
-        setPartners(partnersRes);
-        setContactInfo(contactRes);
-        setSocialLinks(socialRes);
-        if (settingsRes && typeof settingsRes === 'object') {
-          setSystemSettings(settingsRes as Record<string, string>);
-        }
-        setSystemComponents(sysCompRes);
-        setAssociations(assocRes);
-        setClubs(clubsRes);
-        setFederations(fedRes);
-        setDpscoContacts(dpscoRes);
-
-        const contentList: SiteContent[] = Array.isArray(contentRes)
-          ? contentRes
-          : Array.isArray(contentRes?.list)
-          ? contentRes.list
-          : [];
-        setSiteContentList(contentList);
-        const map: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
-        contentList.forEach((c: SiteContent) => {
-          if (c.value !== undefined && c.value !== null) {
-            map[c.key] = c.value;
-          }
-        });
-        if (contentRes?.map && typeof contentRes.map === 'object') {
-          Object.assign(map, contentRes.map);
-        }
-        setSiteContent(map);
-      } catch (err) {
-        console.error('Error fetching public data:', err);
-      } finally {
-        setLoading(false);
+  // Fetch Public Data via single batched bundle request
+  const fetchPublicData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch('/api/bundle');
+      if (!res.ok) {
+        throw new Error(`Failed to fetch public bundle (status ${res.status})`);
       }
-    };
+      const data = await res.json();
 
-    fetchPublicData();
+      setAthletes(Array.isArray(data.athletes) ? data.athletes : []);
+      setNews(Array.isArray(data.news) ? data.news : []);
+      setCareers(Array.isArray(data.careers) ? data.careers : []);
+      setSports(Array.isArray(data.sports) ? data.sports : []);
+      setLeaders(Array.isArray(data.leaders) ? data.leaders : []);
+      setGovernanceDocs(Array.isArray(data.governanceDocs) ? data.governanceDocs : []);
+      setGovernancePolicies(Array.isArray(data.governancePolicies) ? data.governancePolicies : []);
+      setEvents(Array.isArray(data.events) ? data.events : []);
+      setPartners(Array.isArray(data.partners) ? data.partners : []);
+      setContactInfo(data.contactInfo || null);
+      setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
+      setSystemComponents(Array.isArray(data.systemComponents) ? data.systemComponents : []);
+      setAssociations(Array.isArray(data.associations) ? data.associations : []);
+      setClubs(Array.isArray(data.clubs) ? data.clubs : []);
+      setFederations(Array.isArray(data.federations) ? data.federations : []);
+      setDpscoContacts(Array.isArray(data.dpscoContacts) ? data.dpscoContacts : []);
+
+      if (data.systemSettings && typeof data.systemSettings === 'object') {
+        setSystemSettings(data.systemSettings as Record<string, string>);
+      }
+
+      const contentList: SiteContent[] = Array.isArray(data.siteContent) ? data.siteContent : [];
+      setSiteContentList(contentList);
+      const map: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
+      contentList.forEach((c: SiteContent) => {
+        if (c.value !== undefined && c.value !== null) {
+          map[c.key] = c.value;
+        }
+      });
+      if (data.siteContentMap && typeof data.siteContentMap === 'object') {
+        Object.assign(map, data.siteContentMap);
+      }
+      setSiteContent(map);
+    } catch (err: any) {
+      console.error('Error fetching public bundle data:', err);
+      setError(err?.message || 'Failed to fetch public data bundle');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPublicData();
+  }, [fetchPublicData]);
 
   // Fetch Protected Data (Messages, Volunteers, Donations, Media) for dashboard
   const fetchProtectedData = async () => {
@@ -1533,6 +1516,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteNpcFederation: deleteFederation,
 
         loading,
+        error,
+        refetchPublicData: fetchPublicData,
       }}
     >
       {children}
