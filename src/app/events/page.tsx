@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
-import NewsletterBox from '@/components/NewsletterBox';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
   Upcoming:  { bg: '#EFF6FF', text: '#1D4ED8', icon: 'fa-clock' },
@@ -286,15 +285,6 @@ export default function EventsPage() {
               </Link>
             </div>
           </div>
-          {/* Subscribe to Events */}
-          <div className="mt-4">
-            <NewsletterBox
-              category="events"
-              title="Subscribe to Upcoming Events"
-              description="Never miss a Paralympic competition, championship, or community event."
-            />
-          </div>
-
         </div>
       </section>
     </main>

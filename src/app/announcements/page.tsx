@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
-import NewsletterBox from '@/components/NewsletterBox';
 
 const CATEGORIES = ['All', 'Announcement', 'Notice', 'Update', 'Important'];
 
@@ -178,15 +177,6 @@ export default function AnnouncementsPage() {
               onPageChange={setCurrentPage}
             />
           )}
-
-          {/* Subscribe to Announcements */}
-          <div className="mt-5">
-            <NewsletterBox 
-              category="announcements"
-              title="Subscribe to Announcements"
-              description="Get instant notifications whenever new official notices and announcements are released."
-            />
-          </div>
         </div>
       </section>
     </main>

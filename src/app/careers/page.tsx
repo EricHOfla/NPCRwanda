@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import NewsletterBox from '@/components/NewsletterBox';
 
 export default function CareersPage() {
   const { t } = useTranslation();
@@ -151,15 +150,6 @@ export default function CareersPage() {
               </Link>
             </div>
           </div>
-          {/* Subscribe to Careers */}
-          <div className="mt-4">
-            <NewsletterBox
-              category="careers"
-              title="Subscribe to Job & Career Alerts"
-              description="Be notified immediately when new career opportunities or positions are posted at NPC Rwanda."
-            />
-          </div>
-
         </div>
       </section>
     </main>
