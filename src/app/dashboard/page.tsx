@@ -22,6 +22,7 @@ import {
   MediaAsset
 } from '@/context/DataContext';
 import SubscribersTab from '@/components/SubscribersTab';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 // Professional Pagination Component
 const PaginationComponent: React.FC<{
@@ -313,72 +314,123 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const [previewMode, setPreviewMode] = useState(false);
 
-  const insertText = (before: string, after: string = '') => {
+  const insertText = (before: string, after: string = '', defaultText: string = '') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selection = textarea.value.substring(start, end);
+    const selection = textarea.value.substring(start, end) || defaultText;
     const replacement = before + selection + after;
     const newVal = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
     onChange(newVal);
     
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start + before.length, start + before.length + selection.length);
+      const cursorStart = start + before.length;
+      const cursorEnd = cursorStart + selection.length;
+      textarea.setSelectionRange(cursorStart, cursorEnd);
     }, 0);
   };
 
+  const handleInsertLink = () => {
+    const textarea = textareaRef.current;
+    const start = textarea?.selectionStart || 0;
+    const end = textarea?.selectionEnd || 0;
+    const selectedText = textarea?.value.substring(start, end) || '';
+
+    const url = prompt('Enter link URL (e.g. https://example.com or /news):', 'https://');
+    if (!url) return;
+
+    const linkText = selectedText || prompt('Enter link text (e.g. Read Document / Click Here):', 'Link Text') || 'Link';
+    const markdownLink = `[${linkText}](${url})`;
+
+    if (textarea) {
+      const newVal = textarea.value.substring(0, start) + markdownLink + textarea.value.substring(end);
+      onChange(newVal);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + markdownLink.length, start + markdownLink.length);
+      }, 0);
+    }
+  };
+
+  const handleInsertImage = () => {
+    openMediaSelector((url) => {
+      const alt = prompt('Enter image description (alt text):', 'News Image') || 'Image';
+      insertText(`![${alt}](`, ')', url);
+    });
+  };
+
   return (
-    <div className="border rounded bg-white mb-3">
-      <div className="d-flex justify-content-between align-items-center bg-light border-bottom p-2">
-        <span className="small fw-bold text-muted">{label}</span>
+    <div className="border rounded bg-white mb-3 shadow-sm">
+      <div className="d-flex justify-content-between align-items-center bg-light border-bottom px-3 py-2">
+        <span className="small fw-bold text-dark">{label}</span>
         <div className="btn-group btn-group-sm">
-          <button type="button" onClick={() => setPreviewMode(false)} className={`btn btn-sm ${!previewMode ? 'btn-secondary' : 'btn-outline-secondary'}`}>Write</button>
-          <button type="button" onClick={() => setPreviewMode(true)} className={`btn btn-sm ${previewMode ? 'btn-secondary' : 'btn-outline-secondary'}`}>Preview</button>
+          <button type="button" onClick={() => setPreviewMode(false)} className={`btn btn-sm ${!previewMode ? 'btn-primary fw-bold' : 'btn-outline-secondary'}`}>
+            <i className="fas fa-edit me-1" />Write
+          </button>
+          <button type="button" onClick={() => setPreviewMode(true)} className={`btn btn-sm ${previewMode ? 'btn-primary fw-bold' : 'btn-outline-secondary'}`}>
+            <i className="fas fa-eye me-1" />Preview
+          </button>
         </div>
       </div>
       
       {!previewMode ? (
         <div>
-          <div className="d-flex flex-wrap gap-1 p-1 bg-light border-bottom">
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('**', '**')} title="Bold"><i className="fas fa-bold" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('*', '*')} title="Italic"><i className="fas fa-italic" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('<u>', '</u>')} title="Underline"><i className="fas fa-underline" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('### ')} title="Heading 3"><i className="fas fa-heading" />3</button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('- ')} title="Bullet List"><i className="fas fa-list-ul" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('1. ')} title="Numbered List"><i className="fas fa-list-ol" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('[', '](url)')} title="Link"><i className="fas fa-link" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => {
-              openMediaSelector((url) => {
-                insertText(`![image](${url})`);
-              });
-            }} title="Insert Image"><i className="fas fa-image" /></button>
-            <button type="button" className="btn btn-xs btn-outline-secondary py-0 px-2 small" onClick={() => insertText('| Header 1 | Header 2 |\n|---|---|\n| Cell 1 | Cell 2 |')} title="Table"><i className="fas fa-table" /></button>
+          <div className="d-flex flex-wrap gap-1 p-2 bg-light border-bottom">
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small fw-bold" onClick={() => insertText('**', '**', 'bold text')} title="Bold (**text**)">
+              <i className="fas fa-bold" /> Bold
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('*', '*', 'italic text')} title="Italic (*text*)">
+              <i className="fas fa-italic" /> Italic
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('<u>', '</u>', 'underlined text')} title="Underline (<u>text</u>)">
+              <i className="fas fa-underline" /> Underline
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('## ', '', 'Subheading Title')} title="Heading 2 (## Title)">
+              <i className="fas fa-heading" /> H2
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('### ', '', 'Section Title')} title="Heading 3 (### Title)">
+              <i className="fas fa-heading" /> H3
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('- ', '', 'List item')} title="Bullet List (- item)">
+              <i className="fas fa-list-ul" /> List
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('1. ', '', 'First item')} title="Numbered List (1. item)">
+              <i className="fas fa-list-ol" /> Numbered
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-primary py-1 px-2 small fw-bold" onClick={handleInsertLink} title="Insert Link ([Text](URL))">
+              <i className="fas fa-link me-1" /> Add Link
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-success py-1 px-2 small fw-bold" onClick={handleInsertImage} title="Insert Image (![Alt](URL))">
+              <i className="fas fa-image me-1" /> Add Image
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('> ', '', 'Quoted statement')} title="Quote (> Quote)">
+              <i className="fas fa-quote-right" /> Quote
+            </button>
+            <button type="button" className="btn btn-xs btn-outline-dark py-1 px-2 small" onClick={() => insertText('| Header 1 | Header 2 |\n|---|---|\n| Cell 1 | Cell 2 |\n')} title="Table">
+              <i className="fas fa-table" /> Table
+            </button>
           </div>
           <textarea
             ref={textareaRef}
-            className="form-control border-0 rounded-0"
-            rows={5}
+            className="form-control border-0 rounded-0 p-3"
+            rows={8}
             value={value}
             onChange={e => onChange(e.target.value)}
-            style={{ fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
+            placeholder="Type your content here... Supports Markdown & HTML tags (**bold**, *italic*, [link text](url), ![image](url), <h2>Headings</h2>, <ul>lists</ul>, etc.)"
+            style={{ fontSize: '0.95rem', fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', lineHeight: 1.6 }}
           />
         </div>
       ) : (
-        <div className="p-3 bg-light" style={{ minHeight: '140px', fontSize: '0.9rem' }}>
+        <div className="p-4 bg-white" style={{ minHeight: '180px' }}>
           {value ? (
-            <div style={{ whiteSpace: 'pre-wrap' }}>
-              {value.split('\n').map((line, idx) => {
-                if (line.startsWith('### ')) return <h5 key={idx} className="mt-2 fw-bold">{line.replace('### ', '')}</h5>;
-                if (line.startsWith('## ')) return <h4 key={idx} className="mt-2 fw-bold">{line.replace('## ', '')}</h4>;
-                if (line.startsWith('# ')) return <h3 key={idx} className="mt-3 fw-bold">{line.replace('# ', '')}</h3>;
-                if (line.startsWith('- ')) return <li key={idx} className="ms-3">{line.replace('- ', '')}</li>;
-                return <p key={idx} className="mb-2">{line}</p>;
-              })}
-            </div>
+            <MarkdownRenderer content={value} />
           ) : (
-            <span className="text-muted italic">Nothing to preview.</span>
+            <div className="text-muted italic py-4 text-center">
+              <i className="fas fa-file-lines fa-2x mb-2 d-block text-secondary" />
+              Nothing to preview. Switch to "Write" tab to add content.
+            </div>
           )}
         </div>
       )}

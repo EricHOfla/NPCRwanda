@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 export default function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
@@ -86,15 +87,8 @@ export default function ArticleDetailPage({ params }: { params: Promise<{ slug: 
               </div>
 
               {/* Rich Body text */}
-              <article 
-                className="article-body text-dark py-3" 
-                style={{ fontSize: '1.1rem', lineHeight: '1.8', textAlign: 'justify' }}
-              >
-                {displayContent.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">
-                    {paragraph}
-                  </p>
-                ))}
+              <article className="article-body text-dark py-3">
+                <MarkdownRenderer content={displayContent} style={{ fontSize: '1.08rem', lineHeight: '1.8' }} />
               </article>
 
               <hr className="my-5" />

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useData } from '@/context/DataContext';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 export default function CareerDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
@@ -71,9 +72,7 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
         <div className="container" style={{ maxWidth: '800px' }}>
           <div className="custom-card p-4 p-md-5 mb-4 border">
             <h3 className="h5 fw-bold text-dark mb-3">Position Summary & Description</h3>
-            <p className="text-secondary" style={{ fontSize: '1.05rem', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-              {job.desc}
-            </p>
+            <MarkdownRenderer content={job.desc} style={{ fontSize: '1.05rem', lineHeight: 1.8 }} />
 
             <div className="mt-4 pt-4 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
               <div>

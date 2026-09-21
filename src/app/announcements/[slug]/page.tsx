@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useData } from '@/context/DataContext';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 export default function AnnouncementDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
@@ -90,11 +91,7 @@ export default function AnnouncementDetailPage({ params }: { params: Promise<{ s
             </p>
           )}
 
-          <div
-            className="article-content"
-            style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#334155' }}
-            dangerouslySetInnerHTML={{ __html: displayContent.replace(/\n/g, '<br />') }}
-          />
+          <MarkdownRenderer content={displayContent} style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#334155' }} />
 
           {/* Share / Back */}
           <div className="d-flex justify-content-between align-items-center pt-5 mt-5 border-top">
