@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendApplicationReceivedEmail } from '@/lib/mailer';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -125,6 +126,14 @@ export async function POST(request: NextRequest) {
         // If career ID doesn't match a record, proceed gracefully
       }
     }
+
+    // Dispatch confirmation email to applicant in background
+    sendApplicationReceivedEmail({
+      id: application.id,
+      fullName: application.fullName,
+      email: application.email,
+      careerTitle: application.careerTitle,
+    }).catch(err => console.warn('[Recruitment] Background application receipt email error:', err));
 
     return NextResponse.json({
       success: true,

@@ -474,3 +474,284 @@ export async function notifySubscribers(payload: NotificationPayload) {
     console.error('[Notification] Error dispatching subscriber notifications:', err?.message || err);
   }
 }
+
+/**
+ * Sends automated confirmation email to candidate when they submit a job application
+ */
+export async function sendApplicationReceivedEmail(application: {
+  id: string;
+  fullName: string;
+  email: string;
+  careerTitle: string;
+}) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) {
+      console.log(`[Recruitment] SMTP not configured. Application receipt email skipped for ${application.email}`);
+      return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const refCode = application.id.slice(0, 8).toUpperCase();
+
+    const html = `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Received — NPC Rwanda</title>
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; background-color: #F1F5F9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1E293B; }
+    a { color: #0072C6; text-decoration: none; }
+  </style>
+</head>
+<body style="margin: 0; padding: 24px 0; background-color: #F1F5F9;">
+  <center>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+      <tr>
+        <td align="center" style="padding: 0 12px;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #FFFFFF; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+            <tr>
+              <td style="background: #0072C6; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="padding: 28px 36px 20px 36px; border-bottom: 1px solid #EEF2F6;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td valign="middle" width="56" style="padding-right: 16px;">
+                      <img src="https://npcrwanda.org/assets/img/logo.png" alt="NPC Rwanda" width="48" height="48" style="display: block; border-radius: 6px; width: 48px; height: 48px; object-fit: contain;" />
+                    </td>
+                    <td valign="middle">
+                      <div style="font-size: 13px; font-weight: 800; letter-spacing: 0.8px; color: #002B49; text-transform: uppercase;">National Paralympic Committee</div>
+                      <div style="font-size: 11px; font-weight: 500; color: #64748B; margin-top: 2px;">Comité National Paralympique du Rwanda</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 32px 36px 36px 36px;">
+                <span style="display: inline-block; padding: 4px 12px; background-color: #E0F2FE; color: #0284C7; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 20px; letter-spacing: 0.5px; margin-bottom: 16px;">
+                  Application Acknowledgment
+                </span>
+                <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; line-height: 1.3; color: #0F172A;">
+                  Application Received: ${application.careerTitle}
+                </h1>
+                <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+                  Dear <strong>${application.fullName}</strong>,
+                </p>
+                <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+                  Thank you for applying for the position of <strong>${application.careerTitle}</strong> at the National Paralympic Committee of Rwanda (NPC Rwanda).
+                </p>
+                <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px; line-height: 1.6; color: #475569;">
+                    <tr>
+                      <td style="padding: 4px 0; font-weight: 600; color: #1E293B;" width="140">Position:</td>
+                      <td style="padding: 4px 0; color: #0F172A;">${application.careerTitle}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px 0; font-weight: 600; color: #1E293B;">Applicant Name:</td>
+                      <td style="padding: 4px 0; color: #0F172A;">${application.fullName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px 0; font-weight: 600; color: #1E293B;">Reference Code:</td>
+                      <td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #0072C6;">#${refCode}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 4px 0; font-weight: 600; color: #1E293B;">Status:</td>
+                      <td style="padding: 4px 0; color: #0284C7; font-weight: 600;">Received & Under Review</td>
+                    </tr>
+                  </table>
+                </div>
+                <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+                  Our Human Resources & Selection Panel will review your qualifications against the position criteria. If your background matches our requirements, we will contact you directly with instructions regarding the next steps in the recruitment process.
+                </p>
+                <div style="border-top: 1px solid #EEF2F6; padding-top: 20px; font-size: 13px; line-height: 1.6; color: #64748B;">
+                  <strong style="color: #0F172A;">NPC Rwanda Recruitment & Human Resources</strong><br />
+                  Amahoro National Stadium &bull; Kigali, Rwanda<br />
+                  Email: <a href="mailto:info@npcrwanda.org" style="color: #0072C6;">info@npcrwanda.org</a>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 36px; text-align: center; font-size: 12px; color: #64748B;">
+                &copy; ${currentYear} National Paralympic Committee of Rwanda. All rights reserved.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: application.email,
+      subject: `[NPC Rwanda] Application Received — ${application.careerTitle}`,
+      html,
+    });
+  } catch (err: any) {
+    console.error('[Recruitment] Error sending application received email:', err?.message || err);
+  }
+}
+
+/**
+ * Sends candidate status update email (Shortlisted or Regret/Rejected)
+ */
+export async function sendApplicationStatusEmail(application: {
+  fullName: string;
+  email: string;
+  careerTitle: string;
+  status: 'Shortlisted' | 'Rejected' | string;
+}) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) {
+      console.log(`[Recruitment] SMTP not configured. Status email skipped for ${application.email}`);
+      return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const isShortlisted = application.status === 'Shortlisted';
+    const isRejected = application.status === 'Rejected';
+
+    // Only send automated emails for decisive milestones
+    if (!isShortlisted && !isRejected) {
+      return;
+    }
+
+    const subject = isShortlisted
+      ? `[NPC Rwanda] Congratulations — Shortlisted for ${application.careerTitle}`
+      : `[NPC Rwanda] Application Status Update — ${application.careerTitle}`;
+
+    const badgeBg = isShortlisted ? '#DCFCE7' : '#F1F5F9';
+    const badgeColor = isShortlisted ? '#16A34A' : '#64748B';
+    const badgeText = isShortlisted ? 'Application Shortlisted' : 'Recruitment Update';
+
+    const headline = isShortlisted
+      ? `You Have Been Shortlisted!`
+      : `Update on Your Application`;
+
+    const bodyHtml = isShortlisted
+      ? `
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          Dear <strong>${application.fullName}</strong>,
+        </p>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          We are pleased to inform you that following the review of applications for the position of <strong>${application.careerTitle}</strong>, your application has been <strong style="color: #16A34A;">shortlisted</strong> by the National Paralympic Committee of Rwanda (NPC Rwanda).
+        </p>
+        <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 18px 20px; margin: 20px 0;">
+          <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: #166534;">What Happens Next?</h4>
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #15803D;">
+            Our Human Resources team will contact you shortly via email or phone to provide the interview schedule, venue details, and any preparatory requirements. Please ensure your contact channels remain accessible.
+          </p>
+        </div>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          We look forward to meeting with you soon and discussing how your experience can contribute to the Paralympic movement in Rwanda.
+        </p>
+      `
+      : `
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          Dear <strong>${application.fullName}</strong>,
+        </p>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          Thank you very much for taking the time to apply for the position of <strong>${application.careerTitle}</strong> and for your interest in joining the National Paralympic Committee of Rwanda (NPC Rwanda).
+        </p>
+        <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          We received a large number of competitive applications for this vacancy. After careful review and evaluation by our selection panel, we regret to inform you that we will not be moving forward with your application for this specific position at this time.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          We sincerely appreciate the effort you put into your application and your enthusiasm for our mission. We encourage you to visit our careers portal at <a href="https://npcrwanda.org/careers" style="color: #0072C6; font-weight: 600;">npcrwanda.org/careers</a> for future openings that match your skills and qualifications.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">
+          We wish you every success in your career and future endeavors.
+        </p>
+      `;
+
+    const html = `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${headline} — NPC Rwanda</title>
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; background-color: #F1F5F9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1E293B; }
+    a { color: #0072C6; text-decoration: none; }
+  </style>
+</head>
+<body style="margin: 0; padding: 24px 0; background-color: #F1F5F9;">
+  <center>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+      <tr>
+        <td align="center" style="padding: 0 12px;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #FFFFFF; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+            <tr>
+              <td style="background: ${isShortlisted ? '#16A34A' : '#0072C6'}; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="padding: 28px 36px 20px 36px; border-bottom: 1px solid #EEF2F6;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td valign="middle" width="56" style="padding-right: 16px;">
+                      <img src="https://npcrwanda.org/assets/img/logo.png" alt="NPC Rwanda" width="48" height="48" style="display: block; border-radius: 6px; width: 48px; height: 48px; object-fit: contain;" />
+                    </td>
+                    <td valign="middle">
+                      <div style="font-size: 13px; font-weight: 800; letter-spacing: 0.8px; color: #002B49; text-transform: uppercase;">National Paralympic Committee</div>
+                      <div style="font-size: 11px; font-weight: 500; color: #64748B; margin-top: 2px;">Comité National Paralympique du Rwanda</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 32px 36px 36px 36px;">
+                <span style="display: inline-block; padding: 4px 12px; background-color: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 20px; letter-spacing: 0.5px; margin-bottom: 16px;">
+                  ${badgeText}
+                </span>
+                <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; line-height: 1.3; color: #0F172A;">
+                  ${headline}
+                </h1>
+                ${bodyHtml}
+                <div style="border-top: 1px solid #EEF2F6; padding-top: 20px; font-size: 13px; line-height: 1.6; color: #64748B;">
+                  <strong style="color: #0F172A;">NPC Rwanda Human Resources & Recruitment</strong><br />
+                  Amahoro National Stadium &bull; BP 2684, Remera, Kigali, Rwanda<br />
+                  Email: <a href="mailto:info@npcrwanda.org" style="color: #0072C6;">info@npcrwanda.org</a> &bull; Web: <a href="https://npcrwanda.org" style="color: #0072C6;">www.npcrwanda.org</a>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 36px; text-align: center; font-size: 12px; color: #64748B;">
+                &copy; ${currentYear} National Paralympic Committee of Rwanda. All rights reserved.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: application.email,
+      subject,
+      html,
+    });
+  } catch (err: any) {
+    console.error('[Recruitment] Error sending application status email:', err?.message || err);
+  }
+}
+

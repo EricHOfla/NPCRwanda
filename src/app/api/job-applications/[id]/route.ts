@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { sendApplicationStatusEmail } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +26,28 @@ export async function PUT(
       dataToUpdate.status = body.status;
     }
 
+    const currentApp = await prisma.jobApplication.findUnique({
+      where: { id },
+    });
+
+    if (!currentApp) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+    }
+
     const updated = await prisma.jobApplication.update({
       where: { id },
       data: dataToUpdate,
     });
+
+    // If the status has changed to Shortlisted or Rejected, send an official update email
+    if (body.status && body.status !== currentApp.status && (body.status === 'Shortlisted' || body.status === 'Rejected')) {
+      sendApplicationStatusEmail({
+        fullName: updated.fullName,
+        email: updated.email,
+        careerTitle: updated.careerTitle,
+        status: updated.status,
+      }).catch(err => console.warn('[Recruitment] Error sending status email:', err));
+    }
 
     return NextResponse.json(updated);
   } catch (error: any) {
