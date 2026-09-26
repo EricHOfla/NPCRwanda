@@ -6,9 +6,20 @@ export const dynamic = 'force-dynamic';
 // GET: Fetch leadership list
 export async function GET() {
   try {
+    // Auto-migrate: ensure the order column exists on production DB
+    try {
+      await prisma.$executeRawUnsafe(
+        `ALTER TABLE "Leader" ADD COLUMN IF NOT EXISTS "order" INTEGER NOT NULL DEFAULT 0`
+      );
+    } catch {
+      // Column already exists — safe to ignore
+    }
+
     const leadership = await prisma.leader.findMany({
       orderBy: [{ order: 'asc' }, { name: 'asc' }],
-    });
+    }).catch(() =>
+      prisma.leader.findMany({ orderBy: { name: 'asc' } })
+    );
     return NextResponse.json(leadership);
   } catch (error) {
     console.error('Fetch leaders error:', error);

@@ -23,12 +23,21 @@ export async function GET() {
       // Safe fallback
     }
 
+    // Auto-migrate: ensure Leader.order column exists on production DB
+    try {
+      await prisma.$executeRawUnsafe(
+        `ALTER TABLE "Leader" ADD COLUMN IF NOT EXISTS "order" INTEGER NOT NULL DEFAULT 0`
+      );
+    } catch {
+      // Column already exists or DB doesn't support IF NOT EXISTS — safe to ignore
+    }
+
     const [
       athletes,
       news,
       careers,
       sports,
-      leaders,
+      leadersRaw,
       governanceDocs,
       governancePolicies,
       events,
@@ -60,7 +69,10 @@ export async function GET() {
       }),
       prisma.leader.findMany({
         orderBy: [{ order: 'asc' }, { name: 'asc' }],
-      }),
+      }).catch(() =>
+        // Fallback: if 'order' column still doesn't exist, sort by name only
+        prisma.leader.findMany({ orderBy: { name: 'asc' } })
+      ),
       prisma.governanceDocument.findMany({
         where: { published: true },
         orderBy: { order: 'asc' },
@@ -98,6 +110,8 @@ export async function GET() {
         orderBy: [{ province: 'asc' }, { district: 'asc' }],
       }),
     ]);
+
+    const leaders = leadersRaw;
 
     const contactInfo = rawContactInfo || {
       id: 'default',
