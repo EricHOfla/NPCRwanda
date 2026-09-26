@@ -15,6 +15,10 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
 
   const job = careers.find(c => c.slug === slug);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isExpired = Boolean(job && job.deadline && job.deadline < todayStr);
+  const isAvailable = Boolean(job && job.status === 'Open' && !isExpired);
+
   if (loading) {
     return (
       <main className="py-5 text-center">
@@ -27,13 +31,13 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
     );
   }
 
-  if (!job) {
+  if (!job || !isAvailable) {
     return (
       <main className="py-5 text-center">
-        <div className="container py-5">
-          <i className="fas fa-exclamation-circle text-danger fa-3x mb-3"></i>
-          <h1 className="h3 mb-3">Position Not Found</h1>
-          <p className="text-muted">The career position you are looking for does not exist or has been closed.</p>
+        <div className="container py-5 my-5">
+          <i className="fas fa-calendar-times text-danger fa-3x mb-3"></i>
+          <h1 className="h3 mb-3">Position Closed or Unavailable</h1>
+          <p className="text-muted">The career position you are looking for does not exist, has reached its application deadline, or is no longer open.</p>
           <Link href="/careers" className="btn btn-primary mt-3">
             <i className="fas fa-arrow-left me-2"></i>Back to Careers
           </Link>
@@ -41,6 +45,14 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
       </main>
     );
   }
+
+  const formattedDeadline = job.deadline
+    ? new Date(job.deadline).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : null;
 
   return (
     <main id="main-content">
@@ -64,6 +76,14 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
             <span className="badge bg-success text-white text-uppercase px-2 py-1" style={{ fontSize: '0.72rem', fontWeight: 700 }}>
               {job.status} Position
             </span>
+            {formattedDeadline && (
+              <>
+                <span>|</span>
+                <span className="badge bg-warning text-dark px-2 py-1" style={{ fontSize: '0.72rem', fontWeight: 700 }}>
+                  <i className="fas fa-clock me-1"></i>Deadline: {formattedDeadline}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -72,6 +92,15 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
       <article className="py-5">
         <div className="container" style={{ maxWidth: '800px' }}>
           <div className="custom-card p-4 p-md-5 mb-4 border">
+            {formattedDeadline && (
+              <div className="alert alert-warning py-2 px-3 mb-4 rounded-3 small d-flex align-items-center">
+                <i className="fas fa-hourglass-half text-warning-emphasis me-2 fa-lg"></i>
+                <div>
+                  <strong>Application Deadline:</strong> {formattedDeadline} (Applications close at 23:59 CAT)
+                </div>
+              </div>
+            )}
+
             <h3 className="h5 fw-bold text-dark mb-3">Position Summary & Description</h3>
             <MarkdownRenderer content={job.desc} style={{ fontSize: '1.05rem', lineHeight: 1.8 }} />
 
@@ -87,16 +116,9 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
           </div>
 
           {/* Application Form */}
-          {job.status === 'Open' ? (
-            <div className="mb-4">
-              <CareerApplicationForm careerId={job.id} careerTitle={job.title} />
-            </div>
-          ) : (
-            <div className="alert alert-secondary py-3 px-4 rounded-4 mb-4 text-center">
-              <i className="fas fa-lock text-muted me-2" />
-              <strong>Applications Closed:</strong> This position has concluded its application cycle and is no longer accepting new submissions.
-            </div>
-          )}
+          <div id="apply" className="mb-4">
+            <CareerApplicationForm careerId={job.id} careerTitle={job.title} />
+          </div>
 
           <div className="d-flex justify-content-between align-items-center pt-3">
             <Link href="/careers" className="btn btn-outline-primary fw-semibold px-4">

@@ -10,6 +10,7 @@ const careerUpdateSchema = z.object({
   desc: z.string().min(1, 'Description is required').optional(),
   slug: z.string().min(1, 'Slug is required').optional(),
   applicants: z.number().int().nonnegative().optional(),
+  deadline: z.string().optional().nullable(),
 });
 
 // GET: Fetch a single career position

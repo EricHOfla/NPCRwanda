@@ -11,7 +11,12 @@ export default function CareersPage() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const openCareers = careers.filter(c => c.status === 'Open');
+  const todayStr = new Date().toISOString().split('T')[0];
+  const openCareers = careers.filter(c => {
+    if (c.status !== 'Open') return false;
+    if (c.deadline && c.deadline < todayStr) return false;
+    return true;
+  });
 
   const filtered = openCareers.filter(job => {
     const titleText = t(job.title);
@@ -122,9 +127,15 @@ export default function CareersPage() {
                         Open
                       </span>
                     </div>
-                    <div className="mb-3 text-muted small d-flex gap-3">
+                    <div className="mb-3 text-muted small d-flex gap-3 flex-wrap align-items-center">
                       <span><i className="fas fa-map-marker-alt me-1 text-primary"></i>{t(job.location)}</span>
                       <span><i className="fas fa-users me-1 text-primary"></i>{job.applicants} applicant{job.applicants !== 1 ? 's' : ''}</span>
+                      {job.deadline && (
+                        <span className="badge bg-light text-dark border px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1">
+                          <i className="fas fa-clock text-danger" />
+                          <span>Deadline: {new Date(job.deadline + 'T00:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        </span>
+                      )}
                     </div>
                     <p className="small text-muted mb-4 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(job.desc)}</p>
                     

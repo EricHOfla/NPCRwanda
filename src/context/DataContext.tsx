@@ -37,6 +37,7 @@ export interface Career {
   status: string;
   desc: string;
   slug: string;
+  deadline?: string | null;
 }
 
 export interface JobApplication {

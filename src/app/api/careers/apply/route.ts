@@ -100,6 +100,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Please provide your full name, email, phone number, and cover letter.' }, { status: 400 });
     }
 
+    // Verify position is still open and deadline has not passed
+    if (careerId) {
+      try {
+        const targetCareer = await prisma.career.findUnique({ where: { id: careerId } });
+        if (targetCareer) {
+          const today = new Date().toISOString().split('T')[0];
+          if (targetCareer.status !== 'Open' || (targetCareer.deadline && targetCareer.deadline < today)) {
+            return NextResponse.json(
+              { error: 'Applications for this position are now closed as the deadline has passed.' },
+              { status: 400 }
+            );
+          }
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    }
+
     // Create the JobApplication record
     const application = await prisma.jobApplication.create({
       data: {

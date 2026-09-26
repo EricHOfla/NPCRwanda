@@ -64,6 +64,7 @@ model Career {
   status     String   @default("Open") // e.g. "Open", "Closed"
   desc       String
   slug       String   @unique
+  deadline   String?  // e.g. "YYYY-MM-DD"
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

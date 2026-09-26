@@ -5,6 +5,24 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      await prisma.career.updateMany({
+        where: {
+          status: 'Open',
+          deadline: {
+            not: null,
+            lt: today,
+          },
+        },
+        data: {
+          status: 'Closed',
+        },
+      });
+    } catch {
+      // Safe fallback
+    }
+
     const [
       athletes,
       news,

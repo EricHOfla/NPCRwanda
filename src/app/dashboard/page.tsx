@@ -595,7 +595,8 @@ export default function DashboardPage() {
     location: 'Kigali',
     status: 'Open',
     desc: '',
-    slug: ''
+    slug: '',
+    deadline: '',
   });
 
   const [sportFormOpen, setSportFormOpen] = useState(false);
@@ -1163,8 +1164,13 @@ export default function DashboardPage() {
   const handleCareerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const slugValue = careerForm.slug || careerForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    await addCareer({ ...careerForm, slug: slugValue, applicants: 0 });
-    setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '' });
+    await addCareer({
+      ...careerForm,
+      slug: slugValue,
+      deadline: careerForm.deadline || null,
+      applicants: 0,
+    });
+    setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
     setCareerFormOpen(false);
   };
 
@@ -3950,7 +3956,7 @@ export default function DashboardPage() {
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Careers & Vacancies ({careers.length})</h3>
                         <button
                           onClick={() => {
-                            setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '' });
+                            setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
                             setCareerFormOpen(!careerFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -3972,16 +3978,29 @@ export default function DashboardPage() {
                               <label className="form-label small fw-bold">Location</label>
                               <input type="text" className="form-control" required value={careerForm.location} onChange={e => setCareerForm({ ...careerForm, location: e.target.value })} />
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
                               <label className="form-label small fw-bold">Slug URL</label>
                               <input type="text" className="form-control" required value={careerForm.slug} onChange={e => setCareerForm({ ...careerForm, slug: e.target.value })} />
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
                               <label className="form-label small fw-bold">Status</label>
                               <select className="form-control" value={careerForm.status} onChange={e => setCareerForm({ ...careerForm, status: e.target.value })}>
                                 <option value="Open">Open</option>
                                 <option value="Closed">Closed</option>
                               </select>
+                            </div>
+                            <div className="col-md-4">
+                              <label className="form-label small fw-bold">Application Deadline</label>
+                              <input
+                                type="date"
+                                className="form-control"
+                                value={careerForm.deadline}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={e => setCareerForm({ ...careerForm, deadline: e.target.value })}
+                              />
+                              <div className="form-text text-muted" style={{ fontSize: '0.72rem' }}>
+                                Position closes automatically after this date.
+                              </div>
                             </div>
                             <div className="col-md-12">
                               <label className="form-label small fw-bold">Job Description</label>
@@ -4005,40 +4024,62 @@ export default function DashboardPage() {
                                 <th>Title</th>
                                 <th>Location</th>
                                 <th>Applicants</th>
+                                <th>Deadline</th>
                                 <th>Status</th>
                                 <th>Action</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {paginate(filteredCareers, currentPage.careers, pageSizes.careers).map(c => (
-                                <tr key={c.id}>
-                                  <td className="fw-semibold small">{c.title}</td>
-                                  <td className="small text-muted">{c.location}</td>
-                                  <td className="small">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setAdminTab('contacts');
-                                        setInboxSubTab('applications');
-                                        setJobAppSearch(c.title);
-                                      }}
-                                      className="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold d-inline-flex align-items-center gap-1"
-                                      title="View candidate applications for this position"
-                                    >
-                                      <i className="fas fa-users" />
-                                      <span>{c.applicants}</span>
-                                    </button>
-                                  </td>
-                                  <td>
-                                    <span className={`badge ${c.status === 'Open' ? 'bg-success' : 'bg-secondary'}`}>{c.status}</span>
-                                  </td>
-                                  <td>
-                                    {c.status === 'Open' && (
-                                      <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1">Close</button>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
+                              {paginate(filteredCareers, currentPage.careers, pageSizes.careers).map(c => {
+                                const todayStr = new Date().toISOString().split('T')[0];
+                                const isExpired = Boolean(c.deadline && c.deadline < todayStr);
+                                return (
+                                  <tr key={c.id}>
+                                    <td className="fw-semibold small">{c.title}</td>
+                                    <td className="small text-muted">{c.location}</td>
+                                    <td className="small">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setAdminTab('contacts');
+                                          setInboxSubTab('applications');
+                                          setJobAppSearch(c.title);
+                                        }}
+                                        className="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold d-inline-flex align-items-center gap-1"
+                                        title="View candidate applications for this position"
+                                      >
+                                        <i className="fas fa-users" />
+                                        <span>{c.applicants}</span>
+                                      </button>
+                                    </td>
+                                    <td className="small">
+                                      {c.deadline ? (
+                                        <span className={isExpired ? 'text-danger fw-semibold' : 'text-dark'}>
+                                          <i className={`fas ${isExpired ? 'fa-calendar-times text-danger' : 'fa-calendar-day text-primary'} me-1`} />
+                                          {new Date(c.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                          {isExpired && (
+                                            <span className="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" style={{ fontSize: '0.68rem' }}>
+                                              Expired
+                                            </span>
+                                          )}
+                                        </span>
+                                      ) : (
+                                        <span className="text-muted fst-italic">Open-ended</span>
+                                      )}
+                                    </td>
+                                    <td>
+                                      <span className={`badge ${c.status === 'Open' && !isExpired ? 'bg-success' : 'bg-secondary'}`}>
+                                        {c.status === 'Open' && isExpired ? 'Closed (Expired)' : c.status}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      {c.status === 'Open' && (
+                                        <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1">Close</button>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                           {filteredCareers.length === 0 && (

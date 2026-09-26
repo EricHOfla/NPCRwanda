@@ -12,11 +12,36 @@ const careerSchema = z.object({
   status: z.enum(['Open', 'Closed']).default('Open'),
   desc: z.string().min(1, 'Description is required'),
   slug: z.string().min(1, 'Slug is required'),
+  deadline: z.string().optional().nullable(),
 });
+
+async function ensureCareerDeadlineColumnAndAutoClose() {
+  try {
+    await prisma.$executeRaw`
+      ALTER TABLE "Career" ADD COLUMN IF NOT EXISTS "deadline" TEXT;
+    `;
+    const today = new Date().toISOString().split('T')[0];
+    await prisma.career.updateMany({
+      where: {
+        status: 'Open',
+        deadline: {
+          not: null,
+          lt: today,
+        },
+      },
+      data: {
+        status: 'Closed',
+      },
+    });
+  } catch {
+    // Ignore
+  }
+}
 
 // GET: Fetch careers list with optional filters and pagination
 export async function GET(request: Request) {
   try {
+    await ensureCareerDeadlineColumnAndAutoClose();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || '';
     const slug = searchParams.get('slug') || '';
@@ -87,6 +112,7 @@ export async function GET(request: Request) {
 // POST: Create a new job position
 export async function POST(request: Request) {
   try {
+    await ensureCareerDeadlineColumnAndAutoClose();
     const body = await request.json();
 
     // Auto-generate slug if not provided
