@@ -578,7 +578,7 @@ export default function DashboardPage() {
     location: 'Amahoro Stadium, Kigali',
     category: 'National',
     status: 'Upcoming',
-    img: 'sports-hero.jpg',
+    img: '',
     featured: false
   });
 
@@ -1125,7 +1125,7 @@ export default function DashboardPage() {
       location: 'Amahoro Stadium, Kigali',
       category: 'National',
       status: 'Upcoming',
-      img: 'sports-hero.jpg',
+      img: '',
       featured: false
     });
     setEditingEventId(null);
@@ -3742,7 +3742,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingEventId(null);
-                            setEventForm({ title: '', description: '', date: '2026-08-15', endDate: '2026-08-20', location: 'Amahoro Stadium, Kigali', category: 'National', status: 'Upcoming', img: 'sports-hero.jpg', featured: false });
+                            setEventForm({ title: '', description: '', date: '2026-08-15', endDate: '2026-08-20', location: 'Amahoro Stadium, Kigali', category: 'National', status: 'Upcoming', img: '', featured: false });
                             setEventFormOpen(!eventFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"

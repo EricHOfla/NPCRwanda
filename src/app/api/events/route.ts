@@ -13,7 +13,7 @@ const eventSchema = z.object({
   location: z.string().min(1, 'Location is required'),
   category: z.string().default('National'),
   status: z.enum(['Upcoming', 'Ongoing', 'Completed', 'Cancelled']).default('Upcoming'),
-  img: z.string().default('sports-hero.jpg'),
+  img: z.string().default(''),
   featured: z.boolean().default(false),
 });
 

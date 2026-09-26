@@ -21,6 +21,111 @@ const CATEGORY_ICONS: Record<string, string> = {
   Conference:    'fa-chalkboard-teacher',
 };
 
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  National:      'linear-gradient(135deg, #002B49 0%, #0072C6 100%)',
+  International: 'linear-gradient(135deg, #0F172A 0%, #1E40AF 100%)',
+  Regional:      'linear-gradient(135deg, #1E293B 0%, #0D9488 100%)',
+  Training:      'linear-gradient(135deg, #064E3B 0%, #10B981 100%)',
+  Conference:    'linear-gradient(135deg, #312E81 0%, #6366F1 100%)',
+};
+
+const getEventImageUrl = (img?: string) => {
+  if (!img) return null;
+  const clean = img.trim();
+  if (!clean || clean === 'sports-hero.jpg' || clean === 'default' || clean === '#') return null;
+  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/')) {
+    return clean;
+  }
+  return `/assets/img/curated/${clean}`;
+};
+
+function EventCardMedia({
+  ev,
+  height = '180px',
+  statusConfig,
+}: {
+  ev: any;
+  height?: string;
+  statusConfig: { bg: string; text: string; icon: string };
+}) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const rawUrl = getEventImageUrl(ev.img);
+  const hasRealImage = Boolean(rawUrl && !imgFailed);
+
+  const categoryIcon = CATEGORY_ICONS[ev.category] || 'fa-calendar-check';
+  const gradient = CATEGORY_GRADIENTS[ev.category] || 'linear-gradient(135deg, #002B49 0%, #0072C6 100%)';
+
+  const dateObj = ev.date ? new Date(ev.date) : null;
+  const validDate = dateObj && !isNaN(dateObj.getTime());
+  const monthName = validDate ? dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase() : '';
+  const dayNum = validDate ? dateObj.getDate() : '';
+
+  return (
+    <div className="position-relative overflow-hidden" style={{ height, background: gradient }}>
+      {hasRealImage ? (
+        <img
+          src={rawUrl!}
+          alt={ev.title}
+          className="w-100 h-100"
+          style={{ objectFit: 'cover' }}
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <div className="w-100 h-100 d-flex align-items-center justify-content-between px-4 position-relative">
+          <i
+            className={`fas ${categoryIcon} position-absolute`}
+            style={{
+              fontSize: '5.5rem',
+              right: '15px',
+              bottom: '-8px',
+              color: 'rgba(255, 255, 255, 0.15)',
+              pointerEvents: 'none',
+            }}
+          />
+          {validDate && (
+            <div
+              className="text-center rounded-3 px-3 py-2 shadow-sm"
+              style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                color: '#0F172A',
+                minWidth: '60px',
+                zIndex: 2,
+              }}
+            >
+              <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-blue)', letterSpacing: '1px' }}>
+                {monthName}
+              </div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 900, lineHeight: 1 }}>
+                {dayNum}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Status Badge */}
+      <span
+        className="badge fw-bold px-2 py-1 position-absolute top-0 start-0 m-2"
+        style={{ background: statusConfig.bg, color: statusConfig.text, fontSize: '0.72rem', zIndex: 3 }}
+      >
+        <i className={`fas ${statusConfig.icon} me-1`}></i>{ev.status}
+      </span>
+
+      {/* Featured / Category Badge */}
+      <div className="position-absolute top-0 end-0 m-2 d-flex gap-1" style={{ zIndex: 3 }}>
+        {ev.featured && (
+          <span className="badge" style={{ background: '#F59E0B', color: '#fff', fontSize: '0.68rem' }}>
+            <i className="fas fa-star me-1"></i>Featured
+          </span>
+        )}
+        <span className="badge fw-bold" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '0.68rem' }}>
+          <i className={`fas ${categoryIcon} me-1`}></i>{ev.category}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function EventsPage() {
   const { t } = useTranslation();
   const { events } = useData();
@@ -121,25 +226,7 @@ export default function EventsPage() {
                   return (
                     <div key={ev.id} className="col-lg-6" data-aos="fade-up" data-aos-delay={i * 100}>
                       <div className="custom-card h-100 overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
-                        <div className="position-relative">
-                          <img
-                            src={`/assets/img/curated/${ev.img}`}
-                            alt={ev.title}
-                            className="w-100"
-                            style={{ height: '220px', objectFit: 'cover' }}
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
-                          />
-                          <div className="position-absolute top-0 start-0 m-3">
-                            <span className="badge fw-bold px-3 py-2" style={{ background: sc.bg, color: sc.text, fontSize: '0.78rem' }}>
-                              <i className={`fas ${sc.icon} me-1`}></i>{ev.status}
-                            </span>
-                          </div>
-                          <div className="position-absolute top-0 end-0 m-3">
-                            <span className="badge fw-bold px-2 py-2" style={{ background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: '0.72rem' }}>
-                              <i className={`fas ${CATEGORY_ICONS[ev.category] || 'fa-tag'} me-1`}></i>{ev.category}
-                            </span>
-                          </div>
-                        </div>
+                        <EventCardMedia ev={ev} height="220px" statusConfig={sc} />
                         <div className="p-4">
                           <h3 className="h5 mb-2">{ev.title}</h3>
                           <p className="small text-muted mb-3">{ev.description}</p>
@@ -227,26 +314,7 @@ export default function EventsPage() {
                 return (
                   <div key={ev.id} className="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
                     <div className="custom-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E8EDF5' }}>
-                      <div className="position-relative">
-                        <img
-                          src={`/assets/img/curated/${ev.img}`}
-                          alt={ev.title}
-                          className="w-100"
-                          style={{ height: '170px', objectFit: 'cover' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
-                        />
-                        <span
-                          className="badge fw-bold px-2 py-1 position-absolute top-0 start-0 m-2"
-                          style={{ background: sc.bg, color: sc.text, fontSize: '0.72rem' }}
-                        >
-                          <i className={`fas ${sc.icon} me-1`}></i>{ev.status}
-                        </span>
-                        {ev.featured && (
-                          <span className="position-absolute top-0 end-0 m-2 badge" style={{ background: '#F59E0B', color: '#fff', fontSize: '0.68rem' }}>
-                            <i className="fas fa-star me-1"></i>Featured
-                          </span>
-                        )}
-                      </div>
+                      <EventCardMedia ev={ev} height="170px" statusConfig={sc} />
                       <div className="p-4 flex-grow-1 d-flex flex-column">
                         <div className="d-flex align-items-center gap-2 mb-2">
                           <span className="badge" style={{ background: '#EFF6FF', color: '#1D4ED8', fontSize: '0.68rem', fontWeight: 600 }}>
