@@ -49,7 +49,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        maxAge: 60 * 60 * 1000, // 1 hour — stale cache auto-clears; always refetches anyway
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
             // Only persist public queries (e.g. ['npc-public-bundle'])

@@ -437,8 +437,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return res.json();
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes fresh
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours in persistent cache
+    // staleTime: 0 (inherited from global config) — always refetch fresh data
+    // gcTime: 24h (inherited from global config) — keep in IndexedDB
   });
 
   const invalidatePublicBundle = useCallback(() => {

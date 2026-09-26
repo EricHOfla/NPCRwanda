@@ -4,9 +4,9 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        gcTime: 24 * 60 * 60 * 1000, // 24 hours
-        refetchOnWindowFocus: false,
+        staleTime: 0,                        // Always refetch from server (IndexedDB shows instantly while fetching)
+        gcTime: 24 * 60 * 60 * 1000,        // Keep in IndexedDB for 24h
+        refetchOnWindowFocus: true,          // Refetch when tab is focused (catches admin changes)
         refetchOnReconnect: true,
         retry: 2,
       },
