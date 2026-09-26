@@ -475,6 +475,7 @@ export default function DashboardPage() {
     updateEvent,
     deleteEvent,
     addCareer,
+    deleteCareer,
     closeCareer,
     markContactAsRead,
     deleteContactMessage,
@@ -4073,9 +4074,25 @@ export default function DashboardPage() {
                                       </span>
                                     </td>
                                     <td>
-                                      {c.status === 'Open' && (
-                                        <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1">Close</button>
-                                      )}
+                                      <div className="d-flex align-items-center gap-2">
+                                        {c.status === 'Open' && (
+                                          <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1" title="Close vacancy">
+                                            Close
+                                          </button>
+                                        )}
+                                        <button
+                                          onClick={() => {
+                                            if (confirm(`Are you sure you want to permanently delete the position "${c.title}"?`)) {
+                                              deleteCareer(c.id);
+                                            }
+                                          }}
+                                          className="btn btn-sm btn-outline-danger py-1"
+                                          title="Delete position"
+                                        >
+                                          <i className="fas fa-trash-alt me-1" />
+                                          Delete
+                                        </button>
+                                      </div>
                                     </td>
                                   </tr>
                                 );
