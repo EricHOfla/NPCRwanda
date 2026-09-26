@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/context/LanguageContext';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 import {
@@ -439,6 +440,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 };
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const router = useRouter();
   const {
@@ -1037,6 +1039,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch('/api/auth/logout', { method: 'POST' });
       if (res.ok) {
+        queryClient.clear();
         router.push('/login');
         router.refresh();
       }

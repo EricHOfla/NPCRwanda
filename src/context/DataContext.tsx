@@ -1,7 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
+
+export const PUBLIC_BUNDLE_QUERY_KEY = ['npc-public-bundle'] as const;
 
 // Type definitions matching Prisma schema
 export interface Athlete {
@@ -392,64 +395,79 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [federations, setFederations] = useState<NpcFederation[]>([]);
   const [dpscoContacts, setDpscoContacts] = useState<DpscoContact[]>([]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  // Fetch Public Data via single batched bundle request
-  const fetchPublicData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch Public Data via TanStack Query with IndexedDB persistence
+  const {
+    data: bundleData,
+    isLoading: queryIsLoading,
+    isPending,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: PUBLIC_BUNDLE_QUERY_KEY,
+    queryFn: async () => {
       const res = await fetch('/api/bundle');
       if (!res.ok) {
         throw new Error(`Failed to fetch public bundle (status ${res.status})`);
       }
-      const data = await res.json();
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes fresh
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours in persistent cache
+  });
 
-      setAthletes(Array.isArray(data.athletes) ? data.athletes : []);
-      setNews(Array.isArray(data.news) ? data.news : []);
-      setCareers(Array.isArray(data.careers) ? data.careers : []);
-      setSports(Array.isArray(data.sports) ? data.sports : []);
-      setLeaders(Array.isArray(data.leaders) ? data.leaders : []);
-      setGovernanceDocs(Array.isArray(data.governanceDocs) ? data.governanceDocs : []);
-      setGovernancePolicies(Array.isArray(data.governancePolicies) ? data.governancePolicies : []);
-      setEvents(Array.isArray(data.events) ? data.events : []);
-      setPartners(Array.isArray(data.partners) ? data.partners : []);
-      setContactInfo(data.contactInfo || null);
-      setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
-      setSystemComponents(Array.isArray(data.systemComponents) ? data.systemComponents : []);
-      setAssociations(Array.isArray(data.associations) ? data.associations : []);
-      setClubs(Array.isArray(data.clubs) ? data.clubs : []);
-      setFederations(Array.isArray(data.federations) ? data.federations : []);
-      setDpscoContacts(Array.isArray(data.dpscoContacts) ? data.dpscoContacts : []);
+  const invalidatePublicBundle = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
+  }, [queryClient]);
 
-      if (data.systemSettings && typeof data.systemSettings === 'object') {
-        setSystemSettings(data.systemSettings as Record<string, string>);
-      }
-
-      const contentList: SiteContent[] = Array.isArray(data.siteContent) ? data.siteContent : [];
-      setSiteContentList(contentList);
-      const map: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
-      contentList.forEach((c: SiteContent) => {
-        if (c.value !== undefined && c.value !== null) {
-          map[c.key] = c.value;
-        }
-      });
-      if (data.siteContentMap && typeof data.siteContentMap === 'object') {
-        Object.assign(map, data.siteContentMap);
-      }
-      setSiteContent(map);
-    } catch (err: any) {
-      console.error('Error fetching public bundle data:', err);
-      setError(err?.message || 'Failed to fetch public data bundle');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Sync bundleData into state whenever query data arrives (from cache or server)
   useEffect(() => {
-    fetchPublicData();
-  }, [fetchPublicData]);
+    if (!bundleData) return;
+    const data = bundleData;
+
+    setAthletes(Array.isArray(data.athletes) ? data.athletes : []);
+    setNews(Array.isArray(data.news) ? data.news : []);
+    setCareers(Array.isArray(data.careers) ? data.careers : []);
+    setSports(Array.isArray(data.sports) ? data.sports : []);
+    setLeaders(Array.isArray(data.leaders) ? data.leaders : []);
+    setGovernanceDocs(Array.isArray(data.governanceDocs) ? data.governanceDocs : []);
+    setGovernancePolicies(Array.isArray(data.governancePolicies) ? data.governancePolicies : []);
+    setEvents(Array.isArray(data.events) ? data.events : []);
+    setPartners(Array.isArray(data.partners) ? data.partners : []);
+    setContactInfo(data.contactInfo || null);
+    setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
+    setSystemComponents(Array.isArray(data.systemComponents) ? data.systemComponents : []);
+    setAssociations(Array.isArray(data.associations) ? data.associations : []);
+    setClubs(Array.isArray(data.clubs) ? data.clubs : []);
+    setFederations(Array.isArray(data.federations) ? data.federations : []);
+    setDpscoContacts(Array.isArray(data.dpscoContacts) ? data.dpscoContacts : []);
+
+    if (data.systemSettings && typeof data.systemSettings === 'object') {
+      setSystemSettings(data.systemSettings as Record<string, string>);
+    }
+
+    const contentList: SiteContent[] = Array.isArray(data.siteContent) ? data.siteContent : [];
+    setSiteContentList(contentList);
+    const map: Record<string, string> = { ...DEFAULT_SITE_CONTENT };
+    contentList.forEach((c: SiteContent) => {
+      if (c.value !== undefined && c.value !== null) {
+        map[c.key] = c.value;
+      }
+    });
+    if (data.siteContentMap && typeof data.siteContentMap === 'object') {
+      Object.assign(map, data.siteContentMap);
+    }
+    setSiteContent(map);
+  }, [bundleData]);
+
+  // Loading is ONLY true if there is NO cached data available yet
+  const loading = (isPending || queryIsLoading) && !bundleData;
+  const error = queryError ? (queryError as Error).message : null;
+
+  const fetchPublicData = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   // Fetch Protected Data (Messages, Volunteers, Donations, Media) for dashboard
   const fetchProtectedData = async () => {
@@ -491,6 +509,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setAthletes(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add athlete');
@@ -506,6 +525,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setAthletes(prev => prev.map(a => (a.id === updated.id ? updated : a)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update athlete');
@@ -518,6 +538,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setAthletes(prev => prev.filter(a => a.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete athlete');
@@ -534,6 +555,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setNews(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add news');
@@ -549,6 +571,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setNews(prev => prev.map(n => (n.id === updated.id ? updated : n)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update news');
@@ -561,6 +584,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setNews(prev => prev.filter(n => n.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete news');
@@ -577,6 +601,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setCareers(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add career');
@@ -592,6 +617,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setCareers(prev => prev.map(c => (c.id === updated.id ? updated : c)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update career');
@@ -604,6 +630,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setCareers(prev => prev.filter(c => c.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete career');
@@ -620,6 +647,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setSports(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add sport');
@@ -635,6 +663,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setSports(prev => prev.map(s => (s.id === updated.id ? updated : s)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update sport');
@@ -647,6 +676,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setSports(prev => prev.filter(s => s.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete sport');
@@ -663,6 +693,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setLeaders(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add leader');
@@ -678,6 +709,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setLeaders(prev => prev.map(l => (l.id === updated.id ? updated : l)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update leader');
@@ -690,6 +722,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setLeaders(prev => prev.filter(l => l.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete leader');
@@ -706,6 +739,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setEvents(prev => [created, ...prev]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add event');
@@ -721,6 +755,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setEvents(prev => prev.map(e => (e.id === updated.id ? updated : e)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update event');
@@ -733,6 +768,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setEvents(prev => prev.filter(e => e.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete event');
@@ -749,6 +785,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setGovernanceDocs(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add document');
@@ -764,6 +801,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setGovernanceDocs(prev => prev.map(d => (d.id === updated.id ? updated : d)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update document');
@@ -776,6 +814,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setGovernanceDocs(prev => prev.filter(d => d.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete document');
@@ -791,6 +830,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setGovernancePolicies(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add policy');
@@ -806,6 +846,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setGovernancePolicies(prev => prev.map(p => (p.id === updated.id ? updated : p)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update policy');
@@ -818,6 +859,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setGovernancePolicies(prev => prev.filter(p => p.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete policy');
@@ -834,6 +876,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setPartners(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add partner');
@@ -849,6 +892,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setPartners(prev => prev.map(p => (p.id === updated.id ? updated : p)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update partner');
@@ -861,6 +905,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setPartners(prev => prev.filter(p => p.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete partner');
@@ -877,6 +922,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setSiteContent(prev => ({ ...prev, [key]: value }));
+      invalidatePublicBundle();
       setSiteContentList(prev => {
         const index = prev.findIndex(item => item.key === key);
         if (index > -1) {
@@ -905,6 +951,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setContactInfo(updated);
+      invalidatePublicBundle();
       setSystemSettings(prev => ({
         ...prev,
         address: updated.address,
@@ -926,6 +973,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setSocialLinks(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add social link');
@@ -941,6 +989,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setSocialLinks(prev => prev.map(s => (s.id === updated.id ? updated : s)));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update social link');
@@ -953,6 +1002,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (res.ok) {
       setSocialLinks(prev => prev.filter(s => s.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete social link');
@@ -1226,6 +1276,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setAssociations(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add association');
@@ -1241,6 +1292,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setAssociations(prev => prev.map(a => a.id === updated.id ? updated : a));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update association');
@@ -1251,6 +1303,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await fetch(`/api/npc-associations/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setAssociations(prev => prev.filter(a => a.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete association');
@@ -1267,6 +1320,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setClubs(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add club');
@@ -1282,6 +1336,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setClubs(prev => prev.map(c => c.id === updated.id ? updated : c));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update club');
@@ -1292,6 +1347,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await fetch(`/api/npc-clubs/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setClubs(prev => prev.filter(c => c.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete club');
@@ -1308,6 +1364,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setFederations(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add federation');
@@ -1323,6 +1380,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setFederations(prev => prev.map(f => f.id === updated.id ? updated : f));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update federation');
@@ -1333,6 +1391,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await fetch(`/api/npc-federations/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setFederations(prev => prev.filter(f => f.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete federation');
@@ -1349,6 +1408,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const created = await res.json();
       setDpscoContacts(prev => [...prev, created]);
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add DPSCO contact');
@@ -1364,6 +1424,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.ok) {
       const updated = await res.json();
       setDpscoContacts(prev => prev.map(d => d.id === updated.id ? updated : d));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update DPSCO contact');
@@ -1374,6 +1435,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await fetch(`/api/dpsco-contacts/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setDpscoContacts(prev => prev.filter(d => d.id !== id));
+      invalidatePublicBundle();
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete DPSCO contact');

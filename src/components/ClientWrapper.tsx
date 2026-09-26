@@ -8,6 +8,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AccessibilityWidget } from '@/components/AccessibilityWidget';
 
+import { QueryProvider } from '@/components/QueryProvider';
+
 export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith('/dashboard');
@@ -30,13 +32,15 @@ export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [pathname]);
 
   return (
-    <DataProvider>
-      <LanguageProvider>
-        {!isDashboard && <Header />}
-        {isDashboard ? children : <main>{children}</main>}
-        {!isDashboard && <Footer />}
-        {!isDashboard && <AccessibilityWidget />}
-      </LanguageProvider>
-    </DataProvider>
+    <QueryProvider>
+      <DataProvider>
+        <LanguageProvider>
+          {!isDashboard && <Header />}
+          {isDashboard ? children : <main>{children}</main>}
+          {!isDashboard && <Footer />}
+          {!isDashboard && <AccessibilityWidget />}
+        </LanguageProvider>
+      </DataProvider>
+    </QueryProvider>
   );
 };
