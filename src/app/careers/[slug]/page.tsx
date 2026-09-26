@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useData } from '@/context/DataContext';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import CareerApplicationForm from '@/components/CareerApplicationForm';
 
 export default function CareerDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
@@ -76,14 +77,26 @@ export default function CareerDetailPage({ params }: { params: Promise<{ slug: s
 
             <div className="mt-4 pt-4 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
               <div>
-                <span className="small text-muted d-block">How to Apply:</span>
-                <span className="fw-semibold text-dark">Send CV & Letter to info@npcrwanda.org</span>
+                <span className="small text-muted d-block">Recruitment Inquiry:</span>
+                <span className="fw-semibold text-dark">info@npcrwanda.org</span>
               </div>
-              <a href="mailto:info@npcrwanda.org?subject=Application%20for%20Position" className="btn btn-primary fw-bold px-4">
-                <i className="fas fa-paper-plane me-2"></i>Apply via Email
+              <a href="#apply" className="btn btn-primary fw-bold px-4">
+                <i className="fas fa-file-signature me-2"></i>Apply Online Below
               </a>
             </div>
           </div>
+
+          {/* Application Form */}
+          {job.status === 'Open' ? (
+            <div className="mb-4">
+              <CareerApplicationForm careerId={job.id} careerTitle={job.title} />
+            </div>
+          ) : (
+            <div className="alert alert-secondary py-3 px-4 rounded-4 mb-4 text-center">
+              <i className="fas fa-lock text-muted me-2" />
+              <strong>Applications Closed:</strong> This position has concluded its application cycle and is no longer accepting new submissions.
+            </div>
+          )}
 
           <div className="d-flex justify-content-between align-items-center pt-3">
             <Link href="/careers" className="btn btn-outline-primary fw-semibold px-4">

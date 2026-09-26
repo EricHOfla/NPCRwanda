@@ -11,6 +11,7 @@ import {
   Athlete,
   NewsArticle,
   Career,
+  JobApplication,
   ContactMessage,
   Sport,
   Leader,
@@ -454,6 +455,10 @@ export default function DashboardPage() {
     systemComponents,
     volunteers,
     donations,
+    jobApplications,
+    markJobApplicationRead,
+    updateJobApplicationStatus,
+    deleteJobApplication,
     partners,
     siteContent,
     siteContentList,
@@ -710,7 +715,9 @@ export default function DashboardPage() {
   const [activeMessage, setActiveMessage] = useState<ContactMessage | null>(null);
   const [activeVolunteer, setActiveVolunteer] = useState<VolunteerApplication | null>(null);
   const [activeDonation, setActiveDonation] = useState<DonationInquiry | null>(null);
-  const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations'>('messages');
+  const [activeJobApplication, setActiveJobApplication] = useState<JobApplication | null>(null);
+  const [jobAppSearch, setJobAppSearch] = useState('');
+  const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
 
   // Pagination states - Professional configuration
   const [pageSizes] = useState({ 
@@ -724,7 +731,8 @@ export default function DashboardPage() {
     partners: 12,
     media: 20,
     donations: 15,
-    volunteers: 15
+    volunteers: 15,
+    applications: 15
   });
   const [currentPage, setCurrentPage] = useState({ 
     athletes: 1, 
@@ -737,7 +745,8 @@ export default function DashboardPage() {
     partners: 1,
     media: 1,
     donations: 1,
-    volunteers: 1
+    volunteers: 1,
+    applications: 1
   });
 
   // System Settings state
@@ -1549,7 +1558,8 @@ export default function DashboardPage() {
               const unreadMsg = contacts.filter(c => !c.read).length;
               const unreadVol = volunteers.filter(v => !v.read).length;
               const unreadDon = donations.filter(d => !d.read).length;
-              const totalUnread = unreadMsg + unreadVol + unreadDon;
+              const unreadJob = jobApplications.filter(a => !a.read).length;
+              const totalUnread = unreadMsg + unreadVol + unreadDon + unreadJob;
               return (
                 <div style={{ position: 'relative' }} data-bell-dropdown>
                   <button onClick={() => setBellOpen(!bellOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative', padding: '6px' }}>
@@ -1707,6 +1717,46 @@ export default function DashboardPage() {
                                 </span>
                                 <span style={{ fontSize: '0.74rem', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', display: 'block' }}>
                                   Type: {d.supportType} ({d.category})
+                                </span>
+                              </button>
+                            ))}
+
+                            {/* Unread job applications */}
+                            {jobApplications.filter(a => !a.read).map(a => (
+                              <button
+                                key={a.id}
+                                onClick={() => {
+                                  setAdminTab('contacts');
+                                  setInboxSubTab('applications');
+                                  setActiveJobApplication(a);
+                                  markJobApplicationRead(a.id, true);
+                                  setBellOpen(false);
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 16px',
+                                  textAlign: 'left',
+                                  background: 'transparent',
+                                  border: 'none',
+                                  borderBottom: '1px solid #F8FAFC',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '2px',
+                                  cursor: 'pointer',
+                                  transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                  <span style={{ fontWeight: 700, fontSize: '0.78rem', color: '#6366F1' }}>Job Application</span>
+                                  <span style={{ fontSize: '0.65rem', color: '#6366F1', fontWeight: 600 }}>New</span>
+                                </div>
+                                <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', display: 'block' }}>
+                                  {a.fullName} - {a.careerTitle}
+                                </span>
+                                <span style={{ fontSize: '0.74rem', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', display: 'block' }}>
+                                  {a.email} | {a.phone}
                                 </span>
                               </button>
                             ))}
@@ -2634,7 +2684,18 @@ export default function DashboardPage() {
                                   <i className="fas fa-map-marker-alt me-1" /> {c.location}
                                 </span>
                                 <div className="mt-2 text-muted small" style={{ fontSize: '0.72rem' }}>
-                                  Applicants registered: <strong>{c.applicants}</strong>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAdminTab('contacts');
+                                      setInboxSubTab('applications');
+                                      setJobAppSearch(c.title);
+                                    }}
+                                    className="btn btn-link p-0 text-decoration-none fw-semibold text-primary"
+                                    style={{ fontSize: '0.72rem' }}
+                                  >
+                                    Applicants registered: <strong>{c.applicants}</strong> <i className="fas fa-arrow-right ms-0.5" />
+                                  </button>
                                 </div>
                               </div>
                               <span className={`badge ${c.status === 'Open' ? 'bg-success' : 'bg-danger'}`} style={{ fontSize: '0.7rem' }}>{c.status}</span>
@@ -3953,7 +4014,21 @@ export default function DashboardPage() {
                                 <tr key={c.id}>
                                   <td className="fw-semibold small">{c.title}</td>
                                   <td className="small text-muted">{c.location}</td>
-                                  <td className="small fw-bold text-primary">{c.applicants}</td>
+                                  <td className="small">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setAdminTab('contacts');
+                                        setInboxSubTab('applications');
+                                        setJobAppSearch(c.title);
+                                      }}
+                                      className="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold d-inline-flex align-items-center gap-1"
+                                      title="View candidate applications for this position"
+                                    >
+                                      <i className="fas fa-users" />
+                                      <span>{c.applicants}</span>
+                                    </button>
+                                  </td>
                                   <td>
                                     <span className={`badge ${c.status === 'Open' ? 'bg-success' : 'bg-secondary'}`}>{c.status}</span>
                                   </td>
@@ -4621,9 +4696,10 @@ export default function DashboardPage() {
              ────────────────────────────── */}
           {adminTab === 'contacts' && (
             <div>
-              <div className="mb-4 d-flex gap-2 border-bottom pb-2">
+              <div className="mb-4 d-flex gap-2 border-bottom pb-2 flex-wrap">
                 {[
                   { id: 'messages', label: `Messages Inbox (${contacts.filter(c => !c.read).length})` },
+                  { id: 'applications', label: `Job Applications (${jobApplications.filter(a => !a.read).length})` },
                   { id: 'volunteers', label: `Volunteers (${volunteers.filter(v => !v.read).length})` },
                   { id: 'donations', label: `Donation Inquiries (${donations.filter(d => !d.read).length})` },
                 ].map(sub => (
@@ -4644,6 +4720,96 @@ export default function DashboardPage() {
               </div>
 
               {/* Message Details Modals */}
+              {activeJobApplication && (
+                <div className="custom-card p-4 mb-4" style={{ background: '#F8FAFC', border: '1px solid #CBD5E1' }}>
+                  <div className="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <span className="badge bg-primary px-2.5 py-1 rounded-pill small mb-2 d-inline-block">{activeJobApplication.careerTitle}</span>
+                      <h4 className="h5 fw-bold mb-1 text-dark">{activeJobApplication.fullName}</h4>
+                      <div className="small text-muted d-flex gap-3 flex-wrap">
+                        <span><i className="fas fa-envelope me-1 text-primary" />{activeJobApplication.email}</span>
+                        <span><i className="fas fa-phone me-1 text-primary" />{activeJobApplication.phone}</span>
+                        <span><i className="fas fa-clock me-1 text-muted" />{new Date(activeJobApplication.createdAt).toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <button onClick={() => setActiveJobApplication(null)} className="btn btn-close btn-sm" aria-label="Close"></button>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="small fw-bold text-muted text-uppercase d-block mb-1">Application Status</label>
+                    <div className="d-flex gap-2 align-items-center flex-wrap">
+                      {['Pending', 'Reviewed', 'Shortlisted', 'Rejected'].map(st => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => {
+                            updateJobApplicationStatus(activeJobApplication.id, st);
+                            setActiveJobApplication(prev => prev ? { ...prev, status: st } : null);
+                          }}
+                          className={`btn btn-sm ${activeJobApplication.status === st ? (st === 'Shortlisted' ? 'btn-success' : st === 'Rejected' ? 'btn-danger' : st === 'Reviewed' ? 'btn-info text-white' : 'btn-warning text-dark') : 'btn-outline-secondary'}`}
+                        >
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {activeJobApplication.resumeUrl ? (
+                    <div className="p-3 mb-3 rounded bg-light border d-flex justify-content-between align-items-center flex-wrap gap-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <i className="fas fa-file-pdf text-danger fa-2x" />
+                        <div>
+                          <span className="fw-semibold small d-block text-dark">Attached Resume / Curriculum Vitae</span>
+                          <span className="text-muted" style={{ fontSize: '0.78rem' }}>{activeJobApplication.resumeUrl.split('/').pop()}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={activeJobApplication.resumeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm fw-semibold"
+                        download
+                      >
+                        <i className="fas fa-arrow-down-to-bracket me-1" /> Download CV / Resume
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="small text-muted mb-3"><i className="fas fa-info-circle me-1" /> No resume document attached with this application.</p>
+                  )}
+
+                  <div className="mb-3">
+                    <label className="small fw-bold text-muted text-uppercase d-block mb-1">Cover Letter & Motivation Statement</label>
+                    <div className="small text-dark p-3 rounded bg-white" style={{ border: '1px solid #E2E8F0', whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
+                      {activeJobApplication.coverLetter}
+                    </div>
+                  </div>
+
+                  <div className="d-flex gap-2 mt-3 pt-2 border-top">
+                    {!activeJobApplication.read && (
+                      <button
+                        onClick={() => {
+                          markJobApplicationRead(activeJobApplication.id, true);
+                          setActiveJobApplication(prev => prev ? { ...prev, read: true } : null);
+                        }}
+                        className="btn btn-success btn-sm"
+                      >
+                        <i className="fas fa-check me-1" /> Mark as Read
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (confirm(`Are you sure you want to delete the application from ${activeJobApplication.fullName}?`)) {
+                          deleteJobApplication(activeJobApplication.id);
+                          setActiveJobApplication(null);
+                        }
+                      }}
+                      className="btn btn-danger btn-sm"
+                    >
+                      <i className="fas fa-trash me-1" /> Delete Application
+                    </button>
+                  </div>
+                </div>
+              )}
               {activeMessage && (
                 <div className="custom-card p-4 mb-4" style={{ background: '#FFFDF5', border: '1px solid #FFE082' }}>
                   <div className="d-flex justify-content-between align-items-start mb-3">
@@ -4803,6 +4969,172 @@ export default function DashboardPage() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              )}
+
+              {inboxSubTab === 'applications' && (
+                <div className="custom-card">
+                  <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Search applicants by name, email, or role..."
+                        className="form-control form-control-sm"
+                        style={{ maxWidth: '320px' }}
+                        value={jobAppSearch}
+                        onChange={e => setJobAppSearch(e.target.value)}
+                      />
+                      {jobAppSearch && (
+                        <button
+                          onClick={() => setJobAppSearch('')}
+                          className="btn btn-sm btn-outline-secondary py-1 px-2"
+                          title="Clear filter"
+                        >
+                          <i className="fas fa-times" />
+                        </button>
+                      )}
+                    </div>
+                    <span className="small text-muted">
+                      Total Applications: <strong>{jobApplications.length}</strong> ({jobApplications.filter(a => !a.read).length} unread)
+                    </span>
+                  </div>
+
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0 align-middle">
+                      <thead>
+                        <tr>
+                          <th>Applicant</th>
+                          <th>Applied Position</th>
+                          <th>Contact</th>
+                          <th>CV / Resume</th>
+                          <th>Date</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginate(
+                          jobApplications.filter(a => {
+                            if (!jobAppSearch) return true;
+                            const s = jobAppSearch.toLowerCase();
+                            return (
+                              a.fullName.toLowerCase().includes(s) ||
+                              a.email.toLowerCase().includes(s) ||
+                              a.careerTitle.toLowerCase().includes(s) ||
+                              (a.status && a.status.toLowerCase().includes(s))
+                            );
+                          }),
+                          currentPage.applications,
+                          pageSizes.applications
+                        ).map(a => (
+                          <tr key={a.id} className={!a.read ? 'table-light' : ''}>
+                            <td>
+                              <div className="d-flex align-items-center gap-2">
+                                {!a.read && <span className="badge rounded-pill bg-primary p-1" title="Unread"> </span>}
+                                <div>
+                                  <span className="fw-bold small d-block text-dark">{a.fullName}</span>
+                                  <span className="text-muted" style={{ fontSize: '0.78rem' }}>ID: {a.id.slice(0, 8)}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="badge bg-secondary-subtle text-secondary-emphasis px-2 py-1 small fw-semibold">
+                                {a.careerTitle}
+                              </span>
+                            </td>
+                            <td className="small">
+                              <div className="text-dark">{a.email}</div>
+                              <div className="text-muted" style={{ fontSize: '0.78rem' }}>{a.phone}</div>
+                            </td>
+                            <td>
+                              {a.resumeUrl ? (
+                                <a
+                                  href={a.resumeUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-xs btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1"
+                                  download
+                                >
+                                  <i className="fas fa-file-arrow-down" />
+                                  <span>Download CV</span>
+                                </a>
+                              ) : (
+                                <span className="text-muted small fst-italic">None</span>
+                              )}
+                            </td>
+                            <td className="small text-muted">
+                              {new Date(a.createdAt).toLocaleDateString()}
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  a.status === 'Shortlisted'
+                                    ? 'bg-success'
+                                    : a.status === 'Rejected'
+                                    ? 'bg-danger'
+                                    : a.status === 'Reviewed'
+                                    ? 'bg-info text-white'
+                                    : 'bg-warning text-dark'
+                                }`}
+                              >
+                                {a.status || 'Pending'}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    setActiveJobApplication(a);
+                                    if (!a.read) markJobApplicationRead(a.id, true);
+                                  }}
+                                  className="btn btn-sm btn-outline-primary py-0"
+                                >
+                                  Review
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (confirm(`Delete application from ${a.fullName}?`)) {
+                                      deleteJobApplication(a.id);
+                                    }
+                                  }}
+                                  className="btn btn-sm btn-outline-danger py-0"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    {jobApplications.length === 0 && (
+                      <div style={{ textAlign: 'center', padding: '50px 20px', color: '#94a3b8' }}>
+                        <i className="fas fa-id-card-clip fa-3x mb-3 d-block text-secondary" />
+                        <p className="fw-semibold mb-1">No job applications submitted yet</p>
+                        <p className="small text-muted">Candidates applying via https://npcrwanda.org/careers will appear here.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {jobApplications.length > 0 && (
+                    <PaginationComponent
+                      currentPage={currentPage.applications}
+                      totalPages={totalPages(
+                        jobApplications.filter(a => {
+                          if (!jobAppSearch) return true;
+                          const s = jobAppSearch.toLowerCase();
+                          return (
+                            a.fullName.toLowerCase().includes(s) ||
+                            a.email.toLowerCase().includes(s) ||
+                            a.careerTitle.toLowerCase().includes(s)
+                          );
+                        }).length,
+                        pageSizes.applications
+                      )}
+                      onPageChange={page => setCurrentPage({ ...currentPage, applications: page })}
+                    />
+                  )}
                 </div>
               )}
             </div>

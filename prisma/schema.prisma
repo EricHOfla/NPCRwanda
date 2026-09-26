@@ -133,6 +133,25 @@ model VolunteerApplication {
   @@index([read])
 }
 
+model JobApplication {
+  id          String   @id @default(uuid())
+  careerId    String?
+  careerTitle String
+  fullName    String
+  email       String
+  phone       String
+  coverLetter String   @db.Text
+  resumeUrl   String?
+  status      String   @default("Pending") // Pending, Reviewed, Shortlisted, Rejected
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([careerId])
+  @@index([read])
+  @@index([status])
+}
+
 model DonationInquiry {
   id          String   @id @default(uuid())
   name        String

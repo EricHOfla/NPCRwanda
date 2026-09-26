@@ -129,7 +129,7 @@ export default function CareersPage() {
                     <p className="small text-muted mb-4 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(job.desc)}</p>
                     
                     <div className="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                      <Link href={`/careers/${job.slug}`} className="btn btn-primary btn-sm fw-semibold px-4">
+                      <Link href={`/careers/${job.slug}#apply`} className="btn btn-primary btn-sm fw-semibold px-4">
                         {t('phrase.Apply')} <i className="fas fa-arrow-right ms-1"></i>
                       </Link>
                       <span className="small text-muted">Full-Time</span>

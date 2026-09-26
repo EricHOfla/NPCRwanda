@@ -39,6 +39,21 @@ export interface Career {
   slug: string;
 }
 
+export interface JobApplication {
+  id: string;
+  careerId?: string | null;
+  careerTitle: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  coverLetter: string;
+  resumeUrl?: string | null;
+  status: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ContactMessage {
   id: string;
   name: string;
@@ -359,6 +374,12 @@ interface DataContextType {
   updateNpcFederation: (item: NpcFederation) => Promise<void>;
   deleteNpcFederation: (id: string) => Promise<void>;
 
+  jobApplications: JobApplication[];
+  addJobApplication: (formData: FormData | Record<string, any>) => Promise<any>;
+  markJobApplicationRead: (id: string, read?: boolean) => Promise<void>;
+  updateJobApplicationStatus: (id: string, status: string) => Promise<void>;
+  deleteJobApplication: (id: string) => Promise<void>;
+
   loading: boolean;
   error: string | null;
   refetchPublicData: () => Promise<void>;
@@ -388,6 +409,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [volunteers, setVolunteers] = useState<VolunteerApplication[]>([]);
   const [donations, setDonations] = useState<DonationInquiry[]>([]);
+  const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
 
   // Member states
   const [associations, setAssociations] = useState<NpcAssociation[]>([]);
@@ -472,16 +494,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch Protected Data (Messages, Volunteers, Donations, Media) for dashboard
   const fetchProtectedData = async () => {
     try {
-      const [msgRes, volRes, donRes, mediaRes] = await Promise.all([
+      const [msgRes, volRes, donRes, mediaRes, jobAppRes] = await Promise.all([
         fetch('/api/contacts').then(r => r.ok ? r.json() : []),
         fetch('/api/volunteers').then(r => r.ok ? r.json() : []),
         fetch('/api/donations').then(r => r.ok ? r.json() : []),
         fetch('/api/media').then(r => r.ok ? r.json() : []),
+        fetch('/api/job-applications').then(r => r.ok ? r.json() : []),
       ]);
       setMessages(msgRes);
       setVolunteers(volRes);
       setDonations(donRes);
       setMediaAssets(mediaRes);
+      setJobApplications(jobAppRes);
     } catch (err) {
       console.error('Error fetching protected dashboard data:', err);
     }
@@ -1266,6 +1290,68 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const markJobApplicationRead = async (id: string, read = true) => {
+    try {
+      const res = await fetch(`/api/job-applications/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (res.ok) {
+        setJobApplications(prev => prev.map(a => (a.id === id ? { ...a, read } : a)));
+      }
+    } catch (err) {
+      console.error('Error marking job application read:', err);
+    }
+  };
+
+  const updateJobApplicationStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/job-applications/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        setJobApplications(prev => prev.map(a => (a.id === id ? { ...a, status } : a)));
+      }
+    } catch (err) {
+      console.error('Error updating job application status:', err);
+    }
+  };
+
+  const deleteJobApplication = async (id: string) => {
+    try {
+      const res = await fetch(`/api/job-applications/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setJobApplications(prev => prev.filter(a => a.id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting job application:', err);
+    }
+  };
+
+  const addJobApplication = async (formData: FormData | Record<string, any>) => {
+    const isFormData = typeof FormData !== 'undefined' && formData instanceof FormData;
+    const res = await fetch('/api/careers/apply', {
+      method: 'POST',
+      headers: isFormData ? undefined : { 'Content-Type': 'application/json' },
+      body: isFormData ? formData : JSON.stringify(formData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to submit application');
+    }
+    const data = await res.json();
+    if (data.application) {
+      setJobApplications(prev => [data.application, ...prev]);
+      invalidatePublicBundle();
+    }
+    return data;
+  };
+
   // Association Actions
   const addAssociation = async (item: Omit<NpcAssociation, 'id'>) => {
     const res = await fetch('/api/npc-associations', {
@@ -1493,6 +1579,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         messages,
         volunteers,
         donations,
+        jobApplications,
+        addJobApplication,
+        markJobApplicationRead,
+        updateJobApplicationStatus,
+        deleteJobApplication,
         submitContactMessage,
         submitVolunteerApplication,
         submitDonationInquiry,
