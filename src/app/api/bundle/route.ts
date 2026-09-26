@@ -59,7 +59,7 @@ export async function GET() {
         orderBy: { title: 'asc' },
       }),
       prisma.leader.findMany({
-        orderBy: { name: 'asc' },
+        orderBy: [{ order: 'asc' }, { name: 'asc' }],
       }),
       prisma.governanceDocument.findMany({
         where: { published: true },

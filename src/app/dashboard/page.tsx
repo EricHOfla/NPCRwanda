@@ -619,7 +619,8 @@ export default function DashboardPage() {
     committee: 'Board of Directors',
     email: '',
     phone: '',
-    impairment: ''
+    impairment: '',
+    order: 0 as number,
   });
 
   const [systemFormOpen, setSystemFormOpen] = useState(false);
@@ -1199,11 +1200,11 @@ export default function DashboardPage() {
   const handleLeaderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingLeaderId) {
-      await updateLeader({ id: editingLeaderId, ...leaderForm });
+      await updateLeader({ id: editingLeaderId, ...leaderForm, order: Number(leaderForm.order) || 0 });
     } else {
-      await addLeader(leaderForm);
+      await addLeader({ ...leaderForm, order: Number(leaderForm.order) || 0 });
     }
-    setLeaderForm({ name: '', role: 'President', desc: '', avatar: 'avatar-4.svg', committee: 'Board of Directors', email: '', phone: '', impairment: '' });
+    setLeaderForm({ name: '', role: 'President', desc: '', avatar: 'avatar-4.svg', committee: 'Board of Directors', email: '', phone: '', impairment: '', order: 0 });
     setEditingLeaderId(null);
     setLeaderFormOpen(false);
   };
@@ -1217,7 +1218,8 @@ export default function DashboardPage() {
       committee: l.committee || 'Board of Directors',
       email: l.email || '',
       phone: l.phone || '',
-      impairment: l.impairment || ''
+      impairment: l.impairment || '',
+      order: l.order ?? 0,
     });
     setEditingLeaderId(l.id);
     setLeaderFormOpen(true);
@@ -3232,7 +3234,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingLeaderId(null);
-                            setLeaderForm({ name: '', role: 'President', desc: '', avatar: 'avatar-4.svg', committee: 'Board of Directors', email: '', phone: '', impairment: '' });
+                            setLeaderForm({ name: '', role: 'President', desc: '', avatar: 'avatar-4.svg', committee: 'Board of Directors', email: '', phone: '', impairment: '', order: 0 });
                             setLeaderFormOpen(!leaderFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-4"
@@ -3253,7 +3255,7 @@ export default function DashboardPage() {
                               <label className="form-label small fw-bold">Role Title</label>
                               <input type="text" className="form-control" required value={leaderForm.role} onChange={e => setLeaderForm({ ...leaderForm, role: e.target.value })} />
                             </div>
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                               <label className="form-label small fw-bold">Committee Group</label>
                               <select className="form-control" value={leaderForm.committee} onChange={e => setLeaderForm({ ...leaderForm, committee: e.target.value })}>
                                 <option value="Board of Directors">Board of Directors</option>
@@ -3261,6 +3263,17 @@ export default function DashboardPage() {
                                 <option value="Conflict Resolution Committee">Conflict Resolution Committee</option>
                                 <option value="Staff Team">Staff Team</option>
                               </select>
+                            </div>
+                            <div className="col-md-1">
+                              <label className="form-label small fw-bold">Order #</label>
+                              <input
+                                type="number"
+                                className="form-control"
+                                min={0}
+                                value={leaderForm.order}
+                                onChange={e => setLeaderForm({ ...leaderForm, order: Number(e.target.value) })}
+                                title="Display order within the committee group (lower = shown first)"
+                              />
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Email (Optional)</label>
@@ -3312,6 +3325,7 @@ export default function DashboardPage() {
                           <table className="table table-hover mb-0 align-middle">
                             <thead>
                               <tr>
+                                <th style={{ width: '50px' }}>#</th>
                                 <th>Name</th>
                                 <th>Role</th>
                                 <th>Committee</th>
@@ -3321,6 +3335,11 @@ export default function DashboardPage() {
                             <tbody>
                               {paginate(filteredLeaders, currentPage.leaders, pageSizes.leaders).map(l => (
                                 <tr key={l.id}>
+                                  <td>
+                                    <span className="badge bg-light text-dark border fw-bold" style={{ fontSize: '0.78rem', minWidth: '28px' }}>
+                                      {l.order ?? 0}
+                                    </span>
+                                  </td>
                                   <td className="fw-semibold small">{l.name}</td>
                                   <td className="small">{t(l.role)}</td>
                                   <td className="small text-muted">{l.committee}</td>

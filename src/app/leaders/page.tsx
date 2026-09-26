@@ -27,22 +27,24 @@ const getProfileImageSrc = (image?: string) => {
 export default function LeadersPage() {
   const { t } = useTranslation();
   const { leadership } = useData();
-  const [activeCommittee, setActiveCommittee] = React.useState('All');
+  const [activeCommittee, setActiveCommittee] = React.useState('Board of Directors');
   const [search, setSearch] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const committees = ['All', ...Array.from(new Set(leadership.map(leader => leader.committee || 'Board of Directors')))];
-  const filteredLeaders = leadership.filter(leader => {
-    const committee = leader.committee || 'Board of Directors';
-    const matchesCommittee = activeCommittee === 'All' || committee === activeCommittee;
-    const query = search.trim().toLowerCase();
-    const matchesSearch = !query ||
-      leader.name.toLowerCase().includes(query) ||
-      leader.role.toLowerCase().includes(query) ||
-      committee.toLowerCase().includes(query);
+  const filteredLeaders = leadership
+    .filter(leader => {
+      const committee = leader.committee || 'Board of Directors';
+      const matchesCommittee = activeCommittee === 'All' || committee === activeCommittee;
+      const query = search.trim().toLowerCase();
+      const matchesSearch = !query ||
+        leader.name.toLowerCase().includes(query) ||
+        leader.role.toLowerCase().includes(query) ||
+        committee.toLowerCase().includes(query);
 
-    return matchesCommittee && matchesSearch;
-  });
+      return matchesCommittee && matchesSearch;
+    })
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name));
 
   const totalPages = Math.ceil(filteredLeaders.length / ITEMS_PER_PAGE);
   const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));

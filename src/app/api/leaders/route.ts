@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const leadership = await prisma.leader.findMany({
-      orderBy: { name: 'asc' },
+      orderBy: [{ order: 'asc' }, { name: 'asc' }],
     });
     return NextResponse.json(leadership);
   } catch (error) {
@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, role, desc, avatar, committee, email, phone, impairment } = body;
+    const { name, role, desc, avatar, committee, email, phone, impairment, order } = body;
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -45,6 +45,7 @@ export async function POST(request: Request) {
         email: email ? email.trim() : null,
         phone: phone ? phone.trim() : null,
         impairment: impairment ? impairment.trim() : null,
+        order: typeof order === 'number' ? order : 0,
       },
     });
 

@@ -105,6 +105,7 @@ export interface Leader {
   email?: string | null;
   phone?: string | null;
   impairment?: string | null;
+  order?: number;
 }
 
 export interface SystemComponent {

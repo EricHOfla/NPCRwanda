@@ -34,7 +34,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, role, desc, avatar, committee, email, phone, impairment } = body;
+    const { name, role, desc, avatar, committee, email, phone, impairment, order } = body;
 
     const updateData: Record<string, any> = {};
     if (name !== undefined) updateData.name = name.trim();
@@ -45,6 +45,7 @@ export async function PUT(
     if (email !== undefined) updateData.email = email ? email.trim() : null;
     if (phone !== undefined) updateData.phone = phone ? phone.trim() : null;
     if (impairment !== undefined) updateData.impairment = impairment ? impairment.trim() : null;
+    if (order !== undefined) updateData.order = typeof order === 'number' ? order : parseInt(order, 10) || 0;
 
     const updatedLeader = await prisma.leader.update({
       where: { id },
