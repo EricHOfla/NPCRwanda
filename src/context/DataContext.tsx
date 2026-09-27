@@ -496,18 +496,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch Protected Data (Messages, Volunteers, Donations, Media) for dashboard
   const fetchProtectedData = async () => {
     try {
-      const [msgRes, volRes, donRes, mediaRes, jobAppRes] = await Promise.all([
-        fetch('/api/contacts').then(r => r.ok ? r.json() : []),
+      const messagesRequest = fetch('/api/contacts').then(r => r.ok ? r.json() : []);
+      const remainingRequests = Promise.all([
         fetch('/api/volunteers').then(r => r.ok ? r.json() : []),
         fetch('/api/donations').then(r => r.ok ? r.json() : []),
         fetch('/api/media').then(r => r.ok ? r.json() : []),
         fetch('/api/job-applications').then(r => r.ok ? r.json() : []),
       ]);
-      setMessages(msgRes);
-      setVolunteers(volRes);
-      setDonations(donRes);
-      setMediaAssets(mediaRes);
-      setJobApplications(jobAppRes);
+
+      const messagesData = await messagesRequest;
+      setMessages(messagesData);
+
+      const [volunteersData, donationsData, mediaData, jobApplicationsData] = await remainingRequests;
+      setVolunteers(volunteersData);
+      setDonations(donationsData);
+      setMediaAssets(mediaData);
+      setJobApplications(jobApplicationsData);
     } catch (err) {
       console.error('Error fetching protected dashboard data:', err);
     }
