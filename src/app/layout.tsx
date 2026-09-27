@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Sora, Source_Sans_3 } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import { ClientWrapper } from '@/components/ClientWrapper';
@@ -10,17 +9,9 @@ import {
   getWebSiteJsonLd,
 } from '@/lib/seo';
 
-const sora = Sora({
-  variable: '--font-display',
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-});
-
-const sourceSans = Source_Sans_3({
-  variable: '--font-body',
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-});
+// NOTE: next/font/google was removed because Turbopack on the production
+// server cannot resolve @vercel/turbopack-next internal font modules.
+// Fonts are loaded via <link> tags in the <head> instead.
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -99,8 +90,21 @@ export default function RootLayout({
   const websiteSchema = getWebSiteJsonLd();
 
   return (
-    <html lang="en" className={`${sora.variable} ${sourceSans.variable}`}>
+    <html lang="en">
       <head>
+        {/* Google Fonts — loaded via standard link tags (Turbopack compatible) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --font-display: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          }
+        `}} />
         <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/logo.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/logo.png" />
         <link rel="shortcut icon" href="/assets/img/logo.png" />
