@@ -252,6 +252,7 @@ img {
 }
 
 .lang-switcher {
+    position: relative;
     gap: 4px;
 }
 
@@ -311,9 +312,17 @@ img {
 }
 
 .topbar .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    inset: auto 0 auto auto !important;
+    transform: none !important;
     font-size: 0.8rem;
     background-color: #ffffff;
     min-width: 120px;
+    margin: 0 !important;
+    z-index: 1032;
 }
 
 .topbar .dropdown-menu .lang-btn {
