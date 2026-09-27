@@ -12,7 +12,7 @@ import { QueryProvider } from '@/components/QueryProvider';
 
 export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
+  const isAuthOrDashboard = pathname?.startsWith('/dashboard') || pathname === '/login';
 
   useEffect(() => {
     Promise.all([
@@ -35,10 +35,10 @@ export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ childre
     <QueryProvider>
       <DataProvider>
         <LanguageProvider>
-          {!isDashboard && <Header />}
-          {isDashboard ? children : <main>{children}</main>}
-          {!isDashboard && <Footer />}
-          {!isDashboard && <AccessibilityWidget />}
+          {!isAuthOrDashboard && <Header />}
+          {isAuthOrDashboard ? children : <main>{children}</main>}
+          {!isAuthOrDashboard && <Footer />}
+          {!isAuthOrDashboard && <AccessibilityWidget />}
         </LanguageProvider>
       </DataProvider>
     </QueryProvider>

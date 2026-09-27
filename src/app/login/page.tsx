@@ -103,7 +103,7 @@ export default function LoginPage() {
           max-width: 980px;
           background: #ffffff;
           border-radius: 20px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
           display: flex;
           overflow: hidden;
           position: relative;
@@ -192,10 +192,11 @@ export default function LoginPage() {
 
         .login-input-field {
           width: 100%;
+          min-height: 48px;
           padding: 12px 14px 12px 42px;
           border: 1.5px solid #E2E8F0;
           border-radius: 10px;
-          font-size: 0.92rem;
+          font-size: 16px; /* 16px prevents iOS Safari auto-zoom on mobile */
           color: #0F172A;
           background: #F8FAFC;
           outline: none;
@@ -215,26 +216,30 @@ export default function LoginPage() {
 
         .password-toggle-btn {
           position: absolute;
-          right: 12px;
+          right: 8px;
           background: transparent;
           border: none;
           color: #94A3B8;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
           cursor: pointer;
-          padding: 6px;
+          min-width: 36px;
+          min-height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
           transition: color 0.2s ease;
+          border-radius: 8px;
         }
 
         .password-toggle-btn:hover {
           color: #0F172A;
+          background: rgba(0, 0, 0, 0.04);
         }
 
         .login-submit-btn {
           width: 100%;
-          padding: 14px 20px;
+          min-height: 48px;
+          padding: 12px 20px;
           background: linear-gradient(135deg, #0072C6 0%, #0033A0 100%);
           color: #ffffff;
           border: none;
@@ -257,6 +262,10 @@ export default function LoginPage() {
           box-shadow: 0 6px 20px rgba(0, 114, 198, 0.4);
         }
 
+        .login-submit-btn:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
         .login-submit-btn:disabled {
           opacity: 0.75;
           cursor: not-allowed;
@@ -276,19 +285,65 @@ export default function LoginPage() {
         .bar-yellow { flex: 1; background: #FAD201; }
         .bar-green { flex: 1; background: #00A859; }
 
+        /* Smartphone & Small Tablet Optimizations */
         @media (max-width: 860px) {
+          .login-page-wrapper {
+            padding: 16px 12px;
+            align-items: flex-start;
+          }
+
           .login-container-card {
             flex-direction: column;
-            max-width: 480px;
+            max-width: 440px;
+            border-radius: 16px;
+            margin: auto;
           }
+
           .login-branding-panel {
-            padding: 32px 28px 24px 28px;
+            padding: 24px 20px;
+            background: linear-gradient(135deg, #061a3d 0%, #0033A0 100%);
+            border-bottom: 3px solid #FFA000;
           }
-          .login-form-panel {
-            padding: 36px 28px;
+
+          .login-branding-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
           }
+
+          .login-branding-panel h1 {
+            font-size: 1.25rem !important;
+            margin-top: 10px !important;
+          }
+
+          .login-branding-panel p {
+            font-size: 0.78rem !important;
+            margin-top: 4px !important;
+          }
+
           .login-branding-features {
             display: none;
+          }
+
+          .login-branding-footer {
+            display: none !important;
+          }
+
+          .login-form-panel {
+            padding: 28px 20px 24px 20px;
+          }
+
+          .login-header-desktop-badge {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 400px) {
+          .login-page-wrapper {
+            padding: 10px 8px;
+          }
+
+          .login-form-panel {
+            padding: 22px 16px 20px 16px;
           }
         }
       `}</style>
@@ -347,7 +402,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div>
+          <div className="login-branding-footer">
             <div className="national-accent-bar">
               <div className="bar-blue" />
               <div className="bar-yellow" />
@@ -362,14 +417,14 @@ export default function LoginPage() {
 
         {/* Right Side: Professional Login Form */}
         <div className="login-form-panel">
-          <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
               <img
                 src="/assets/img/logo.png"
                 alt="NPC Rwanda Logo"
-                style={{ height: '48px', width: 'auto', objectFit: 'contain' }}
+                style={{ height: '44px', width: 'auto', objectFit: 'contain' }}
               />
-              <div style={{ borderLeft: '1px solid #E2E8F0', paddingLeft: '12px' }}>
+              <div className="login-header-desktop-badge" style={{ borderLeft: '1px solid #E2E8F0', paddingLeft: '12px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0072C6', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                   ADMIN ACCESS
                 </span>
@@ -377,11 +432,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
               Sign In to Your Account
             </h2>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B' }}>
-              Enter your credentials to access the administrative dashboard.
+            <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B' }}>
+              Enter your official credentials to access the administrative dashboard.
             </p>
           </div>
 
@@ -393,7 +448,7 @@ export default function LoginPage() {
               borderRadius: '10px',
               color: '#B45309',
               fontSize: '0.84rem',
-              marginBottom: '20px',
+              marginBottom: '18px',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -412,7 +467,7 @@ export default function LoginPage() {
               borderRadius: '10px',
               color: '#B91C1C',
               fontSize: '0.84rem',
-              marginBottom: '20px',
+              marginBottom: '18px',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -423,7 +478,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label
                 htmlFor="loginEmail"
@@ -443,6 +498,7 @@ export default function LoginPage() {
                   required
                   autoFocus
                   disabled={loading}
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -463,11 +519,12 @@ export default function LoginPage() {
                   id="loginPassword"
                   placeholder="Enter your account password"
                   className="login-input-field"
-                  style={{ paddingRight: '42px' }}
+                  style={{ paddingRight: '46px' }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -485,7 +542,7 @@ export default function LoginPage() {
               type="submit"
               className="login-submit-btn"
               disabled={loading}
-              style={{ marginTop: '8px' }}
+              style={{ marginTop: '6px' }}
             >
               {loading ? (
                 <>
@@ -501,7 +558,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
             <Link
               href="/"
               style={{ color: '#0072C6', fontSize: '0.82rem', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
@@ -509,7 +566,7 @@ export default function LoginPage() {
               <i className="fas fa-arrow-left-long" /> Back to Public Website
             </Link>
 
-            <span style={{ color: '#94A3B8', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ color: '#94A3B8', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
               <i className="fas fa-shield-alt text-success" /> 256-Bit SSL Secured
             </span>
           </div>
