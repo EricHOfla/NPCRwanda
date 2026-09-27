@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { isPublicHostname } from '@/lib/site-domain';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,12 +16,21 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if (isPublicHostname()) {
+        window.location.replace('https://admin.npcrwanda.org/login');
+        return;
+      }
+
       const params = new URLSearchParams(window.location.search);
       if (params.get('expired') === 'true') {
         setSessionNotice('Your session has ended for your security. Please log in again to continue.');
       }
     }
   }, []);
+
+  if (typeof window !== 'undefined' && isPublicHostname()) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
