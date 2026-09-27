@@ -38,8 +38,8 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(sessionCookie, key);
       return NextResponse.next();
     } catch {
-      // Expired or invalid token — clear cookie and send to login
-      const response = NextResponse.redirect(new URL('/login', request.url));
+      // Expired or invalid token — clear cookie and send to login with expired notice
+      const response = NextResponse.redirect(new URL('/login?expired=true', request.url));
       response.cookies.set('npc_session', '', { maxAge: 0, path: '/' });
       return response;
     }
@@ -114,5 +114,5 @@ export async function middleware(request: NextRequest) {
 
 // Match dashboard, login, and all API routes
 export const config = {
-  matcher: ['/login', '/dashboard/:path*', '/api/:path*'],
+  matcher: ['/login', '/dashboard', '/dashboard/:path*', '/api/:path*'],
 };

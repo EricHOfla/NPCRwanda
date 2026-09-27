@@ -9,7 +9,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [sessionNotice, setSessionNotice] = useState('');
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('expired') === 'true') {
+        setSessionNotice('Your session has ended for your security. Please log in again to continue.');
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +74,13 @@ export default function LoginPage() {
           <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#0033A0', margin: 0 }}>Login</h2>
           <p style={{ margin: '8px 0 0 0', fontSize: '0.85rem', color: '#64748B' }}>NPC Rwanda Portal Login</p>
         </div>
+
+        {sessionNotice && (
+          <div style={{ padding: '12px 14px', background: '#FFF8E1', border: '1px solid #FFE082', borderRadius: '8px', color: '#B78103', fontSize: '0.82rem', marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <i className="fas fa-clock-rotate-left fa-lg" />
+            <span>{sessionNotice}</span>
+          </div>
+        )}
 
         {error && (
           <div style={{ padding: '12px', background: '#FFEBEE', border: '1px solid #FFCDD2', borderRadius: '8px', color: '#C62828', fontSize: '0.82rem', marginBottom: '20px', fontWeight: 500 }}>

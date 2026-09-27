@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser, signJWT } from '@/lib/auth';
+import { getSessionUser, signJWT, SESSION_MAX_AGE_SECONDS } from '@/lib/auth';
 
 // GET: Retrieve current logged-in user profile details
 export async function GET(request: NextRequest) {
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: SESSION_MAX_AGE_SECONDS, // 2 hours
     });
 
     return response;

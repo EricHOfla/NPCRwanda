@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { signJWT } from '@/lib/auth';
+import { signJWT, SESSION_MAX_AGE_SECONDS } from '@/lib/auth';
 import { ensureDefaultAdmin } from '@/lib/adminSeed';
 
 export async function POST(request: Request) {
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24,
+      maxAge: SESSION_MAX_AGE_SECONDS,
     });
 
     return response;

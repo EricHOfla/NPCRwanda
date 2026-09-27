@@ -1010,19 +1010,108 @@ export default function DashboardPage() {
     }
   }, [adminTab, fetchSystemSettings]);
 
-  // Initial mount data fetch
-  useEffect(() => {
-    fetch('/api/auth/profile')
-      .then(r => (r.ok ? r.json() : null))
-      .then(data => {
-        if (data) setProfile(prev => ({ ...prev, name: data.name, email: data.email }));
-      })
-      .catch(() => {});
+  // Session security & idle management
+  const lastActivityRef = useRef<number>(Date.now());
+  const [authVerified, setAuthVerified] = useState(false);
 
-    fetchMediaAssets();
-    fetchGovData();
-    fetchProtectedData();
-  }, []);
+  const verifySession = useCallback(async (): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/auth/profile');
+      if (res.status === 401 || res.status === 403) {
+        queryClient.clear();
+        try {
+          localStorage.removeItem('admin_active_tab');
+          localStorage.removeItem('admin_active_page');
+          localStorage.removeItem('admin_inbox_subtab');
+        } catch {}
+        router.push('/login?expired=true');
+        return false;
+      }
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(prev => ({ ...prev, name: data.name, email: data.email }));
+        setAuthVerified(true);
+        return true;
+      }
+    } catch (err) {
+      console.error('Session verification error:', err);
+    }
+    return false;
+  }, [queryClient, router]);
+
+  // Initial mount data fetch with session verification guard
+  useEffect(() => {
+    verifySession().then(isValid => {
+      if (isValid) {
+        fetchMediaAssets();
+        fetchGovData();
+        fetchProtectedData();
+      }
+    });
+  }, [verifySession]);
+
+  // Inactivity timeout (60 minutes) & periodic session check
+  useEffect(() => {
+    if (!authVerified) return;
+
+    const IDLE_LIMIT = 60 * 60 * 1000; // 60 minutes of inactivity
+
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    window.addEventListener('mousemove', updateActivity, { passive: true });
+    window.addEventListener('keydown', updateActivity, { passive: true });
+    window.addEventListener('mousedown', updateActivity, { passive: true });
+    window.addEventListener('touchstart', updateActivity, { passive: true });
+    window.addEventListener('scroll', updateActivity, { passive: true });
+
+    // When the user focuses back on this tab after being away
+    const handleFocus = () => {
+      const idleTime = Date.now() - lastActivityRef.current;
+      if (idleTime > IDLE_LIMIT) {
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+        queryClient.clear();
+        try {
+          localStorage.removeItem('admin_active_tab');
+          localStorage.removeItem('admin_active_page');
+          localStorage.removeItem('admin_inbox_subtab');
+        } catch {}
+        router.push('/login?expired=true');
+      } else {
+        verifySession();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic heartbeat check every 2 minutes
+    const interval = setInterval(() => {
+      const idleTime = Date.now() - lastActivityRef.current;
+      if (idleTime > IDLE_LIMIT) {
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+        queryClient.clear();
+        try {
+          localStorage.removeItem('admin_active_tab');
+          localStorage.removeItem('admin_active_page');
+          localStorage.removeItem('admin_inbox_subtab');
+        } catch {}
+        router.push('/login?expired=true');
+      } else {
+        verifySession();
+      }
+    }, 2 * 60 * 1000);
+
+    return () => {
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+      window.removeEventListener('mousedown', updateActivity);
+      window.removeEventListener('touchstart', updateActivity);
+      window.removeEventListener('scroll', updateActivity);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [authVerified, verifySession, queryClient, router]);
 
   // Update contactForm states when loaded from DB
   useEffect(() => {
@@ -1486,6 +1575,15 @@ export default function DashboardPage() {
   };
 
   const totalPages = (total: number, size: number) => Math.ceil(total / size) || 1;
+
+  if (!authVerified) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+        <i className="fas fa-spinner fa-spin text-primary fa-3x mb-3" />
+        <p className="text-muted small fw-semibold">Verifying secure administrator session...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>

@@ -12,12 +12,16 @@ export interface JWTPayload {
   name: string;
 }
 
+// Session timeout: 2 hours of inactivity/duration
+export const SESSION_MAX_AGE_SECONDS = 2 * 60 * 60; // 7,200 seconds (2 hours)
+export const SESSION_EXPIRATION_STR = '2h';
+
 // Sign a JWT token containing user session details
 export async function signJWT(payload: JWTPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('24h')
+    .setExpirationTime(SESSION_EXPIRATION_STR)
     .sign(key);
 }
 
