@@ -17,7 +17,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (isPublicHostname()) {
-        window.location.replace('https://admin.npcrwanda.org/login');
+        window.location.replace('https://npcrwanda.org/');
         return;
       }
 

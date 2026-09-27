@@ -36,15 +36,11 @@ export async function middleware(request: NextRequest) {
   };
 
   if (isPublicRequest && pathname === '/login') {
-    return NextResponse.redirect(new URL(getAdminAppUrl('/login'), request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (isPublicRequest && pathname.startsWith('/dashboard')) {
-    const destination = (await isValidSession())
-      ? new URL(getAdminAppUrl('/dashboard'), request.url)
-      : new URL(getAdminAppUrl('/login?expired=true'), request.url);
-
-    return NextResponse.redirect(destination);
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (isAdminRequest && pathname === '/') {
