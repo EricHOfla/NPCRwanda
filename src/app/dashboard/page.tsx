@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -722,7 +722,114 @@ export default function DashboardPage() {
   const [jobAppSearch, setJobAppSearch] = useState('');
   const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
 
-  // Pagination states - Professional configuration
+  // Track whether tab/page state has been restored on client mount
+  const isTabInitializedRef = useRef(false);
+
+  // Restore active tab and page on client mount from URL or localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlTab = params.get('tab') as AdminTab | null;
+    const urlPage = params.get('page');
+    const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
+
+    const storedTab = localStorage.getItem('admin_active_tab') as AdminTab | null;
+    const storedPage = localStorage.getItem('admin_active_page');
+    const storedSubTab = localStorage.getItem('admin_inbox_subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
+
+    const targetTab = urlTab || storedTab || 'overview';
+    const targetPage = urlPage !== null && urlPage !== undefined ? urlPage : storedPage;
+    const targetSubTab = urlSubTab || storedSubTab;
+
+    const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners'];
+
+    if (PAGE_IDS.includes(targetTab)) {
+      setAdminTab('pages');
+      setActiveEditPage(targetTab);
+    } else {
+      setAdminTab(targetTab);
+      if (targetTab === 'pages' && targetPage) {
+        setActiveEditPage(targetPage);
+      }
+    }
+
+    if (targetSubTab && ['messages', 'volunteers', 'donations', 'applications'].includes(targetSubTab)) {
+      setInboxSubTab(targetSubTab);
+    }
+
+    isTabInitializedRef.current = true;
+  }, []);
+
+  // Sync active tab, page, and subtab to URL and localStorage when changed
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!isTabInitializedRef.current) return;
+
+    try {
+      localStorage.setItem('admin_active_tab', adminTab);
+      if (adminTab === 'pages' && activeEditPage) {
+        localStorage.setItem('admin_active_page', activeEditPage);
+      } else {
+        localStorage.removeItem('admin_active_page');
+      }
+
+      if (adminTab === 'contacts') {
+        localStorage.setItem('admin_inbox_subtab', inboxSubTab);
+      }
+
+      // Update URL query parameters without triggering full page reload
+      const url = new URL(window.location.href);
+      if (adminTab === 'overview') {
+        url.searchParams.delete('tab');
+        url.searchParams.delete('page');
+        url.searchParams.delete('subtab');
+      } else {
+        url.searchParams.set('tab', adminTab);
+        if (adminTab === 'pages' && activeEditPage) {
+          url.searchParams.set('page', activeEditPage);
+        } else {
+          url.searchParams.delete('page');
+        }
+        if (adminTab === 'contacts' && inboxSubTab !== 'messages') {
+          url.searchParams.set('subtab', inboxSubTab);
+        } else {
+          url.searchParams.delete('subtab');
+        }
+      }
+
+      window.history.replaceState({}, '', url.toString());
+    } catch {
+      // Ignore storage/url write errors
+    }
+  }, [adminTab, activeEditPage, inboxSubTab]);
+
+  // Support browser Back and Forward navigation
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = (params.get('tab') as AdminTab | null) || 'overview';
+      const urlPage = params.get('page');
+      const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
+
+      const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners'];
+      if (PAGE_IDS.includes(urlTab)) {
+        setAdminTab('pages');
+        setActiveEditPage(urlTab);
+      } else {
+        setAdminTab(urlTab);
+        setActiveEditPage(urlTab === 'pages' ? urlPage : null);
+      }
+      if (urlSubTab && ['messages', 'volunteers', 'donations', 'applications'].includes(urlSubTab)) {
+        setInboxSubTab(urlSubTab);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [pageSizes] = useState({ 
     athletes: 10, 
     news: 8, 
@@ -1052,6 +1159,11 @@ export default function DashboardPage() {
       const res = await fetch('/api/auth/logout', { method: 'POST' });
       if (res.ok) {
         queryClient.clear();
+        try {
+          localStorage.removeItem('admin_active_tab');
+          localStorage.removeItem('admin_active_page');
+          localStorage.removeItem('admin_inbox_subtab');
+        } catch {}
         router.push('/login');
         router.refresh();
       }
