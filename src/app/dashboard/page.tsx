@@ -2215,7 +2215,7 @@ export default function DashboardPage() {
                     <i className="fas fa-bullhorn" /> Announcements
                   </button>
                   <a 
-                    href="/" 
+                    href="https://npcrwanda.org/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-sm btn-link"
