@@ -569,12 +569,12 @@ export default function LoginPage() {
           </form>
 
           <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-            <Link
-              href="/"
+            <a
+              href="https://npcrwanda.org/"
               style={{ color: '#0072C6', fontSize: '0.82rem', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <i className="fas fa-arrow-left-long" /> Back to Public Website
-            </Link>
+            </a>
 
             <span style={{ color: '#94A3B8', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
               <i className="fas fa-shield-alt text-success" /> 256-Bit SSL Secured
