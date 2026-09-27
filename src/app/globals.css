@@ -1147,7 +1147,35 @@ footer a {
 
 footer a:hover {
     color: var(--accent-yellow);
-    padding-left: 4px;
+}
+
+footer .footer-link {
+    display: inline-block;
+    position: relative;
+}
+
+footer .footer-link::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
+    height: 2px;
+    background: var(--accent-yellow);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 180ms ease;
+}
+
+footer .footer-link:hover::after,
+footer .footer-link:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+footer .footer-social-link:hover,
+footer .footer-social-link:focus-visible {
+    opacity: 1;
 }
 
 footer ul li {

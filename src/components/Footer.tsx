@@ -80,7 +80,7 @@ export const Footer: React.FC = () => {
                     href={s.url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="text-white opacity-75 hover-opacity-100"
+                    className="footer-social-link text-white opacity-75"
                     title={s.platform}
                   >
                     <i className={`fab ${s.icon} fa-lg`}></i>
@@ -95,42 +95,42 @@ export const Footer: React.FC = () => {
             <h5>{t('footer.quick_links')}</h5>
             <ul className="list-unstyled small">
               <li className="mb-2">
-                <Link href="/">
+                <Link className="footer-link" href="/">
                   {t('nav.home')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/about">
+                <Link className="footer-link" href="/about">
                   {t('footer.about_npc')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/sports">
+                <Link className="footer-link" href="/sports">
                   {t('footer.sports_programs')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/athletes">
+                <Link className="footer-link" href="/athletes">
                   {t('footer.our_athletes')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/news">
+                <Link className="footer-link" href="/news">
                   {t('nav.news_events')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/careers">
+                <Link className="footer-link" href="/careers">
                   {t('nav.careers')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/system">
+                <Link className="footer-link" href="/system">
                   {t('footer.system_directory')}
                 </Link>
               </li>
               <li className="mb-2">
-                <a href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
+                <a className="footer-link" href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
                   Webmail Login
                 </a>
               </li>
@@ -142,22 +142,22 @@ export const Footer: React.FC = () => {
             <h5>{t('nav.governance')}</h5>
             <ul className="list-unstyled small">
               <li className="mb-2">
-                <Link href="/governance#board">
+                <Link className="footer-link" href="/governance#board">
                   {t('system.board_members')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/governance#reports">
+                <Link className="footer-link" href="/governance#reports">
                   {t('footer.annual_reports')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/governance#policies">
+                <Link className="footer-link" href="/governance#policies">
                   {t('footer.policies')}
                 </Link>
               </li>
               <li className="mb-2">
-                <Link href="/governance#strategic-plan">
+                <Link className="footer-link" href="/governance#strategic-plan">
                   {t('footer.strategic_plan')}
                 </Link>
               </li>
