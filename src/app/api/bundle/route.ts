@@ -1,36 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      await prisma.career.updateMany({
-        where: {
-          status: 'Open',
-          deadline: {
-            not: null,
-            lt: today,
-          },
-        },
-        data: {
-          status: 'Closed',
-        },
-      });
-    } catch {
-      // Safe fallback
-    }
-
-    // Auto-migrate: ensure Leader.order column exists on production DB
-    try {
-      await prisma.$executeRawUnsafe(
-        `ALTER TABLE "Leader" ADD COLUMN IF NOT EXISTS "order" INTEGER NOT NULL DEFAULT 0`
-      );
-    } catch {
-      // Column already exists or DB doesn't support IF NOT EXISTS — safe to ignore
-    }
+    await ensureAutoMigrated();
 
     const [
       athletes,

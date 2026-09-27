@@ -16,26 +16,8 @@ const careerSchema = z.object({
 });
 
 async function ensureCareerDeadlineColumnAndAutoClose() {
-  try {
-    await prisma.$executeRaw`
-      ALTER TABLE "Career" ADD COLUMN IF NOT EXISTS "deadline" TEXT;
-    `;
-    const today = new Date().toISOString().split('T')[0];
-    await prisma.career.updateMany({
-      where: {
-        status: 'Open',
-        deadline: {
-          not: null,
-          lt: today,
-        },
-      },
-      data: {
-        status: 'Closed',
-      },
-    });
-  } catch {
-    // Ignore
-  }
+  const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
+  await ensureAutoMigrated();
 }
 
 // GET: Fetch careers list with optional filters and pagination
