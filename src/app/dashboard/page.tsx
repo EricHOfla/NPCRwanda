@@ -1024,7 +1024,7 @@ export default function DashboardPage() {
           localStorage.removeItem('admin_active_page');
           localStorage.removeItem('admin_inbox_subtab');
         } catch {}
-        router.push('/login?expired=true');
+        router.push('https://admin.npcrwanda.org/login?expired=true');
         return false;
       }
       if (res.ok) {
@@ -1077,7 +1077,7 @@ export default function DashboardPage() {
           localStorage.removeItem('admin_active_page');
           localStorage.removeItem('admin_inbox_subtab');
         } catch {}
-        router.push('/login?expired=true');
+        router.push('https://admin.npcrwanda.org/login?expired=true');
       } else {
         verifySession();
       }
@@ -1096,7 +1096,7 @@ export default function DashboardPage() {
           localStorage.removeItem('admin_active_page');
           localStorage.removeItem('admin_inbox_subtab');
         } catch {}
-        router.push('/login?expired=true');
+        router.push('https://admin.npcrwanda.org/login?expired=true');
       } else {
         verifySession();
       }
@@ -1253,7 +1253,7 @@ export default function DashboardPage() {
           localStorage.removeItem('admin_active_page');
           localStorage.removeItem('admin_inbox_subtab');
         } catch {}
-        router.push('/login');
+        router.push('https://admin.npcrwanda.org/login');
         router.refresh();
       }
     } catch (err) {

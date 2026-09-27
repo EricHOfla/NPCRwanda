@@ -135,9 +135,9 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li className="mb-2">
-                <Link href="/login">
+                <a href="https://admin.npcrwanda.org/" rel="noopener noreferrer">
                   Admin Login
-                </Link>
+                </a>
               </li>
             </ul>
           </div>

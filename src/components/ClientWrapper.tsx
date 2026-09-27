@@ -7,12 +7,14 @@ import { DataProvider } from '../context/DataContext';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AccessibilityWidget } from '@/components/AccessibilityWidget';
+import { isAdminHostname } from '@/lib/site-domain';
 
 import { QueryProvider } from '@/components/QueryProvider';
 
 export const ClientWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
-  const isAuthOrDashboard = pathname?.startsWith('/dashboard') || pathname === '/login';
+  const isAdminContext = isAdminHostname();
+  const isAuthOrDashboard = pathname?.startsWith('/dashboard') || pathname === '/login' || (isAdminContext && pathname === '/');
 
   useEffect(() => {
     Promise.all([

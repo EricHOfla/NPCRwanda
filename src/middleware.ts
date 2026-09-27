@@ -1,15 +1,30 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
+import {
+  PUBLIC_HOSTNAMES,
+  getAdminAppUrl,
+  normalizeHostname,
+  isAdminHostname,
+} from '@/lib/site-domain';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_npc_rwanda_2026';
 const key = new TextEncoder().encode(JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = normalizeHostname(request.headers.get('host'));
+  const isAdminRequest = isAdminHostname(host);
+  const isPublicRequest = PUBLIC_HOSTNAMES.includes(host) || (!isAdminRequest && host.endsWith('.npcrwanda.org'));
   const sessionCookie = request.cookies.get('npc_session')?.value;
 
-  // Helper: verify JWT validity
+  const setNoIndexHeader = (response: NextResponse) => {
+    if (isAdminRequest) {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    }
+    return response;
+  };
+
   const isValidSession = async (): Promise<boolean> => {
     if (!sessionCookie) return false;
     try {
@@ -20,32 +35,49 @@ export async function middleware(request: NextRequest) {
     }
   };
 
-  // 1. If already logged in and trying to visit /login → redirect to dashboard
-  if (pathname === '/login') {
-    if (await isValidSession()) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-    return NextResponse.next();
+  if (isPublicRequest && pathname === '/login') {
+    return NextResponse.redirect(new URL(getAdminAppUrl('/login'), request.url));
   }
 
-  // 2. Dashboard protection — must be logged in
+  if (isPublicRequest && pathname.startsWith('/dashboard')) {
+    const destination = (await isValidSession())
+      ? new URL(getAdminAppUrl('/dashboard'), request.url)
+      : new URL(getAdminAppUrl('/login?expired=true'), request.url);
+
+    return NextResponse.redirect(destination);
+  }
+
+  if (isAdminRequest && pathname === '/') {
+    if (await isValidSession()) {
+      return setNoIndexHeader(NextResponse.redirect(new URL('/dashboard', request.url)));
+    }
+    return setNoIndexHeader(NextResponse.redirect(new URL('/login', request.url)));
+  }
+
+  if (pathname === '/login') {
+    if (await isValidSession()) {
+      const response = NextResponse.redirect(new URL('/dashboard', request.url));
+      return setNoIndexHeader(response);
+    }
+    return setNoIndexHeader(NextResponse.next());
+  }
+
   if (pathname.startsWith('/dashboard')) {
     if (!sessionCookie) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      return setNoIndexHeader(response);
     }
 
     try {
       await jwtVerify(sessionCookie, key);
-      return NextResponse.next();
+      return setNoIndexHeader(NextResponse.next());
     } catch {
-      // Expired or invalid token — clear cookie and send to login with expired notice
       const response = NextResponse.redirect(new URL('/login?expired=true', request.url));
       response.cookies.set('npc_session', '', { maxAge: 0, path: '/' });
-      return response;
+      return setNoIndexHeader(response);
     }
   }
 
-  // 3. Protected API endpoints (upload routes handle their own auth to avoid middleware body buffering limits)
   if (pathname.startsWith('/api') && !pathname.startsWith('/api/auth') && !pathname.startsWith('/api/upload')) {
     const method = request.method;
     let requiresAuth = false;
@@ -60,21 +92,15 @@ export async function middleware(request: NextRequest) {
     const isSettingsRoute = pathname.startsWith('/api/system-settings');
 
     if (isUnsubscribeRoute) {
-      // Unsubscribe link from email is always public
       requiresAuth = false;
     } else if (isPublicFormRoute) {
-      // GET, PUT, DELETE, PATCH require auth (admin only). POST is public (form submissions).
       if (['GET', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
         requiresAuth = true;
       }
     } else if (isSettingsRoute) {
-      // All system-settings methods require auth
       requiresAuth = true;
-    } else {
-      // All write operations require auth; GET is public
-      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-        requiresAuth = true;
-      }
+    } else if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+      requiresAuth = true;
     }
 
     if (requiresAuth) {
@@ -88,7 +114,6 @@ export async function middleware(request: NextRequest) {
       try {
         const { payload } = await jwtVerify(sessionCookie, key);
 
-        // Editors cannot delete resources
         if (method === 'DELETE') {
           const userRole = payload.role as string;
           if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
@@ -109,10 +134,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  return setNoIndexHeader(response);
 }
 
-// Match dashboard, login, and all API routes
 export const config = {
-  matcher: ['/login', '/dashboard', '/dashboard/:path*', '/api/:path*'],
+  matcher: ['/', '/login', '/dashboard', '/dashboard/:path*', '/api/:path*'],
 };
