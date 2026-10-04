@@ -329,6 +329,30 @@ async function runAutoMigration(): Promise<void> {
     // Safe ignore
   }
 
+  // Self-heal news articles with spaces in slugs
+  try {
+    const articlesWithSpaces = await prisma.newsArticle.findMany({
+      where: {
+        slug: {
+          contains: ' ',
+        },
+      },
+    });
+    for (const art of articlesWithSpaces) {
+      const clean = art.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const existing = await prisma.newsArticle.findFirst({ where: { slug: clean } });
+      if (!existing) {
+        await prisma.newsArticle.update({
+          where: { id: art.id },
+          data: { slug: clean },
+        });
+        console.log(`[AutoMigrate] Cleaned news slug from "${art.slug}" to "${clean}"`);
+      }
+    }
+  } catch {
+    // Safe ignore
+  }
+
   migrationExecuted = true;
 }
 

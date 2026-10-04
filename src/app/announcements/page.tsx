@@ -6,8 +6,6 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
 
-const CATEGORIES = ['All', 'Announcement', 'Notice', 'Update', 'Important'];
-
 export default function AnnouncementsPage() {
   const { t } = useTranslation();
   const { news } = useData();
@@ -17,21 +15,36 @@ export default function AnnouncementsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  // Filter for announcements (show all published news articles as announcements)
-  const announcements = news.filter(n => n.status === 'Published' || !n.status);
-  const featured = announcements[0];
-  const rest = announcements.slice(1);
+  // Categories derived purely from real data — no hardcoded list
+  const categories = React.useMemo(() => {
+    const seen = new Set<string>();
+    const list = ['All'];
+    news.forEach(n => {
+      if (n.category && !seen.has(n.category)) {
+        seen.add(n.category);
+        list.push(n.category);
+      }
+    });
+    return list;
+  }, [news]);
 
-  const filtered = rest.filter(article => {
-    const catMatch = activeCategory === 'All' || article.category === activeCategory;
-    const searchMatch = !search || article.title.toLowerCase().includes(search.toLowerCase()) || article.desc.toLowerCase().includes(search.toLowerCase());
+  const announcements = news.filter(n => n.status === 'Published' || !n.status);
+  const isFiltering = Boolean(search || activeCategory !== 'All');
+
+  const featured = !isFiltering ? announcements[0] : null;
+  const pool = !isFiltering ? announcements.slice(1) : announcements;
+
+  const filtered = pool.filter(article => {
+    const catMatch = activeCategory === 'All' || article.category?.toLowerCase() === activeCategory.toLowerCase();
+    const searchMatch = !search ||
+      article.title.toLowerCase().includes(search.toLowerCase()) ||
+      article.desc.toLowerCase().includes(search.toLowerCase());
     return catMatch && searchMatch;
   });
-  
-  const visibleArticles = search || activeCategory !== 'All' ? filtered : rest;
-  const totalPages = Math.ceil(visibleArticles.length / ITEMS_PER_PAGE);
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));
-  const paginatedArticles = visibleArticles.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
+  const paginatedArticles = filtered.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
 
   return (
     <main id="main-content">
@@ -60,7 +73,7 @@ export default function AnnouncementsPage() {
         <section className="py-5 bg-light">
           <div className="container">
             <h2 className="h5 fw-bold text-muted mb-4 text-uppercase">Featured Announcement</h2>
-            <Link href={`/announcements/${featured.slug || featured.id}`} className="text-decoration-none">
+            <Link href={`/announcements/${encodeURIComponent(featured.slug || featured.id)}`} className="text-decoration-none">
               <div className="card shadow-sm h-100 border-0" style={{ overflow: 'hidden', cursor: 'pointer' }}>
                 <div className="row g-0">
                   <div className="col-md-5">
@@ -113,7 +126,7 @@ export default function AnnouncementsPage() {
             </div>
             <div className="col-md-6">
               <div className="d-flex flex-wrap gap-2">
-                {CATEGORIES.map(cat => (
+                {categories.map(cat => (
                   <button
                     key={cat}
                     onClick={() => {
@@ -139,7 +152,7 @@ export default function AnnouncementsPage() {
             {paginatedArticles.length > 0 ? (
               paginatedArticles.map(article => (
                 <div key={article.id} className="col-md-6 col-lg-4">
-                  <Link href={`/announcements/${article.slug || article.id}`} className="text-decoration-none">
+                  <Link href={`/announcements/${encodeURIComponent(article.slug || article.id)}`} className="text-decoration-none">
                     <div className="card h-100 shadow-sm border-0" style={{ cursor: 'pointer', transition: 'transform 0.3s, box-shadow 0.3s' }}>
                       <img
                         src={article.img?.startsWith('http') || article.img?.startsWith('/') ? article.img : `/assets/img/${article.img}`}

@@ -6,8 +6,6 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
 
-const CATEGORIES = ['All', 'Competition', 'Training', 'Governance', 'Community', 'International'];
-
 export default function NewsPage() {
   const { t } = useTranslation();
   const { news } = useData();
@@ -17,19 +15,37 @@ export default function NewsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  const published = news.filter(n => n.status === 'Published' || !n.status);
-  const featured  = published[0];
-  const rest      = published.slice(1);
+  // Categories derived purely from real data — no hardcoded list
+  const categories = React.useMemo(() => {
+    const seen = new Set<string>();
+    const list = ['All'];
+    news.forEach(n => {
+      if (n.category && !seen.has(n.category)) {
+        seen.add(n.category);
+        list.push(n.category);
+      }
+    });
+    return list;
+  }, [news]);
 
-  const filtered = rest.filter(article => {
-    const catMatch = activeCategory === 'All' || article.category === activeCategory;
-    const searchMatch = !search || article.title.toLowerCase().includes(search.toLowerCase()) || article.desc.toLowerCase().includes(search.toLowerCase());
+  const published = news.filter(n => n.status === 'Published' || !n.status);
+  const isFiltering = Boolean(search || activeCategory !== 'All');
+
+  // When not filtering, feature the first item; when filtering, include all matching items in the grid
+  const featured = !isFiltering ? published[0] : null;
+  const pool = !isFiltering ? published.slice(1) : published;
+
+  const filtered = pool.filter(article => {
+    const catMatch = activeCategory === 'All' || article.category?.toLowerCase() === activeCategory.toLowerCase();
+    const searchMatch = !search ||
+      article.title.toLowerCase().includes(search.toLowerCase()) ||
+      article.desc.toLowerCase().includes(search.toLowerCase());
     return catMatch && searchMatch;
   });
-  const visibleArticles = search || activeCategory !== 'All' ? filtered : rest;
-  const totalPages = Math.ceil(visibleArticles.length / ITEMS_PER_PAGE);
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));
-  const paginatedArticles = visibleArticles.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
+  const paginatedArticles = filtered.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
 
   return (
     <main id="main-content">
@@ -79,7 +95,7 @@ export default function NewsPage() {
                   <p className="text-muted mb-4" style={{ lineHeight: 1.7 }}>{featured.desc}</p>
                   <div className="d-flex align-items-center gap-3">
                     <span className="small text-muted"><i className="fas fa-calendar me-1"></i>{featured.date}</span>
-                    <Link href={`/news/${featured.slug}`} className="btn btn-primary btn-sm px-4 fw-semibold">
+                    <Link href={`/news/${encodeURIComponent(featured.slug || featured.id)}`} className="btn btn-primary btn-sm px-4 fw-semibold">
                       {t('phrase.Read More')} <i className="fas fa-arrow-right ms-1"></i>
                     </Link>
                   </div>
@@ -109,7 +125,7 @@ export default function NewsPage() {
             </div>
             <div className="col-md-7">
               <div className="d-flex flex-wrap gap-2">
-                {CATEGORIES.map(cat => (
+                {categories.map(cat => (
                   <button
                     key={cat}
                     onClick={() => {
@@ -149,7 +165,7 @@ export default function NewsPage() {
             <>
               <div className="row g-4">
                 {paginatedArticles.map((article, i) => (
-                  <div key={article.slug} className="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
+                  <div key={article.id || article.slug} className="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
                     <div className="custom-card news-card h-100 d-flex flex-column">
                       <div className="news-img position-relative">
                         <img
@@ -169,7 +185,7 @@ export default function NewsPage() {
                         <div className="news-date mb-2"><i className="fas fa-calendar-alt me-1 opacity-60"></i>{article.date}</div>
                         <h4 className="h6 fw-bold mb-2 flex-grow-1">{article.title}</h4>
                         <p className="small text-muted mb-3">{article.desc}</p>
-                        <Link href={`/news/${article.slug}`} className="text-primary fw-bold text-decoration-none small mt-auto">
+                        <Link href={`/news/${encodeURIComponent(article.slug || article.id)}`} className="text-primary fw-bold text-decoration-none small mt-auto">
                           <span>{t('phrase.Read More')}</span> <i className="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                         </Link>
                       </div>

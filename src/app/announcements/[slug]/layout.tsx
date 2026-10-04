@@ -6,10 +6,9 @@ import {
   getArticleJsonLd,
   getBreadcrumbJsonLd,
 } from '@/lib/seo';
-
 import { normalizeSlug } from '@/lib/slug';
 
-interface ArticleLayoutProps {
+interface AnnouncementLayoutProps {
   children: React.ReactNode;
   params: Promise<{ slug: string }>;
 }
@@ -79,9 +78,9 @@ export async function generateMetadata({
 
     if (!article) {
       return generatePageMetadata({
-        title: 'Article Not Found',
-        description: 'The requested news article could not be found.',
-        path: `/news/${slug}`,
+        title: 'Announcement Not Found',
+        description: 'The requested announcement could not be found.',
+        path: `/announcements/${slug}`,
         noIndex: true,
       });
     }
@@ -89,53 +88,51 @@ export async function generateMetadata({
     return generatePageMetadata({
       title: article.title,
       description: article.desc || article.title,
-      path: `/news/${slug}`,
+      path: `/announcements/${slug}`,
       image: article.img || undefined,
       type: 'article',
       publishedTime: article.createdAt.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
-      section: article.category || 'Sports',
+      section: article.category || 'Announcements',
     });
   } catch (error) {
-    console.error('[ArticleMetadata] Error loading article metadata:', error);
+    console.error('[AnnouncementMetadata] Error loading announcement metadata:', error);
     return generatePageMetadata({
-      title: 'News Article',
-      description: 'Read the latest Paralympic news from Rwanda.',
-      path: `/news/${slug}`,
+      title: 'Official Announcement',
+      description: 'Read the latest official announcements from NPC Rwanda.',
+      path: `/announcements/${slug}`,
     });
   }
 }
 
-export default async function ArticleLayout({
+export default async function AnnouncementLayout({
   children,
   params,
-}: ArticleLayoutProps) {
+}: AnnouncementLayoutProps) {
   const { slug } = await params;
   let articleJsonLd = null;
-  let articleTitle = 'News Article';
 
   try {
     const article = await findArticleBySlug(slug);
 
     if (article) {
-      articleTitle = article.title;
       articleJsonLd = getArticleJsonLd({
         title: article.title,
         description: article.desc || article.title,
-        url: `/news/${slug}`,
+        url: `/announcements/${slug}`,
         imageUrl: article.img,
         datePublished: article.createdAt.toISOString(),
         dateModified: article.updatedAt.toISOString(),
       });
     }
   } catch (error) {
-    console.error('[ArticleLayout] Error preparing JSON-LD:', error);
+    console.error('[AnnouncementLayout] Error preparing JSON-LD:', error);
   }
 
   const breadcrumbs = getBreadcrumbJsonLd([
     { name: 'Home', url: '/' },
-    { name: 'News', url: '/news' },
-    { name: articleTitle, url: `/news/${slug}` },
+    { name: 'Announcements', url: '/announcements' },
+    { name: slug, url: `/announcements/${slug}` },
   ]);
 
   return (

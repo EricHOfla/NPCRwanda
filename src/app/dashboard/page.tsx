@@ -1298,7 +1298,8 @@ export default function DashboardPage() {
 
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const slugValue = newsForm.slug || newsForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const rawSlug = newsForm.slug?.trim() || newsForm.title;
+    const slugValue = rawSlug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     const finalForm = { ...newsForm, slug: slugValue };
 
     if (editingNewsId) {

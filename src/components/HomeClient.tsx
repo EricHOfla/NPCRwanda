@@ -271,7 +271,7 @@ export default function HomeClient() {
                       <div className="news-date">{t(article.date)}</div>
                       <h4 className="h5 mb-3">{t(article.title)}</h4>
                       <p className="small text-muted">{t(article.desc)}</p>
-                      <Link href={`/news/${article.slug}`} className="text-primary fw-bold text-decoration-none small">
+                      <Link href={`/news/${encodeURIComponent(article.slug || article.id)}`} className="text-primary fw-bold text-decoration-none small">
                         <span>{t('phrase.Read More')}</span> <i className="fas fa-arrow-right ms-1" aria-hidden="true"></i>
                       </Link>
                     </div>

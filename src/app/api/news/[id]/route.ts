@@ -15,16 +15,42 @@ const newsUpdateSchema = z.object({
   slug: z.string().min(1, 'Slug is required').optional(),
 });
 
-// GET: Fetch a single news article
+// GET: Fetch a single news article (by id or slug)
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const article = await prisma.newsArticle.findUnique({
-      where: { id },
+    let decoded = id;
+    try {
+      decoded = decodeURIComponent(id);
+    } catch {}
+
+    const clean = decoded.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+    // 1. Try direct ID or direct slug match
+    let article = await prisma.newsArticle.findFirst({
+      where: {
+        OR: [
+          { id },
+          { slug: id },
+          { slug: decoded },
+          { slug: clean },
+        ],
+      },
     });
+
+    // 2. If not found, search all for case-insensitive / normalized match
+    if (!article) {
+      const all = await prisma.newsArticle.findMany();
+      article = all.find(a => 
+        a.id === id ||
+        a.slug.toLowerCase() === id.toLowerCase() ||
+        a.slug.toLowerCase() === decoded.toLowerCase() ||
+        a.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') === clean
+      ) || null;
+    }
 
     if (!article) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 });

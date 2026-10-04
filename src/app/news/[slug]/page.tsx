@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import { matchesSlug } from '@/lib/slug';
 
 export default function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
@@ -14,9 +15,32 @@ export default function ArticleDetailPage({ params }: { params: Promise<{ slug: 
   const { t } = useTranslation();
   const { news, loading } = useData();
 
-  const article = news.find(n => n.slug === slug);
+  const [directArticle, setDirectArticle] = useState<any>(null);
+  const [isFetchingDirect, setIsFetchingDirect] = useState(false);
 
-  if (loading) {
+  // Look in DataContext news array first
+  const contextArticle = news.find(n => matchesSlug(n, slug));
+  const article = directArticle || contextArticle;
+
+  // Fallback: If not found in context (e.g. fresh navigation / stale cache), fetch directly from API
+  useEffect(() => {
+    if (!contextArticle && slug) {
+      setIsFetchingDirect(true);
+      fetch(`/api/news/${encodeURIComponent(slug)}`)
+        .then(res => (res.ok ? res.json() : null))
+        .then(data => {
+          if (data && !data.error) {
+            setDirectArticle(data);
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          setIsFetchingDirect(false);
+        });
+    }
+  }, [contextArticle, slug]);
+
+  if (loading || (!article && isFetchingDirect)) {
     return (
       <main className="py-5 text-center">
         <div className="container py-5 my-5">
