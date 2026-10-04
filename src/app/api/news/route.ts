@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
+import { isAnnouncementCategory } from '@/lib/newsUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,9 +132,11 @@ export async function POST(request: Request) {
     });
 
     if (newArticle.status === 'Published') {
-      const isAnnouncement = ['announcement', 'notice', 'update', 'important'].includes((newArticle.category || '').toLowerCase());
+      const isAnnouncement = isAnnouncementCategory(newArticle.category || '');
       const cat = isAnnouncement ? 'announcements' : 'news';
-      const targetUrl = isAnnouncement ? `/announcements/${newArticle.slug}` : `/news/${newArticle.slug}`;
+      const targetUrl = isAnnouncement
+        ? `/announcements/${newArticle.slug}`
+        : `/news/${newArticle.slug}`;
 
       // Notify subscribers asynchronously
       notifySubscribers({

@@ -304,11 +304,21 @@ export async function notifySubscribers(payload: NotificationPayload) {
       careers: 'Career Opportunity & Vacancy',
     };
 
+    const categoryColors: Record<string, string> = {
+      announcements: '#C0392B',  // red — official/urgent
+      news: '#0072C6',           // blue — NPC brand
+      events: '#E67E22',         // orange — events
+      careers: '#27AE60',        // green — opportunity
+    };
+
     const label = categoryLabels[payload.category] || 'Official Update';
-    const actionText = payload.category === 'careers' 
-      ? 'View Position & Apply' 
+    const accentColor = categoryColors[payload.category] || '#0072C6';
+    const actionText = payload.category === 'careers'
+      ? 'View Position & Apply'
       : payload.category === 'events'
       ? 'View Event Details'
+      : payload.category === 'announcements'
+      ? 'Read Official Notice'
       : 'Read Full Article';
 
     const fullUrl = payload.url.startsWith('http') ? payload.url : `https://npcrwanda.org${payload.url}`;
@@ -356,7 +366,7 @@ export async function notifySubscribers(payload: NotificationPayload) {
             
             <!-- Rwanda / Olympic Accent Stripe -->
             <tr>
-              <td style="background: #0072C6; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+              <td style="background: ${accentColor}; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
             </tr>
 
             <!-- Header -->
@@ -383,7 +393,7 @@ export async function notifySubscribers(payload: NotificationPayload) {
                 <!-- Category Eyebrow & Date -->
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
                   <tr>
-                    <td align="left" style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #0072C6;">
+                    <td align="left" style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: ${accentColor};">
                       ${label}
                     </td>
                     <td align="right" style="font-size: 12px; color: #94A3B8; font-weight: 500;">
@@ -416,7 +426,7 @@ export async function notifySubscribers(payload: NotificationPayload) {
                 <!-- Call to Action Button -->
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 32px;">
                   <tr>
-                    <td align="center" bgcolor="#0072C6" style="border-radius: 6px;">
+                    <td align="center" bgcolor="${accentColor}" style="border-radius: 6px;">
                       <a href="${fullUrl}" target="_blank" style="display: inline-block; padding: 13px 28px; font-size: 14px; font-weight: 600; color: #FFFFFF; text-decoration: none; border-radius: 6px; letter-spacing: 0.2px;">
                         ${actionText} &rarr;
                       </a>

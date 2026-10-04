@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
+import { isAnnouncementCategory } from '@/lib/newsUtils';
 
 // News validation update schema
 const newsUpdateSchema = z.object({
@@ -110,10 +111,14 @@ export async function PUT(
       data: result.data,
     });
 
-    if (updatedArticle.status === 'Published') {
-      const isAnnouncement = ['announcement', 'notice', 'update', 'important'].includes((updatedArticle.category || '').toLowerCase());
+    // Only notify subscribers when status transitions to Published (not on every update)
+    const wasAlreadyPublished = existingArticle?.status === 'Published';
+    if (updatedArticle.status === 'Published' && !wasAlreadyPublished) {
+      const isAnnouncement = isAnnouncementCategory(updatedArticle.category || '');
       const cat = isAnnouncement ? 'announcements' : 'news';
-      const targetUrl = isAnnouncement ? `/announcements/${updatedArticle.slug}` : `/news/${updatedArticle.slug}`;
+      const targetUrl = isAnnouncement
+        ? `/announcements/${updatedArticle.slug}`
+        : `/news/${updatedArticle.slug}`;
 
       notifySubscribers({
         category: cat,

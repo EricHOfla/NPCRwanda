@@ -81,14 +81,17 @@ export async function POST(request: Request) {
     }
     const event = await prisma.event.create({ data: result.data });
 
-    // Notify subscribers asynchronously
-    notifySubscribers({
-      category: 'events',
-      title: event.title,
-      description: `${event.description} | Location: ${event.location} | Date: ${event.date}`,
-      url: `/events#${event.id}`,
-      imageUrl: event.img,
-    }).catch(err => console.warn('Notification error on event create:', err));
+    // Only notify subscribers for upcoming events
+    if (event.status === 'Upcoming') {
+      const dateStr = event.date ? new Date(event.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : event.date;
+      notifySubscribers({
+        category: 'events',
+        title: event.title,
+        description: `${event.description}\n\nDate: ${dateStr}${event.endDate ? ` – ${new Date(event.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}\nLocation: ${event.location}\nCategory: ${event.category}`,
+        url: `/events`,
+        imageUrl: event.img,
+      }).catch(err => console.warn('Notification error on event create:', err));
+    }
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
