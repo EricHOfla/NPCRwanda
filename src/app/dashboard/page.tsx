@@ -2525,7 +2525,7 @@ export default function DashboardPage() {
                       { id: 'athletes', title: 'Athletes Page', desc: 'Manage national para-athletes profiles, sport classifications, and display stats.', icon: 'fa-person-running', bg: '#fdf2f8', border: '#fbcfe8' },
                       { id: 'sports', title: 'Sports Programs', icon: 'fa-volleyball', desc: 'Configure sitting volleyball, wheelchair basketball, and goalball program highlights.', bg: '#f5f3ff', border: '#ddd6fe' },
                       { id: 'news', title: 'News Room', icon: 'fa-newspaper', desc: 'Write articles and event blog posts with the visual Markdown rich-text editor.', bg: '#ecfdf5', border: '#a7f3d0' },
-                      { id: 'announcements', title: 'Announcements Page', desc: 'Configure header titles, subtitles, and view current public notifications.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
+                      { id: 'announcements', title: 'Official Gazette & Notices', desc: 'Publish official circulars, communiqués, gazette notices, and regulatory announcements.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'events', title: 'Events Calendar', icon: 'fa-calendar-days', desc: 'Schedule matches, championships, training camps, and featured event details.', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'careers', title: 'Careers & Vacancies', icon: 'fa-briefcase', desc: 'Manage job vacancies, volunteer registrations, and applicant logs.', bg: '#f0fdfa', border: '#99f6e4' },
                       { id: 'contact', title: 'Contact & Footer', icon: 'fa-address-card', desc: 'Edit physical address, contact phone/email, map embeds, and footer social links.', bg: '#fafaf9', border: '#e7e5e4' },
@@ -2835,32 +2835,31 @@ export default function DashboardPage() {
                   )}
 
                   {activeEditPage === 'announcements' && (
-                    <div className="border rounded bg-white p-4 shadow" style={{ maxWidth: '900px', margin: '0 auto' }}>
-                      <div className="text-center py-4 bg-light mb-4 rounded">
-                        <h2 className="fw-bold text-dark">Latest Announcements & Updates</h2>
-                        <span className="small text-muted">Stay informed with the latest notices, alerts, and official releases Mockup</span>
+                    <div className="border rounded-4 bg-white p-4 shadow-sm" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                      <div className="text-center py-4 bg-light mb-4 rounded-3 border-top border-3 border-primary">
+                        <span className="badge bg-danger px-3 py-1 mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>Official Gazette Preview</span>
+                        <h2 className="fw-bold text-dark h4 mb-1">Official Announcements &amp; Public Notices</h2>
+                        <span className="small text-muted">Previewing live registry of communiqués and circulars as displayed to the public</span>
                       </div>
-                      <div className="row g-4">
+                      <div className="list-group list-group-flush border rounded-3 overflow-hidden">
                         {news.filter(n => isAnnouncementCategory(n.category) && (n.status === 'Published' || !n.status)).map(n => (
-                          <div key={n.id} className="col-md-4">
-                            <div className="border rounded overflow-hidden bg-white h-100 shadow-sm d-flex flex-column justify-content-between">
+                          <div key={n.id} className="list-group-item p-3 d-flex align-items-center justify-content-between gap-3 bg-white">
+                            <div className="d-flex align-items-center gap-3">
+                              <div className="d-flex flex-column align-items-center justify-content-center rounded border bg-light px-2 py-1 text-center" style={{ minWidth: '70px' }}>
+                                <i className="fas fa-calendar-day text-primary mb-1" style={{ fontSize: '0.75rem' }} />
+                                <span className="fw-bold text-dark" style={{ fontSize: '0.7rem', lineHeight: 1.1 }}>{n.date || 'Notice'}</span>
+                              </div>
                               <div>
-                                <img 
-                                  src={n.img?.startsWith('/') || n.img?.startsWith('http') ? n.img : `/assets/img/curated/${n.img || 'news-volleyball.jpg'}`} 
-                                  style={{ width: '100%', height: '140px', objectFit: 'cover' }} 
-                                  alt={n.title}
-                                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/news-feature.svg'; }}
-                                />
-                                <div className="p-3">
-                                  <div className="d-flex justify-content-between align-items-center mb-2">
-                                    <span className="badge bg-danger" style={{ fontSize: '0.65rem' }}>Announcement</span>
-                                    <span className="small text-muted" style={{ fontSize: '0.7rem' }}>{n.date}</span>
-                                  </div>
-                                  <h5 className="fw-bold text-dark mb-2" style={{ fontSize: '0.95rem' }}>{n.title}</h5>
-                                  <p className="small text-muted" style={{ fontSize: '0.78rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{n.desc}</p>
-                                </div>
+                                <span className="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle text-uppercase fw-bold mb-1" style={{ fontSize: '0.62rem' }}>
+                                  {n.category || 'Announcement'}
+                                </span>
+                                <h6 className="fw-bold text-dark mb-0" style={{ fontSize: '0.9rem' }}>{n.title}</h6>
+                                <p className="small text-muted mb-0" style={{ fontSize: '0.75rem', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{n.desc}</p>
                               </div>
                             </div>
+                            <span className="btn btn-xs btn-outline-primary fw-bold text-nowrap" style={{ fontSize: '0.72rem' }}>
+                              Read Notice <i className="fas fa-arrow-right ms-1" />
+                            </span>
                           </div>
                         ))}
                       </div>
