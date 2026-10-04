@@ -6,6 +6,8 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
 
+import { isAnnouncementCategory } from '@/lib/newsUtils';
+
 export default function AnnouncementsPage() {
   const { t } = useTranslation();
   const { news } = useData();
@@ -15,20 +17,25 @@ export default function AnnouncementsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  // Categories derived purely from real data — no hardcoded list
+  // Announcements only: filter to items with an announcement-related category
+  const announcementsOnly = React.useMemo(() => {
+    return news.filter(n => isAnnouncementCategory(n.category));
+  }, [news]);
+
+  // Categories derived purely from real announcement data — no hardcoded list
   const categories = React.useMemo(() => {
     const seen = new Set<string>();
     const list = ['All'];
-    news.forEach(n => {
+    announcementsOnly.forEach(n => {
       if (n.category && !seen.has(n.category)) {
         seen.add(n.category);
         list.push(n.category);
       }
     });
     return list;
-  }, [news]);
+  }, [announcementsOnly]);
 
-  const announcements = news.filter(n => n.status === 'Published' || !n.status);
+  const announcements = announcementsOnly.filter(n => n.status === 'Published' || !n.status);
   const isFiltering = Boolean(search || activeCategory !== 'All');
 
   const featured = !isFiltering ? announcements[0] : null;

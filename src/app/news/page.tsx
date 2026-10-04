@@ -6,6 +6,8 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
 
+import { isAnnouncementCategory } from '@/lib/newsUtils';
+
 export default function NewsPage() {
   const { t } = useTranslation();
   const { news } = useData();
@@ -15,20 +17,25 @@ export default function NewsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  // Categories derived purely from real data — no hardcoded list
+  // News only: filter out announcements
+  const newsOnly = React.useMemo(() => {
+    return news.filter(n => !isAnnouncementCategory(n.category));
+  }, [news]);
+
+  // Categories derived purely from real news data — no hardcoded list
   const categories = React.useMemo(() => {
     const seen = new Set<string>();
     const list = ['All'];
-    news.forEach(n => {
+    newsOnly.forEach(n => {
       if (n.category && !seen.has(n.category)) {
         seen.add(n.category);
         list.push(n.category);
       }
     });
     return list;
-  }, [news]);
+  }, [newsOnly]);
 
-  const published = news.filter(n => n.status === 'Published' || !n.status);
+  const published = newsOnly.filter(n => n.status === 'Published' || !n.status);
   const isFiltering = Boolean(search || activeCategory !== 'All');
 
   // When not filtering, feature the first item; when filtering, include all matching items in the grid

@@ -23,6 +23,7 @@ import {
   Event,
   MediaAsset
 } from '@/context/DataContext';
+import { isAnnouncementCategory } from '@/lib/newsUtils';
 import SubscribersTab from '@/components/SubscribersTab';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
@@ -1267,7 +1268,7 @@ export default function DashboardPage() {
 
   const STATS = [
     { label: 'Total Athletes', value: String(athletes.length), icon: 'fa-person-running', color: '#0072C6' },
-    { label: 'News Articles', value: String(news.length), icon: 'fa-newspaper', color: '#4CAF50' },
+    { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50' },
     { label: 'Events Count', value: String(events.length), icon: 'fa-calendar-alt', color: '#673AB7' },
     { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935' },
     { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000' },
@@ -1304,14 +1305,18 @@ export default function DashboardPage() {
     e.preventDefault();
     const rawSlug = newsForm.slug?.trim() || newsForm.title;
     const slugValue = rawSlug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    const finalForm = { ...newsForm, slug: slugValue };
+    const isAddingAnnouncement = activeEditPage === 'announcements' || isAnnouncementCategory(newsForm.category);
+    const formCategory = isAddingAnnouncement ? (newsForm.category || 'Announcement') : (newsForm.category || 'Sport');
+    const finalForm = { ...newsForm, category: formCategory, slug: slugValue };
 
     if (editingNewsId) {
       await updateNews({ id: editingNewsId, ...finalForm });
     } else {
       await addNews(finalForm);
     }
-    setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: '', desc: '', content: '', slug: '' });
+    const resetCategory = activeEditPage === 'announcements' ? 'Announcement' : 'Sport';
+    const resetStatus = activeEditPage === 'announcements' ? 'Published' : 'Draft';
+    setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: resetCategory, status: resetStatus, img: '', desc: '', content: '', slug: '' });
     setEditingNewsId(null);
     setNewsFormOpen(false);
   };
@@ -1538,10 +1543,14 @@ export default function DashboardPage() {
     a.sport.toLowerCase().includes(athleteSearch.toLowerCase())
   );
 
-  const filteredNews = news.filter(n =>
-    n.title.toLowerCase().includes(newsSearch.toLowerCase()) ||
-    n.category.toLowerCase().includes(newsSearch.toLowerCase())
-  );
+  const filteredNews = news
+    .filter(n => !isAnnouncementCategory(n.category))
+    .filter(n =>
+      n.title.toLowerCase().includes(newsSearch.toLowerCase()) ||
+      n.category.toLowerCase().includes(newsSearch.toLowerCase())
+    );
+
+  const announcementsList = news.filter(n => isAnnouncementCategory(n.category));
 
   const filteredEvents = events.filter(e =>
     e.title.toLowerCase().includes(eventSearch.toLowerCase()) ||
@@ -2796,7 +2805,7 @@ export default function DashboardPage() {
                         <span className="small text-muted">Updates from NPC Rwanda sports press desk Mockup</span>
                       </div>
                       <div className="row g-4">
-                        {news.map(n => (
+                        {news.filter(n => !isAnnouncementCategory(n.category)).map(n => (
                           <div key={n.id} className="col-md-4">
                             <div className="border rounded overflow-hidden bg-white h-100 shadow-sm d-flex flex-column justify-content-between">
                               <div>
@@ -2832,7 +2841,7 @@ export default function DashboardPage() {
                         <span className="small text-muted">Stay informed with the latest notices, alerts, and official releases Mockup</span>
                       </div>
                       <div className="row g-4">
-                        {news.filter(n => n.status === 'Published' || !n.status).map(n => (
+                        {news.filter(n => isAnnouncementCategory(n.category) && (n.status === 'Published' || !n.status)).map(n => (
                           <div key={n.id} className="col-md-4">
                             <div className="border rounded overflow-hidden bg-white h-100 shadow-sm d-flex flex-column justify-content-between">
                               <div>
@@ -3813,7 +3822,7 @@ export default function DashboardPage() {
                   {activeEditPage === 'news' && (
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>News Articles ({news.length})</h3>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>News Articles ({news.filter(n => !isAnnouncementCategory(n.category)).length})</h3>
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
@@ -3946,7 +3955,7 @@ export default function DashboardPage() {
                   {activeEditPage === 'announcements' && (
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Announcements ({news.filter(n => n.status === 'Published' || !n.status).length} published)</h3>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Announcements ({news.filter(n => isAnnouncementCategory(n.category) && (n.status === 'Published' || !n.status)).length} published)</h3>
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
@@ -4013,7 +4022,7 @@ export default function DashboardPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {news.map(n => (
+                              {news.filter(n => isAnnouncementCategory(n.category)).map(n => (
                                 <tr key={n.id}>
                                   <td className="fw-semibold small">{n.title}</td>
                                   <td className="small text-muted">{n.date}</td>
@@ -4023,7 +4032,7 @@ export default function DashboardPage() {
                                   <td>
                                     <div className="d-flex gap-2">
                                       <button onClick={() => {
-                                        setNewsForm({ title: n.title, date: n.date, category: n.category, status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
+                                        setNewsForm({ title: n.title, date: n.date, category: n.category || 'Announcement', status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
                                         setEditingNewsId(n.id);
                                         setNewsFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>

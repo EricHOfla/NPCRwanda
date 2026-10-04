@@ -250,13 +250,13 @@ export default function HomeClient() {
               </Link>
             </div>
           </div>
-          {news.filter(article => article.status === 'Published').length === 0 ? (
+          {news.filter(article => article.status === 'Published' && !['announcement', 'notice', 'update', 'important'].includes((article.category || '').toLowerCase())).length === 0 ? (
             <div className="text-center py-4">
               <p className="text-muted">No published news available.</p>
             </div>
           ) : (
             <div className="row g-4">
-              {news.filter(article => article.status === 'Published').slice(0, 3).map((article, i) => (
+              {news.filter(article => article.status === 'Published' && !['announcement', 'notice', 'update', 'important'].includes((article.category || '').toLowerCase())).slice(0, 3).map((article, i) => (
                 <div key={article.slug} className="col-lg-4" data-aos="fade-up" data-aos-delay={`${i * 100}`}>
                   <div className="custom-card news-card h-100">
                     <div className="news-img">
