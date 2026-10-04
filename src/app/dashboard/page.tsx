@@ -3981,15 +3981,25 @@ export default function DashboardPage() {
                               <label className="form-label small fw-bold">Slug</label>
                               <input type="text" className="form-control" required value={newsForm.slug} onChange={e => setNewsForm({ ...newsForm, slug: e.target.value })} />
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
+                              <label className="form-label small fw-bold">Classification / Badge</label>
+                              <select className="form-control" value={newsForm.category} onChange={e => setNewsForm({ ...newsForm, category: e.target.value })}>
+                                <option value="Announcement">Announcement</option>
+                                <option value="Circular">Official Circular</option>
+                                <option value="Public Notice">Public Notice</option>
+                                <option value="Press Release">Press Release</option>
+                                <option value="Important">Urgent Notice</option>
+                              </select>
+                            </div>
+                            <div className="col-md-4">
                               <label className="form-label small fw-bold">Status</label>
                               <select className="form-control" value={newsForm.status} onChange={e => setNewsForm({ ...newsForm, status: e.target.value })}>
                                 <option value="Published">Published</option>
                                 <option value="Draft">Draft</option>
                               </select>
                             </div>
-                            <div className="col-md-6">
-                              <label className="form-label small fw-bold">Date</label>
+                            <div className="col-md-4">
+                              <label className="form-label small fw-bold">Gazette Date (e.g. Oct 2026)</label>
                               <input type="text" className="form-control" value={newsForm.date} onChange={e => setNewsForm({ ...newsForm, date: e.target.value })} />
                             </div>
                             <div className="col-12">
@@ -4016,6 +4026,7 @@ export default function DashboardPage() {
                             <thead>
                               <tr>
                                 <th>Title</th>
+                                <th>Classification</th>
                                 <th>Date</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -4025,6 +4036,11 @@ export default function DashboardPage() {
                               {news.filter(n => isAnnouncementCategory(n.category)).map(n => (
                                 <tr key={n.id}>
                                   <td className="fw-semibold small">{n.title}</td>
+                                  <td>
+                                    <span className="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle text-uppercase" style={{ fontSize: '0.68rem', letterSpacing: '0.4px' }}>
+                                      {n.category || 'Announcement'}
+                                    </span>
+                                  </td>
                                   <td className="small text-muted">{n.date}</td>
                                   <td>
                                     <span className={`badge ${n.status === 'Published' ? 'bg-success' : 'bg-warning'}`}>{n.status}</span>
