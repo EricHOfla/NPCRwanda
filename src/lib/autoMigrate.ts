@@ -371,3 +371,69 @@ export function ensureAutoMigrated(): Promise<void> {
 
   return migrationRunningPromise;
 }
+
+/**
+ * Auto-update event statuses based on today's date.
+ *
+ * Rules (Cancelled events are never touched):
+ *   - date > today               → Upcoming
+ *   - date <= today <= endDate   → Ongoing
+ *   - endDate < today (or date < today when no endDate)  → Completed
+ *
+ * Uses a single bulk UPDATE per status bucket for efficiency.
+ */
+export async function autoUpdateEventStatuses(): Promise<void> {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+    // Fetch all non-cancelled events
+    const events = await prisma.event.findMany({
+      where: { status: { not: 'Cancelled' } },
+      select: { id: true, date: true, endDate: true, status: true },
+    });
+
+    const toUpcoming: string[] = [];
+    const toOngoing: string[]  = [];
+    const toCompleted: string[] = [];
+
+    for (const ev of events) {
+      const start = ev.date?.trim() || '';            // "YYYY-MM-DD"
+      const end   = ev.endDate?.trim() || '';         // "YYYY-MM-DD" or ""
+
+      let computed: string;
+      if (!start) {
+        continue; // no date stored — skip
+      } else if (start > today) {
+        computed = 'Upcoming';
+      } else if (end && end >= today) {
+        // start <= today AND end >= today → Ongoing
+        computed = 'Ongoing';
+      } else if (!end && start === today) {
+        // single-day event, happening today
+        computed = 'Ongoing';
+      } else {
+        computed = 'Completed';
+      }
+
+      if (computed !== ev.status) {
+        if (computed === 'Upcoming')  toUpcoming.push(ev.id);
+        if (computed === 'Ongoing')   toOngoing.push(ev.id);
+        if (computed === 'Completed') toCompleted.push(ev.id);
+      }
+    }
+
+    // Bulk updates — only run if there is something to change
+    const updates: Promise<unknown>[] = [];
+    if (toUpcoming.length)  updates.push(prisma.event.updateMany({ where: { id: { in: toUpcoming } },  data: { status: 'Upcoming' } }));
+    if (toOngoing.length)   updates.push(prisma.event.updateMany({ where: { id: { in: toOngoing } },   data: { status: 'Ongoing' } }));
+    if (toCompleted.length) updates.push(prisma.event.updateMany({ where: { id: { in: toCompleted } }, data: { status: 'Completed' } }));
+
+    if (updates.length) {
+      await Promise.all(updates);
+      console.log(`[AutoStatus] Events updated — Upcoming:${toUpcoming.length} Ongoing:${toOngoing.length} Completed:${toCompleted.length}`);
+    }
+  } catch (err) {
+    // Non-fatal — log and continue
+    console.warn('[AutoStatus] Event status update skipped:', err);
+  }
+}

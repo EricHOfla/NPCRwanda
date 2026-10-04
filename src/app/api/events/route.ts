@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
+import { autoUpdateEventStatuses } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,9 @@ const eventSchema = z.object({
 
 export async function GET(request: Request) {
   try {
+    // Auto-update event statuses based on today's date before returning results
+    await autoUpdateEventStatuses();
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || '';
     const category = searchParams.get('category') || '';

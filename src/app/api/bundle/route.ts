@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
     await ensureAutoMigrated();
+    // Keep event statuses accurate on every public bundle request
+    await autoUpdateEventStatuses();
 
     const [
       athletes,
