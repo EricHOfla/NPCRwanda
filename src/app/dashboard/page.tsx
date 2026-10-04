@@ -574,7 +574,7 @@ export default function DashboardPage() {
     date: todayMonthYear,
     category: 'Sport',
     status: 'Draft',
-    img: 'news-volleyball.jpg',
+    img: '',
     desc: '',
     content: '',
     slug: ''
@@ -587,7 +587,7 @@ export default function DashboardPage() {
     description: '',
     date: todayIso,
     endDate: todayIso,
-    location: 'Amahoro Stadium, Kigali',
+    location: '',
     category: 'National',
     status: 'Upcoming',
     img: '',
@@ -980,10 +980,10 @@ export default function DashboardPage() {
         const data = await r.json();
         setSysSettings(prev => ({
           ...prev,
-          siteName: data.siteName || prev.siteName || 'National Paralympic Committee of Rwanda',
-          contactEmail: data.contactEmail || prev.contactEmail || contactInfo?.email || 'info@npcrwanda.org',
-          contactPhone: data.contactPhone || prev.contactPhone || contactInfo?.phone || '+250 788 672 739',
-          address: data.address || prev.address || contactInfo?.address || 'Amahoro Stadium, Kigali',
+          siteName: data.siteName || prev.siteName || '',
+          contactEmail: data.contactEmail || prev.contactEmail || contactInfo?.email || '',
+          contactPhone: data.contactPhone || prev.contactPhone || contactInfo?.phone || '',
+          address: data.address || prev.address || contactInfo?.address || '',
           facebook: data.facebook !== undefined ? data.facebook : prev.facebook,
           twitter: data.twitter !== undefined ? data.twitter : prev.twitter,
           instagram: data.instagram !== undefined ? data.instagram : prev.instagram,
@@ -993,9 +993,9 @@ export default function DashboardPage() {
       } else if (contactInfo) {
         setSysSettings(prev => ({
           ...prev,
-          contactPhone: contactInfo.phone || prev.contactPhone || '+250 788 672 739',
-          contactEmail: contactInfo.email || prev.contactEmail || 'info@npcrwanda.org',
-          address: contactInfo.address || prev.address || 'Amahoro Stadium, Kigali',
+          contactPhone: contactInfo.phone || prev.contactPhone || '',
+          contactEmail: contactInfo.email || prev.contactEmail || '',
+          address: contactInfo.address || prev.address || '',
         }));
       }
     } catch (err) {
@@ -1189,9 +1189,9 @@ export default function DashboardPage() {
         // Also update contactInfo state in context if available
         if (updateContactInfo && (sysSettings.contactPhone || sysSettings.contactEmail || sysSettings.address)) {
           updateContactInfo({
-            phone: sysSettings.contactPhone || contactInfo?.phone || '+250 788 672 739',
-            email: sysSettings.contactEmail || contactInfo?.email || 'info@npcrwanda.org',
-            address: sysSettings.address || contactInfo?.address || 'Amahoro Stadium, Kigali',
+            phone: sysSettings.contactPhone || contactInfo?.phone || '',
+            email: sysSettings.contactEmail || contactInfo?.email || '',
+            address: sysSettings.address || contactInfo?.address || '',
             mapUrl: contactInfo?.mapUrl || '',
           }).catch(() => {});
         }
@@ -1311,7 +1311,7 @@ export default function DashboardPage() {
     } else {
       await addNews(finalForm);
     }
-    setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+    setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: '', desc: '', content: '', slug: '' });
     setEditingNewsId(null);
     setNewsFormOpen(false);
   };
@@ -1343,7 +1343,7 @@ export default function DashboardPage() {
       description: '',
       date: new Date().toISOString().split('T')[0],
       endDate: new Date().toISOString().split('T')[0],
-      location: 'Amahoro Stadium, Kigali',
+      location: '',
       category: 'National',
       status: 'Upcoming',
       img: '',
@@ -2943,7 +2943,7 @@ export default function DashboardPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                               <div>
                                 <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Physical Address</span>
-                                <span style={{ fontSize: '0.85rem', color: '#0F172A' }}>{contactForm.address || contactInfo?.address || 'Amahoro Stadium, Kigali'}</span>
+                                <span style={{ fontSize: '0.85rem', color: '#0F172A' }}>{contactForm.address || contactInfo?.address || '—'}</span>
                               </div>
                               <div>
                                 <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748B', display: 'block', textTransform: 'uppercase' }}>Phone Number</span>
@@ -3817,7 +3817,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
-                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: '', desc: '', content: '', slug: '' });
                             setNewsFormOpen(!newsFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -3950,7 +3950,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
-                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Announcement', status: 'Published', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Announcement', status: 'Published', img: '', desc: '', content: '', slug: '' });
                             setNewsFormOpen(!newsFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -4047,7 +4047,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingEventId(null);
-                            setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: 'Amahoro Stadium, Kigali', category: 'National', status: 'Upcoming', img: '', featured: false });
+                            setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: '', category: 'National', status: 'Upcoming', img: '', featured: false });
                             setEventFormOpen(!eventFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
