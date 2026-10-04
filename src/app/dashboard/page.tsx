@@ -3974,11 +3974,14 @@ export default function DashboardPage() {
                           <form onSubmit={handleNewsSubmit} className="row g-3">
                             <div className="col-md-6">
                               <label className="form-label small fw-bold">Title</label>
-                              <input type="text" className="form-control" required value={newsForm.title} onChange={e => setNewsForm({ ...newsForm, title: e.target.value })} />
+                              <input type="text" className="form-control" required value={newsForm.title} onChange={e => {
+                                const t = e.target.value;
+                                setNewsForm({ ...newsForm, title: t, slug: newsForm.slug && newsForm.slug !== newsForm.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') ? newsForm.slug : t.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') });
+                              }} />
                             </div>
                             <div className="col-md-6">
-                              <label className="form-label small fw-bold">Slug</label>
-                              <input type="text" className="form-control" required value={newsForm.slug} onChange={e => setNewsForm({ ...newsForm, slug: e.target.value })} />
+                              <label className="form-label small fw-bold">Slug <span className="text-muted fw-normal">(auto-generated)</span></label>
+                              <input type="text" className="form-control" placeholder="auto-generated from title" value={newsForm.slug} onChange={e => setNewsForm({ ...newsForm, slug: e.target.value })} />
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Classification / Badge</label>
@@ -4003,7 +4006,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="col-12">
                               <label className="form-label small fw-bold">Short Summary</label>
-                              <textarea className="form-control" rows={3} value={newsForm.desc} onChange={e => setNewsForm({ ...newsForm, desc: e.target.value })} />
+                              <textarea className="form-control" rows={3} required value={newsForm.desc} onChange={e => setNewsForm({ ...newsForm, desc: e.target.value })} />
                             </div>
                             <div className="col-12">
                               <label className="form-label small fw-bold">Full Content</label>

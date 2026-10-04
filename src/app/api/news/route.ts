@@ -14,7 +14,7 @@ const newsSchema = z.object({
   img: z.string().default('news-volleyball.jpg'),
   desc: z.string().min(1, 'Description is required'),
   content: z.string().default(''),
-  slug: z.string().min(1, 'Slug is required'),
+  slug: z.string().default(''),
 });
 
 // GET: Fetch news articles with optional filters and pagination
@@ -118,16 +118,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify slug uniqueness
-    const existing = await prisma.newsArticle.findUnique({
-      where: { slug: result.data.slug },
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Slug must be unique.' },
-        { status: 400 }
-      );
+    // Verify slug uniqueness — append suffix if needed
+    let slugCandidate = result.data.slug;
+    const existingCheck = await prisma.newsArticle.findUnique({ where: { slug: slugCandidate } });
+    if (existingCheck) {
+      slugCandidate = `${slugCandidate}-${Date.now().toString(36)}`;
+      result.data.slug = slugCandidate;
     }
 
     const newArticle = await prisma.newsArticle.create({
