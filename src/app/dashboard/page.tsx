@@ -512,6 +512,10 @@ export default function DashboardPage() {
     addDpscoContact, updateDpscoContact, deleteDpscoContact,
   } = useData();
 
+  // Today's date helpers — used as default values in add-item forms
+  const todayIso = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const todayMonthYear = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); // e.g. "Oct 2026"
+
   const [adminTab, setAdminTab] = useState<AdminTab>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -567,7 +571,7 @@ export default function DashboardPage() {
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
   const [newsForm, setNewsForm] = useState({
     title: '',
-    date: 'Jul 2026',
+    date: todayMonthYear,
     category: 'Sport',
     status: 'Draft',
     img: 'news-volleyball.jpg',
@@ -581,8 +585,8 @@ export default function DashboardPage() {
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
-    date: '2026-08-15',
-    endDate: '2026-08-20',
+    date: todayIso,
+    endDate: todayIso,
     location: 'Amahoro Stadium, Kigali',
     category: 'National',
     status: 'Upcoming',
@@ -1307,7 +1311,7 @@ export default function DashboardPage() {
     } else {
       await addNews(finalForm);
     }
-    setNewsForm({ title: '', date: 'Jul 2026', category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+    setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
     setEditingNewsId(null);
     setNewsFormOpen(false);
   };
@@ -1337,8 +1341,8 @@ export default function DashboardPage() {
     setEventForm({
       title: '',
       description: '',
-      date: '2026-08-15',
-      endDate: '2026-08-20',
+      date: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0],
       location: 'Amahoro Stadium, Kigali',
       category: 'National',
       status: 'Upcoming',
@@ -3813,7 +3817,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
-                            setNewsForm({ title: '', date: 'Jul 2026', category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
                             setNewsFormOpen(!newsFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -3946,7 +3950,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingNewsId(null);
-                            setNewsForm({ title: '', date: 'Jul 2026', category: 'Announcement', status: 'Published', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
+                            setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Announcement', status: 'Published', img: 'news-volleyball.jpg', desc: '', content: '', slug: '' });
                             setNewsFormOpen(!newsFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -4043,7 +4047,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingEventId(null);
-                            setEventForm({ title: '', description: '', date: '2026-08-15', endDate: '2026-08-20', location: 'Amahoro Stadium, Kigali', category: 'National', status: 'Upcoming', img: '', featured: false });
+                            setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: 'Amahoro Stadium, Kigali', category: 'National', status: 'Upcoming', img: '', featured: false });
                             setEventFormOpen(!eventFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
