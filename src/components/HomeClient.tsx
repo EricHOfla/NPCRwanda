@@ -91,73 +91,89 @@ export default function HomeClient() {
               </p>
 
               <div className="pro-ngo-hero__actions">
+                <Link href="/about" className="pro-ngo-btn-primary">
+                  <i className="fas fa-shield-halved" aria-hidden="true" />
+                  <span>{t('phrase.Our Mission & Mandate')}</span>
+                </Link>
+
                 <Link href="/donate" className="pro-ngo-btn-donate">
                   <i className="fas fa-heart text-danger" aria-hidden="true" />
-                  <span>{t('phrase.Support Athlete Fund')}</span>
+                  <span>{t('phrase.Donate to Athlete Fund')}</span>
                 </Link>
 
                 <Link href="/governance#strategic-plan" className="pro-ngo-btn-outline">
-                  <i className="fas fa-file-shield text-warning" aria-hidden="true" />
+                  <i className="fas fa-file-contract text-primary" aria-hidden="true" />
                   <span>{t('phrase.Strategic Plan 2024–2028')}</span>
-                </Link>
-
-                <Link href="/sports" className="pro-ngo-btn-outline">
-                  <i className="fas fa-medal text-info" aria-hidden="true" />
-                  <span>{t('phrase.Our Sports')}</span>
                 </Link>
               </div>
 
               {/* Verified Institutional Indicators */}
               <div className="pro-ngo-hero__kpis">
-                <div>
-                  <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.districts', '30/30')}</div>
+                <div className="pro-ngo-hero__kpi-card">
+                  <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.districts', '30')}</div>
                   <div className="pro-ngo-hero__kpi-label">{t('phrase.Districts (DPSCO)')}</div>
                 </div>
-                <div>
+                <div className="pro-ngo-hero__kpi-card">
                   <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.athletes', '500+')}</div>
                   <div className="pro-ngo-hero__kpi-label">{t('phrase.Registered Athletes')}</div>
                 </div>
-                <div>
+                <div className="pro-ngo-hero__kpi-card">
                   <div className="pro-ngo-hero__kpi-num">4×</div>
                   <div className="pro-ngo-hero__kpi-label">{t('phrase.African Champions')}</div>
                 </div>
-                <div>
+                <div className="pro-ngo-hero__kpi-card">
                   <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.disciplines', '12+')}</div>
                   <div className="pro-ngo-hero__kpi-label">{t('phrase.Sport Disciplines')}</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Spotlight Card */}
+            {/* Right Column: Hero Visual Spotlight Card (Authentic Rwanda Para-Sport) */}
             <div className="col-lg-5" data-aos="zoom-in" data-aos-delay="100">
-              <div className="pro-ngo-hero__showcase">
-                <img
-                  src={getSiteText('hero.image', '/assets/img/curated/about-hero.jpg')}
-                  alt="Rwanda Women's Sitting Volleyball National Team"
-                  className="pro-ngo-hero__showcase-img"
-                />
-                <div className="pro-ngo-hero__showcase-gradient">
-                  <div className="pro-ngo-hero__badge-row">
-                    <span className="pro-ngo-tag pro-ngo-tag--gold">
-                      <i className="fas fa-trophy" aria-hidden="true" /> African Champions
-                    </span>
-                    <span className="pro-ngo-tag pro-ngo-tag--white">
-                      Paris 2024 Paralympians
-                    </span>
+              <div className="pro-ngo-hero__showcase-wrap">
+                <div className="pro-ngo-hero__showcase">
+                  <img
+                    src="/assets/img/curated/news-volleyball.jpg"
+                    alt="Rwanda National Para-Sports Team in Action"
+                    className="pro-ngo-hero__showcase-img"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg';
+                    }}
+                  />
+                  <div className="pro-ngo-hero__showcase-gradient">
+                    <div className="pro-ngo-hero__badge-row">
+                      <span className="pro-ngo-tag pro-ngo-tag--gold">
+                        <i className="fas fa-trophy" aria-hidden="true" /> 4× African Champions
+                      </span>
+                      <span className="pro-ngo-tag pro-ngo-tag--white">
+                        Paris 2024 Paralympians
+                      </span>
+                    </div>
+
+                    <h3 className="pro-ngo-hero__showcase-title">
+                      Rwanda National Para-Sports Movement
+                    </h3>
+
+                    <p className="pro-ngo-hero__showcase-desc">
+                      From grassroots scouting in 30 districts to continental championships and the Paralympic podium.
+                    </p>
+
+                    <Link href="/athletes" className="pro-ngo-hero__showcase-link">
+                      <span>{t('phrase.Meet Our Champions')}</span>
+                      <i className="fas fa-arrow-right" aria-hidden="true" />
+                    </Link>
                   </div>
+                </div>
 
-                  <h3 className="pro-ngo-hero__showcase-title">
-                    Women&apos;s National Sitting Volleyball Team
-                  </h3>
-
-                  <p className="pro-ngo-hero__showcase-desc">
-                    Four-time continental champions defending national prestige on the world stage and breaking disability barriers across Rwanda.
-                  </p>
-
-                  <Link href="/athletes" className="pro-ngo-hero__showcase-link">
-                    <span>{t('phrase.Meet the National Squad')}</span>
-                    <i className="fas fa-arrow-right" aria-hidden="true" />
-                  </Link>
+                {/* Floating Verified Trust Badge */}
+                <div className="pro-ngo-hero__inset-card">
+                  <div className="pro-ngo-hero__inset-icon">
+                    <i className="fas fa-medal" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <div className="pro-ngo-hero__inset-title">World ParaVolley &amp; IPC</div>
+                    <div className="pro-ngo-hero__inset-sub">Affiliated Member Since 2001</div>
+                  </div>
                 </div>
               </div>
             </div>
