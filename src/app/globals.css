@@ -2876,3 +2876,526 @@ body.accessibility-center-text {
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════════
+   NGO HOME PAGE — Professional Redesign Styles
+   All classes prefixed with .ngo- to avoid collisions
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Shared utilities ── */
+.ngo-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--primary-blue);
+  margin-bottom: 8px;
+}
+.ngo-eyebrow--light {
+  color: rgba(255,255,255,0.65);
+}
+.ngo-section-header__title {
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+.ngo-section-header__sub {
+  font-size: 1rem;
+  color: #64748B;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── HERO ── */
+.ngo-hero {
+  position: relative;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center 20%;
+  display: flex;
+  align-items: center;
+  padding: 120px 0 80px;
+}
+.ngo-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(5,20,50,0.88) 0%, rgba(10,63,122,0.72) 60%, rgba(0,114,198,0.45) 100%);
+  z-index: 0;
+}
+.ngo-hero__body {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+}
+.ngo-hero__kicker {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 24px;
+}
+.ngo-hero__title {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+.ngo-hero__title--accent {
+  color: var(--accent-yellow);
+}
+.ngo-hero__lead {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ngo-hero__actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.ngo-hero__scroll-cue {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.5);
+  font-size: 1.2rem;
+  animation: bounceY 1.8s ease infinite;
+  z-index: 1;
+  text-decoration: none;
+}
+@keyframes bounceY {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ── IMPACT BAR ── */
+.ngo-impact-bar {
+  background: #0a3f7a;
+  padding: 0;
+}
+.ngo-impact-bar__item {
+  padding: 28px 20px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.2s;
+}
+.ngo-impact-bar__item:last-child { border-right: none; }
+.ngo-impact-bar__item:hover { background: rgba(255,255,255,0.07); }
+.ngo-impact-bar__value {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  color: var(--accent-yellow);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.ngo-impact-bar__label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ── PILLARS ── */
+.ngo-pillars {
+  padding: 100px 0;
+  background: #F8FAFC;
+}
+.ngo-pillar-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 28px;
+  height: 100%;
+  border: 1px solid #E2E8F0;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.ngo-pillar-card:hover {
+  box-shadow: 0 12px 40px rgba(10,63,122,0.1);
+  transform: translateY(-4px);
+}
+.ngo-pillar-card__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+.ngo-pillar-card__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 10px;
+}
+.ngo-pillar-card__desc {
+  font-size: 0.9rem;
+  color: #64748B;
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+
+/* ── ABOUT SPLIT ── */
+.ngo-about-split {
+  padding: 100px 0;
+  background: #fff;
+}
+.ngo-about-split__img-wrap {
+  position: relative;
+}
+.ngo-about-split__img {
+  width: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  max-height: 500px;
+  box-shadow: 0 20px 60px rgba(10,63,122,0.15);
+}
+.ngo-about-split__badge {
+  position: absolute;
+  bottom: 24px;
+  right: -20px;
+  background: #0072C6;
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 24px rgba(0,114,198,0.35);
+}
+.ngo-about-split__badge-val {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.ngo-about-split__badge-sub {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ngo-about-split__text {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+.ngo-about-split__checks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ngo-about-split__check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #334155;
+  font-weight: 500;
+}
+.ngo-about-split__check .fa-circle-check {
+  color: #27AE60;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ── SPORTS ── */
+.ngo-sports {
+  padding: 100px 0;
+  background: #F8FAFC;
+}
+.ngo-sport-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+  transition: box-shadow 0.25s, transform 0.25s;
+  background: #fff;
+}
+.ngo-sport-card:hover {
+  box-shadow: 0 12px 40px rgba(10,63,122,0.12);
+  transform: translateY(-4px);
+}
+.ngo-sport-card__img-wrap {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+.ngo-sport-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s;
+}
+.ngo-sport-card:hover .ngo-sport-card__img {
+  transform: scale(1.06);
+}
+.ngo-sport-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(10,40,80,0.3) 100%);
+}
+.ngo-sport-card__body {
+  padding: 16px 18px;
+}
+.ngo-sport-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 6px;
+}
+.ngo-sport-card__cta {
+  font-size: 0.8rem;
+  color: #0072C6;
+  font-weight: 600;
+}
+
+/* ── ATHLETES ── */
+.ngo-athletes {
+  padding: 100px 0;
+  background: #fff;
+}
+.ngo-athlete-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+  background: #fff;
+  transition: box-shadow 0.25s, transform 0.25s;
+  height: 100%;
+}
+.ngo-athlete-card:hover {
+  box-shadow: 0 12px 40px rgba(10,63,122,0.12);
+  transform: translateY(-4px);
+}
+.ngo-athlete-card__img-wrap {
+  height: 220px;
+  overflow: hidden;
+}
+.ngo-athlete-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s;
+}
+.ngo-athlete-card:hover .ngo-athlete-card__img {
+  transform: scale(1.05);
+}
+.ngo-athlete-card__body {
+  padding: 20px;
+}
+.ngo-athlete-card__sport {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #0072C6;
+  margin-bottom: 6px;
+}
+.ngo-athlete-card__name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 8px;
+}
+.ngo-athlete-card__desc {
+  font-size: 0.85rem;
+  color: #64748B;
+  line-height: 1.6;
+  margin-bottom: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── UPDATES (news + announcements + events) ── */
+.ngo-updates {
+  padding: 100px 0;
+  background: #F8FAFC;
+}
+.ngo-updates__all-link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0072C6;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.ngo-updates__all-link:hover { color: #0a3f7a; }
+
+.ngo-news-list { display: flex; flex-direction: column; gap: 0; }
+.ngo-news-item {
+  display: flex;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px solid #E2E8F0;
+  transition: opacity 0.2s;
+}
+.ngo-news-item:hover { opacity: 0.82; }
+.ngo-news-item:first-child { padding-top: 0; }
+.ngo-news-item--featured { flex-direction: column; gap: 16px; padding-bottom: 24px; margin-bottom: 4px; }
+.ngo-news-item__img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; }
+.ngo-news-item__body { flex: 1; min-width: 0; }
+.ngo-news-item__cat {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; color: #0072C6; margin-bottom: 6px;
+}
+.ngo-news-item__title {
+  font-size: 1rem; font-weight: 700; color: #0F172A; line-height: 1.4;
+  margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.ngo-news-item--featured .ngo-news-item__title { font-size: 1.25rem; -webkit-line-clamp: 3; }
+.ngo-news-item__desc {
+  font-size: 0.85rem; color: #64748B; line-height: 1.6; margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ngo-news-item__meta { font-size: 0.78rem; color: #94A3B8; display: flex; align-items: center; }
+.ngo-news-item__read { color: #0072C6; font-weight: 700; }
+
+.ngo-notice-list { display: flex; flex-direction: column; gap: 2px; }
+.ngo-notice-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 16px; transition: box-shadow 0.2s, transform 0.2s; margin-bottom: 10px;
+}
+.ngo-notice-item:hover { box-shadow: 0 4px 18px rgba(10,63,122,0.08); transform: translateX(4px); }
+.ngo-notice-item__icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(192,57,43,0.1); color: #C0392B;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; flex-shrink: 0;
+}
+.ngo-notice-item__badge {
+  display: inline-block; font-size: 0.64rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px;
+  border-radius: 4px; margin-bottom: 5px;
+  background: rgba(192,57,43,0.1); color: #C0392B;
+}
+.ngo-notice-item__title {
+  font-size: 0.88rem; font-weight: 600; color: #0F172A; line-height: 1.4;
+  margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.ngo-notice-item__date { font-size: 0.75rem; color: #94A3B8; }
+
+.ngo-event-list { display: flex; flex-direction: column; gap: 10px; }
+.ngo-event-item {
+  display: flex; align-items: center; gap: 16px;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 14px 16px; transition: box-shadow 0.2s;
+}
+.ngo-event-item:hover { box-shadow: 0 4px 18px rgba(10,63,122,0.08); }
+.ngo-event-item__date {
+  min-width: 48px; text-align: center;
+  background: var(--primary-blue); color: #fff;
+  border-radius: 10px; padding: 8px 6px; flex-shrink: 0;
+}
+.ngo-event-item__day { display: block; font-size: 1.4rem; font-weight: 900; line-height: 1; }
+.ngo-event-item__mon { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85; }
+.ngo-event-item__body { flex: 1; min-width: 0; }
+.ngo-event-item__title { font-size: 0.9rem; font-weight: 700; color: #0F172A; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ngo-event-item__loc { font-size: 0.75rem; color: #64748B; display: block; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ngo-event-item__status { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+.ngo-event-item__status--upcoming { background: #DBEAFE; color: #1D4ED8; }
+.ngo-event-item__status--ongoing  { background: #DCFCE7; color: #16A34A; }
+.ngo-event-item__status--completed{ background: #F1F5F9; color: #64748B; }
+.ngo-event-item__status--cancelled{ background: #FEE2E2; color: #DC2626; }
+
+/* ── GOVERNANCE ── */
+.ngo-governance {
+  padding: 100px 0;
+  background: linear-gradient(135deg, #0a3f7a 0%, #0072C6 50%, #0a3f7a 100%);
+}
+.ngo-gov-card {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px; padding: 20px 22px; color: #fff;
+  transition: background 0.25s, transform 0.25s; backdrop-filter: blur(4px);
+}
+.ngo-gov-card:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+.ngo-gov-card__icon { font-size: 1.5rem; color: var(--accent-yellow); flex-shrink: 0; width: 28px; text-align: center; }
+.ngo-gov-card__label { font-size: 0.95rem; font-weight: 700; line-height: 1.2; }
+.ngo-gov-card__sub { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.ngo-gov-card__arrow { margin-left: auto; font-size: 0.9rem; color: rgba(255,255,255,0.4); }
+
+/* ── PARTNERS ── */
+.ngo-partners {
+  padding: 60px 0;
+  background: #fff;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+.ngo-partners__label {
+  text-align: center; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 32px;
+}
+.ngo-partners__logos {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 36px 48px;
+}
+.ngo-partners__logo-link {
+  display: flex; align-items: center; opacity: 0.6; transition: opacity 0.2s; filter: grayscale(1);
+}
+.ngo-partners__logo-link:hover { opacity: 1; filter: grayscale(0); }
+.ngo-partners__logo { max-height: 50px; max-width: 130px; object-fit: contain; }
+
+/* ── CTA ── */
+.ngo-cta {
+  position: relative;
+  background: url('/assets/img/curated/home-hero.jpg') center/cover no-repeat fixed;
+  padding: 120px 0;
+}
+.ngo-cta__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(5,20,50,0.92) 0%, rgba(0,114,198,0.8) 100%);
+}
+.ngo-cta__body { position: relative; z-index: 1; color: #fff; }
+.ngo-cta__title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900;
+  color: #fff; line-height: 1.2; margin-bottom: 20px;
+}
+.ngo-cta__desc {
+  font-size: 1.05rem; color: rgba(255,255,255,0.8); line-height: 1.75; margin-bottom: 40px;
+}
+.ngo-cta__actions {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 991px) {
+  .ngo-hero { min-height: 90vh; padding: 100px 0 60px; }
+  .ngo-about-split__badge { right: 12px; }
+  .ngo-pillars, .ngo-about-split, .ngo-sports, .ngo-athletes,
+  .ngo-updates, .ngo-governance { padding: 70px 0; }
+  .ngo-cta { padding: 80px 0; }
+}
+@media (max-width: 767px) {
+  .ngo-hero { min-height: 100svh; padding: 100px 16px 60px; background-attachment: scroll; }
+  .ngo-hero__actions { gap: 12px; }
+  .ngo-hero__actions .btn { width: 100%; max-width: 300px; }
+  .ngo-impact-bar__item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .ngo-about-split__badge { right: 8px; bottom: 8px; }
+  .ngo-cta { background-attachment: scroll; }
+  .ngo-cta__actions .btn { width: 100%; max-width: 300px; }
+  .ngo-gov-card__arrow { display: none; }
+}
