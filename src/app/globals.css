@@ -3399,3 +3399,68 @@ body.accessibility-center-text {
   .ngo-cta__actions .btn { width: 100%; max-width: 300px; }
   .ngo-gov-card__arrow { display: none; }
 }
+
+/* ── PARALYMPIC PATHWAY ── */
+.ngo-pathway {
+  padding: 100px 0;
+  background: #FFFFFF;
+  border-top: 1px solid #E2E8F0;
+}
+.ngo-pathway-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 30px 24px;
+  height: 100%;
+  position: relative;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.ngo-pathway-card:hover {
+  transform: translateY(-5px);
+  background: #FFFFFF;
+  border-color: #0072C6;
+  box-shadow: 0 16px 36px rgba(0, 114, 198, 0.08);
+}
+.ngo-pathway-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.ngo-pathway-card__step {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0072C6;
+  letter-spacing: -0.5px;
+  opacity: 0.9;
+}
+.ngo-pathway-card__icon {
+  font-size: 1.6rem;
+  color: #0a3f7a;
+}
+.ngo-pathway-card__title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.ngo-pathway-card__actor {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #2e9e57;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+.ngo-pathway-card__desc {
+  font-size: 0.88rem;
+  color: #64748B;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+@media (max-width: 991px) {
+  .ngo-pathway { padding: 70px 0; }
+}

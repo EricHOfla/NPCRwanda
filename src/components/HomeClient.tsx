@@ -214,6 +214,75 @@ export default function HomeClient() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          PARALYMPIC LIFECYCLE / ATHLETE PATHWAY — What We Actually Do
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="ngo-pathway">
+        <div className="container">
+          <div className="ngo-section-header text-center mb-5">
+            <span className="ngo-eyebrow">The Para-Sport Ecosystem</span>
+            <h2 className="ngo-section-header__title">From Grassroots to Paralympic Podium</h2>
+            <p className="ngo-section-header__sub">
+              NPC Rwanda coordinates the full developmental pathway to ensure athletes with impairments are discovered, officially classified, and trained to compete at the highest levels.
+            </p>
+          </div>
+          <div className="row g-4">
+            {[
+              {
+                step: '01',
+                title: 'Community Scouting',
+                actor: 'DPSCOs (30 Districts)',
+                desc: 'Identifying talent among youth and adults with impairments across schools, health centers, and community cells.',
+                icon: 'fa-magnifying-glass-location'
+              },
+              {
+                step: '02',
+                title: 'Medical & Technical Classification',
+                actor: 'IPC Certified Classifiers',
+                desc: 'Official impairment assessment assigning eligible athletes to their sport classes (e.g. T46, F57, Sitting Volleyball VS1).',
+                icon: 'fa-notes-medical'
+              },
+              {
+                step: '03',
+                title: 'National Championships',
+                actor: 'National Para Federations & Clubs',
+                desc: 'Regular domestic leagues and national championship cups providing structured year-round competition across Rwanda.',
+                icon: 'fa-trophy'
+              },
+              {
+                step: '04',
+                title: 'Continental & Global Representation',
+                actor: 'Team Rwanda Paralympics',
+                desc: 'High-performance national squad preparation for African Para Games, World Championships, and the Paralympic Games.',
+                icon: 'fa-earth-africa'
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${idx * 100}`}>
+                <div className="ngo-pathway-card">
+                  <div className="ngo-pathway-card__header">
+                    <span className="ngo-pathway-card__step">{item.step}</span>
+                    <i className={`fas ${item.icon} ngo-pathway-card__icon`} aria-hidden="true" />
+                  </div>
+                  <h3 className="ngo-pathway-card__title">{item.title}</h3>
+                  <div className="ngo-pathway-card__actor">
+                    <i className="fas fa-certificate me-1" />{item.actor}
+                  </div>
+                  <p className="ngo-pathway-card__desc">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-5">
+            <Link href="/members/dpsco" className="btn btn-outline-primary px-4 fw-bold me-3 mb-2 mb-md-0">
+              <i className="fas fa-sitemap me-2" /> Explore DPSCO District Network
+            </Link>
+            <Link href="/sports" className="btn btn-primary px-4 fw-bold">
+              <i className="fas fa-medal me-2" /> View Regulated Sports Disciplines
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
           SPORTS PROGRAMS — icon grid, compact
       ═══════════════════════════════════════════════════════════ */}
       {sports.length > 0 && (
@@ -523,12 +592,12 @@ export default function HomeClient() {
             <div className="col-lg-8">
               <span className="ngo-eyebrow ngo-eyebrow--light">{t('phrase.Take Action')}</span>
               <h2 className="ngo-cta__title">
-                {getSiteText('cta.title', 'Support Inclusive Sports in Rwanda')}
+                {getSiteText('cta.title', 'Champion Rwanda’s Para-Athletes')}
               </h2>
               <p className="ngo-cta__desc">
                 {getSiteText(
                   'cta.desc',
-                  'Help us expand access, strengthen athlete pathways, and deliver excellence in para-sport. Every contribution changes lives.'
+                  'Support athlete equipment, certified medical classification, training camps, and international travel. Partner with NPC Rwanda to elevate disability inclusion through the power of sport.'
                 )}
               </p>
               <div className="ngo-cta__actions">
@@ -536,10 +605,10 @@ export default function HomeClient() {
                   <i className="fas fa-heart me-2" /> {t('phrase.Donate Now')}
                 </Link>
                 <Link href="/volunteer" className="btn btn-outline-light btn-lg fw-bold px-5">
-                  <i className="fas fa-hands-helping me-2" /> {t('phrase.Volunteer')}
+                  <i className="fas fa-hands-helping me-2" /> Become a Volunteer
                 </Link>
                 <Link href="/contact" className="btn btn-outline-light btn-lg fw-bold px-5">
-                  <i className="fas fa-envelope me-2" /> {t('phrase.Contact Us')}
+                  <i className="fas fa-handshake me-2" /> Institutional Partnership
                 </Link>
               </div>
             </div>
