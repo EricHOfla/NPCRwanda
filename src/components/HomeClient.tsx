@@ -40,18 +40,18 @@ export default function HomeClient() {
           <div className="row justify-content-center text-center">
             <div className="col-lg-9">
               <span className="ngo-hero__kicker">
-                {getSiteText('hero.kicker', 'NPC RWANDA · NATIONAL PARALYMPIC COMMITTEE')}
+                {getSiteText('hero.kicker', 'NPC RWANDA · COMITÉ NATIONAL PARALYMPIQUE')}
               </span>
               <h1 className="ngo-hero__title">
-                {getSiteText('hero.title1', 'Empowering Ability.')}{' '}
+                {getSiteText('hero.title1', 'Rwanda Paralympic.')}{' '}
                 <span className="ngo-hero__title--accent">
-                  {getSiteText('hero.title2', 'Inspiring Rwanda.')}
+                  {getSiteText('hero.title2', 'Stronger Together.')}
                 </span>
               </h1>
               <p className="ngo-hero__lead">
                 {getSiteText(
                   'hero.lead',
-                  'We build inclusive pathways in sport and prepare elite para-athletes to represent Rwanda on the world stage. Ability comes first.'
+                  'The National Paralympic Committee of Rwanda governs, develops and promotes para-sport nationwide — from grassroots DPSCO clubs in all 30 districts to the Paralympic Games on the world stage.'
                 )}
               </p>
               <div className="ngo-hero__actions">
@@ -102,41 +102,41 @@ export default function HomeClient() {
       <section className="ngo-pillars">
         <div className="container">
           <div className="ngo-section-header text-center mb-5">
-            <span className="ngo-eyebrow">{t('phrase.What We Do')}</span>
+            <span className="ngo-eyebrow">What NPC Rwanda Does</span>
             <h2 className="ngo-section-header__title">
-              {getSiteText('pillars.title', 'Our Core Mission Areas')}
+              {getSiteText('pillars.title', 'Our Paralympic Mandate')}
             </h2>
             <p className="ngo-section-header__sub">
               {getSiteText(
                 'pillars.desc',
-                'NPC Rwanda operates across four strategic pillars to ensure every person with a disability in Rwanda can access, enjoy and excel in sport.'
+                'As Rwanda\'s sole IPC-recognised national Paralympic body, NPC Rwanda is responsible for governing, developing and fielding national para-sport teams — from community level to the Paralympic Games.'
               )}
             </p>
           </div>
           <div className="row g-4">
             {[
               {
-                icon: 'fa-magnifying-glass-chart',
-                title: getSiteText('pillar1.title', 'Talent Identification'),
-                desc: getSiteText('pillar1.desc', 'Community scouting across all 30 districts, connecting grassroots DPSCO networks with national competition pathways.'),
+                icon: 'fa-id-card-clip',
+                title: getSiteText('pillar1.title', 'Athlete Classification & Registration'),
+                desc: getSiteText('pillar1.desc', 'NPC Rwanda oversees the formal classification of para-athletes according to IPC standards — ensuring every competitor is correctly assessed for their impairment class before competing nationally or internationally.'),
                 color: '#0072C6',
               },
               {
-                icon: 'fa-trophy',
-                title: getSiteText('pillar2.title', 'High Performance'),
-                desc: getSiteText('pillar2.desc', 'Elite training, coaching certification, and full preparation for continental and global Paralympic events.'),
+                icon: 'fa-flag',
+                title: getSiteText('pillar2.title', 'National Team & Competition'),
+                desc: getSiteText('pillar2.desc', 'We select, prepare and send Rwanda\'s national para-sport teams to the Paralympic Games, African Para Games, Parapan African Games, and IPC World Championships.'),
                 color: '#E67E22',
               },
               {
-                icon: 'fa-heart-pulse',
-                title: getSiteText('pillar3.title', 'Athlete Welfare'),
-                desc: getSiteText('pillar3.desc', 'Medical support, classification, anti-doping education, and athlete safeguarding programmes.'),
+                icon: 'fa-sitemap',
+                title: getSiteText('pillar3.title', 'DPSCO Coordination (30 Districts)'),
+                desc: getSiteText('pillar3.desc', 'Through 30 District Paralympic Sports Committees (DPSCOs), NPC Rwanda reaches every corner of the country — identifying talent, registering athletes, and running local para-sport activities.'),
                 color: '#27AE60',
               },
               {
-                icon: 'fa-handshake',
-                title: getSiteText('pillar4.title', 'Inclusive Communities'),
-                desc: getSiteText('pillar4.desc', 'Removing barriers through policy advocacy, disability awareness, and partnerships with government and civil society.'),
+                icon: 'fa-scale-balanced',
+                title: getSiteText('pillar4.title', 'Policy, Advocacy & Inclusion'),
+                desc: getSiteText('pillar4.desc', 'NPC Rwanda champions disability-inclusive sport policy, works with the government, federations, and schools to remove barriers, and ensures sports for persons with disabilities comply with Rwanda Vision 2050.'),
                 color: '#8E44AD',
               },
             ].map(({ icon, title, desc, color }, i) => (
@@ -164,36 +164,35 @@ export default function HomeClient() {
               <div className="ngo-about-split__img-wrap">
                 <img
                   src={getSiteText('about.previewImage', '/assets/img/curated/about-hero.jpg')}
-                  alt="NPC Rwanda para-athletes in action"
+                  alt="NPC Rwanda para-athletes competing"
                   className="ngo-about-split__img"
                 />
-                {/* Floating badge */}
                 <div className="ngo-about-split__badge">
                   <i className="fas fa-medal" />
                   <div>
                     <div className="ngo-about-split__badge-val">IPC</div>
-                    <div className="ngo-about-split__badge-sub">Member</div>
+                    <div className="ngo-about-split__badge-sub">Recognised NPC</div>
                   </div>
                 </div>
               </div>
             </div>
             <div className="col-lg-7" data-aos="fade-left">
-              <span className="ngo-eyebrow">{getSiteText('about.eyebrow', 'Who We Are')}</span>
+              <span className="ngo-eyebrow">{getSiteText('about.eyebrow', 'About NPC Rwanda')}</span>
               <h2 className="ngo-section-header__title mb-4">
-                {getSiteText('about.previewTitle', 'Driving Inclusion Through Sport')}
+                {getSiteText('about.previewTitle', 'Rwanda\'s National Body for Paralympic Sport')}
               </h2>
               <p className="ngo-about-split__text">
                 {getSiteText(
                   'about.previewText',
-                  'The National Paralympic Committee of Rwanda (NPC Rwanda) is a national non-governmental organization established in 2001. Our vision is to be the leading Paralympic nation in Africa — our mission is to build a sustainable system that enables para-athletes to achieve their sporting aspirations.'
+                  'Founded in 2001 and recognised by the International Paralympic Committee (IPC), NPC Rwanda is the sole national authority responsible for the development, governance and promotion of para-sport in Rwanda. We work to ensure that persons with physical, visual and intellectual impairments have equal access to competitive and recreational sport — from local clubs to the Paralympic Games.'
                 )}
               </p>
               <div className="ngo-about-split__checks">
                 {[
-                  getSiteText('about.bullet1', 'Full member of IPC & World ParaVolley'),
-                  getSiteText('about.bullet2', 'Present in all 30 Districts via DPSCO'),
-                  getSiteText('about.bullet3', 'Inclusive sports for all abilities'),
-                  getSiteText('about.bullet4', 'Aligned with Rwanda Vision 2050'),
+                  getSiteText('about.bullet1', 'IPC-recognised National Paralympic Committee since 2001'),
+                  getSiteText('about.bullet2', '30 District Paralympic Sports Committees (DPSCOs) nationwide'),
+                  getSiteText('about.bullet3', 'Member of World ParaVolley, Para Athletics & other IFs'),
+                  getSiteText('about.bullet4', 'Aligned with Rwanda Vision 2050 & NSC Strategic Plan'),
                 ].map((text, i) => (
                   <div key={i} className="ngo-about-split__check">
                     <i className="fas fa-circle-check" aria-hidden="true" />
@@ -203,10 +202,10 @@ export default function HomeClient() {
               </div>
               <div className="d-flex gap-3 flex-wrap mt-4">
                 <Link href="/about" className="btn btn-primary fw-bold px-4">
-                  {t('phrase.Read Full Mission')}
+                  Our Full Story
                 </Link>
                 <Link href="/governance" className="btn btn-outline-secondary fw-bold px-4">
-                  {t('phrase.View Governance')}
+                  Governance & Leadership
                 </Link>
               </div>
             </div>
@@ -221,10 +220,10 @@ export default function HomeClient() {
         <section className="ngo-sports">
           <div className="container">
             <div className="ngo-section-header text-center mb-5">
-              <span className="ngo-eyebrow">{t('phrase.Disciplines')}</span>
-              <h2 className="ngo-section-header__title">{t('phrase.Our Sports Programs')}</h2>
+              <span className="ngo-eyebrow">IPC-Recognised Para-Sports</span>
+              <h2 className="ngo-section-header__title">Disciplines We Govern</h2>
               <p className="ngo-section-header__sub">
-                {t('phrase.Explore the diverse para-sports disciplines we manage and support across Rwanda.')}
+                NPC Rwanda manages and develops these IPC-recognized para-sport disciplines across Rwanda — each with national athlete registration, DPSCO club networks, and pathways to international competition.
               </p>
             </div>
             <div className="row g-4">
@@ -270,11 +269,11 @@ export default function HomeClient() {
           <div className="container">
             <div className="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
               <div>
-                <span className="ngo-eyebrow">{t('phrase.Inspiration')}</span>
-                <h2 className="ngo-section-header__title mb-0">{t('phrase.Featured Athletes')}</h2>
+                <span className="ngo-eyebrow">Rwanda National Para-Sport Team</span>
+                <h2 className="ngo-section-header__title mb-0">Our Registered Athletes</h2>
               </div>
               <Link href="/athletes" className="btn btn-outline-primary fw-bold">
-                {t('phrase.All Athletes')} <i className="fas fa-arrow-right ms-2" />
+                Full Athlete Registry <i className="fas fa-arrow-right ms-2" />
               </Link>
             </div>
             <div className="row g-4">
@@ -454,24 +453,24 @@ export default function HomeClient() {
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-lg-4">
-              <span className="ngo-eyebrow ngo-eyebrow--light">{t('phrase.Accountability')}</span>
+              <span className="ngo-eyebrow ngo-eyebrow--light">NPC Rwanda Governance</span>
               <h2 className="ngo-section-header__title" style={{ color: '#fff' }}>
-                {t('phrase.Governance & Transparency')}
+                Accountable. Transparent. IPC-Compliant.
               </h2>
               <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
-                {t('phrase.We are committed to the highest standards of transparency and professional management.')}
+                NPC Rwanda operates under its IPC-approved Constitution, overseen by an elected Executive Committee and accountable to the Annual General Assembly (AGA), the Rwanda National Sports Council (NSC), and the International Paralympic Committee.
               </p>
               <Link href="/governance" className="btn btn-warning fw-bold px-4 mt-2">
-                {t('phrase.View Governance')} <i className="fas fa-arrow-right ms-2" />
+                View Governance Structure <i className="fas fa-arrow-right ms-2" />
               </Link>
             </div>
             <div className="col-lg-8">
               <div className="row g-3">
                 {[
-                  { icon: 'fa-users-gear',     label: t('phrase.Board Members'),  sub: t('phrase.Our leadership'),         anchor: 'board' },
-                  { icon: 'fa-file-invoice',   label: t('phrase.Annual Reports'), sub: t('phrase.2024-2025 Activity'),      anchor: 'reports' },
-                  { icon: 'fa-scale-balanced', label: t('phrase.Policies'),       sub: t('phrase.Rules & Regulations'),     anchor: 'policies' },
-                  { icon: 'fa-chess-knight',   label: t('phrase.Strategic Plan'), sub: t('phrase.Vision for 2028'),         anchor: 'strategic-plan' },
+                  { icon: 'fa-users-gear',     label: 'Executive Committee',    sub: 'President, VP & Board Members',  anchor: 'board' },
+                  { icon: 'fa-file-invoice',   label: 'Annual Reports',         sub: 'Activity & financial reports',   anchor: 'reports' },
+                  { icon: 'fa-scale-balanced', label: 'NPC Constitution & Rules', sub: 'Statutes & regulations',       anchor: 'policies' },
+                  { icon: 'fa-chess-knight',   label: 'Strategic Plan',         sub: 'Vision for Paris 2024 & LA 2028', anchor: 'strategic-plan' },
                 ].map(({ icon, label, sub, anchor }, i) => (
                   <div key={anchor} className="col-sm-6" data-aos="fade-up" data-aos-delay={`${i * 80}`}>
                     <Link href={`/governance#${anchor}`} className="text-decoration-none">
