@@ -2878,589 +2878,1181 @@ body.accessibility-center-text {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   NGO HOME PAGE — Professional Redesign Styles
-   All classes prefixed with .ngo- to avoid collisions
+   PREMIER NGO DESIGN SYSTEM — Executive Institutional Layout
+   All classes prefixed with .pro-ngo-
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Shared utilities ── */
-.ngo-eyebrow {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--primary-blue);
-  margin-bottom: 8px;
-}
-.ngo-eyebrow--light {
-  color: rgba(255,255,255,0.65);
-}
-.ngo-section-header__title {
-  font-size: clamp(1.55rem, 3vw, 2.1rem);
-  font-weight: 800;
-  color: #0F172A;
-  line-height: 1.25;
-  margin-bottom: 0.5rem;
-}
-.ngo-section-header__sub {
-  font-size: 1rem;
-  color: #64748B;
-  max-width: 640px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
-
-/* ── HERO ── */
-.ngo-hero {
-  position: relative;
-  min-height: 100vh;
-  background-size: cover;
-  background-position: center 20%;
-  display: flex;
-  align-items: center;
-  padding: 120px 0 80px;
-}
-.ngo-hero__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(5,20,50,0.88) 0%, rgba(10,63,122,0.72) 60%, rgba(0,114,198,0.45) 100%);
-  z-index: 0;
-}
-.ngo-hero__body {
-  position: relative;
-  z-index: 1;
-  color: #fff;
-}
-.ngo-hero__kicker {
-  display: inline-block;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 100px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  padding: 6px 18px;
-  color: rgba(255,255,255,0.9);
-  margin-bottom: 24px;
-}
-.ngo-hero__title {
-  font-size: clamp(2.4rem, 6vw, 4rem);
-  font-weight: 900;
-  line-height: 1.1;
-  color: #fff;
-  margin-bottom: 24px;
-  letter-spacing: -0.5px;
-}
-.ngo-hero__title--accent {
-  color: var(--accent-yellow);
-}
-.ngo-hero__lead {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: rgba(255,255,255,0.85);
-  line-height: 1.7;
-  margin-bottom: 40px;
-  max-width: 640px;
+/* ── Global Utility Tokens for NGO ── */
+.pro-ngo-container {
+  max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
-}
-.ngo-hero__actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.ngo-hero__scroll-cue {
-  position: absolute;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255,255,255,0.5);
-  font-size: 1.2rem;
-  animation: bounceY 1.8s ease infinite;
-  z-index: 1;
-  text-decoration: none;
-}
-@keyframes bounceY {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(8px); }
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-/* ── IMPACT BAR ── */
-.ngo-impact-bar {
-  background: #0a3f7a;
-  padding: 0;
+.pro-ngo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 6px;
+  line-height: 1;
 }
-.ngo-impact-bar__item {
-  padding: 28px 20px;
-  text-align: center;
-  border-right: 1px solid rgba(255,255,255,0.1);
-  transition: background 0.2s;
+
+.pro-ngo-tag--blue {
+  background: rgba(0, 114, 198, 0.1);
+  color: #0072C6;
+  border: 1px solid rgba(0, 114, 198, 0.25);
 }
-.ngo-impact-bar__item:last-child { border-right: none; }
-.ngo-impact-bar__item:hover { background: rgba(255,255,255,0.07); }
-.ngo-impact-bar__value {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+
+.pro-ngo-tag--gold {
+  background: rgba(255, 215, 0, 0.15);
+  color: #B45309;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+.pro-ngo-tag--white {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pro-ngo-tag--red {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+/* ── Live Institutional Bulletin Bar ── */
+.pro-ngo-bulletin {
+  background: #06152B;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  padding: 8px 0;
+  font-size: 0.82rem;
+  position: relative;
+  z-index: 10;
+}
+
+.pro-ngo-bulletin__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pro-ngo-bulletin__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pro-ngo-bulletin__pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: proPulse 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes proPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.pro-ngo-bulletin__badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: #DC2626;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.pro-ngo-bulletin__title {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
+.pro-ngo-bulletin__link {
+  color: #FCD34D;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.pro-ngo-bulletin__link:hover {
+  color: #FFFFFF;
+}
+
+/* ── Hero Section (Executive Asymmetric Split) ── */
+.pro-ngo-hero {
+  background: radial-gradient(circle at 10% 20%, #0F2B59 0%, #07162C 65%, #030B17 100%);
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 90px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pro-ngo-hero::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 114, 198, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.pro-ngo-hero__trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 7px 16px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 24px;
+}
+
+.pro-ngo-hero__title {
+  font-size: clamp(2.3rem, 4.2vw, 3.8rem);
   font-weight: 900;
-  color: var(--accent-yellow);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin-bottom: 22px;
+}
+
+.pro-ngo-hero__title-highlight {
+  color: #FFD700;
+  display: block;
+}
+
+.pro-ngo-hero__lead {
+  font-size: clamp(1.02rem, 1.3vw, 1.18rem);
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  max-width: 620px;
+  margin-bottom: 34px;
+}
+
+.pro-ngo-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.pro-ngo-btn-donate {
+  background: #FFD700;
+  color: #06152B !important;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 14px 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
+  transition: all 0.25s ease;
+  border: none;
+}
+
+.pro-ngo-btn-donate:hover {
+  background: #FFE033;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.45);
+}
+
+.pro-ngo-btn-outline {
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 14px 26px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.pro-ngo-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Hero Key Indicators Ribbon */
+.pro-ngo-hero__kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pro-ngo-hero__kpi-num {
+  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+  font-weight: 900;
+  color: #FFD700;
   line-height: 1;
   margin-bottom: 6px;
 }
-.ngo-impact-bar__label {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.7);
-  font-weight: 600;
-  letter-spacing: 0.5px;
+
+.pro-ngo-hero__kpi-label {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.65);
   text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
-/* ── PILLARS ── */
-.ngo-pillars {
-  padding: 100px 0;
+/* Hero Right Showcase Card */
+.pro-ngo-hero__showcase {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0B1E38;
+}
+
+.pro-ngo-hero__showcase-img {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.pro-ngo-hero__showcase:hover .pro-ngo-hero__showcase-img {
+  transform: scale(1.03);
+}
+
+.pro-ngo-hero__showcase-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6, 21, 43, 0.95) 0%, rgba(6, 21, 43, 0.3) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+.pro-ngo-hero__badge-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pro-ngo-hero__showcase-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+
+.pro-ngo-hero__showcase-desc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.pro-ngo-hero__showcase-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #FFD700;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: gap 0.2s;
+}
+
+.pro-ngo-hero__showcase-link:hover {
+  gap: 12px;
+  color: #FFFFFF;
+}
+
+/* ── Statutory Recognition Strip ── */
+.pro-ngo-accreditation {
+  background: #FFFFFF;
+  padding: 36px 0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.pro-ngo-accreditation__title {
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #64748B;
+  margin-bottom: 24px;
+}
+
+.pro-ngo-accreditation__grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 36px 54px;
+}
+
+.pro-ngo-accreditation__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: #F8FAFC;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  transition: all 0.25s ease;
+}
+
+.pro-ngo-accreditation__item:hover {
+  background: #FFFFFF;
+  border-color: #0072C6;
+  box-shadow: 0 4px 18px rgba(0, 114, 198, 0.1);
+  transform: translateY(-2px);
+}
+
+.pro-ngo-accreditation__abbr {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0072C6;
+  line-height: 1;
+}
+
+.pro-ngo-accreditation__name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1.25;
+}
+
+.pro-ngo-accreditation__sub {
+  font-size: 0.68rem;
+  color: #64748B;
+  display: block;
+}
+
+/* ── Section Titles ── */
+.pro-ngo-section-header {
+  margin-bottom: 50px;
+}
+
+.pro-ngo-section-header--center {
+  text-align: center;
+}
+
+.pro-ngo-eyebrow {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #0072C6;
+  margin-bottom: 10px;
+}
+
+.pro-ngo-heading {
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 900;
+  color: #0F172A;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+
+.pro-ngo-heading--white {
+  color: #FFFFFF;
+}
+
+.pro-ngo-subhead {
+  font-size: 1.05rem;
+  color: #64748B;
+  line-height: 1.7;
+  max-width: 680px;
+}
+
+.pro-ngo-subhead--center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pro-ngo-subhead--white {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Strategic Mission Bento Grid ── */
+.pro-ngo-pillars {
+  padding: 90px 0;
   background: #F8FAFC;
 }
-.ngo-pillar-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 36px 28px;
-  height: 100%;
+
+.pro-ngo-bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.pro-ngo-bento-card {
+  background: #FFFFFF;
+  border-radius: 18px;
   border: 1px solid #E2E8F0;
-  transition: box-shadow 0.25s, transform 0.25s;
+  padding: 36px 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
 }
-.ngo-pillar-card:hover {
-  box-shadow: 0 12px 40px rgba(10,63,122,0.1);
+
+.pro-ngo-bento-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  border-color: #CBD5E1;
 }
-.ngo-pillar-card__icon {
-  width: 60px;
-  height: 60px;
+
+.pro-ngo-bento-card--featured {
+  background: linear-gradient(135deg, #0A2548 0%, #06162C 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__title {
+  color: #FFFFFF;
+}
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.pro-ngo-bento-card__icon-box {
+  width: 56px;
+  height: 56px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  margin-bottom: 20px;
-}
-.ngo-pillar-card__title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0F172A;
-  margin-bottom: 10px;
-}
-.ngo-pillar-card__desc {
-  font-size: 0.9rem;
-  color: #64748B;
-  line-height: 1.65;
-  margin-bottom: 0;
+  margin-bottom: 22px;
 }
 
-/* ── ABOUT SPLIT ── */
-.ngo-about-split {
-  padding: 100px 0;
-  background: #fff;
-}
-.ngo-about-split__img-wrap {
-  position: relative;
-}
-.ngo-about-split__img {
-  width: 100%;
-  border-radius: 20px;
-  object-fit: cover;
-  max-height: 500px;
-  box-shadow: 0 20px 60px rgba(10,63,122,0.15);
-}
-.ngo-about-split__badge {
-  position: absolute;
-  bottom: 24px;
-  right: -20px;
-  background: #0072C6;
-  color: #fff;
-  border-radius: 14px;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.4rem;
-  box-shadow: 0 8px 24px rgba(0,114,198,0.35);
-}
-.ngo-about-split__badge-val {
-  font-size: 1rem;
+.pro-ngo-bento-card__title {
+  font-size: 1.3rem;
   font-weight: 800;
-  line-height: 1;
+  color: #0F172A;
+  margin-bottom: 12px;
+  line-height: 1.3;
 }
-.ngo-about-split__badge-sub {
-  font-size: 0.7rem;
-  opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+
+.pro-ngo-bento-card__desc {
+  font-size: 0.94rem;
+  color: #64748B;
+  line-height: 1.65;
+  margin-bottom: 24px;
 }
-.ngo-about-split__text {
-  font-size: 1rem;
-  color: #475569;
-  line-height: 1.8;
-  margin-bottom: 28px;
-}
-.ngo-about-split__checks {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.ngo-about-split__check {
+
+.pro-ngo-bento-card__footer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.95rem;
-  color: #334155;
-  font-weight: 500;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid #F1F5F9;
+  margin-top: auto;
 }
-.ngo-about-split__check .fa-circle-check {
-  color: #27AE60;
-  font-size: 1.1rem;
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__footer {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.pro-ngo-bento-card__metric {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0072C6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__metric {
+  color: #FFD700;
+}
+
+.pro-ngo-bento-card__link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0F172A;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap 0.2s;
+}
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__link {
+  color: #FFFFFF;
+}
+
+.pro-ngo-bento-card__link:hover {
+  gap: 10px;
+  color: #0072C6;
+}
+
+.pro-ngo-bento-card--featured .pro-ngo-bento-card__link:hover {
+  color: #FFD700;
+}
+
+/* ── Operations & Media Center Split ── */
+.pro-ngo-operations {
+  padding: 90px 0;
+  background: #FFFFFF;
+}
+
+/* Featured Lead Story */
+.pro-ngo-lead-story {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+.pro-ngo-lead-story:hover {
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  border-color: #0072C6;
+}
+
+.pro-ngo-lead-story__img-wrap {
+  position: relative;
+  height: 290px;
+  overflow: hidden;
+}
+
+.pro-ngo-lead-story__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.pro-ngo-lead-story:hover .pro-ngo-lead-story__img {
+  transform: scale(1.04);
+}
+
+.pro-ngo-lead-story__body {
+  padding: 28px;
+}
+
+.pro-ngo-lead-story__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #64748B;
+  margin-bottom: 12px;
+}
+
+.pro-ngo-lead-story__title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.pro-ngo-lead-story__excerpt {
+  font-size: 0.92rem;
+  color: #475569;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+
+/* Secondary News Row */
+.pro-ngo-story-row {
+  display: flex;
+  gap: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  margin-bottom: 16px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.pro-ngo-story-row:hover {
+  background: #FFFFFF;
+  border-color: #0072C6;
+  box-shadow: 0 6px 20px rgba(0, 114, 198, 0.08);
+  transform: translateX(4px);
+}
+
+.pro-ngo-story-row__img {
+  width: 110px;
+  height: 85px;
+  border-radius: 8px;
+  object-fit: cover;
   flex-shrink: 0;
 }
 
-/* ── SPORTS ── */
-.ngo-sports {
-  padding: 100px 0;
-  background: #F8FAFC;
-}
-.ngo-sport-card {
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid #E2E8F0;
-  transition: box-shadow 0.25s, transform 0.25s;
-  background: #fff;
-}
-.ngo-sport-card:hover {
-  box-shadow: 0 12px 40px rgba(10,63,122,0.12);
-  transform: translateY(-4px);
-}
-.ngo-sport-card__img-wrap {
-  position: relative;
-  height: 160px;
-  overflow: hidden;
-}
-.ngo-sport-card__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s;
-}
-.ngo-sport-card:hover .ngo-sport-card__img {
-  transform: scale(1.06);
-}
-.ngo-sport-card__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 40%, rgba(10,40,80,0.3) 100%);
-}
-.ngo-sport-card__body {
-  padding: 16px 18px;
-}
-.ngo-sport-card__title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #0F172A;
-  margin-bottom: 6px;
-}
-.ngo-sport-card__cta {
-  font-size: 0.8rem;
-  color: #0072C6;
-  font-weight: 600;
+.pro-ngo-story-row__body {
+  flex: 1;
+  min-width: 0;
 }
 
-/* ── ATHLETES ── */
-.ngo-athletes {
-  padding: 100px 0;
-  background: #fff;
-}
-.ngo-athlete-card {
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid #E2E8F0;
-  background: #fff;
-  transition: box-shadow 0.25s, transform 0.25s;
-  height: 100%;
-}
-.ngo-athlete-card:hover {
-  box-shadow: 0 12px 40px rgba(10,63,122,0.12);
-  transform: translateY(-4px);
-}
-.ngo-athlete-card__img-wrap {
-  height: 220px;
-  overflow: hidden;
-}
-.ngo-athlete-card__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s;
-}
-.ngo-athlete-card:hover .ngo-athlete-card__img {
-  transform: scale(1.05);
-}
-.ngo-athlete-card__body {
-  padding: 20px;
-}
-.ngo-athlete-card__sport {
-  display: inline-block;
-  font-size: 0.72rem;
+.pro-ngo-story-row__title {
+  font-size: 0.98rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #0072C6;
-  margin-bottom: 6px;
-}
-.ngo-athlete-card__name {
-  font-size: 1.05rem;
-  font-weight: 800;
   color: #0F172A;
-  margin-bottom: 8px;
-}
-.ngo-athlete-card__desc {
-  font-size: 0.85rem;
-  color: #64748B;
-  line-height: 1.6;
-  margin-bottom: 0;
+  line-height: 1.35;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ── UPDATES (news + announcements + events) ── */
-.ngo-updates {
-  padding: 100px 0;
+.pro-ngo-story-row__date {
+  font-size: 0.78rem;
+  color: #64748B;
+}
+
+/* Official Gazette Register Card */
+.pro-ngo-gazette-panel {
   background: #F8FAFC;
-}
-.ngo-updates__all-link {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #0072C6;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.2s;
-}
-.ngo-updates__all-link:hover { color: #0a3f7a; }
-
-.ngo-news-list { display: flex; flex-direction: column; gap: 0; }
-.ngo-news-item {
-  display: flex;
-  gap: 18px;
-  padding: 20px 0;
-  border-bottom: 1px solid #E2E8F0;
-  transition: opacity 0.2s;
-}
-.ngo-news-item:hover { opacity: 0.82; }
-.ngo-news-item:first-child { padding-top: 0; }
-.ngo-news-item--featured { flex-direction: column; gap: 16px; padding-bottom: 24px; margin-bottom: 4px; }
-.ngo-news-item__img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; }
-.ngo-news-item__body { flex: 1; min-width: 0; }
-.ngo-news-item__cat {
-  display: inline-block; font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; color: #0072C6; margin-bottom: 6px;
-}
-.ngo-news-item__title {
-  font-size: 1rem; font-weight: 700; color: #0F172A; line-height: 1.4;
-  margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-.ngo-news-item--featured .ngo-news-item__title { font-size: 1.25rem; -webkit-line-clamp: 3; }
-.ngo-news-item__desc {
-  font-size: 0.85rem; color: #64748B; line-height: 1.6; margin-bottom: 10px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.ngo-news-item__meta { font-size: 0.78rem; color: #94A3B8; display: flex; align-items: center; }
-.ngo-news-item__read { color: #0072C6; font-weight: 700; }
-
-.ngo-notice-list { display: flex; flex-direction: column; gap: 2px; }
-.ngo-notice-item {
-  display: flex; align-items: flex-start; gap: 14px;
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
-  padding: 16px; transition: box-shadow 0.2s, transform 0.2s; margin-bottom: 10px;
-}
-.ngo-notice-item:hover { box-shadow: 0 4px 18px rgba(10,63,122,0.08); transform: translateX(4px); }
-.ngo-notice-item__icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  background: rgba(192,57,43,0.1); color: #C0392B;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.95rem; flex-shrink: 0;
-}
-.ngo-notice-item__badge {
-  display: inline-block; font-size: 0.64rem; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px;
-  border-radius: 4px; margin-bottom: 5px;
-  background: rgba(192,57,43,0.1); color: #C0392B;
-}
-.ngo-notice-item__title {
-  font-size: 0.88rem; font-weight: 600; color: #0F172A; line-height: 1.4;
-  margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-.ngo-notice-item__date { font-size: 0.75rem; color: #94A3B8; }
-
-.ngo-event-list { display: flex; flex-direction: column; gap: 10px; }
-.ngo-event-item {
-  display: flex; align-items: center; gap: 16px;
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
-  padding: 14px 16px; transition: box-shadow 0.2s;
-}
-.ngo-event-item:hover { box-shadow: 0 4px 18px rgba(10,63,122,0.08); }
-.ngo-event-item__date {
-  min-width: 48px; text-align: center;
-  background: var(--primary-blue); color: #fff;
-  border-radius: 10px; padding: 8px 6px; flex-shrink: 0;
-}
-.ngo-event-item__day { display: block; font-size: 1.4rem; font-weight: 900; line-height: 1; }
-.ngo-event-item__mon { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85; }
-.ngo-event-item__body { flex: 1; min-width: 0; }
-.ngo-event-item__title { font-size: 0.9rem; font-weight: 700; color: #0F172A; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ngo-event-item__loc { font-size: 0.75rem; color: #64748B; display: block; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ngo-event-item__status { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; }
-.ngo-event-item__status--upcoming { background: #DBEAFE; color: #1D4ED8; }
-.ngo-event-item__status--ongoing  { background: #DCFCE7; color: #16A34A; }
-.ngo-event-item__status--completed{ background: #F1F5F9; color: #64748B; }
-.ngo-event-item__status--cancelled{ background: #FEE2E2; color: #DC2626; }
-
-/* ── GOVERNANCE ── */
-.ngo-governance {
-  padding: 100px 0;
-  background: linear-gradient(135deg, #0a3f7a 0%, #0072C6 50%, #0a3f7a 100%);
-}
-.ngo-gov-card {
-  display: flex; align-items: center; gap: 16px;
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 14px; padding: 20px 22px; color: #fff;
-  transition: background 0.25s, transform 0.25s; backdrop-filter: blur(4px);
-}
-.ngo-gov-card:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
-.ngo-gov-card__icon { font-size: 1.5rem; color: var(--accent-yellow); flex-shrink: 0; width: 28px; text-align: center; }
-.ngo-gov-card__label { font-size: 0.95rem; font-weight: 700; line-height: 1.2; }
-.ngo-gov-card__sub { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
-.ngo-gov-card__arrow { margin-left: auto; font-size: 0.9rem; color: rgba(255,255,255,0.4); }
-
-/* ── PARTNERS ── */
-.ngo-partners {
-  padding: 60px 0;
-  background: #fff;
-  border-top: 1px solid #E2E8F0;
-  border-bottom: 1px solid #E2E8F0;
-}
-.ngo-partners__label {
-  text-align: center; font-size: 0.72rem; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase; color: #94A3B8; margin-bottom: 32px;
-}
-.ngo-partners__logos {
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 36px 48px;
-}
-.ngo-partners__logo-link {
-  display: flex; align-items: center; opacity: 0.6; transition: opacity 0.2s; filter: grayscale(1);
-}
-.ngo-partners__logo-link:hover { opacity: 1; filter: grayscale(0); }
-.ngo-partners__logo { max-height: 50px; max-width: 130px; object-fit: contain; }
-
-/* ── CTA ── */
-.ngo-cta {
-  position: relative;
-  background: url('/assets/img/curated/home-hero.jpg') center/cover no-repeat fixed;
-  padding: 120px 0;
-}
-.ngo-cta__overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(5,20,50,0.92) 0%, rgba(0,114,198,0.8) 100%);
-}
-.ngo-cta__body { position: relative; z-index: 1; color: #fff; }
-.ngo-cta__title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900;
-  color: #fff; line-height: 1.2; margin-bottom: 20px;
-}
-.ngo-cta__desc {
-  font-size: 1.05rem; color: rgba(255,255,255,0.8); line-height: 1.75; margin-bottom: 40px;
-}
-.ngo-cta__actions {
-  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-}
-
-/* ── Responsive ── */
-@media (max-width: 991px) {
-  .ngo-hero { min-height: 90vh; padding: 100px 0 60px; }
-  .ngo-about-split__badge { right: 12px; }
-  .ngo-pillars, .ngo-about-split, .ngo-sports, .ngo-athletes,
-  .ngo-updates, .ngo-governance { padding: 70px 0; }
-  .ngo-cta { padding: 80px 0; }
-}
-@media (max-width: 767px) {
-  .ngo-hero { min-height: 100svh; padding: 100px 16px 60px; background-attachment: scroll; }
-  .ngo-hero__actions { gap: 12px; }
-  .ngo-hero__actions .btn { width: 100%; max-width: 300px; }
-  .ngo-impact-bar__item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .ngo-about-split__badge { right: 8px; bottom: 8px; }
-  .ngo-cta { background-attachment: scroll; }
-  .ngo-cta__actions .btn { width: 100%; max-width: 300px; }
-  .ngo-gov-card__arrow { display: none; }
-}
-
-/* ── PARALYMPIC PATHWAY ── */
-.ngo-pathway {
-  padding: 100px 0;
-  background: #FFFFFF;
-  border-top: 1px solid #E2E8F0;
-}
-.ngo-pathway-card {
-  background: #F8FAFC;
+  border-radius: 18px;
   border: 1px solid #E2E8F0;
-  border-radius: 16px;
-  padding: 30px 24px;
-  height: 100%;
-  position: relative;
-  transition: all 0.25s ease;
-  display: flex;
-  flex-direction: column;
+  padding: 28px;
+  margin-bottom: 28px;
 }
-.ngo-pathway-card:hover {
-  transform: translateY(-5px);
-  background: #FFFFFF;
-  border-color: #0072C6;
-  box-shadow: 0 16px 36px rgba(0, 114, 198, 0.08);
-}
-.ngo-pathway-card__header {
+
+.pro-ngo-gazette-panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #E2E8F0;
 }
-.ngo-pathway-card__step {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: #0072C6;
-  letter-spacing: -0.5px;
-  opacity: 0.9;
-}
-.ngo-pathway-card__icon {
-  font-size: 1.6rem;
-  color: #0a3f7a;
-}
-.ngo-pathway-card__title {
-  font-size: 1.1rem;
+
+.pro-ngo-gazette-panel__title {
+  font-size: 1.05rem;
   font-weight: 800;
   color: #0F172A;
-  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.pro-ngo-gazette-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  margin-bottom: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pro-ngo-gazette-item:hover {
+  border-color: #DC2626;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.08);
+  transform: translateX(3px);
+}
+
+.pro-ngo-gazette-item__badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.pro-ngo-gazette-item__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1.35;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pro-ngo-gazette-item__date {
+  font-size: 0.74rem;
+  color: #64748B;
+}
+
+/* Fixtures / Matches Panel */
+.pro-ngo-fixtures-panel {
+  background: #0B1E38;
+  border-radius: 18px;
+  padding: 28px;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pro-ngo-fixtures-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pro-ngo-fixture-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pro-ngo-fixture-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFD700;
+  transform: translateX(3px);
+}
+
+.pro-ngo-fixture-date {
+  background: #0072C6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.pro-ngo-fixture-date__day {
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #FFFFFF;
+  display: block;
+}
+
+.pro-ngo-fixture-date__mon {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+}
+
+.pro-ngo-fixture-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pro-ngo-fixture-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pro-ngo-fixture-venue {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+}
+
+/* ── Athletes: Hall of Champions ── */
+.pro-ngo-champions {
+  padding: 90px 0;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.pro-ngo-athlete-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+  text-decoration: none;
+  display: block;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+}
+
+.pro-ngo-athlete-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(10, 37, 72, 0.12);
+  border-color: #0072C6;
+}
+
+.pro-ngo-athlete-card__img-box {
+  height: 270px;
+  overflow: hidden;
+  position: relative;
+  background: #06162C;
+}
+
+.pro-ngo-athlete-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.pro-ngo-athlete-card:hover .pro-ngo-athlete-card__img {
+  transform: scale(1.05);
+}
+
+.pro-ngo-athlete-card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(6, 22, 44, 0.9) 0%, transparent 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.pro-ngo-athlete-card__sport {
+  background: #0072C6;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.pro-ngo-athlete-card__body {
+  padding: 22px;
+}
+
+.pro-ngo-athlete-card__name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 6px;
   line-height: 1.3;
 }
-.ngo-pathway-card__actor {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #2e9e57;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 14px;
+
+.pro-ngo-athlete-card__accolade {
+  font-size: 0.84rem;
+  color: #64748B;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.ngo-pathway-card__desc {
-  font-size: 0.88rem;
+
+.pro-ngo-athlete-card__cta {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0072C6;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Governance & Fiduciary Transparency ── */
+.pro-ngo-governance {
+  padding: 95px 0;
+  background: #07162C;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.pro-ngo-governance::before {
+  content: '';
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 114, 198, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.pro-ngo-gov-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.pro-ngo-gov-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 28px 24px;
+  color: #FFFFFF;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.pro-ngo-gov-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFD700;
+  transform: translateY(-4px);
+}
+
+.pro-ngo-gov-card__icon {
+  font-size: 2rem;
+  color: #FFD700;
+  margin-bottom: 20px;
+}
+
+.pro-ngo-gov-card__title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.pro-ngo-gov-card__desc {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.pro-ngo-gov-card__action {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FFD700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Community Support & Targeted Giving ── */
+.pro-ngo-support {
+  padding: 95px 0;
+  background: #FFFFFF;
+}
+
+.pro-ngo-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 40px;
+}
+
+.pro-ngo-tier-card {
+  border-radius: 18px;
+  border: 1px solid #E2E8F0;
+  padding: 36px 30px;
+  background: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.pro-ngo-tier-card:hover {
+  background: #FFFFFF;
+  border-color: #0072C6;
+  box-shadow: 0 16px 36px rgba(0, 114, 198, 0.1);
+  transform: translateY(-4px);
+}
+
+.pro-ngo-tier-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(0, 114, 198, 0.1);
+  color: #0072C6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.pro-ngo-tier-card__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 10px;
+}
+
+.pro-ngo-tier-card__desc {
+  font-size: 0.92rem;
   color: #64748B;
   line-height: 1.6;
-  margin-bottom: 0;
+  margin-bottom: 26px;
 }
-@media (max-width: 991px) {
-  .ngo-pathway { padding: 70px 0; }
+
+.pro-ngo-tier-card__btn {
+  margin-top: auto;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
+
+.pro-ngo-tier-card__btn--primary {
+  background: #0072C6;
+  color: #FFFFFF;
+}
+
+.pro-ngo-tier-card__btn--primary:hover {
+  background: #005A9E;
+  color: #FFFFFF;
+}
+
+/* ── Partners & Corporate Donors ── */
+.pro-ngo-partners {
+  padding: 60px 0;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+}
+
+.pro-ngo-partners__title {
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #94A3B8;
+  margin-bottom: 30px;
+}
+
+.pro-ngo-partners__list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 36px 54px;
+}
+
+.pro-ngo-partners__logo-link {
+  filter: grayscale(100%);
+  opacity: 0.55;
+  transition: all 0.25s ease;
+  display: inline-block;
+}
+
+.pro-ngo-partners__logo-link:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.pro-ngo-partners__img {
+  max-height: 48px;
+  max-width: 130px;
+  object-fit: contain;
+}
+
+/* ── Responsive Overrides for Premier NGO ── */
+@media (max-width: 1024px) {
+  .pro-ngo-bento {
+    grid-template-columns: 1fr;
+  }
+  .pro-ngo-hero__kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pro-ngo-gov-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pro-ngo-tier-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pro-ngo-hero {
+    padding: 60px 0;
+  }
+  .pro-ngo-hero__showcase-img {
+    height: 360px;
+  }
+  .pro-ngo-hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pro-ngo-hero__actions .pro-ngo-btn-donate,
+  .pro-ngo-hero__actions .pro-ngo-btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+  .pro-ngo-gov-grid {
+    grid-template-columns: 1fr;
+  }
+  .pro-ngo-accreditation__grid {
+    gap: 16px;
+  }
+  .pro-ngo-accreditation__item {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

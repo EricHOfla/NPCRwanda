@@ -12,13 +12,18 @@ export default function HomeClient() {
 
   const getSiteText = (key: string, fallback: string) => siteContent[key] || fallback;
 
+  // Filter true news vs announcements
   const publishedNews = news.filter(
     a => a.status === 'Published' && !isAnnouncementCategory(a.category || '')
-  ).slice(0, 3);
+  );
 
   const publishedAnnouncements = news.filter(
     a => a.status === 'Published' && isAnnouncementCategory(a.category || '')
-  ).slice(0, 3);
+  );
+
+  const latestAnnouncement = publishedAnnouncements[0] || null;
+  const leadNews = publishedNews[0] || null;
+  const secondaryNews = publishedNews.slice(1, 3);
 
   const upcomingEvents = events
     .filter(e => e.status === 'Upcoming' || e.status === 'Ongoing')
@@ -28,439 +33,458 @@ export default function HomeClient() {
     <main id="main-content">
 
       {/* ═══════════════════════════════════════════════════════════
-          HERO — Full-bleed, mission-first
+          1. LIVE INSTITUTIONAL BULLETIN TICKER
       ═══════════════════════════════════════════════════════════ */}
-      <section
-        className="ngo-hero"
-        style={{ backgroundImage: `url('${getSiteText('hero.image', '/assets/img/curated/home-hero.jpg')}')` }}
-        aria-label="Hero section"
-      >
-        <div className="ngo-hero__overlay" />
-        <div className="container ngo-hero__body">
-          <div className="row justify-content-center text-center">
-            <div className="col-lg-9">
-              <span className="ngo-hero__kicker">
-                {getSiteText('hero.kicker', 'NPC RWANDA · COMITÉ NATIONAL PARALYMPIQUE')}
-              </span>
-              <h1 className="ngo-hero__title">
-                {getSiteText('hero.title1', 'Rwanda Paralympic.')}{' '}
-                <span className="ngo-hero__title--accent">
-                  {getSiteText('hero.title2', 'Stronger Together.')}
+      {latestAnnouncement && (
+        <aside className="pro-ngo-bulletin" aria-label="Official Announcement Bulletin">
+          <div className="pro-ngo-container">
+            <div className="pro-ngo-bulletin__inner">
+              <div className="pro-ngo-bulletin__content">
+                <span className="pro-ngo-bulletin__pulse" aria-hidden="true" />
+                <span className="pro-ngo-bulletin__badge">
+                  {latestAnnouncement.category || 'Official Gazette'}
                 </span>
-              </h1>
-              <p className="ngo-hero__lead">
-                {getSiteText(
-                  'hero.lead',
-                  'The National Paralympic Committee of Rwanda governs, develops and promotes para-sport nationwide — from grassroots DPSCO clubs in all 30 districts to the Paralympic Games on the world stage.'
-                )}
-              </p>
-              <div className="ngo-hero__actions">
-                <Link href="/about" className="btn btn-primary btn-lg px-5 fw-bold">
-                  {t('phrase.Our Mission')}
-                </Link>
-                <Link href="/donate" className="btn btn-warning btn-lg px-5 fw-bold">
-                  {t('phrase.Donate Now')}
-                </Link>
-                <Link href="/contact" className="btn btn-outline-light btn-lg px-5">
-                  {t('phrase.Partner With Us')}
-                </Link>
+                <span className="pro-ngo-bulletin__title">
+                  {t(latestAnnouncement.title)}
+                </span>
               </div>
+              <Link
+                href={`/announcements/${encodeURIComponent(latestAnnouncement.slug || latestAnnouncement.id)}`}
+                className="pro-ngo-bulletin__link"
+              >
+                <span>{t('phrase.Read Official Notice')}</span>
+                <i className="fas fa-arrow-right small" aria-hidden="true" />
+              </Link>
             </div>
           </div>
-        </div>
-        {/* Scroll cue */}
-        <a href="#impact" className="ngo-hero__scroll-cue" aria-label="Scroll down">
-          <i className="fas fa-chevron-down" />
-        </a>
-      </section>
+        </aside>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════
-          IMPACT NUMBERS — thin dark bar
+          2. HERO SECTION — EXECUTIVE ASYMMETRIC EDITORIAL
       ═══════════════════════════════════════════════════════════ */}
-      <section id="impact" className="ngo-impact-bar">
-        <div className="container">
-          <div className="row g-0 justify-content-center">
-            {[
-              { value: getSiteText('stats.athletes', '500+'),  label: t('phrase.Para-athletes Supported') },
-              { value: getSiteText('stats.districts', '30'),   label: t('phrase.Districts (DPSCO)') },
-              { value: getSiteText('stats.disciplines', '12+'), label: t('phrase.Sport Disciplines') },
-              { value: getSiteText('stats.founded', '2001'),   label: t('phrase.Year Established') },
-              { value: getSiteText('stats.clubs', '30+'),      label: t('phrase.Member Clubs') },
-            ].map(({ value, label }, i) => (
-              <div key={i} className="col-6 col-md-4 col-lg ngo-impact-bar__item">
-                <div className="ngo-impact-bar__value">{value}</div>
-                <div className="ngo-impact-bar__label">{label}</div>
+      <section className="pro-ngo-hero" aria-label="Executive Institutional Introduction">
+        <div className="pro-ngo-container">
+          <div className="row align-items-center g-5">
+            
+            {/* Left Column: Institutional Authority & Mandate */}
+            <div className="col-lg-7" data-aos="fade-right">
+              <div className="pro-ngo-hero__trust-badge">
+                <span className="badge bg-warning text-dark fw-bold px-2 py-1 rounded-pill" style={{ fontSize: '0.65rem' }}>
+                  RWANDA
+                </span>
+                <span>{getSiteText('hero.kicker', 'NATIONAL PARALYMPIC COMMITTEE · FOUNDED 2001')}</span>
               </div>
-            ))}
+
+              <h1 className="pro-ngo-hero__title">
+                {getSiteText('hero.title1', 'Empowering Rwandan Para-Athletes.')}{' '}
+                <span className="pro-ngo-hero__title-highlight">
+                  {getSiteText('hero.title2', 'Championing National Inclusion.')}
+                </span>
+              </h1>
+
+              <p className="pro-ngo-hero__lead">
+                {getSiteText(
+                  'hero.lead',
+                  'As Rwanda\'s apex governing body for para-sport, we scout grassroots talent across all 30 districts and forge world-class Paralympic champions. Ability, dignity, and national pride come first.'
+                )}
+              </p>
+
+              <div className="pro-ngo-hero__actions">
+                <Link href="/donate" className="pro-ngo-btn-donate">
+                  <i className="fas fa-heart text-danger" aria-hidden="true" />
+                  <span>{t('phrase.Support Athlete Fund')}</span>
+                </Link>
+
+                <Link href="/governance#strategic-plan" className="pro-ngo-btn-outline">
+                  <i className="fas fa-file-shield text-warning" aria-hidden="true" />
+                  <span>{t('phrase.Strategic Plan 2024–2028')}</span>
+                </Link>
+
+                <Link href="/sports" className="pro-ngo-btn-outline">
+                  <i className="fas fa-medal text-info" aria-hidden="true" />
+                  <span>{t('phrase.Our Sports')}</span>
+                </Link>
+              </div>
+
+              {/* Verified Institutional Indicators */}
+              <div className="pro-ngo-hero__kpis">
+                <div>
+                  <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.districts', '30/30')}</div>
+                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Districts (DPSCO)')}</div>
+                </div>
+                <div>
+                  <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.athletes', '500+')}</div>
+                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Registered Athletes')}</div>
+                </div>
+                <div>
+                  <div className="pro-ngo-hero__kpi-num">4×</div>
+                  <div className="pro-ngo-hero__kpi-label">{t('phrase.African Champions')}</div>
+                </div>
+                <div>
+                  <div className="pro-ngo-hero__kpi-num">{getSiteText('stats.disciplines', '12+')}</div>
+                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Sport Disciplines')}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Hero Visual Spotlight Card */}
+            <div className="col-lg-5" data-aos="zoom-in" data-aos-delay="100">
+              <div className="pro-ngo-hero__showcase">
+                <img
+                  src={getSiteText('hero.image', '/assets/img/curated/about-hero.jpg')}
+                  alt="Rwanda Women's Sitting Volleyball National Team"
+                  className="pro-ngo-hero__showcase-img"
+                />
+                <div className="pro-ngo-hero__showcase-gradient">
+                  <div className="pro-ngo-hero__badge-row">
+                    <span className="pro-ngo-tag pro-ngo-tag--gold">
+                      <i className="fas fa-trophy" aria-hidden="true" /> African Champions
+                    </span>
+                    <span className="pro-ngo-tag pro-ngo-tag--white">
+                      Paris 2024 Paralympians
+                    </span>
+                  </div>
+
+                  <h3 className="pro-ngo-hero__showcase-title">
+                    Women&apos;s National Sitting Volleyball Team
+                  </h3>
+
+                  <p className="pro-ngo-hero__showcase-desc">
+                    Four-time continental champions defending national prestige on the world stage and breaking disability barriers across Rwanda.
+                  </p>
+
+                  <Link href="/athletes" className="pro-ngo-hero__showcase-link">
+                    <span>{t('phrase.Meet the National Squad')}</span>
+                    <i className="fas fa-arrow-right" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          MISSION PILLARS — 3-column cards with icon
+          3. STATUTORY ACCREDITATION & GLOBAL AFFILIATIONS
       ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-pillars">
-        <div className="container">
-          <div className="ngo-section-header text-center mb-5">
-            <span className="ngo-eyebrow">What NPC Rwanda Does</span>
-            <h2 className="ngo-section-header__title">
-              {getSiteText('pillars.title', 'Our Paralympic Mandate')}
+      <section className="pro-ngo-accreditation" aria-label="Official Accreditations">
+        <div className="pro-ngo-container">
+          <div className="pro-ngo-accreditation__title">
+            {t('phrase.Officially Recognized & Affiliated With Global Sports Authorities')}
+          </div>
+          <div className="pro-ngo-accreditation__grid">
+            
+            <div className="pro-ngo-accreditation__item">
+              <div className="pro-ngo-accreditation__abbr">IPC</div>
+              <div>
+                <div className="pro-ngo-accreditation__name">International Paralympic Committee</div>
+                <span className="pro-ngo-accreditation__sub">Full Member Since 2001</span>
+              </div>
+            </div>
+
+            <div className="pro-ngo-accreditation__item">
+              <div className="pro-ngo-accreditation__abbr">MINISPORTS</div>
+              <div>
+                <div className="pro-ngo-accreditation__name">Ministry of Sports Rwanda</div>
+                <span className="pro-ngo-accreditation__sub">National Sports Federation</span>
+              </div>
+            </div>
+
+            <div className="pro-ngo-accreditation__item">
+              <div className="pro-ngo-accreditation__abbr">WPV</div>
+              <div>
+                <div className="pro-ngo-accreditation__name">World ParaVolley</div>
+                <span className="pro-ngo-accreditation__sub">Zone Africa Member</span>
+              </div>
+            </div>
+
+            <div className="pro-ngo-accreditation__item">
+              <div className="pro-ngo-accreditation__abbr">APC</div>
+              <div>
+                <div className="pro-ngo-accreditation__name">African Paralympic Committee</div>
+                <span className="pro-ngo-accreditation__sub">Continental Member</span>
+              </div>
+            </div>
+
+            <div className="pro-ngo-accreditation__item">
+              <div className="pro-ngo-accreditation__abbr">NUDOR</div>
+              <div>
+                <div className="pro-ngo-accreditation__name">Disability Organisations Union</div>
+                <span className="pro-ngo-accreditation__sub">National Civil Society Partner</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          4. STRATEGIC MISSION BENTO GRID
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="pro-ngo-pillars" aria-label="Core Strategic Pillars">
+        <div className="pro-ngo-container">
+          
+          <div className="pro-ngo-section-header pro-ngo-section-header--center" data-aos="fade-up">
+            <span className="pro-ngo-eyebrow">{t('phrase.Our Mandate & Strategy')}</span>
+            <h2 className="pro-ngo-heading">
+              {getSiteText('pillars.title', 'Four Pillars of Inclusive Impact')}
             </h2>
-            <p className="ngo-section-header__sub">
+            <p className="pro-ngo-subhead pro-ngo-subhead--center">
               {getSiteText(
                 'pillars.desc',
-                'As Rwanda\'s sole IPC-recognised national Paralympic body, NPC Rwanda is responsible for governing, developing and fielding national para-sport teams — from community level to the Paralympic Games.'
+                'We operate an end-to-end framework: from grassroots identification in rural sectors to medal podiums at the Paralympic Games.'
               )}
             </p>
           </div>
-          <div className="row g-4">
-            {[
-              {
-                icon: 'fa-id-card-clip',
-                title: getSiteText('pillar1.title', 'Athlete Classification & Registration'),
-                desc: getSiteText('pillar1.desc', 'NPC Rwanda oversees the formal classification of para-athletes according to IPC standards — ensuring every competitor is correctly assessed for their impairment class before competing nationally or internationally.'),
-                color: '#0072C6',
-              },
-              {
-                icon: 'fa-flag',
-                title: getSiteText('pillar2.title', 'National Team & Competition'),
-                desc: getSiteText('pillar2.desc', 'We select, prepare and send Rwanda\'s national para-sport teams to the Paralympic Games, African Para Games, Parapan African Games, and IPC World Championships.'),
-                color: '#E67E22',
-              },
-              {
-                icon: 'fa-sitemap',
-                title: getSiteText('pillar3.title', 'DPSCO Coordination (30 Districts)'),
-                desc: getSiteText('pillar3.desc', 'Through 30 District Paralympic Sports Committees (DPSCOs), NPC Rwanda reaches every corner of the country — identifying talent, registering athletes, and running local para-sport activities.'),
-                color: '#27AE60',
-              },
-              {
-                icon: 'fa-scale-balanced',
-                title: getSiteText('pillar4.title', 'Policy, Advocacy & Inclusion'),
-                desc: getSiteText('pillar4.desc', 'NPC Rwanda champions disability-inclusive sport policy, works with the government, federations, and schools to remove barriers, and ensures sports for persons with disabilities comply with Rwanda Vision 2050.'),
-                color: '#8E44AD',
-              },
-            ].map(({ icon, title, desc, color }, i) => (
-              <div key={i} className="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 80}`}>
-                <div className="ngo-pillar-card">
-                  <div className="ngo-pillar-card__icon" style={{ background: `${color}18`, color }}>
-                    <i className={`fas ${icon}`} aria-hidden="true" />
-                  </div>
-                  <h3 className="ngo-pillar-card__title">{title}</h3>
-                  <p className="ngo-pillar-card__desc">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ═══════════════════════════════════════════════════════════
-          ABOUT SPLIT — image left, text right
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-about-split">
-        <div className="container">
-          <div className="row align-items-center g-5">
-            <div className="col-lg-5" data-aos="fade-right">
-              <div className="ngo-about-split__img-wrap">
-                <img
-                  src={getSiteText('about.previewImage', '/assets/img/curated/about-hero.jpg')}
-                  alt="NPC Rwanda para-athletes competing"
-                  className="ngo-about-split__img"
-                />
-                <div className="ngo-about-split__badge">
-                  <i className="fas fa-medal" />
-                  <div>
-                    <div className="ngo-about-split__badge-val">IPC</div>
-                    <div className="ngo-about-split__badge-sub">Recognised NPC</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-7" data-aos="fade-left">
-              <span className="ngo-eyebrow">{getSiteText('about.eyebrow', 'About NPC Rwanda')}</span>
-              <h2 className="ngo-section-header__title mb-4">
-                {getSiteText('about.previewTitle', 'Rwanda\'s National Body for Paralympic Sport')}
-              </h2>
-              <p className="ngo-about-split__text">
-                {getSiteText(
-                  'about.previewText',
-                  'Founded in 2001 and recognised by the International Paralympic Committee (IPC), NPC Rwanda is the sole national authority responsible for the development, governance and promotion of para-sport in Rwanda. We work to ensure that persons with physical, visual and intellectual impairments have equal access to competitive and recreational sport — from local clubs to the Paralympic Games.'
-                )}
-              </p>
-              <div className="ngo-about-split__checks">
-                {[
-                  getSiteText('about.bullet1', 'IPC-recognised National Paralympic Committee since 2001'),
-                  getSiteText('about.bullet2', '30 District Paralympic Sports Committees (DPSCOs) nationwide'),
-                  getSiteText('about.bullet3', 'Member of World ParaVolley, Para Athletics & other IFs'),
-                  getSiteText('about.bullet4', 'Aligned with Rwanda Vision 2050 & NSC Strategic Plan'),
-                ].map((text, i) => (
-                  <div key={i} className="ngo-about-split__check">
-                    <i className="fas fa-circle-check" aria-hidden="true" />
-                    <span>{text}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="d-flex gap-3 flex-wrap mt-4">
-                <Link href="/about" className="btn btn-primary fw-bold px-4">
-                  Our Full Story
-                </Link>
-                <Link href="/governance" className="btn btn-outline-secondary fw-bold px-4">
-                  Governance & Leadership
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          <div className="pro-ngo-bento">
 
-      {/* ═══════════════════════════════════════════════════════════
-          PARALYMPIC LIFECYCLE / ATHLETE PATHWAY — What We Actually Do
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-pathway">
-        <div className="container">
-          <div className="ngo-section-header text-center mb-5">
-            <span className="ngo-eyebrow">The Para-Sport Ecosystem</span>
-            <h2 className="ngo-section-header__title">From Grassroots to Paralympic Podium</h2>
-            <p className="ngo-section-header__sub">
-              NPC Rwanda coordinates the full developmental pathway to ensure athletes with impairments are discovered, officially classified, and trained to compete at the highest levels.
-            </p>
-          </div>
-          <div className="row g-4">
-            {[
-              {
-                step: '01',
-                title: 'Community Scouting',
-                actor: 'DPSCOs (30 Districts)',
-                desc: 'Identifying talent among youth and adults with impairments across schools, health centers, and community cells.',
-                icon: 'fa-magnifying-glass-location'
-              },
-              {
-                step: '02',
-                title: 'Medical & Technical Classification',
-                actor: 'IPC Certified Classifiers',
-                desc: 'Official impairment assessment assigning eligible athletes to their sport classes (e.g. T46, F57, Sitting Volleyball VS1).',
-                icon: 'fa-notes-medical'
-              },
-              {
-                step: '03',
-                title: 'National Championships',
-                actor: 'National Para Federations & Clubs',
-                desc: 'Regular domestic leagues and national championship cups providing structured year-round competition across Rwanda.',
-                icon: 'fa-trophy'
-              },
-              {
-                step: '04',
-                title: 'Continental & Global Representation',
-                actor: 'Team Rwanda Paralympics',
-                desc: 'High-performance national squad preparation for African Para Games, World Championships, and the Paralympic Games.',
-                icon: 'fa-earth-africa'
-              }
-            ].map((item, idx) => (
-              <div key={idx} className="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${idx * 100}`}>
-                <div className="ngo-pathway-card">
-                  <div className="ngo-pathway-card__header">
-                    <span className="ngo-pathway-card__step">{item.step}</span>
-                    <i className={`fas ${item.icon} ngo-pathway-card__icon`} aria-hidden="true" />
-                  </div>
-                  <h3 className="ngo-pathway-card__title">{item.title}</h3>
-                  <div className="ngo-pathway-card__actor">
-                    <i className="fas fa-certificate me-1" />{item.actor}
-                  </div>
-                  <p className="ngo-pathway-card__desc">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-5">
-            <Link href="/members/dpsco" className="btn btn-outline-primary px-4 fw-bold me-3 mb-2 mb-md-0">
-              <i className="fas fa-sitemap me-2" /> Explore DPSCO District Network
-            </Link>
-            <Link href="/sports" className="btn btn-primary px-4 fw-bold">
-              <i className="fas fa-medal me-2" /> View Regulated Sports Disciplines
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SPORTS PROGRAMS — icon grid, compact
-      ═══════════════════════════════════════════════════════════ */}
-      {sports.length > 0 && (
-        <section className="ngo-sports">
-          <div className="container">
-            <div className="ngo-section-header text-center mb-5">
-              <span className="ngo-eyebrow">IPC-Recognised Para-Sports</span>
-              <h2 className="ngo-section-header__title">Disciplines We Govern</h2>
-              <p className="ngo-section-header__sub">
-                NPC Rwanda manages and develops these IPC-recognized para-sport disciplines across Rwanda — each with national athlete registration, DPSCO club networks, and pathways to international competition.
-              </p>
-            </div>
-            <div className="row g-4">
-              {sports.slice(0, 8).map((sport, i) => (
-                <div key={sport.id} className="col-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 60}`}>
-                  <Link href={`/sports#${sport.id}`} className="text-decoration-none">
-                    <div className="ngo-sport-card">
-                      <div className="ngo-sport-card__img-wrap">
-                        <img
-                          src={sport.img.startsWith('http') || sport.img.startsWith('/') ? sport.img : `/assets/img/curated/${sport.img}`}
-                          alt={t(sport.title)}
-                          className="ngo-sport-card__img"
-                        />
-                        <div className="ngo-sport-card__overlay" />
-                      </div>
-                      <div className="ngo-sport-card__body">
-                        <h3 className="ngo-sport-card__title">{t(sport.title)}</h3>
-                        <span className="ngo-sport-card__cta">
-                          {t('phrase.Learn More')} <i className="fas fa-arrow-right ms-1" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
-            {sports.length > 8 && (
-              <div className="text-center mt-5">
-                <Link href="/sports" className="btn btn-outline-primary px-5 fw-bold">
-                  {t('phrase.All Sports')} <i className="fas fa-arrow-right ms-2" />
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════
-          ATHLETES SPOTLIGHT — horizontal scroll cards
-      ═══════════════════════════════════════════════════════════ */}
-      {athletes.length > 0 && (
-        <section className="ngo-athletes">
-          <div className="container">
-            <div className="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+            {/* Pillar 1: High Performance (Wide, Featured) */}
+            <div className="pro-ngo-bento-card pro-ngo-bento-card--featured" style={{ gridColumn: 'span 7' }} data-aos="fade-up">
               <div>
-                <span className="ngo-eyebrow">Rwanda National Para-Sport Team</span>
-                <h2 className="ngo-section-header__title mb-0">Our Registered Athletes</h2>
+                <div className="pro-ngo-bento-card__icon-box" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#FFD700' }}>
+                  <i className="fas fa-trophy" aria-hidden="true" />
+                </div>
+                <span className="pro-ngo-tag pro-ngo-tag--gold mb-3">
+                  Continental & Global Podiums
+                </span>
+                <h3 className="pro-ngo-bento-card__title">
+                  {getSiteText('pillar1.title', 'Elite Pathway & High Performance')}
+                </h3>
+                <p className="pro-ngo-bento-card__desc">
+                  Providing national team squads with world-class coaching, scientific conditioning, international training tours, and competitive exposure. Preparing athletes for the African Para Games and the Paralympic Games.
+                </p>
               </div>
-              <Link href="/athletes" className="btn btn-outline-primary fw-bold">
-                Full Athlete Registry <i className="fas fa-arrow-right ms-2" />
-              </Link>
+              <div className="pro-ngo-bento-card__footer">
+                <span className="pro-ngo-bento-card__metric">
+                  <i className="fas fa-check-circle" aria-hidden="true" /> 12+ Official Para-Sports Sanctioned
+                </span>
+                <Link href="/sports" className="pro-ngo-bento-card__link">
+                  <span>{t('phrase.View Sports Programs')}</span>
+                  <i className="fas fa-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
-            <div className="row g-4">
-              {athletes.slice(0, 4).map((a, i) => {
-                const anchor = a.name.toLowerCase().split(' ').pop();
-                return (
-                  <div key={a.id} className="col-sm-6 col-lg-3" data-aos="zoom-in" data-aos-delay={`${i * 80}`}>
-                    <Link href={`/athletes#${anchor}`} className="text-decoration-none">
-                      <div className="ngo-athlete-card">
-                        <div className="ngo-athlete-card__img-wrap">
-                          <img
-                            src={a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`}
-                            alt={`${a.name} — ${a.sport}`}
-                            className="ngo-athlete-card__img"
-                            onError={e => { (e.target as HTMLImageElement).src = '/assets/img/avatar-1.svg'; }}
-                          />
-                        </div>
-                        <div className="ngo-athlete-card__body">
-                          <span className="ngo-athlete-card__sport">{t(a.sport)}</span>
-                          <h3 className="ngo-athlete-card__name">{a.name}</h3>
-                          <p className="ngo-athlete-card__desc">{t(a.desc)}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                );
-              })}
+
+            {/* Pillar 2: Grassroots Scouting DPSCO */}
+            <div className="pro-ngo-bento-card" style={{ gridColumn: 'span 5' }} data-aos="fade-up" data-aos-delay="100">
+              <div>
+                <div className="pro-ngo-bento-card__icon-box" style={{ background: 'rgba(0, 114, 198, 0.1)', color: '#0072C6' }}>
+                  <i className="fas fa-map-location-dot" aria-hidden="true" />
+                </div>
+                <span className="pro-ngo-tag pro-ngo-tag--blue mb-3">
+                  All 30 Districts (DPSCO)
+                </span>
+                <h3 className="pro-ngo-bento-card__title">
+                  {getSiteText('pillar2.title', 'Grassroots Talent Scouting')}
+                </h3>
+                <p className="pro-ngo-bento-card__desc">
+                  Active District Paralympic Sports Committees (DPSCO) discovering and nurturing raw athletic potential in schools and community centers across every sector of Rwanda.
+                </p>
+              </div>
+              <div className="pro-ngo-bento-card__footer">
+                <span className="pro-ngo-bento-card__metric">
+                  <i className="fas fa-shield-halved" aria-hidden="true" /> 100% District Coverage
+                </span>
+                <Link href="/members/dpsco" className="pro-ngo-bento-card__link">
+                  <span>{t('phrase.Explore DPSCO')}</span>
+                  <i className="fas fa-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
+
+            {/* Pillar 3: Medical Classification & Welfare */}
+            <div className="pro-ngo-bento-card" style={{ gridColumn: 'span 6' }} data-aos="fade-up" data-aos-delay="150">
+              <div>
+                <div className="pro-ngo-bento-card__icon-box" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
+                  <i className="fas fa-heart-pulse" aria-hidden="true" />
+                </div>
+                <span className="pro-ngo-tag pro-ngo-tag--blue mb-3">
+                  IPC Certified Fair Play
+                </span>
+                <h3 className="pro-ngo-bento-card__title">
+                  {getSiteText('pillar3.title', 'Functional Classification & Welfare')}
+                </h3>
+                <p className="pro-ngo-bento-card__desc">
+                  Ensuring fair competition through international functional classification panels, athlete safeguarding protocols, mental health services, and anti-doping education.
+                </p>
+              </div>
+              <div className="pro-ngo-bento-card__footer">
+                <span className="pro-ngo-bento-card__metric">
+                  <i className="fas fa-certificate" aria-hidden="true" /> IPC Code of Ethics
+                </span>
+                <Link href="/about" className="pro-ngo-bento-card__link">
+                  <span>{t('phrase.Learn More')}</span>
+                  <i className="fas fa-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Pillar 4: Gender Equality & Advocacy */}
+            <div className="pro-ngo-bento-card" style={{ gridColumn: 'span 6' }} data-aos="fade-up" data-aos-delay="200">
+              <div>
+                <div className="pro-ngo-bento-card__icon-box" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8B5CF6' }}>
+                  <i className="fas fa-venus-mars" aria-hidden="true" />
+                </div>
+                <span className="pro-ngo-tag pro-ngo-tag--blue mb-3">
+                  Inclusion & Dignity
+                </span>
+                <h3 className="pro-ngo-bento-card__title">
+                  {getSiteText('pillar4.title', 'Gender Equity & Community Advocacy')}
+                </h3>
+                <p className="pro-ngo-bento-card__desc">
+                  Challenging stigma and cultural misconceptions around disability. Championing equal leadership, female coach development, and inclusive participation across Rwandan society.
+                </p>
+              </div>
+              <div className="pro-ngo-bento-card__footer">
+                <span className="pro-ngo-bento-card__metric">
+                  <i className="fas fa-users" aria-hidden="true" /> Over 40% Female Athletes
+                </span>
+                <Link href="/about" className="pro-ngo-bento-card__link">
+                  <span>{t('phrase.Read Full Mission')}</span>
+                  <i className="fas fa-arrow-right" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          NEWS + ANNOUNCEMENTS — two-column split
+          5. OPERATIONS & MEDIA CENTER (NEWS + GAZETTE + FIXTURES)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-updates">
-        <div className="container">
+      <section className="pro-ngo-operations" aria-label="News and Official Announcements">
+        <div className="pro-ngo-container">
+          
           <div className="row g-5">
-            {/* News column */}
-            <div className="col-lg-7">
+
+            {/* Left Channel: Field Dispatches & News Feed */}
+            <div className="col-lg-7" data-aos="fade-up">
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <div>
-                  <span className="ngo-eyebrow">{t('phrase.Stay Updated')}</span>
-                  <h2 className="ngo-section-header__title mb-0">{t('phrase.Latest News')}</h2>
+                  <span className="pro-ngo-eyebrow">{t('phrase.Field Reports & Press')}</span>
+                  <h2 className="pro-ngo-heading mb-0" style={{ fontSize: '1.65rem' }}>
+                    {t('phrase.Latest News & Updates')}
+                  </h2>
                 </div>
-                <Link href="/news" className="ngo-updates__all-link">
-                  {t('phrase.All News')} <i className="fas fa-arrow-right ms-1" />
+                <Link href="/news" className="btn btn-outline-primary btn-sm fw-bold px-3">
+                  {t('phrase.All News')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
                 </Link>
               </div>
-              {publishedNews.length === 0 ? (
-                <p className="text-muted">{t('phrase.No published news available.')}</p>
-              ) : (
-                <div className="ngo-news-list">
-                  {publishedNews.map((article, i) => (
-                    <Link key={article.slug} href={`/news/${encodeURIComponent(article.slug || article.id)}`} className="text-decoration-none">
-                      <div className={`ngo-news-item ${i === 0 ? 'ngo-news-item--featured' : ''}`}>
-                        {i === 0 && (
-                          <div className="ngo-news-item__img-wrap">
-                            <img
-                              src={article.img.startsWith('http') || article.img.startsWith('/') ? article.img : `/assets/img/curated/${article.img}`}
-                              alt={t(article.title)}
-                              className="ngo-news-item__img"
-                            />
-                          </div>
-                        )}
-                        <div className="ngo-news-item__body">
-                          <span className="ngo-news-item__cat">{article.category || 'News'}</span>
-                          <h3 className="ngo-news-item__title">{t(article.title)}</h3>
-                          <p className="ngo-news-item__desc">{t(article.desc)}</p>
-                          <div className="ngo-news-item__meta">
-                            <i className="fas fa-calendar-alt me-1" />
-                            {article.date}
-                            <span className="ngo-news-item__read ms-3">
-                              {t('phrase.Read More')} <i className="fas fa-arrow-right ms-1" />
-                            </span>
-                          </div>
+
+              {leadNews ? (
+                <div>
+                  {/* Lead Featured Article */}
+                  <div className="pro-ngo-lead-story">
+                    <div className="pro-ngo-lead-story__img-wrap">
+                      <img
+                        src={leadNews.img.startsWith('http') || leadNews.img.startsWith('/') ? leadNews.img : `/assets/img/curated/${leadNews.img}`}
+                        alt={t(leadNews.title)}
+                        className="pro-ngo-lead-story__img"
+                      />
+                    </div>
+                    <div className="pro-ngo-lead-story__body">
+                      <div className="pro-ngo-lead-story__meta">
+                        <span className="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1">
+                          {leadNews.category || 'News'}
+                        </span>
+                        <span>
+                          <i className="fas fa-calendar-alt me-1 text-muted" aria-hidden="true" />
+                          {leadNews.date}
+                        </span>
+                        <span className="text-muted">
+                          <i className="fas fa-building-columns me-1" aria-hidden="true" />
+                          NPC Communications
+                        </span>
+                      </div>
+
+                      <h3 className="pro-ngo-lead-story__title">
+                        <Link href={`/news/${encodeURIComponent(leadNews.slug || leadNews.id)}`} className="text-dark text-decoration-none">
+                          {t(leadNews.title)}
+                        </Link>
+                      </h3>
+
+                      <p className="pro-ngo-lead-story__excerpt">
+                        {t(leadNews.desc)}
+                      </p>
+
+                      <Link
+                        href={`/news/${encodeURIComponent(leadNews.slug || leadNews.id)}`}
+                        className="btn btn-primary btn-sm fw-bold px-4"
+                      >
+                        <span>{t('phrase.Read Full Story')}</span>
+                        <i className="fas fa-arrow-right ms-2" aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Secondary News Stories */}
+                  {secondaryNews.map(story => (
+                    <Link
+                      key={story.slug}
+                      href={`/news/${encodeURIComponent(story.slug || story.id)}`}
+                      className="pro-ngo-story-row"
+                    >
+                      <img
+                        src={story.img.startsWith('http') || story.img.startsWith('/') ? story.img : `/assets/img/curated/${story.img}`}
+                        alt={t(story.title)}
+                        className="pro-ngo-story-row__img"
+                      />
+                      <div className="pro-ngo-story-row__body">
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                          <span className="badge bg-light text-secondary border px-2 py-0" style={{ fontSize: '0.65rem' }}>
+                            {story.category || 'Update'}
+                          </span>
+                          <span className="pro-ngo-story-row__date">{story.date}</span>
                         </div>
+                        <h4 className="pro-ngo-story-row__title">{t(story.title)}</h4>
                       </div>
                     </Link>
                   ))}
                 </div>
+              ) : (
+                <p className="text-muted">{t('phrase.No published news available.')}</p>
               )}
             </div>
 
-            {/* Announcements + Events sidebar */}
-            <div className="col-lg-5">
-              {/* Official Notices */}
-              <div className="mb-5">
-                <div className="d-flex align-items-center justify-content-between mb-4">
-                  <div>
-                    <span className="ngo-eyebrow">{t('phrase.Official')}</span>
-                    <h2 className="ngo-section-header__title mb-0" style={{ fontSize: '1.3rem' }}>
-                      {t('phrase.Announcements')}
-                    </h2>
-                  </div>
-                  <Link href="/announcements" className="ngo-updates__all-link">
-                    {t('phrase.View All')} <i className="fas fa-arrow-right ms-1" />
+            {/* Right Channel: Official Gazette & Fixtures Calendar */}
+            <div className="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+              
+              {/* Panel 1: Official Gazette & Communiqués */}
+              <div className="pro-ngo-gazette-panel">
+                <div className="pro-ngo-gazette-panel__header">
+                  <h3 className="pro-ngo-gazette-panel__title">
+                    <i className="fas fa-stamp text-danger" aria-hidden="true" />
+                    <span>{t('phrase.Official Gazette & Communiqués')}</span>
+                  </h3>
+                  <Link href="/announcements" className="text-primary fw-bold text-decoration-none small">
+                    {t('phrase.Register')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
                   </Link>
                 </div>
+
                 {publishedAnnouncements.length === 0 ? (
-                  <p className="text-muted small">{t('phrase.No announcements available.')}</p>
+                  <p className="text-muted small mb-0">{t('phrase.No official notices published.')}</p>
                 ) : (
-                  <div className="ngo-notice-list">
-                    {publishedAnnouncements.map(a => (
-                      <Link key={a.slug} href={`/announcements/${encodeURIComponent(a.slug || a.id)}`} className="text-decoration-none">
-                        <div className="ngo-notice-item">
-                          <div className="ngo-notice-item__icon">
-                            <i className="fas fa-bullhorn" />
-                          </div>
-                          <div>
-                            <span className={`ngo-notice-item__badge ngo-notice-item__badge--${(a.category || 'announcement').toLowerCase().replace(/\s+/g, '-')}`}>
-                              {a.category || 'Announcement'}
-                            </span>
-                            <p className="ngo-notice-item__title">{t(a.title)}</p>
-                            <span className="ngo-notice-item__date">
-                              <i className="fas fa-calendar-alt me-1" />{a.date}
-                            </span>
-                          </div>
+                  <div>
+                    {publishedAnnouncements.slice(0, 3).map(notice => (
+                      <Link
+                        key={notice.slug}
+                        href={`/announcements/${encodeURIComponent(notice.slug || notice.id)}`}
+                        className="pro-ngo-gazette-item"
+                      >
+                        <i className="fas fa-scroll text-danger mt-1" aria-hidden="true" />
+                        <div>
+                          <span className="pro-ngo-gazette-item__badge">
+                            {notice.category || 'Official Circular'}
+                          </span>
+                          <h4 className="pro-ngo-gazette-item__title">{t(notice.title)}</h4>
+                          <span className="pro-ngo-gazette-item__date">
+                            <i className="fas fa-calendar-check me-1" aria-hidden="true" />
+                            {notice.date}
+                          </span>
                         </div>
                       </Link>
                     ))}
@@ -468,112 +492,292 @@ export default function HomeClient() {
                 )}
               </div>
 
-              {/* Upcoming Events */}
-              {upcomingEvents.length > 0 && (
-                <div>
-                  <div className="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                      <span className="ngo-eyebrow">{t('phrase.Calendar')}</span>
-                      <h2 className="ngo-section-header__title mb-0" style={{ fontSize: '1.3rem' }}>
-                        {t('phrase.Upcoming Events')}
-                      </h2>
-                    </div>
-                    <Link href="/events" className="ngo-updates__all-link">
-                      {t('phrase.View All')} <i className="fas fa-arrow-right ms-1" />
-                    </Link>
-                  </div>
-                  <div className="ngo-event-list">
-                    {upcomingEvents.map(ev => {
-                      const d = ev.date ? new Date(ev.date) : null;
+              {/* Panel 2: Competition Fixtures & Calendar */}
+              <div className="pro-ngo-fixtures-panel">
+                <div className="pro-ngo-fixtures-panel__header">
+                  <h3 className="h6 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                    <i className="fas fa-calendar-days text-warning" aria-hidden="true" />
+                    <span>{t('phrase.Upcoming Competitions')}</span>
+                  </h3>
+                  <Link href="/events" className="text-warning fw-bold text-decoration-none small">
+                    {t('phrase.View All')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                  </Link>
+                </div>
+
+                {upcomingEvents.length === 0 ? (
+                  <p className="text-white-50 small mb-0">{t('phrase.No upcoming fixtures scheduled.')}</p>
+                ) : (
+                  <div>
+                    {upcomingEvents.map(event => {
+                      const d = event.date ? new Date(event.date) : null;
                       return (
-                        <Link key={ev.id} href="/events" className="text-decoration-none">
-                          <div className="ngo-event-item">
-                            {d && (
-                              <div className="ngo-event-item__date">
-                                <span className="ngo-event-item__day">{d.getDate()}</span>
-                                <span className="ngo-event-item__mon">{d.toLocaleString('en-US', { month: 'short' })}</span>
-                              </div>
-                            )}
-                            <div className="ngo-event-item__body">
-                              <h4 className="ngo-event-item__title">{ev.title}</h4>
-                              <span className="ngo-event-item__loc">
-                                <i className="fas fa-location-dot me-1" />{ev.location}
-                              </span>
-                              <span className={`ngo-event-item__status ngo-event-item__status--${ev.status.toLowerCase()}`}>
-                                {ev.status}
-                              </span>
-                            </div>
+                        <Link key={event.id} href="/events" className="pro-ngo-fixture-card">
+                          <div className="pro-ngo-fixture-date">
+                            <span className="pro-ngo-fixture-date__day">
+                              {d ? d.getDate() : '—'}
+                            </span>
+                            <span className="pro-ngo-fixture-date__mon">
+                              {d ? d.toLocaleString('en-US', { month: 'short' }) : 'DATE'}
+                            </span>
+                          </div>
+                          <div className="pro-ngo-fixture-body">
+                            <h4 className="pro-ngo-fixture-title">{event.title}</h4>
+                            <span className="pro-ngo-fixture-venue">
+                              <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
+                              {event.location} · {event.category}
+                            </span>
                           </div>
                         </Link>
                       );
                     })}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
             </div>
+
           </div>
+
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          GOVERNANCE — accountability strip
+          6. HALL OF CHAMPIONS (ATHLETES SPOTLIGHT)
       ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-governance">
-        <div className="container">
-          <div className="row align-items-center g-5">
-            <div className="col-lg-4">
-              <span className="ngo-eyebrow ngo-eyebrow--light">NPC Rwanda Governance</span>
-              <h2 className="ngo-section-header__title" style={{ color: '#fff' }}>
-                Accountable. Transparent. IPC-Compliant.
-              </h2>
-              <p style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
-                NPC Rwanda operates under its IPC-approved Constitution, overseen by an elected Executive Committee and accountable to the Annual General Assembly (AGA), the Rwanda National Sports Council (NSC), and the International Paralympic Committee.
-              </p>
-              <Link href="/governance" className="btn btn-warning fw-bold px-4 mt-2">
-                View Governance Structure <i className="fas fa-arrow-right ms-2" />
+      {athletes.length > 0 && (
+        <section className="pro-ngo-champions" aria-label="Featured Para-Athletes">
+          <div className="pro-ngo-container">
+            
+            <div className="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3" data-aos="fade-up">
+              <div>
+                <span className="pro-ngo-eyebrow">{t('phrase.National Pride & Inspiration')}</span>
+                <h2 className="pro-ngo-heading mb-0">
+                  {t('phrase.The Hall of Champions')}
+                </h2>
+              </div>
+              <Link href="/athletes" className="btn btn-outline-primary fw-bold px-4">
+                {t('phrase.View All Athletes')} <i className="fas fa-arrow-right ms-2" aria-hidden="true" />
               </Link>
             </div>
-            <div className="col-lg-8">
-              <div className="row g-3">
-                {[
-                  { icon: 'fa-users-gear',     label: 'Executive Committee',    sub: 'President, VP & Board Members',  anchor: 'board' },
-                  { icon: 'fa-file-invoice',   label: 'Annual Reports',         sub: 'Activity & financial reports',   anchor: 'reports' },
-                  { icon: 'fa-scale-balanced', label: 'NPC Constitution & Rules', sub: 'Statutes & regulations',       anchor: 'policies' },
-                  { icon: 'fa-chess-knight',   label: 'Strategic Plan',         sub: 'Vision for Paris 2024 & LA 2028', anchor: 'strategic-plan' },
-                ].map(({ icon, label, sub, anchor }, i) => (
-                  <div key={anchor} className="col-sm-6" data-aos="fade-up" data-aos-delay={`${i * 80}`}>
-                    <Link href={`/governance#${anchor}`} className="text-decoration-none">
-                      <div className="ngo-gov-card">
-                        <i className={`fas ${icon} ngo-gov-card__icon`} aria-hidden="true" />
-                        <div>
-                          <div className="ngo-gov-card__label">{label}</div>
-                          <div className="ngo-gov-card__sub">{sub}</div>
+
+            <div className="row g-4">
+              {athletes.slice(0, 4).map((athlete, i) => {
+                const anchor = athlete.name.toLowerCase().split(' ').pop();
+                return (
+                  <div key={athlete.id} className="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 80}`}>
+                    <Link href={`/athletes#${anchor}`} className="pro-ngo-athlete-card">
+                      <div className="pro-ngo-athlete-card__img-box">
+                        <img
+                          src={athlete.avatar.startsWith('http') || athlete.avatar.startsWith('/') ? athlete.avatar : `/assets/img/${athlete.avatar}`}
+                          alt={athlete.name}
+                          className="pro-ngo-athlete-card__img"
+                          onError={e => { (e.target as HTMLImageElement).src = '/assets/img/avatar-1.svg'; }}
+                        />
+                        <div className="pro-ngo-athlete-card__overlay">
+                          <span className="pro-ngo-athlete-card__sport">
+                            {t(athlete.sport)}
+                          </span>
                         </div>
-                        <i className="fas fa-arrow-right ngo-gov-card__arrow" />
+                      </div>
+
+                      <div className="pro-ngo-athlete-card__body">
+                        <h3 className="pro-ngo-athlete-card__name">{athlete.name}</h3>
+                        <p className="pro-ngo-athlete-card__accolade">{t(athlete.desc)}</p>
+                        <span className="pro-ngo-athlete-card__cta">
+                          <span>{t('phrase.Biography & Records')}</span>
+                          <i className="fas fa-arrow-right" aria-hidden="true" />
+                        </span>
                       </div>
                     </Link>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          7. FIDUCIARY INTEGRITY & OPEN GOVERNANCE
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="pro-ngo-governance" aria-label="Governance and Transparency">
+        <div className="pro-ngo-container">
+          
+          <div className="row align-items-center g-5">
+            <div className="col-lg-6" data-aos="fade-right">
+              <span className="pro-ngo-eyebrow text-warning">
+                {t('phrase.Public Trust & Accountability')}
+              </span>
+              <h2 className="pro-ngo-heading pro-ngo-heading--white">
+                {t('phrase.Open Governance & Statutory Integrity')}
+              </h2>
+              <p className="pro-ngo-subhead pro-ngo-subhead--white">
+                {t('phrase.As an accredited non-governmental sports entity, NPC Rwanda adheres to strict public financial audits, democratic elections, and the International Paralympic Committee Code of Ethics.')}
+              </p>
+            </div>
+            <div className="col-lg-6 text-lg-end" data-aos="fade-left">
+              <Link href="/governance" className="btn btn-warning btn-lg fw-bold px-4">
+                <i className="fas fa-scale-balanced me-2" aria-hidden="true" />
+                {t('phrase.Visit Governance Portal')}
+              </Link>
             </div>
           </div>
+
+          <div className="pro-ngo-gov-grid">
+            
+            <Link href="/governance#policies" className="pro-ngo-gov-card" data-aos="zoom-in" data-aos-delay="50">
+              <i className="fas fa-book-bookmark pro-ngo-gov-card__icon" aria-hidden="true" />
+              <div>
+                <h3 className="pro-ngo-gov-card__title">{t('phrase.NPC Constitution')}</h3>
+                <p className="pro-ngo-gov-card__desc">
+                  Statutes and bylaws governing the National Paralympic Committee of Rwanda.
+                </p>
+              </div>
+              <span className="pro-ngo-gov-card__action">
+                <span>{t('phrase.View Legal Framework')}</span>
+                <i className="fas fa-arrow-right" aria-hidden="true" />
+              </span>
+            </Link>
+
+            <Link href="/governance#reports" className="pro-ngo-gov-card" data-aos="zoom-in" data-aos-delay="100">
+              <i className="fas fa-file-invoice-dollar pro-ngo-gov-card__icon" aria-hidden="true" />
+              <div>
+                <h3 className="pro-ngo-gov-card__title">{t('phrase.Audited Reports')}</h3>
+                <p className="pro-ngo-gov-card__desc">
+                  Independent annual financial statements and fiscal year activity audits.
+                </p>
+              </div>
+              <span className="pro-ngo-gov-card__action">
+                <span>{t('phrase.View Annual Audits')}</span>
+                <i className="fas fa-arrow-right" aria-hidden="true" />
+              </span>
+            </Link>
+
+            <Link href="/governance#strategic-plan" className="pro-ngo-gov-card" data-aos="zoom-in" data-aos-delay="150">
+              <i className="fas fa-compass-drafting pro-ngo-gov-card__icon" aria-hidden="true" />
+              <div>
+                <h3 className="pro-ngo-gov-card__title">{t('phrase.Strategic Plan')}</h3>
+                <p className="pro-ngo-gov-card__desc">
+                  Five-year developmental roadmap for para-sports growth across Rwanda (2024–2028).
+                </p>
+              </div>
+              <span className="pro-ngo-gov-card__action">
+                <span>{t('phrase.Read Strategy')}</span>
+                <i className="fas fa-arrow-right" aria-hidden="true" />
+              </span>
+            </Link>
+
+            <Link href="/resources" className="pro-ngo-gov-card" data-aos="zoom-in" data-aos-delay="200">
+              <i className="fas fa-shield-virus pro-ngo-gov-card__icon" aria-hidden="true" />
+              <div>
+                <h3 className="pro-ngo-gov-card__title">{t('phrase.Athlete Safeguarding')}</h3>
+                <p className="pro-ngo-gov-card__desc">
+                  Zero tolerance protection code, medical rights, and anti-doping regulations.
+                </p>
+              </div>
+              <span className="pro-ngo-gov-card__action">
+                <span>{t('phrase.Compliance Codes')}</span>
+                <i className="fas fa-arrow-right" aria-hidden="true" />
+              </span>
+            </Link>
+
+          </div>
+
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          PARTNERS LOGOS
+          8. TARGETED COMMUNITY SUPPORT & GIVING TIERS
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="pro-ngo-support" aria-label="Support Our Mission">
+        <div className="pro-ngo-container">
+          
+          <div className="pro-ngo-section-header pro-ngo-section-header--center" data-aos="fade-up">
+            <span className="pro-ngo-eyebrow">{t('phrase.Make a Direct Impact')}</span>
+            <h2 className="pro-ngo-heading">
+              {getSiteText('cta.title', 'Invest in Rwandan Para-Sports Excellence')}
+            </h2>
+            <p className="pro-ngo-subhead pro-ngo-subhead--center">
+              {getSiteText(
+                'cta.desc',
+                'Your support directly funds life-changing equipment, grassroots district tournaments, and high-performance training for athletes with disabilities.'
+              )}
+            </p>
+          </div>
+
+          <div className="pro-ngo-tier-grid">
+            
+            {/* Tier 1: Para-Equipment */}
+            <div className="pro-ngo-tier-card" data-aos="fade-up">
+              <div className="pro-ngo-tier-card__icon">
+                <i className="fas fa-wheelchair" aria-hidden="true" />
+              </div>
+              <h3 className="pro-ngo-tier-card__title">Adaptive Sports Equipment</h3>
+              <p className="pro-ngo-tier-card__desc">
+                Provide specialized racing wheelchairs, sitting volleyball regulation balls, throwing frames, and guide runners gear for aspiring athletes.
+              </p>
+              <Link href="/donate" className="pro-ngo-tier-card__btn pro-ngo-tier-card__btn--primary">
+                {t('phrase.Fund Equipment')}
+              </Link>
+            </div>
+
+            {/* Tier 2: Grassroots District Camps */}
+            <div className="pro-ngo-tier-card" data-aos="fade-up" data-aos-delay="100">
+              <div className="pro-ngo-tier-card__icon" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#B45309' }}>
+                <i className="fas fa-campground" aria-hidden="true" />
+              </div>
+              <h3 className="pro-ngo-tier-card__title">Grassroots DPSCO Camps</h3>
+              <p className="pro-ngo-tier-card__desc">
+                Sponsor district talent scouting camps and coaching clinics in all 5 provinces, discovering children with disabilities in rural areas.
+              </p>
+              <Link href="/donate" className="pro-ngo-tier-card__btn pro-ngo-tier-card__btn--primary">
+                {t('phrase.Sponsor a Camp')}
+              </Link>
+            </div>
+
+            {/* Tier 3: Podium Preparation */}
+            <div className="pro-ngo-tier-card" data-aos="fade-up" data-aos-delay="200">
+              <div className="pro-ngo-tier-card__icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
+                <i className="fas fa-plane-departure" aria-hidden="true" />
+              </div>
+              <h3 className="pro-ngo-tier-card__title">Podium & International Tours</h3>
+              <p className="pro-ngo-tier-card__desc">
+                Support national squad travel, medical classification fees, and international qualification events leading to the Paralympic Games.
+              </p>
+              <Link href="/contact" className="pro-ngo-tier-card__btn pro-ngo-tier-card__btn--primary">
+                {t('phrase.Corporate Partnership')}
+              </Link>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          9. STRATEGIC PARTNERS & DONORS
       ═══════════════════════════════════════════════════════════ */}
       {partners.filter(p => p.active).length > 0 && (
-        <section className="ngo-partners">
-          <div className="container">
-            <p className="ngo-partners__label">{t('phrase.Our Partners & Supporters')}</p>
-            <div className="ngo-partners__logos">
-              {partners.filter(p => p.active).map(p => (
-                <a key={p.id} href={p.website || '#'} target="_blank" rel="noopener noreferrer" title={p.name} className="ngo-partners__logo-link">
+        <section className="pro-ngo-partners" aria-label="Institutional Partners">
+          <div className="pro-ngo-container">
+            <div className="pro-ngo-partners__title">
+              {t('phrase.Our Supporting Partners & Development Allies')}
+            </div>
+            <div className="pro-ngo-partners__list">
+              {partners.filter(p => p.active).map(partner => (
+                <a
+                  key={partner.id}
+                  href={partner.website || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={partner.name}
+                  className="pro-ngo-partners__logo-link"
+                >
                   <img
-                    src={p.logo.startsWith('http') || p.logo.startsWith('/') ? p.logo : `/assets/img/${p.logo}`}
-                    alt={p.name}
-                    className="ngo-partners__logo"
+                    src={partner.logo.startsWith('http') || partner.logo.startsWith('/') ? partner.logo : `/assets/img/${partner.logo}`}
+                    alt={partner.name}
+                    className="pro-ngo-partners__img"
                   />
                 </a>
               ))}
@@ -581,40 +785,6 @@ export default function HomeClient() {
           </div>
         </section>
       )}
-
-      {/* ═══════════════════════════════════════════════════════════
-          CTA BAND — support & volunteer
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="ngo-cta">
-        <div className="ngo-cta__overlay" />
-        <div className="container ngo-cta__body">
-          <div className="row justify-content-center text-center">
-            <div className="col-lg-8">
-              <span className="ngo-eyebrow ngo-eyebrow--light">{t('phrase.Take Action')}</span>
-              <h2 className="ngo-cta__title">
-                {getSiteText('cta.title', 'Champion Rwanda’s Para-Athletes')}
-              </h2>
-              <p className="ngo-cta__desc">
-                {getSiteText(
-                  'cta.desc',
-                  'Support athlete equipment, certified medical classification, training camps, and international travel. Partner with NPC Rwanda to elevate disability inclusion through the power of sport.'
-                )}
-              </p>
-              <div className="ngo-cta__actions">
-                <Link href="/donate" className="btn btn-warning btn-lg fw-bold px-5">
-                  <i className="fas fa-heart me-2" /> {t('phrase.Donate Now')}
-                </Link>
-                <Link href="/volunteer" className="btn btn-outline-light btn-lg fw-bold px-5">
-                  <i className="fas fa-hands-helping me-2" /> Become a Volunteer
-                </Link>
-                <Link href="/contact" className="btn btn-outline-light btn-lg fw-bold px-5">
-                  <i className="fas fa-handshake me-2" /> Institutional Partnership
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
     </main>
   );
