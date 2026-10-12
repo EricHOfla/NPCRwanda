@@ -19,6 +19,7 @@ export default function HomeClient() {
     governancePolicies,
     npcClubs,
     dpscoContacts,
+    socialLinks,
   } = useData();
 
   // Helper to fetch database-backed site text or fallback
@@ -34,15 +35,37 @@ export default function HomeClient() {
   );
 
   const latestAnnouncement = publishedAnnouncements[0] || null;
-  const leadNews = publishedNews[0] || null;
-  const secondaryNews = publishedNews.slice(1, 3);
 
-  const upcomingEvents = events
-    .filter(e => e.status === 'Upcoming' || e.status === 'Ongoing')
-    .slice(0, 3);
+  // Exactly latest 2 news
+  const displayNews = publishedNews.slice(0, 2);
+
+  // Exactly latest 1 announcement
+  const displayAnnouncement = publishedAnnouncements[0] || null;
+
+  // Exactly latest 1 event
+  const displayEvent = events
+    .filter(e => e.status === 'Upcoming' || e.status === 'Ongoing')[0] || null;
 
   // Active verified partners from database
   const activePartners = partners.filter(p => p.active);
+
+  // Helper to parse YouTube link to embed URL
+  const formatYouTubeEmbed = (url: string) => {
+    if (!url) return 'https://www.youtube-nocookie.com/embed/videoseries?list=PLRwandaParalympic';
+    if (url.includes('embed/')) return url;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    if (match && match[1]) {
+      return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+    }
+    return url;
+  };
+
+  const configuredSocials = socialLinks && socialLinks.length > 0 ? socialLinks.filter(s => s.active) : [
+    { id: '1', platform: 'youtube', url: 'https://youtube.com/npcrwanda', icon: 'fa-youtube', active: true, order: 1 },
+    { id: '2', platform: 'instagram', url: 'https://instagram.com/npcrwanda', icon: 'fa-instagram', active: true, order: 2 },
+    { id: '3', platform: 'twitter', url: 'https://twitter.com/npcrwanda', icon: 'fa-twitter', active: true, order: 3 },
+    { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
+  ];
 
   // Dynamic counts derived directly from database records
   const districtsCount = dpscoContacts.length > 0 ? `${dpscoContacts.length}` : getSiteText('stats.districts', '30');
@@ -497,7 +520,7 @@ export default function HomeClient() {
         <div className="pro-ngo-container">
           <div className="row g-5">
 
-            {/* Left Channel: Published News from DB */}
+            {/* Left Channel: Published News from DB (Latest 2 News) */}
             <div className="col-lg-7" data-aos="fade-up">
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <div>
@@ -511,61 +534,62 @@ export default function HomeClient() {
                 </Link>
               </div>
 
-              {leadNews ? (
+              {displayNews.length > 0 ? (
                 <div>
-                  {/* Lead Featured Article */}
-                  <div className="pro-ngo-lead-story">
-                    <div className="pro-ngo-lead-story__img-wrap">
-                      <img
-                        src={leadNews.img.startsWith('http') || leadNews.img.startsWith('/') ? leadNews.img : `/assets/img/curated/${leadNews.img}`}
-                        alt={t(leadNews.title)}
-                        className="pro-ngo-lead-story__img"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/img/curated/news-hero.jpg';
-                        }}
-                      />
-                    </div>
-                    <div className="pro-ngo-lead-story__body">
-                      <div className="pro-ngo-lead-story__meta">
-                        <span className="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1">
-                          {leadNews.category || 'News'}
-                        </span>
-                        <span>
-                          <i className="fas fa-calendar-alt me-1 text-muted" aria-hidden="true" />
-                          {leadNews.date}
-                        </span>
+                  {/* Lead Featured Article (1st of 2) */}
+                  {displayNews[0] && (
+                    <div className="pro-ngo-lead-story">
+                      <div className="pro-ngo-lead-story__img-wrap">
+                        <img
+                          src={displayNews[0].img.startsWith('http') || displayNews[0].img.startsWith('/') ? displayNews[0].img : `/assets/img/curated/${displayNews[0].img}`}
+                          alt={t(displayNews[0].title)}
+                          className="pro-ngo-lead-story__img"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/assets/img/curated/news-hero.jpg';
+                          }}
+                        />
                       </div>
+                      <div className="pro-ngo-lead-story__body">
+                        <div className="pro-ngo-lead-story__meta">
+                          <span className="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1">
+                            {displayNews[0].category || 'News'}
+                          </span>
+                          <span>
+                            <i className="fas fa-calendar-alt me-1 text-muted" aria-hidden="true" />
+                            {displayNews[0].date}
+                          </span>
+                        </div>
 
-                      <h3 className="pro-ngo-lead-story__title">
-                        <Link href={`/news/${encodeURIComponent(leadNews.slug || leadNews.id)}`} className="text-dark text-decoration-none">
-                          {t(leadNews.title)}
+                        <h3 className="pro-ngo-lead-story__title">
+                          <Link href={`/news/${encodeURIComponent(displayNews[0].slug || displayNews[0].id)}`} className="text-dark text-decoration-none">
+                            {t(displayNews[0].title)}
+                          </Link>
+                        </h3>
+
+                        <p className="pro-ngo-lead-story__excerpt">
+                          {t(displayNews[0].desc)}
+                        </p>
+
+                        <Link
+                          href={`/news/${encodeURIComponent(displayNews[0].slug || displayNews[0].id)}`}
+                          className="btn btn-primary btn-sm fw-bold px-4"
+                        >
+                          <span>{t('phrase.Read More')}</span>
+                          <i className="fas fa-arrow-right ms-2" aria-hidden="true" />
                         </Link>
-                      </h3>
-
-                      <p className="pro-ngo-lead-story__excerpt">
-                        {t(leadNews.desc)}
-                      </p>
-
-                      <Link
-                        href={`/news/${encodeURIComponent(leadNews.slug || leadNews.id)}`}
-                        className="btn btn-primary btn-sm fw-bold px-4"
-                      >
-                        <span>{t('phrase.Read More')}</span>
-                        <i className="fas fa-arrow-right ms-2" aria-hidden="true" />
-                      </Link>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Secondary Stories */}
-                  {secondaryNews.map(story => (
+                  {/* Secondary Story (2nd of 2) */}
+                  {displayNews[1] && (
                     <Link
-                      key={story.slug}
-                      href={`/news/${encodeURIComponent(story.slug || story.id)}`}
+                      href={`/news/${encodeURIComponent(displayNews[1].slug || displayNews[1].id)}`}
                       className="pro-ngo-story-row"
                     >
                       <img
-                        src={story.img.startsWith('http') || story.img.startsWith('/') ? story.img : `/assets/img/curated/${story.img}`}
-                        alt={t(story.title)}
+                        src={displayNews[1].img.startsWith('http') || displayNews[1].img.startsWith('/') ? displayNews[1].img : `/assets/img/curated/${displayNews[1].img}`}
+                        alt={t(displayNews[1].title)}
                         className="pro-ngo-story-row__img"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/assets/img/curated/news-hero.jpg';
@@ -574,82 +598,82 @@ export default function HomeClient() {
                       <div className="pro-ngo-story-row__body">
                         <div className="d-flex align-items-center gap-2 mb-1">
                           <span className="badge bg-light text-secondary border px-2 py-0" style={{ fontSize: '0.65rem' }}>
-                            {story.category || 'Update'}
+                            {displayNews[1].category || 'Update'}
                           </span>
-                          <span className="pro-ngo-story-row__date">{story.date}</span>
+                          <span className="pro-ngo-story-row__date">{displayNews[1].date}</span>
                         </div>
-                        <h4 className="pro-ngo-story-row__title">{t(story.title)}</h4>
+                        <h4 className="pro-ngo-story-row__title">{t(displayNews[1].title)}</h4>
                       </div>
                     </Link>
-                  ))}
+                  )}
                 </div>
               ) : (
                 <p className="text-muted">{t('phrase.No published news available.')}</p>
               )}
             </div>
 
-            {/* Right Channel: Official Gazette Notices + Fixtures Calendar from DB */}
+            {/* Right Channel: 1 Announcement + 1 Event from DB */}
             <div className="col-lg-5" data-aos="fade-up" data-aos-delay="100">
               
-              {/* Panel 1: Official Gazette & Communiqués from DB */}
-              <div className="pro-ngo-gazette-panel">
+              {/* Panel 1: Official Announcements (Exactly 1) */}
+              <div className="pro-ngo-gazette-panel mb-4">
                 <div className="pro-ngo-gazette-panel__header">
                   <h3 className="pro-ngo-gazette-panel__title">
-                    <i className="fas fa-stamp text-danger" aria-hidden="true" />
-                    <span>{t('phrase.Official Gazette & Communiqués')}</span>
+                    <i className="fas fa-bullhorn text-danger" aria-hidden="true" />
+                    <span>{t('phrase.Official Announcements')}</span>
                   </h3>
                   <Link href="/announcements" className="text-primary fw-bold text-decoration-none small">
-                    {t('phrase.Register')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                    {t('phrase.View More')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
                   </Link>
                 </div>
 
-                {publishedAnnouncements.length === 0 ? (
+                {!displayAnnouncement ? (
                   <p className="text-muted small mb-0">{t('phrase.No official notices published.')}</p>
                 ) : (
                   <div>
-                    {publishedAnnouncements.slice(0, 3).map(notice => (
-                      <Link
-                        key={notice.slug}
-                        href={`/announcements/${encodeURIComponent(notice.slug || notice.id)}`}
-                        className="pro-ngo-gazette-item"
-                      >
-                        <i className="fas fa-scroll text-danger mt-1" aria-hidden="true" />
-                        <div>
-                          <span className="pro-ngo-gazette-item__badge">
-                            {notice.category || 'Official Circular'}
-                          </span>
-                          <h4 className="pro-ngo-gazette-item__title">{t(notice.title)}</h4>
-                          <span className="pro-ngo-gazette-item__date">
-                            <i className="fas fa-calendar-check me-1" aria-hidden="true" />
-                            {notice.date}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
+                    <Link
+                      href={`/announcements/${encodeURIComponent(displayAnnouncement.slug || displayAnnouncement.id)}`}
+                      className="pro-ngo-gazette-item"
+                    >
+                      <i className="fas fa-file-lines text-danger mt-1" aria-hidden="true" />
+                      <div>
+                        <span className="pro-ngo-gazette-item__badge">
+                          {(displayAnnouncement.category || 'Official Circular').replace(/gazette/gi, 'Announcement')}
+                        </span>
+                        <h4 className="pro-ngo-gazette-item__title">{t(displayAnnouncement.title)}</h4>
+                        <p className="small text-muted mb-2 text-truncate" style={{ maxWidth: '320px' }}>
+                          {t(displayAnnouncement.desc)}
+                        </p>
+                        <span className="pro-ngo-gazette-item__date">
+                          <i className="fas fa-calendar-check me-1" aria-hidden="true" />
+                          {displayAnnouncement.date}
+                        </span>
+                      </div>
+                    </Link>
                   </div>
                 )}
               </div>
 
-              {/* Panel 2: Competition Fixtures & Events from DB */}
+              {/* Panel 2: Competition Fixtures & Events from DB (Exactly 1) */}
               <div className="pro-ngo-fixtures-panel">
                 <div className="pro-ngo-fixtures-panel__header">
                   <h3 className="h6 fw-bold mb-0 text-white d-flex align-items-center gap-2">
                     <i className="fas fa-calendar-days text-warning" aria-hidden="true" />
-                    <span>{t('phrase.Upcoming Events')}</span>
+                    <span>{t('phrase.Upcoming Event')}</span>
                   </h3>
                   <Link href="/events" className="text-warning fw-bold text-decoration-none small">
-                    {t('phrase.View All')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                    {t('phrase.View More')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
                   </Link>
                 </div>
 
-                {upcomingEvents.length === 0 ? (
+                {!displayEvent ? (
                   <p className="text-white-50 small mb-0">{t('phrase.No upcoming fixtures scheduled.')}</p>
                 ) : (
                   <div>
-                    {upcomingEvents.map(event => {
-                      const d = event.date ? new Date(event.date) : null;
+                    {(() => {
+                      const d = displayEvent.date ? new Date(displayEvent.date) : null;
                       return (
-                        <Link key={event.id} href="/events" className="pro-ngo-fixture-card">
+                        <Link href="/events" className="pro-ngo-fixture-card">
                           <div className="pro-ngo-fixture-date">
                             <span className="pro-ngo-fixture-date__day">
                               {d && !isNaN(d.getDate()) ? d.getDate() : '—'}
@@ -659,15 +683,15 @@ export default function HomeClient() {
                             </span>
                           </div>
                           <div className="pro-ngo-fixture-body">
-                            <h4 className="pro-ngo-fixture-title">{event.title}</h4>
+                            <h4 className="pro-ngo-fixture-title">{displayEvent.title}</h4>
                             <span className="pro-ngo-fixture-venue">
                               <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
-                              {event.location} · {event.category}
+                              {displayEvent.location} · {displayEvent.category}
                             </span>
                           </div>
                         </Link>
                       );
-                    })}
+                    })()}
                   </div>
                 )}
               </div>
@@ -675,6 +699,103 @@ export default function HomeClient() {
             </div>
 
           </div>
+
+          {/* Social Media & Video Hub (YouTube, Instagram, Social Channels) */}
+          <div className="pro-ngo-social-hub" data-aos="fade-up">
+            <div className="row g-4 align-items-stretch">
+              
+              {/* YouTube Video Player & Channel */}
+              <div className="col-lg-7">
+                <div className="pro-ngo-video-card">
+                  <div className="pro-ngo-video-card__embed-wrap">
+                    <iframe
+                      className="pro-ngo-video-card__iframe"
+                      src={formatYouTubeEmbed(getSiteText('media.youtubeUrl', 'https://www.youtube.com/embed/videoseries?list=PLRwandaParalympic'))}
+                      title="National Paralympic Committee Rwanda Video"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="pro-ngo-video-card__body">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <span className="badge bg-danger text-white px-2 py-1">
+                        <i className="fab fa-youtube me-1" aria-hidden="true" /> YouTube
+                      </span>
+                      <a
+                        href={configuredSocials.find(s => s.platform === 'youtube')?.url || 'https://youtube.com/npcrwanda'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-outline-danger fw-bold rounded-pill"
+                      >
+                        <span>{t('phrase.Subscribe / Watch More')}</span>
+                        <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                      </a>
+                    </div>
+                    <h3 className="pro-ngo-video-card__title">
+                      {getSiteText('media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys')}
+                    </h3>
+                    <p className="pro-ngo-video-card__desc">
+                      {getSiteText('media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Instagram & Official Social Networks */}
+              <div className="col-lg-5 d-flex flex-column gap-3">
+                
+                {/* Instagram Spotlight Card */}
+                <div className="pro-ngo-social-card">
+                  <div className="d-flex align-items-center gap-3 mb-2">
+                    <div className="pro-ngo-social-card__icon pro-ngo-social-card__icon--instagram">
+                      <i className="fab fa-instagram" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>Instagram @npcrwanda</h4>
+                      <small className="text-muted">Official Photo & Reel Updates</small>
+                    </div>
+                  </div>
+                  <p className="small text-muted mb-3">
+                    Follow Rwanda’s para-athletes in training, continental qualification rounds, and community events across the nation.
+                  </p>
+                  <a
+                    href={configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://instagram.com/npcrwanda'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-sm btn-outline-dark fw-bold rounded-pill align-self-start"
+                  >
+                    <span>{t('phrase.Follow on Instagram')}</span>
+                    <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                  </a>
+                </div>
+
+                {/* Social Channel Links */}
+                <div className="pro-ngo-social-channels p-3 bg-light rounded-3 border">
+                  <h4 className="fw-bold text-dark mb-2" style={{ fontSize: '0.88rem' }}>
+                    <i className="fas fa-share-nodes text-primary me-2" aria-hidden="true" />
+                    {t('phrase.Connect Across Channels')}
+                  </h4>
+                  <div className="d-flex flex-wrap gap-2">
+                    {configuredSocials.map(soc => (
+                      <a
+                        key={soc.id || soc.platform}
+                        href={soc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="pro-ngo-channel-item"
+                      >
+                        <i className={`fab ${soc.icon || (soc.platform === 'youtube' ? 'fa-youtube' : soc.platform === 'instagram' ? 'fa-instagram' : soc.platform === 'twitter' ? 'fa-twitter' : 'fa-facebook-f')}`} aria-hidden="true" />
+                        <span className="text-capitalize">{soc.platform}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </section>
 
