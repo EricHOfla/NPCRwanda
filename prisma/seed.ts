@@ -554,6 +554,9 @@ async function main() {
     { key: 'about.objective.phrase.Partnership Growth', value: 'Build sustainable partnerships with government, federations, and private sector sponsors.', type: 'text' },
     { key: 'cta.title', value: 'Support Inclusive Sports in Rwanda', type: 'text' },
     { key: 'cta.desc', value: 'Help us expand access, strengthen athlete pathways, and deliver excellence in para-sport.', type: 'text' },
+    { key: 'media.youtubeUrl', value: 'https://www.youtube.com/embed/Ud6f9Y7puJU?si=hyocuTgLNYTHO2_3', type: 'text' },
+    { key: 'media.videoTitle', value: 'Rwanda Paralympic Highlights & Athlete Journeys', type: 'text' },
+    { key: 'media.videoDesc', value: 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.', type: 'text' },
     { key: 'footer.description', value: 'The National Paralympic Committee of Rwanda is dedicated to the development of Paralympic sports and fostering inclusion for persons with disabilities through the power of athletic excellence.', type: 'text' },
     { key: 'footer.logo', value: '/assets/img/logo.png', type: 'image' },
   ];
