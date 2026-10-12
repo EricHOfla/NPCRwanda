@@ -28,8 +28,8 @@ export const SITE_CONFIG = {
     'https://www.wikidata.org/wiki/Q16955743',
     'https://facebook.com/npcrwanda',
     'https://twitter.com/npcrwanda',
-    'https://instagram.com/npcrwanda',
-    'https://youtube.com/npcrwanda',
+    'https://www.instagram.com/npc.rwanda/',
+    'https://www.youtube.com/@npcrwandaofficial1716',
   ],
 };
 

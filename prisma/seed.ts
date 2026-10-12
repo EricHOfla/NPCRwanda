@@ -311,7 +311,7 @@ async function main() {
     { key: 'address', value: 'Amahoro Stadium, Remera, Kigali, Rwanda' },
     { key: 'facebook', value: 'https://facebook.com/npcrwanda' },
     { key: 'twitter', value: 'https://twitter.com/npcrwanda' },
-    { key: 'instagram', value: 'https://instagram.com/npcrwanda' },
+    { key: 'instagram', value: 'https://www.instagram.com/npc.rwanda/' },
     { key: 'logo', value: '/assets/img/logo.png' },
     { key: 'favicon', value: '/assets/img/favicon.ico' },
   ];
@@ -485,8 +485,8 @@ async function main() {
   const socialLinks = [
     { platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', order: 1, active: true },
     { platform: 'twitter', url: 'https://twitter.com/npcrwanda', icon: 'fa-twitter', order: 2, active: true },
-    { platform: 'instagram', url: 'https://instagram.com/npcrwanda', icon: 'fa-instagram', order: 3, active: true },
-    { platform: 'youtube', url: 'https://youtube.com/npcrwanda', icon: 'fa-youtube', order: 4, active: true },
+    { platform: 'instagram', url: 'https://www.instagram.com/npc.rwanda/', icon: 'fa-instagram', order: 3, active: true },
+    { platform: 'youtube', url: 'https://www.youtube.com/@npcrwandaofficial1716', icon: 'fa-youtube', order: 4, active: true },
   ];
   for (const s of socialLinks) {
     await prisma.socialLink.create({ data: s });

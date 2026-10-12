@@ -61,8 +61,8 @@ export default function HomeClient() {
   };
 
   const configuredSocials = socialLinks && socialLinks.length > 0 ? socialLinks.filter(s => s.active) : [
-    { id: '1', platform: 'youtube', url: 'https://youtube.com/npcrwanda', icon: 'fa-youtube', active: true, order: 1 },
-    { id: '2', platform: 'instagram', url: 'https://instagram.com/npcrwanda', icon: 'fa-instagram', active: true, order: 2 },
+    { id: '1', platform: 'youtube', url: 'https://www.youtube.com/@npcrwandaofficial1716', icon: 'fa-youtube', active: true, order: 1 },
+    { id: '2', platform: 'instagram', url: 'https://www.instagram.com/npc.rwanda/', icon: 'fa-instagram', active: true, order: 2 },
     { id: '3', platform: 'twitter', url: 'https://twitter.com/npcrwanda', icon: 'fa-twitter', active: true, order: 3 },
     { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
   ];
@@ -722,7 +722,7 @@ export default function HomeClient() {
                         <i className="fab fa-youtube me-1" aria-hidden="true" /> YouTube
                       </span>
                       <a
-                        href={configuredSocials.find(s => s.platform === 'youtube')?.url || 'https://youtube.com/npcrwanda'}
+                        href={configuredSocials.find(s => s.platform === 'youtube')?.url || 'https://www.youtube.com/@npcrwandaofficial1716'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-sm btn-outline-danger fw-bold rounded-pill"
@@ -751,7 +751,7 @@ export default function HomeClient() {
                       <i className="fab fa-instagram" aria-hidden="true" />
                     </div>
                     <div>
-                      <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>Instagram @npcrwanda</h4>
+                      <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>Instagram @npc.rwanda</h4>
                       <small className="text-muted">Official Photo & Reel Updates</small>
                     </div>
                   </div>
@@ -759,7 +759,7 @@ export default function HomeClient() {
                     Follow Rwanda’s para-athletes in training, continental qualification rounds, and community events across the nation.
                   </p>
                   <a
-                    href={configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://instagram.com/npcrwanda'}
+                    href={configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-sm btn-outline-dark fw-bold rounded-pill align-self-start"
