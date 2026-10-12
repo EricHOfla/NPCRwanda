@@ -179,21 +179,16 @@ export default function HomeClient() {
                       )}
                     </p>
 
-                    <Link href="/athletes" className="pro-ngo-hero__showcase-link">
-                      <span>{t('phrase.Meet Our Para-Athletes')}</span>
-                      <i className="fas fa-arrow-right" aria-hidden="true" />
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Floating Verified Trust Pill */}
-                <div className="pro-ngo-hero__inset-card">
-                  <div className="pro-ngo-hero__inset-icon">
-                    <i className="fas fa-shield-halved" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <div className="pro-ngo-hero__inset-title">IPC &amp; MINISPORTS</div>
-                    <div className="pro-ngo-hero__inset-sub">{t('phrase.Accredited National Paralympic Committee')}</div>
+                    <div className="mt-2">
+                      <Link
+                        href="/athletes"
+                        className="btn btn-warning fw-bold text-dark px-4 py-2 d-inline-flex align-items-center gap-2 shadow rounded-pill"
+                        style={{ fontSize: '0.88rem' }}
+                      >
+                        <span>{t('phrase.Meet Our Para-Athletes')}</span>
+                        <i className="fas fa-arrow-right" aria-hidden="true" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -204,61 +199,7 @@ export default function HomeClient() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          3. STATUTORY ACCREDITATION & GLOBAL ALLIANCES (FROM DATABASE)
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="pro-ngo-accreditation" aria-label="Official Accreditations">
-        <div className="pro-ngo-container">
-          <div className="pro-ngo-accreditation__title">
-            {t('phrase.Officially Recognized & Affiliated With Global Sports Authorities')}
-          </div>
-          <div className="pro-ngo-accreditation__grid">
-            
-            <div className="pro-ngo-accreditation__item">
-              <div className="pro-ngo-accreditation__abbr">IPC</div>
-              <div>
-                <div className="pro-ngo-accreditation__name">International Paralympic Committee</div>
-                <span className="pro-ngo-accreditation__sub">Full Member Since {getSiteText('stats.founded', '2001')}</span>
-              </div>
-            </div>
-
-            <div className="pro-ngo-accreditation__item">
-              <div className="pro-ngo-accreditation__abbr">MINISPORTS</div>
-              <div>
-                <div className="pro-ngo-accreditation__name">Ministry of Sports Rwanda</div>
-                <span className="pro-ngo-accreditation__sub">National Sports Governing Partner</span>
-              </div>
-            </div>
-
-            <div className="pro-ngo-accreditation__item">
-              <div className="pro-ngo-accreditation__abbr">WPV</div>
-              <div>
-                <div className="pro-ngo-accreditation__name">World ParaVolley</div>
-                <span className="pro-ngo-accreditation__sub">Zone Africa Member</span>
-              </div>
-            </div>
-
-            <div className="pro-ngo-accreditation__item">
-              <div className="pro-ngo-accreditation__abbr">APC</div>
-              <div>
-                <div className="pro-ngo-accreditation__name">African Paralympic Committee</div>
-                <span className="pro-ngo-accreditation__sub">Continental Member Federation</span>
-              </div>
-            </div>
-
-            <div className="pro-ngo-accreditation__item">
-              <div className="pro-ngo-accreditation__abbr">NUDOR</div>
-              <div>
-                <div className="pro-ngo-accreditation__name">Disability Organisations Union</div>
-                <span className="pro-ngo-accreditation__sub">National Inclusion Ally</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          4. STRATEGIC MISSION PILLARS (100% FROM DATABASE SITECONTENT)
+          3. STRATEGIC MISSION PILLARS (100% FROM DATABASE SITECONTENT)
       ═══════════════════════════════════════════════════════════ */}
       <section className="pro-ngo-pillars" aria-label="Core Strategic Pillars">
         <div className="pro-ngo-container">
