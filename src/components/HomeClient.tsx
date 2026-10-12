@@ -149,24 +149,40 @@ export default function HomeClient() {
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Frame (Clean Presentation, No Duplicate Content) */}
+            {/* Right Column: Hero Visual Showcase (Distinct Words from Database/CMS) */}
             <div className="col-lg-5" data-aos="zoom-in" data-aos-delay="100">
               <div className="pro-ngo-hero__showcase-wrap">
                 <div className="pro-ngo-hero__showcase">
                   <img
                     src={getSiteText('hero.image', '/assets/img/curated/home-hero.jpg')}
-                    alt={getSiteText('hero.title1', 'National Paralympic Committee of Rwanda')}
+                    alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
                     className="pro-ngo-hero__showcase-img"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg';
                     }}
                   />
-                  <div className="pro-ngo-hero__showcase-gradient" aria-hidden="true" />
-                  <div className="pro-ngo-hero__showcase-caption">
-                    <span className="pro-ngo-tag pro-ngo-tag--white">
-                      <i className="fas fa-medal text-warning" aria-hidden="true" />
-                      {t('phrase.Official Paralympic Movement in Rwanda')}
-                    </span>
+                  <div className="pro-ngo-hero__showcase-gradient">
+                    <div className="pro-ngo-hero__badge-row">
+                      <span className="pro-ngo-tag pro-ngo-tag--gold">
+                        <i className="fas fa-trophy" aria-hidden="true" /> {getSiteText('hero.showcaseBadge', t('phrase.Team Rwanda Spotlight'))}
+                      </span>
+                    </div>
+
+                    <h3 className="pro-ngo-hero__showcase-title">
+                      {getSiteText('hero.showcaseTitle', getSiteText('about.vision', t('phrase.Excellence in Motion: Leading Africa in Para-Sport')))}
+                    </h3>
+
+                    <p className="pro-ngo-hero__showcase-desc">
+                      {getSiteText(
+                        'hero.showcaseDesc',
+                        t('phrase.From grassroots talent scouting in 30 districts to continental championships and the Paralympic podium, our athletes redefine what is possible.')
+                      )}
+                    </p>
+
+                    <Link href="/athletes" className="pro-ngo-hero__showcase-link">
+                      <span>{t('phrase.Meet Our Para-Athletes')}</span>
+                      <i className="fas fa-arrow-right" aria-hidden="true" />
+                    </Link>
                   </div>
                 </div>
 
