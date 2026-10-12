@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -62,15 +62,15 @@ export default function HomeClient() {
   // Active verified partners from database
   const activePartners = partners.filter(p => p.active);
 
-  // Helper to parse YouTube link to embed URL
-  const formatYouTubeEmbed = (url: string) => {
-    if (!url) return 'https://www.youtube-nocookie.com/embed/videoseries?list=PLRwandaParalympic';
-    if (url.includes('embed/')) return url;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-    if (match && match[1]) {
-      return `https://www.youtube-nocookie.com/embed/${match[1]}`;
-    }
-    return url;
+  // Helper to parse YouTube link to embed URL � returns null if URL is not embeddable (e.g. channel page)
+  const formatYouTubeEmbed = (url: string): string | null => {
+    if (!url) return null;
+    if (url.includes('/embed/')) return url; // already an embed URL
+    const plMatch = url.match(/[?&]list=([\w-]+)/);
+    if (plMatch) return `https://www.youtube-nocookie.com/embed/videoseries?list=${plMatch[1]}`; // playlist
+    const vidMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    if (vidMatch && vidMatch[1]) return `https://www.youtube-nocookie.com/embed/${vidMatch[1]}`; // single video
+    return null; // channel URL or unknown � not embeddable
   };
 
   const configuredSocials = socialLinks && socialLinks.length > 0 ? socialLinks.filter(s => s.active) : [
@@ -160,7 +160,7 @@ export default function HomeClient() {
 
                 <Link href="/governance#strategic-plan" className="pro-ngo-btn-outline">
                   <i className="fas fa-file-contract text-primary" aria-hidden="true" />
-                  <span>{t('phrase.Strategic Plan 2024–2028')}</span>
+                  <span>{t('phrase.Strategic Plan 2024-2028')}</span>
                 </Link>
               </div>
 
@@ -689,7 +689,7 @@ export default function HomeClient() {
                         <Link href="/events" className="pro-ngo-fixture-card">
                           <div className="pro-ngo-fixture-date">
                             <span className="pro-ngo-fixture-date__day">
-                              {d && !isNaN(d.getDate()) ? d.getDate() : '—'}
+                              {d && !isNaN(d.getDate()) ? d.getDate() : '-'}
                             </span>
                             <span className="pro-ngo-fixture-date__mon">
                               {d && !isNaN(d.getMonth()) ? d.toLocaleString('en-US', { month: 'short' }) : 'DATE'}
@@ -718,42 +718,62 @@ export default function HomeClient() {
             <div className="row g-4 align-items-stretch">
               
               {/* YouTube Video Player & Channel */}
-              <div className="col-lg-7">
-                <div className="pro-ngo-video-card">
-                  <div className="pro-ngo-video-card__embed-wrap">
-                    <iframe
-                      className="pro-ngo-video-card__iframe"
-                      src={formatYouTubeEmbed(getSiteText('media.youtubeUrl', 'https://www.youtube.com/embed/videoseries?list=PLRwandaParalympic'))}
-                      title="National Paralympic Committee Rwanda Video"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="pro-ngo-video-card__body">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <span className="badge bg-danger text-white px-2 py-1">
-                        <i className="fab fa-youtube me-1" aria-hidden="true" /> YouTube
-                      </span>
-                      <a
-                        href={configuredSocials.find(s => s.platform === 'youtube')?.url || 'https://www.youtube.com/@npcrwandaofficial1716'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-sm btn-outline-danger fw-bold rounded-pill"
-                      >
-                        <span>{t('phrase.Subscribe / Watch More')}</span>
-                        <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
-                      </a>
+              {(() => {
+                const youtubeChannelUrl = configuredSocials.find(s => s.platform === 'youtube')?.url || 'https://www.youtube.com/@npcrwandaofficial1716';
+                const embedSrc = formatYouTubeEmbed(getSiteText('media.youtubeUrl', ''));
+                const videoTitle = getSiteText('media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys');
+                const videoDesc = getSiteText('media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.');
+                return (
+                  <div className="col-lg-7">
+                    <div className="pro-ngo-video-card">
+                      {embedSrc ? (
+                        <div className="pro-ngo-video-card__embed-wrap">
+                          <iframe
+                            className="pro-ngo-video-card__iframe"
+                            src={embedSrc}
+                            title="National Paralympic Committee Rwanda Video"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : (
+                        <a
+                          href={youtubeChannelUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="d-flex flex-column align-items-center justify-content-center text-decoration-none"
+                          style={{ background: '#111', minHeight: '220px', borderRadius: '12px 12px 0 0', padding: '2rem', textAlign: 'center' }}
+                        >
+                          <i className="fab fa-youtube" style={{ fontSize: '3.5rem', color: '#FF0000', marginBottom: '0.75rem' }} aria-hidden="true" />
+                          <span className="fw-bold text-white" style={{ fontSize: '1.1rem' }}>NPC Rwanda on YouTube</span>
+                          <span className="text-white-50 small mt-1">@npcrwandaofficial1716</span>
+                          <span className="btn btn-danger btn-sm mt-3 rounded-pill fw-bold px-4">
+                            <i className="fas fa-play me-1" />Visit Channel
+                          </span>
+                        </a>
+                      )}
+                      <div className="pro-ngo-video-card__body">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <span className="badge bg-danger text-white px-2 py-1">
+                            <i className="fab fa-youtube me-1" aria-hidden="true" /> YouTube
+                          </span>
+                          <a
+                            href={youtubeChannelUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-sm btn-outline-danger fw-bold rounded-pill"
+                          >
+                            <span>Subscribe / Watch More</span>
+                            <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                          </a>
+                        </div>
+                        <h3 className="pro-ngo-video-card__title">{videoTitle}</h3>
+                        <p className="pro-ngo-video-card__desc">{videoDesc}</p>
+                      </div>
                     </div>
-                    <h3 className="pro-ngo-video-card__title">
-                      {getSiteText('media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys')}
-                    </h3>
-                    <p className="pro-ngo-video-card__desc">
-                      {getSiteText('media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.')}
-                    </p>
                   </div>
-                </div>
-              </div>
-
+                );
+              })()}
               {/* Instagram & Official Social Networks */}
               <div className="col-lg-5 d-flex flex-column gap-3">
                 
