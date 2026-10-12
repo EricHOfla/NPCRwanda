@@ -149,7 +149,7 @@ export default function HomeClient() {
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Showcase (Loaded from Database Site Content) */}
+            {/* Right Column: Hero Visual Frame (Clean Presentation, No Duplicate Content) */}
             <div className="col-lg-5" data-aos="zoom-in" data-aos-delay="100">
               <div className="pro-ngo-hero__showcase-wrap">
                 <div className="pro-ngo-hero__showcase">
@@ -161,42 +161,23 @@ export default function HomeClient() {
                       (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg';
                     }}
                   />
-                  <div className="pro-ngo-hero__showcase-gradient">
-                    <div className="pro-ngo-hero__badge-row">
-                      <span className="pro-ngo-tag pro-ngo-tag--gold">
-                        <i className="fas fa-award" aria-hidden="true" /> {getSiteText('stats.founded', '2001')}
-                      </span>
-                      <span className="pro-ngo-tag pro-ngo-tag--white">
-                        {disciplinesCount} {t('phrase.Disciplines')}
-                      </span>
-                    </div>
-
-                    <h3 className="pro-ngo-hero__showcase-title">
-                      {getSiteText('hero.title1', 'Empowering Ability.')} {getSiteText('hero.title2', 'Inspiring Rwanda.')}
-                    </h3>
-
-                    <p className="pro-ngo-hero__showcase-desc">
-                      {getSiteText(
-                        'hero.lead',
-                        'We build inclusive pathways in sport and prepare elite para-athletes to represent Rwanda on the world stage.'
-                      )}
-                    </p>
-
-                    <Link href="/sports" className="pro-ngo-hero__showcase-link">
-                      <span>{t('phrase.Explore Sports Programs')}</span>
-                      <i className="fas fa-arrow-right" aria-hidden="true" />
-                    </Link>
+                  <div className="pro-ngo-hero__showcase-gradient" aria-hidden="true" />
+                  <div className="pro-ngo-hero__showcase-caption">
+                    <span className="pro-ngo-tag pro-ngo-tag--white">
+                      <i className="fas fa-medal text-warning" aria-hidden="true" />
+                      {t('phrase.Official Paralympic Movement in Rwanda')}
+                    </span>
                   </div>
                 </div>
 
-                {/* Floating Verified Badge */}
+                {/* Floating Verified Trust Pill */}
                 <div className="pro-ngo-hero__inset-card">
                   <div className="pro-ngo-hero__inset-icon">
-                    <i className="fas fa-medal" aria-hidden="true" />
+                    <i className="fas fa-shield-halved" aria-hidden="true" />
                   </div>
                   <div>
-                    <div className="pro-ngo-hero__inset-title">{getSiteText('hero.stat2.title', 'High Performance')}</div>
-                    <div className="pro-ngo-hero__inset-sub">{getSiteText('hero.stat2.desc', 'Elite preparation for continental and global events.')}</div>
+                    <div className="pro-ngo-hero__inset-title">IPC &amp; MINISPORTS</div>
+                    <div className="pro-ngo-hero__inset-sub">{t('phrase.Accredited National Paralympic Committee')}</div>
                   </div>
                 </div>
               </div>
