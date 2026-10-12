@@ -27,6 +27,8 @@ export interface NewsArticle {
   desc: string;
   content: string;
   slug: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface Career {
@@ -143,6 +145,8 @@ export interface Event {
   status: string;
   img: string;
   featured: boolean;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface Partner {

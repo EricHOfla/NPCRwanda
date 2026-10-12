@@ -25,14 +25,22 @@ export default function HomeClient() {
   // Helper to fetch database-backed site text or fallback
   const getSiteText = (key: string, fallback: string) => siteContent[key] || fallback;
 
-  // Filter true news vs announcements directly from the database
-  const publishedNews = news.filter(
-    a => a.status === 'Published' && !isAnnouncementCategory(a.category || '')
-  );
+  // Filter true news vs announcements directly from the database, sorted strictly by latest post first
+  const publishedNews = news
+    .filter(a => a.status === 'Published' && !isAnnouncementCategory(a.category || ''))
+    .sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
 
-  const publishedAnnouncements = news.filter(
-    a => a.status === 'Published' && isAnnouncementCategory(a.category || '')
-  );
+  const publishedAnnouncements = news
+    .filter(a => a.status === 'Published' && isAnnouncementCategory(a.category || ''))
+    .sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
 
   const latestAnnouncement = publishedAnnouncements[0] || null;
 
@@ -42,9 +50,14 @@ export default function HomeClient() {
   // Exactly latest 1 announcement
   const displayAnnouncement = publishedAnnouncements[0] || null;
 
-  // Exactly latest 1 event
+  // Exactly latest 1 event (soonest upcoming or ongoing)
   const displayEvent = events
-    .filter(e => e.status === 'Upcoming' || e.status === 'Ongoing')[0] || null;
+    .filter(e => e.status === 'Upcoming' || e.status === 'Ongoing')
+    .sort((a, b) => {
+      const dateA = a.date ? new Date(a.date).getTime() : Infinity;
+      const dateB = b.date ? new Date(b.date).getTime() : Infinity;
+      return dateA - dateB;
+    })[0] || null;
 
   // Active verified partners from database
   const activePartners = partners.filter(p => p.active);
