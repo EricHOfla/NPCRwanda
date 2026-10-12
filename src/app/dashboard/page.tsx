@@ -2528,7 +2528,7 @@ export default function DashboardPage() {
                       { id: 'announcements', title: 'Official Gazette & Notices', desc: 'Publish official circulars, communiqués, gazette notices, and regulatory announcements.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'events', title: 'Events Calendar', icon: 'fa-calendar-days', desc: 'Schedule matches, championships, training camps, and featured event details.', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'careers', title: 'Careers & Vacancies', icon: 'fa-briefcase', desc: 'Manage job vacancies, volunteer registrations, and applicant logs.', bg: '#f0fdfa', border: '#99f6e4' },
-                      { id: 'contact', title: 'Contact & Footer', icon: 'fa-address-card', desc: 'Edit physical address, contact phone/email, map embeds, and footer social links.', bg: '#fafaf9', border: '#e7e5e4' },
+                      { id: 'contact', title: 'Contact & Footer', icon: 'fa-address-card', desc: 'Edit physical address, contact phone/email, map embeds, and social media links (footer & homepage social hub).', bg: '#fafaf9', border: '#e7e5e4' },
                       { id: 'governance', title: 'Governance & Policies', icon: 'fa-scale-balanced', desc: 'Edit strategic plans, constitution document assets, and official policy manuals.', bg: '#f8fafc', border: '#cbd5e1' },
                       { id: 'partners', title: 'Partners & Sponsors', icon: 'fa-handshake', desc: 'Manage sponsors list, Ministry of Sports logos, and corporate partners URLs.', bg: '#fff7ed', border: '#fed7aa' },
                       { id: 'system', title: 'System Components', icon: 'fa-gears', desc: 'Define translation tags and metadata keys for the system components registry.', bg: '#f0fdfa', border: '#99f6e4' }
@@ -3236,6 +3236,27 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
+                      {/* Social Media Hub Settings */}
+                      <div className="custom-card p-4">
+                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fab fa-youtube me-2" />Social Media Hub Settings</h4>
+                        <p className="small text-muted mb-3">Control the YouTube video embed and social channels shown on the homepage &ldquo;Stay Updated&rdquo; section.</p>
+                        <div className="row g-3">
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">YouTube Embed URL <span className="text-muted fw-normal">(video or playlist)</span></label>
+                            <input type="text" className="form-control" value={siteForm['media.youtubeUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.youtubeUrl': e.target.value })} placeholder="https://www.youtube.com/embed/videoseries?list=YOUR_PLAYLIST_ID" />
+                            <small className="text-muted">Paste a YouTube embed URL (e.g. from &ldquo;Share → Embed&rdquo; on YouTube). Used for the homepage video card.</small>
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label small fw-bold">Video Section Title</label>
+                            <input type="text" className="form-control" value={siteForm['media.videoTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoTitle': e.target.value })} placeholder="Watch Our Story" />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label small fw-bold">Video Section Description</label>
+                            <input type="text" className="form-control" value={siteForm['media.videoDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoDesc': e.target.value })} placeholder="Follow our journey on YouTube" />
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Bottom Save Action Bar */}
                       <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
                         <div>
@@ -3245,7 +3266,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
-                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc'])}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}
@@ -4410,7 +4431,7 @@ export default function DashboardPage() {
                       {/* Social Link List */}
                       <div className="custom-card p-4">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                          <h4 className="h6 fw-bold mb-0 text-dark"><i className="fas fa-share-nodes text-primary me-2" />Footer Social Links</h4>
+                          <h4 className="h6 fw-bold mb-0 text-dark"><i className="fas fa-share-nodes text-primary me-2" />Social Media Links <span className="text-muted fw-normal small">(Footer &amp; Homepage)</span></h4>
                           <button
                             onClick={() => {
                               setEditingSocialId(null);
@@ -5689,7 +5710,19 @@ export default function DashboardPage() {
                         <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
                           <i className="fab fa-instagram text-danger me-1" /> Instagram URL
                         </label>
-                        <input type="text" className="form-control" value={sysSettings.instagram || ''} onChange={e => setSysSettings(p => ({ ...p, instagram: e.target.value }))} placeholder="https://instagram.com/npcrwanda" />
+                        <input type="text" className="form-control" value={sysSettings.instagram || ''} onChange={e => setSysSettings(p => ({ ...p, instagram: e.target.value }))} placeholder="https://instagram.com/npc.rwanda" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
+                          <i className="fab fa-youtube text-danger me-1" /> YouTube Channel URL
+                        </label>
+                        <input type="text" className="form-control" value={sysSettings.youtube || ''} onChange={e => setSysSettings(p => ({ ...p, youtube: e.target.value }))} placeholder="https://www.youtube.com/@npcrwandaofficial1716" />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 600, color: '#64748B' }}>
+                          <i className="fab fa-linkedin text-primary me-1" /> LinkedIn URL
+                        </label>
+                        <input type="text" className="form-control" value={sysSettings.linkedin || ''} onChange={e => setSysSettings(p => ({ ...p, linkedin: e.target.value }))} placeholder="https://linkedin.com/company/npcrwanda" />
                       </div>
                     </div>
                   </div>
