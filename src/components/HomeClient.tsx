@@ -837,29 +837,37 @@ export default function HomeClient() {
               <div className="col-lg-5 d-flex flex-column gap-3">
                 
                 {/* Instagram Spotlight Card */}
-                <div className="pro-ngo-social-card">
-                  <div className="d-flex align-items-center gap-3 mb-2">
-                    <div className="pro-ngo-social-card__icon pro-ngo-social-card__icon--instagram">
-                      <i className="fab fa-instagram" aria-hidden="true" />
+                {(() => {
+                  const instaTitle = getSiteText('media.instagramTitle', 'Instagram @npc.rwanda');
+                  const instaSubtitle = getSiteText('media.instagramSubtitle', 'Official Photo & Reel Updates');
+                  const instaDesc = getSiteText('media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation.");
+                  const instaUrl = getSiteText('media.instagramUrl', configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/');
+                  return (
+                    <div className="pro-ngo-social-card">
+                      <div className="d-flex align-items-center gap-3 mb-2">
+                        <div className="pro-ngo-social-card__icon pro-ngo-social-card__icon--instagram">
+                          <i className="fab fa-instagram" aria-hidden="true" />
+                        </div>
+                        <div>
+                          <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>{instaTitle}</h4>
+                          <small className="text-muted">{instaSubtitle}</small>
+                        </div>
+                      </div>
+                      <p className="small text-muted mb-3">
+                        {instaDesc}
+                      </p>
+                      <a
+                        href={instaUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-outline-dark fw-bold rounded-pill align-self-start"
+                      >
+                        <span>{t('phrase.Follow on Instagram')}</span>
+                        <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                      </a>
                     </div>
-                    <div>
-                      <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>Instagram @npc.rwanda</h4>
-                      <small className="text-muted">Official Photo & Reel Updates</small>
-                    </div>
-                  </div>
-                  <p className="small text-muted mb-3">
-                    Follow Rwanda�s para-athletes in training, continental qualification rounds, and community events across the nation.
-                  </p>
-                  <a
-                    href={configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-sm btn-outline-dark fw-bold rounded-pill align-self-start"
-                  >
-                    <span>{t('phrase.Follow on Instagram')}</span>
-                    <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
-                  </a>
-                </div>
+                  );
+                })()}
 
                 {/* Social Channel Links */}
                 <div className="pro-ngo-social-channels p-3 bg-light rounded-3 border">

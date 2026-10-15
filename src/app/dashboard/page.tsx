@@ -2688,7 +2688,7 @@ export default function DashboardPage() {
                       onClick={() => {
                         const target = activeEditPage || 'home';
                         if (target === 'home') {
-                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc']);
+                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl']);
                         } else if (target === 'about') {
                           handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
                         } else if (target === 'npc-background') {
@@ -3377,9 +3377,13 @@ export default function DashboardPage() {
 
                       {/* Social Media Hub Settings */}
                       <div className="custom-card p-4">
-                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fab fa-youtube me-2" />Social Media Hub Settings</h4>
-                        <p className="small text-muted mb-3">Control the YouTube video embed and social channels shown on the homepage &ldquo;Stay Updated&rdquo; section.</p>
+                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fab fa-youtube me-2" /><i className="fab fa-instagram me-2" />Social Media Hub Settings (YouTube & Instagram)</h4>
+                        <p className="small text-muted mb-3">Control the YouTube video embed and Instagram spotlight card shown on the homepage &ldquo;Stay Updated&rdquo; section.</p>
                         <div className="row g-3">
+                          {/* YouTube Settings */}
+                          <div className="col-12">
+                            <span className="badge bg-danger text-white mb-1"><i className="fab fa-youtube me-1" /> YouTube Section</span>
+                          </div>
                           <div className="col-12">
                             <label className="form-label small fw-bold">YouTube Embed URL <span className="text-muted fw-normal">(video or playlist)</span></label>
                             <input type="text" className="form-control" value={siteForm['media.youtubeUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.youtubeUrl': e.target.value })} placeholder="https://www.youtube.com/embed/videoseries?list=YOUR_PLAYLIST_ID" />
@@ -3387,11 +3391,32 @@ export default function DashboardPage() {
                           </div>
                           <div className="col-md-6">
                             <label className="form-label small fw-bold">Video Section Title</label>
-                            <input type="text" className="form-control" value={siteForm['media.videoTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoTitle': e.target.value })} placeholder="Watch Our Story" />
+                            <input type="text" className="form-control" value={siteForm['media.videoTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoTitle': e.target.value })} placeholder="Rwanda Paralympic Highlights & Athlete Journeys" />
                           </div>
                           <div className="col-md-6">
                             <label className="form-label small fw-bold">Video Section Description</label>
-                            <input type="text" className="form-control" value={siteForm['media.videoDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoDesc': e.target.value })} placeholder="Follow our journey on YouTube" />
+                            <input type="text" className="form-control" value={siteForm['media.videoDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoDesc': e.target.value })} placeholder="Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines." />
+                          </div>
+
+                          {/* Instagram Settings */}
+                          <div className="col-12 pt-3 border-top">
+                            <span className="badge text-white mb-1" style={{ background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }}><i className="fab fa-instagram me-1" /> Instagram Spotlight Card</span>
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label small fw-bold">Instagram Card Title</label>
+                            <input type="text" className="form-control" value={siteForm['media.instagramTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramTitle': e.target.value })} placeholder="Instagram @npc.rwanda" />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label small fw-bold">Instagram Subtitle</label>
+                            <input type="text" className="form-control" value={siteForm['media.instagramSubtitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramSubtitle': e.target.value })} placeholder="Official Photo & Reel Updates" />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Instagram Description</label>
+                            <textarea rows={2} className="form-control" value={siteForm['media.instagramDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramDesc': e.target.value })} placeholder="Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation." />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Instagram Profile Link</label>
+                            <input type="text" className="form-control" value={siteForm['media.instagramUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramUrl': e.target.value })} placeholder="https://www.instagram.com/npc.rwanda/" />
                           </div>
                         </div>
                       </div>
@@ -3400,12 +3425,12 @@ export default function DashboardPage() {
                       <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
                         <div>
                           <span className="fw-bold text-dark d-block">Save Home Page Changes</span>
-                          <span className="small text-muted">All hero, statistics, impact snapshot, and about preview details will update live on the site.</span>
+                          <span className="small text-muted">All hero, statistics, impact snapshot, about preview, YouTube, and Instagram details will update live on the site.</span>
                         </div>
                         <button 
                           type="button" 
                           disabled={pageSaving}
-                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc'])}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}

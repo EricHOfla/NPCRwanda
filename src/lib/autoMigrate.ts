@@ -365,6 +365,13 @@ async function runAutoMigration(): Promise<void> {
       ['stats.founded', '2001'],
       ['stats.clubs', '30+'],
       ['leadership.mandatePeriod', '2024–2028'],
+      ['media.youtubeUrl', 'https://www.youtube.com/@npcrwandaofficial1716'],
+      ['media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys'],
+      ['media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.'],
+      ['media.instagramTitle', 'Instagram @npc.rwanda'],
+      ['media.instagramSubtitle', 'Official Photo & Reel Updates'],
+      ['media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation."],
+      ['media.instagramUrl', 'https://www.instagram.com/npc.rwanda/'],
     ];
     for (const [key, val] of essentialKeys) {
       const exist = await prisma.siteContent.findUnique({ where: { key } });
