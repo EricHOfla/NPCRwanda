@@ -15,7 +15,6 @@ import {
   ContactMessage,
   Sport,
   Leader,
-  SystemComponent,
   VolunteerApplication,
   DonationInquiry,
   Partner,
@@ -89,7 +88,6 @@ type AdminTab =
   | 'events'
   | 'careers'
   | 'leadership'
-  | 'system'
   | 'governance'
   | 'partners'
   | 'site-content'
@@ -454,7 +452,6 @@ export default function DashboardPage() {
     contacts,
     sports,
     leadership,
-    systemComponents,
     volunteers,
     donations,
     jobApplications,
@@ -487,9 +484,6 @@ export default function DashboardPage() {
     addLeader,
     updateLeader,
     deleteLeader,
-    addSystemComponent,
-    updateSystemComponent,
-    deleteSystemComponent,
     markVolunteerAsRead,
     deleteVolunteerApplication,
     markDonationAsRead,
@@ -541,7 +535,6 @@ export default function DashboardPage() {
   const [careerSearch, setCareerSearch] = useState('');
   const [sportSearch, setSportSearch] = useState('');
   const [leaderSearch, setLeaderSearch] = useState('');
-  const [systemSearch, setSystemSearch] = useState('');
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [donationSearch, setDonationSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
@@ -629,14 +622,6 @@ export default function DashboardPage() {
     order: 0 as number,
   });
 
-  const [systemFormOpen, setSystemFormOpen] = useState(false);
-  const [editingSystemId, setEditingSystemId] = useState<string | null>(null);
-  const [systemForm, setSystemForm] = useState({
-    title: '',
-    desc: ''
-  });
-
-  
   // Members State
   const [assocFormOpen, setAssocFormOpen] = useState(false);
   const [editingAssocId, setEditingAssocId] = useState<string | null>(null);
@@ -932,7 +917,6 @@ export default function DashboardPage() {
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
     if (isSuperAdmin) return false;
-    if (page === 'system') return true;
     if (isEditor && !editorAllowedPages.includes(page || 'home')) return true;
     return false;
   };
@@ -1560,24 +1544,6 @@ export default function DashboardPage() {
     setLeaderFormOpen(true);
   };
 
-  const handleSystemSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingSystemId) {
-      await updateSystemComponent({ id: editingSystemId, ...systemForm });
-    } else {
-      await addSystemComponent(systemForm);
-    }
-    setSystemForm({ title: '', desc: '' });
-    setEditingSystemId(null);
-    setSystemFormOpen(false);
-  };
-
-  const handleEditSystemClick = (c: SystemComponent) => {
-    setSystemForm({ title: c.title, desc: c.desc });
-    setEditingSystemId(c.id);
-    setSystemFormOpen(true);
-  };
-
   const handlePartnerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingPartnerId) {
@@ -1694,10 +1660,6 @@ export default function DashboardPage() {
     l.role.toLowerCase().includes(leaderSearch.toLowerCase())
   );
 
-  const filteredSystem = systemComponents.filter(s =>
-    s.title.toLowerCase().includes(systemSearch.toLowerCase())
-  );
-
   const filteredPartners = partners.filter(p =>
     p.name.toLowerCase().includes(partnerSearch.toLowerCase())
   );
@@ -1803,7 +1765,6 @@ export default function DashboardPage() {
             // Section: Configuration (Super Admin only)
             ...(isSuperAdmin ? [
               { type: 'header', label: 'CONFIGURATION' } as const,
-              { id: 'page-system', type: 'page', tabId: 'pages', pageId: 'system', label: 'System Components', icon: 'fa-gears' } as const,
               { id: 'settings', type: 'tab', tabId: 'settings', label: 'System Settings', icon: 'fa-sliders' } as const,
             ] : []),
           ].map((item: any, idx: number) => {
@@ -1956,8 +1917,7 @@ export default function DashboardPage() {
                 activeEditPage === 'careers' ? 'Careers & Vacancies' :
                 activeEditPage === 'contact' ? 'Contact & Footer Settings' :
                 activeEditPage === 'governance' ? 'Governance & Policies' :
-                activeEditPage === 'partners' ? 'Partners & Sponsors' :
-                activeEditPage === 'system' ? 'System Components' : 'Home Page Editor'
+                activeEditPage === 'partners' ? 'Partners & Sponsors' : 'Home Page Editor'
               )}
               {adminTab === 'members' && 'Members Directory'}
               {adminTab === 'users' && 'System User Management & Access Control'}
@@ -2687,14 +2647,12 @@ export default function DashboardPage() {
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
                   <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className={`fas ${!isSuperAdmin && activeEditPage === 'system' ? 'fa-shield-halved' : 'fa-pen-slash'}`} style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <i className="fas fa-pen-slash" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
                     <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>
-                      {!isSuperAdmin && activeEditPage === 'system' ? 'Super Admin Only' : 'Editor Access Restricted'}
+                      Editor Access Restricted
                     </h4>
                     <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
-                      {!isSuperAdmin && activeEditPage === 'system'
-                        ? 'System Components are restricted to Super Administrators only.'
-                        : 'Editors are authorized to manage: Athletes Directory, Sports Programs, News Room, Announcements, Events Calendar, and Careers & Vacancies only.'}
+                      Editors are authorized to manage: Athletes Directory, Sports Programs, News Room, Announcements, Events Calendar, and Careers & Vacancies only.
                     </p>
                   </div>
                   <div className="card-body text-center py-3">
@@ -2736,8 +2694,7 @@ export default function DashboardPage() {
                      activeEditPage === 'careers' ? 'Careers & Vacancies' :
                      activeEditPage === 'contact' ? 'Contact Info & Footer Settings' :
                      activeEditPage === 'governance' ? 'Governance Documents & Policies' :
-                     activeEditPage === 'partners' ? 'Partners & Sponsors' :
-                     activeEditPage === 'system' ? 'System Components' : 'Home Page Editor'}
+                     activeEditPage === 'partners' ? 'Partners & Sponsors' : 'Home Page Editor'}
                   </h3>
                 </div>
                 <div className="d-flex gap-2">
@@ -3255,33 +3212,6 @@ export default function DashboardPage() {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeEditPage === 'system' && (
-                    <div className="border rounded bg-white p-4 shadow" style={{ maxWidth: '900px', margin: '0 auto' }}>
-                      <div className="text-center py-4 bg-light mb-4 rounded">
-                        <h2 className="fw-bold text-dark">System Translation & Metadata Components</h2>
-                        <span className="small text-muted">System keys mapping directory Mockup</span>
-                      </div>
-                      <div className="table-responsive bg-white rounded border shadow-sm">
-                        <table className="table table-hover mb-0 align-middle">
-                          <thead>
-                            <tr>
-                              <th>Title Key</th>
-                              <th>Description Translation Value</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {systemComponents.map(s => (
-                              <tr key={s.id}>
-                                <td className="fw-bold text-primary">{s.title}</td>
-                                <td className="small text-muted">{s.desc}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
                       </div>
                     </div>
                   )}
@@ -5107,81 +5037,6 @@ export default function DashboardPage() {
                           onPageChange={(page) => setCurrentPage({ ...currentPage, partners: page })}
                         />
                       )}
-                    </div>
-                  )}
-
-                  {/* SYSTEM COMPONENTS PAGE EDITOR */}
-                  {activeEditPage === 'system' && (
-                    <div>
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h3 className="h6 fw-bold mb-0 text-dark">System Components Translation Registry ({systemComponents.length})</h3>
-                        <button
-                          onClick={() => {
-                            setEditingSystemId(null);
-                            setSystemForm({ title: '', desc: '' });
-                            setSystemFormOpen(!systemFormOpen);
-                          }}
-                          className="btn btn-primary btn-sm fw-bold px-4"
-                        >
-                          <i className={`fas ${systemFormOpen ? 'fa-minus' : 'fa-plus'} me-1`} />
-                          {systemFormOpen ? 'Cancel' : 'New System Key'}
-                        </button>
-                      </div>
-
-                      {systemFormOpen && (
-                        <form onSubmit={handleSystemSubmit} className="custom-card p-4 mb-4 row g-3 bg-light border">
-                          <h4 className="h6 fw-bold col-12">{editingSystemId ? 'Edit System Key' : 'Create System Key'}</h4>
-                          <div className="col-md-6">
-                            <label className="form-label small fw-bold">Component Identifier Key</label>
-                            <input type="text" className="form-control" required value={systemForm.title} onChange={e => setSystemForm({ ...systemForm, title: e.target.value })} placeholder="e.g. system.navbar" />
-                          </div>
-                          <div className="col-md-12">
-                            <label className="form-label small fw-bold">Description Translation / Value</label>
-                            <textarea className="form-control" required rows={2} value={systemForm.desc} onChange={e => setSystemForm({ ...systemForm, desc: e.target.value })} placeholder="e.g. system.navbar_desc" />
-                          </div>
-                          <div className="col-12 d-flex gap-2">
-                            <button type="submit" className="btn btn-primary btn-sm px-4">{editingSystemId ? 'Update Key' : 'Create Key'}</button>
-                            <button type="button" onClick={() => setSystemFormOpen(false)} className="btn btn-light btn-sm px-4">Cancel</button>
-                          </div>
-                        </form>
-                      )}
-
-                      <div className="p-3 bg-light border-bottom mb-3 rounded">
-                        <input type="text" placeholder="Search components..." className="form-control form-control-sm" style={{ maxWidth: '300px' }} value={systemSearch} onChange={e => setSystemSearch(e.target.value)} />
-                      </div>
-
-                      <div className="table-responsive bg-white rounded border shadow-sm">
-                        <table className="table table-hover mb-0 align-middle">
-                          <thead>
-                            <tr>
-                              <th>Component Key</th>
-                              <th>Description / Value</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {filteredSystem.map(s => (
-                              <tr key={s.id}>
-                                <td className="small fw-semibold text-primary">{s.title}</td>
-                                <td className="small text-muted">{s.desc}</td>
-                                <td>
-                                  <div className="d-flex gap-2">
-                                    <button 
-                                      onClick={() => {
-                                        setSystemForm({ title: s.title, desc: s.desc });
-                                        setEditingSystemId(s.id);
-                                        setSystemFormOpen(true);
-                                      }} 
-                                      className="btn btn-sm btn-outline-primary py-0"
-                                    >Edit</button>
-                                    <button onClick={() => deleteSystemComponent(s.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
                     </div>
                   )}
                 </div>

@@ -23,7 +23,6 @@ export async function GET() {
       siteContentList,
       rawContactInfo,
       socialLinks,
-      systemComponents,
       rawSystemSettings,
       associations,
       clubs,
@@ -70,9 +69,6 @@ export async function GET() {
       prisma.contactInfo.findFirst(),
       prisma.socialLink.findMany({
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-      }),
-      prisma.systemComponent.findMany({
-        orderBy: { createdAt: 'asc' },
       }),
       prisma.systemSetting.findMany(),
       prisma.npcAssociation.findMany({
@@ -153,7 +149,6 @@ export async function GET() {
       siteContentMap,
       contactInfo,
       socialLinks,
-      systemComponents,
       systemSettings: settingsMap,
       associations,
       clubs,

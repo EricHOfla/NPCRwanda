@@ -110,12 +110,6 @@ export interface Leader {
   order?: number;
 }
 
-export interface SystemComponent {
-  id: string;
-  title: string;
-  desc: string;
-}
-
 export interface GovernanceDocument {
   id: string;
   title: string;
@@ -248,7 +242,6 @@ interface DataContextType {
   sports: SportDiscipline[];
   leaders: Leader[];
   leadership: Leader[];
-  systemComponents: SystemComponent[];
   governanceDocs: GovernanceDocument[];
   governancePolicies: GovernancePolicy[];
   events: Event[];
@@ -362,9 +355,6 @@ interface DataContextType {
   closeCareer: (id: string) => Promise<void>;
   markContactAsRead: (id: string, read?: boolean) => Promise<void>;
   deleteContactMessage: (id: string) => Promise<void>;
-  addSystemComponent: (item: Omit<SystemComponent, 'id'>) => Promise<void>;
-  updateSystemComponent: (item: SystemComponent) => Promise<void>;
-  deleteSystemComponent: (id: string) => Promise<void>;
   markVolunteerAsRead: (id: string, read?: boolean) => Promise<void>;
   deleteVolunteerApplication: (id: string) => Promise<void>;
   markDonationAsRead: (id: string, read?: boolean) => Promise<void>;
@@ -399,7 +389,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [careers, setCareers] = useState<Career[]>([]);
   const [sports, setSports] = useState<SportDiscipline[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
-  const [systemComponents, setSystemComponents] = useState<SystemComponent[]>([]);
   const [governanceDocs, setGovernanceDocs] = useState<GovernanceDocument[]>([]);
   const [governancePolicies, setGovernancePolicies] = useState<GovernancePolicy[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -465,7 +454,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPartners(Array.isArray(data.partners) ? data.partners : []);
     setContactInfo(data.contactInfo || null);
     setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
-    setSystemComponents(Array.isArray(data.systemComponents) ? data.systemComponents : []);
     setAssociations(Array.isArray(data.associations) ? data.associations : []);
     setClubs(Array.isArray(data.clubs) ? data.clubs : []);
     setFederations(Array.isArray(data.federations) ? data.federations : []);
@@ -1562,7 +1550,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sports,
         leaders,
         leadership: leaders,
-        systemComponents,
         governanceDocs,
         governancePolicies,
         events,
@@ -1658,15 +1645,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         markContactAsRead: async (id: string, read = true) => markMessageRead(id, read),
         deleteContactMessage: deleteMessage,
-        addSystemComponent: async (item: Omit<SystemComponent, 'id'>) => {
-          setSystemComponents(prev => [...prev, { ...item, id: Date.now().toString() }]);
-        },
-        updateSystemComponent: async (item: SystemComponent) => {
-          setSystemComponents(prev => prev.map(c => c.id === item.id ? item : c));
-        },
-        deleteSystemComponent: async (id: string) => {
-          setSystemComponents(prev => prev.filter(c => c.id !== id));
-        },
         markVolunteerAsRead: async (id: string, read = true) => markVolunteerRead(id, read),
         deleteVolunteerApplication: deleteVolunteer,
         markDonationAsRead: async (id: string, read = true) => markDonationRead(id, read),

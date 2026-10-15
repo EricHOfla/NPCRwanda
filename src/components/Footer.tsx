@@ -125,11 +125,6 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li className="mb-2">
-                <Link className="footer-link" href="/system">
-                  {t('footer.system_directory')}
-                </Link>
-              </li>
-              <li className="mb-2">
                 <a className="footer-link" href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
                   Webmail Login
                 </a>

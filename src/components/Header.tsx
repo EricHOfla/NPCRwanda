@@ -234,7 +234,7 @@ export const Header: React.FC = () => {
               {/* Governance (dropdown) */}
               <li className="nav-item dropdown">
                 <Link
-                  className={`nav-link dropdown-toggle ${isActive('/governance') || isActive('/leaders') || isActive('/system') ? 'active' : ''}`}
+                  className={`nav-link dropdown-toggle ${isActive('/governance') || isActive('/leaders') ? 'active' : ''}`}
                   href="/governance"
                   id="governanceMenu"
                   role="button"
@@ -254,12 +254,6 @@ export const Header: React.FC = () => {
                     <Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-users me-2 text-primary opacity-75"></i>
                       {t('phrase.Our Leadership') || 'Leaders'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/system" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-sitemap me-2 text-primary opacity-75"></i>
-                      {t('system.page_title') || 'System Directory'}
                     </Link>
                   </li>
                 </ul>
