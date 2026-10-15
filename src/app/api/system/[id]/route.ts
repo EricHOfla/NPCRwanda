@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getSessionUser } from '@/lib/auth';
 
 const systemComponentUpdateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -38,6 +39,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getSessionUser(request as any);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Permission denied. Super Admin access required.' }, { status: 403 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const result = systemComponentUpdateSchema.safeParse(body);
@@ -70,6 +79,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getSessionUser(request as any);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Permission denied. Super Admin access required.' }, { status: 403 });
+    }
+
     const { id } = await params;
     await prisma.systemComponent.delete({
       where: { id },

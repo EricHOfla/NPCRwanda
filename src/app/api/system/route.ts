@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getSessionUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,14 @@ export async function GET() {
 // POST: Create a new system component
 export async function POST(request: Request) {
   try {
+    const session = await getSessionUser(request as any);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Permission denied. Super Admin access required.' }, { status: 403 });
+    }
+
     const body = await request.json();
     const result = systemComponentSchema.safeParse(body);
 

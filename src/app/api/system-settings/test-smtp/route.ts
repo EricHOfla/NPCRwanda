@@ -10,6 +10,9 @@ export async function POST(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (session.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Permission denied. Super Admin access required.' }, { status: 403 });
+    }
 
     const result = await testSmtpConnection();
     return NextResponse.json(result);

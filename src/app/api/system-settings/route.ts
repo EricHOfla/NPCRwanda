@@ -51,6 +51,9 @@ export async function PUT(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (session.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Permission denied. Only Super Administrators can modify system configuration.' }, { status: 403 });
+    }
 
     const body = await request.json();
 

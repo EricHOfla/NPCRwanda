@@ -924,6 +924,12 @@ export default function DashboardPage() {
   const [userSearch, setUserSearch] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState<string>('ALL');
 
+  // Role permissions helpers
+  const userRole = (currentUser.role || 'EDITOR') as 'SUPER_ADMIN' | 'ADMIN' | 'EDITOR';
+  const isSuperAdmin = userRole === 'SUPER_ADMIN';
+  const isAdmin = userRole === 'ADMIN' || isSuperAdmin;
+  const isEditor = userRole === 'EDITOR';
+
   // Governance Document/Policy States & CRUD Operations
   const [govDocs, setGovDocs] = useState<any[]>([]);
   const [govPolicies, setGovPolicies] = useState<any[]>([]);
@@ -1754,8 +1760,8 @@ export default function DashboardPage() {
         <nav className="dashboard-sidebar-nav" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', padding: '12px 0', overflowY: 'auto' }}>
           {[
             { id: 'overview', type: 'tab', tabId: 'overview', label: 'Overview', icon: 'fa-chart-pie' },
-            
-            // Section: Website Pages
+
+            // Section: Website Pages (all roles)
             { type: 'header', label: 'WEBSITE PAGES' },
             { id: 'page-home', type: 'page', tabId: 'pages', pageId: 'home', label: 'Home Page', icon: 'fa-house' },
             { id: 'page-about', type: 'page', tabId: 'pages', pageId: 'about', label: 'About Us', icon: 'fa-circle-info' },
@@ -1771,18 +1777,22 @@ export default function DashboardPage() {
             { id: 'page-partners', type: 'page', tabId: 'pages', pageId: 'partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
             { id: 'page-contact', type: 'page', tabId: 'pages', pageId: 'contact', label: 'Contact & Footer', icon: 'fa-address-card' },
 
-            // Section: Management
-            { type: 'header', label: 'MANAGEMENT' },
-            { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' },
-            { id: 'users', type: 'tab', tabId: 'users', label: 'User Management', icon: 'fa-user-shield' },
-            { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
-            { id: 'subscribers', type: 'tab', tabId: 'subscribers', label: 'Subscribers', icon: 'fa-bell' },
+            // Section: Management (Admin and above only)
+            ...(isAdmin ? [
+              { type: 'header', label: 'MANAGEMENT' } as const,
+              { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' } as const,
+              { id: 'users', type: 'tab', tabId: 'users', label: 'User Management', icon: 'fa-user-shield' } as const,
+              { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' } as const,
+              { id: 'subscribers', type: 'tab', tabId: 'subscribers', label: 'Subscribers', icon: 'fa-bell' } as const,
+            ] : []),
 
-            // Section: Configuration
-            { type: 'header', label: 'CONFIGURATION' },
-            { id: 'page-system', type: 'page', tabId: 'pages', pageId: 'system', label: 'System Components', icon: 'fa-gears' },
-            { id: 'settings', type: 'tab', tabId: 'settings', label: 'System Settings', icon: 'fa-sliders' },
-          ].map((item, idx) => {
+            // Section: Configuration (Super Admin only)
+            ...(isSuperAdmin ? [
+              { type: 'header', label: 'CONFIGURATION' } as const,
+              { id: 'page-system', type: 'page', tabId: 'pages', pageId: 'system', label: 'System Components', icon: 'fa-gears' } as const,
+              { id: 'settings', type: 'tab', tabId: 'settings', label: 'System Settings', icon: 'fa-sliders' } as const,
+            ] : []),
+          ].map((item: any, idx: number) => {
             if (item.type === 'header') {
               if (!sidebarOpen) return <div key={`sep-${idx}`} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 12px' }} />;
               return (
@@ -1868,7 +1878,7 @@ export default function DashboardPage() {
               />
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.name || 'Admin'}</span>
-                <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>System Administrator</span>
+                <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isSuperAdmin ? 'Super Administrator' : isAdmin ? 'Administrator' : 'Content Editor'}</span>
               </div>
             </div>
           )}
@@ -2236,6 +2246,11 @@ export default function DashboardPage() {
                     <div style={{ minWidth: 0 }}>
                       <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#0F172A', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.name || 'Admin User'}</span>
                       <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.email || 'admin@npcrwanda.org'}</span>
+                      <span style={{ display: 'inline-block', marginTop: '4px', fontSize: '0.65rem', fontWeight: 700, padding: '2px 8px', borderRadius: '20px',
+                        background: isSuperAdmin ? 'linear-gradient(135deg, #B45309, #F59E0B)' : isAdmin ? '#1E40AF' : '#065F46',
+                        color: '#fff', letterSpacing: '0.5px', textTransform: 'uppercase' as const }}>
+                        {isSuperAdmin ? '👑 Super Admin' : isAdmin ? '🛡 Administrator' : '✏️ Editor'}
+                      </span>
                     </div>
                   </div>
 
@@ -2331,6 +2346,40 @@ export default function DashboardPage() {
           {/* ──────────────────────────────
              TAB: OVERVIEW
              ────────────────────────────── */}
+          {/* Unauthorized Access Guard */}
+              {(!isAdmin && (adminTab === 'users' || adminTab === 'members' || adminTab === 'contacts' || adminTab === 'subscribers')) && (
+                <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                      <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>This section requires Administrator or higher privileges. Contact your Super Administrator for access.</p>
+                    </div>
+                    <div className="card-body text-center py-3">
+                      <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}>
+                        <i className="fas fa-arrow-left me-2" />Back to Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {(!isSuperAdmin && (adminTab === 'settings' || (adminTab === 'pages' && activeEditPage === 'system'))) && (
+                <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                      <i className="fas fa-shield-halved" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Super Admin Only</h4>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>System Settings and Configuration are restricted to Super Administrators only.</p>
+                    </div>
+                    <div className="card-body text-center py-3">
+                      <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}>
+                        <i className="fas fa-arrow-left me-2" />Back to Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
           {adminTab === 'overview' && (
             <div>
               {/* Welcome Panel */}
@@ -6014,7 +6063,7 @@ export default function DashboardPage() {
                           >
                             <option value="EDITOR">Editor (Can create &amp; publish articles, events, sports)</option>
                             <option value="ADMIN">Administrator (Can manage site content, members, announcements)</option>
-                            <option value="SUPER_ADMIN">Super Administrator (Full unrestricted system control)</option>
+                            {isSuperAdmin && <option value="SUPER_ADMIN">Super Administrator (Full unrestricted system control)</option>}
                           </select>
                         </div>
                       </div>
