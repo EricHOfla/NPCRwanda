@@ -509,7 +509,7 @@ async function main() {
 
   // 17. Site Content
   const contents = [
-    { key: 'hero.image', value: '/assets/img/curated/home-hero.jpg', type: 'image' },
+    { key: 'hero.image', value: '', type: 'image' },
     { key: 'hero.kicker', value: "RWANDA'S PARALYMPIC PRIDE", type: 'text' },
     { key: 'hero.title1', value: 'Empowering Ability.', type: 'text' },
     { key: 'hero.title2', value: 'Inspiring Rwanda.', type: 'text' },

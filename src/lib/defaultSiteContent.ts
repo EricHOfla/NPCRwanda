@@ -1,6 +1,6 @@
 export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   // Home Page
-  'hero.image': '/assets/img/curated/home-hero.jpg',
+  'hero.image': '',
   'hero.kicker': "RWANDA'S PARALYMPIC PRIDE",
   'hero.title1': 'Empowering Ability.',
   'hero.title2': 'Inspiring Rwanda.',

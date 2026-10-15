@@ -197,30 +197,35 @@ export default function HomeClient() {
                     minHeight: '480px',
                     boxShadow: '0 20px 50px rgba(10, 37, 64, 0.16)',
                     border: '4px solid #FFFFFF',
-                    background: '#0B1E38',
+                    background: 'linear-gradient(145deg, #07192F 0%, #0F2D54 50%, #081B34 100%)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end'
                   }}
                 >
-                  {siteContent['hero.image'] ? (
-                    <img
-                      src={siteContent['hero.image']}
-                      alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
-                      className="pro-ngo-hero__showcase-img"
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block'
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : null}
+                  {(() => {
+                    const heroImg = siteContent['hero.image'];
+                    const hasDbHeroImage = Boolean(heroImg && heroImg.trim() !== '' && !heroImg.includes('/assets/img/curated/'));
+                    if (!hasDbHeroImage) return null;
+                    return (
+                      <img
+                        src={heroImg}
+                        alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
+                        className="pro-ngo-hero__showcase-img"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    );
+                  })()}
                   
                   {/* High contrast gradient so words and button are always razor sharp and clearly visible */}
                   <div 
