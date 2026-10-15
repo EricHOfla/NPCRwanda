@@ -4,17 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import Pagination from '@/components/Pagination';
-
 export default function AboutPage() {
   const { t } = useTranslation();
-  const { leadership, siteContent } = useData();
-  const [currentLeaderPage, setCurrentLeaderPage] = React.useState(1);
-
-  const ITEMS_PER_PAGE_LEADERSHIP = 6;
-  const totalLeaderPages = Math.ceil(leadership.length / ITEMS_PER_PAGE_LEADERSHIP);
-  const visibleLeaderPage = Math.min(currentLeaderPage, Math.max(totalLeaderPages, 1));
-  const paginatedLeadership = leadership.slice((visibleLeaderPage - 1) * ITEMS_PER_PAGE_LEADERSHIP, visibleLeaderPage * ITEMS_PER_PAGE_LEADERSHIP);
+  const { siteContent } = useData();
 
   const getSiteText = (key: string, fallback: string) => {
     return siteContent[key] || fallback;
@@ -57,7 +49,7 @@ export default function AboutPage() {
             {t('phrase.About NPC Rwanda')}
           </h1>
           <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
-            Learn about our journey, mission, leadership, and commitment to the Paralympic movement.
+            Learn about our journey, mission, vision, core values, and strategic commitment to the Paralympic movement.
           </p>
         </div>
       </header>
@@ -149,44 +141,6 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Leadership */}
-      <section id="leadership">
-        <div className="container">
-          <div className="section-title" data-aos="fade-up">
-            <h2>{t('phrase.Our Leadership')}</h2>
-            <p className="text-muted">
-              {t('phrase.The dedicated team steering the strategic direction of NPC Rwanda.')}
-            </p>
-          </div>
-          {leadership.length === 0 ? (
-            <p className="text-muted text-center">No leadership team loaded.</p>
-          ) : (
-            <>
-              <div className="row g-4">
-                {paginatedLeadership.map(({ avatar, name, role, desc }, i) => (
-                  <div key={name} className="col-md-4" data-aos="fade-up" data-aos-delay={`${i * 100}`}>
-                    <div className="custom-card p-4 text-center">
-                      <div className="athlete-thumb mb-3">
-                        <img 
-                          src={avatar.startsWith('http') || avatar.startsWith('/') ? avatar : `/assets/img/${avatar}`} 
-                          alt={`${name} portrait`} 
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/avatar-4.svg'; }}
-                        />
-                      </div>
-                      <h4 className="h5 mb-1">{name}</h4>
-                      <p className="text-accent-green fw-bold">{t(role)}</p>
-                      <p className="small text-muted">{t(desc)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Pagination currentPage={visibleLeaderPage} totalPages={totalLeaderPages} onPageChange={setCurrentLeaderPage} ariaLabel="Leadership pagination" />
-            </>
-          )}
         </div>
       </section>
 

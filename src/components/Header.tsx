@@ -203,12 +203,6 @@ export const Header: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-users me-2 text-primary opacity-75"></i>
-                      {t('phrase.Our Leadership') || 'Our Leadership'}
-                    </Link>
-                  </li>
-                  <li>
                     <Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}>
                       <i className="fas fa-heart me-2 text-primary opacity-75"></i>
                       {t('phrase.Core Values') || 'Core Values'}
