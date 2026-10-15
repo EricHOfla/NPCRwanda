@@ -56,7 +56,7 @@ export default function SportsPage() {
         <div className="container">
           <div className="row g-4">
             {paginatedSports.map((sport, i) => (
-              <div key={sport.id} className="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 100}`}>
+              <div key={sport.id} id={sport.id} className="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 100}`}>
                 <div className="custom-card sport-card">
                   <img
                     src={getSportImageSrc(sport.img)}

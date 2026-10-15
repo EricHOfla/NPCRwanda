@@ -107,6 +107,7 @@ export default function ArticleDetailPage({ params }: { params: Promise<{ slug: 
                   alt={article.title}
                   className="w-100 img-fluid"
                   style={{ maxHeight: '480px', objectFit: 'cover' }}
+                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
                 />
               </div>
 

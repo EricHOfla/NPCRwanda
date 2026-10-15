@@ -91,6 +91,7 @@ export default function NewsPage() {
                     alt={featured.title}
                     className="w-100 h-100"
                     style={{ objectFit: 'cover', minHeight: '300px' }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
                   />
                 </div>
                 <div className="col-lg-6 d-flex flex-column justify-content-center p-4 p-lg-5">
@@ -180,6 +181,7 @@ export default function NewsPage() {
                           alt={article.title}
                           className="img-fluid w-100"
                           style={{ height: '200px', objectFit: 'cover' }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
                         />
                         <span
                           className="badge position-absolute top-0 end-0 m-2 fw-semibold"
