@@ -855,31 +855,6 @@ export default function DashboardPage() {
   const [savedSysSettings, setSavedSysSettings] = useState<Record<string, string>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMsg, setSettingsMsg] = useState('');
-  const [smtpTesting, setSmtpTesting] = useState(false);
-  const [smtpTestResult, setSmtpTestResult] = useState<{ success?: boolean; message?: string } | null>(null);
-
-  const handleTestSmtp = async () => {
-    setSmtpTesting(true);
-    setSmtpTestResult(null);
-    try {
-      await fetch('/api/system-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sysSettings),
-      });
-      const res = await fetch('/api/system-settings/test-smtp', { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        setSmtpTestResult({ success: true, message: data.message || 'SMTP connected successfully!' });
-      } else {
-        setSmtpTestResult({ success: false, message: data.error || 'Connection failed.' });
-      }
-    } catch (e: any) {
-      setSmtpTestResult({ success: false, message: e?.message || 'Error testing connection' });
-    } finally {
-      setSmtpTesting(false);
-    }
-  };
 
   // Admin Profile state
   const [profile, setProfile] = useState({ name: '', email: '', password: '', confirmPassword: '' });
@@ -6344,36 +6319,6 @@ export default function DashboardPage() {
                         </select>
                       </div>
                     </div>
-                    <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <button
-                        type="button"
-                        onClick={handleTestSmtp}
-                        disabled={smtpTesting || !sysSettings.smtpHost || !sysSettings.smtpUser}
-                        style={{
-                          background: '#E0F2FE',
-                          color: '#0369A1',
-                          border: '1px solid #BAE6FD',
-                          borderRadius: '8px',
-                          padding: '8px 16px',
-                          fontWeight: 600,
-                          fontSize: '0.82rem',
-                          cursor: smtpTesting ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        <i className={`fas ${smtpTesting ? 'fa-spinner fa-spin' : 'fa-paper-plane'} me-2`} />
-                        {smtpTesting ? 'Testing Connection...' : 'Test SMTP Connection'}
-                      </button>
-                      {smtpTestResult && (
-                        <span style={{
-                          fontSize: '0.82rem',
-                          fontWeight: 600,
-                          color: smtpTestResult.success ? '#15803D' : '#B91C1C'
-                        }}>
-                          <i className={`fas ${smtpTestResult.success ? 'fa-check-circle' : 'fa-triangle-exclamation'} me-1`} />
-                          {smtpTestResult.message}
-                        </span>
-                      )}
-                    </div>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
                     <button type="submit" disabled={settingsSaving} style={{ background: '#0072C6', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 24px', fontWeight: 700, fontSize: '0.88rem', cursor: settingsSaving ? 'not-allowed' : 'pointer', opacity: settingsSaving ? 0.7 : 1 }}>
@@ -6384,23 +6329,23 @@ export default function DashboardPage() {
                 </form>
               </div>
 
-              {/* Database Backup & Disaster Recovery */}
+              {/* Database Backup & Disaster Recovery (.SQL) */}
               <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', marginTop: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <i className="fas fa-database" style={{ fontSize: '1.3rem', color: '#D97706' }} />
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>Database Backup & Disaster Recovery</h3>
-                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>Download a complete, structured JSON snapshot of all system collections.</p>
+                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>Database Backup & Disaster Recovery (.SQL)</h3>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>Download a complete, ready-to-restore .SQL database script containing all system tables and records.</p>
                   </div>
                 </div>
                 <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: 1.6, marginBottom: '20px' }}>
-                  Generate an instant offline backup of all database tables including athletes, news articles, events, careers, governance records, contact inquiries, volunteer applications, and subscriber lists. All user credentials and passwords are automatically scrubbed for security.
+                  Generate an instant offline SQL script backup of all database tables including athletes, news articles, events, careers, governance records, contact inquiries, volunteer applications, and subscriber lists. All user credentials and passwords are automatically scrubbed for security. Ready to import directly into PostgreSQL.
                 </p>
                 <a
                   href="/api/backup/export"
-                  download
+                  download="npcrwanda_backup.sql"
                   className="btn"
                   style={{
                     background: 'linear-gradient(135deg, #F59E0B, #D97706)',
@@ -6417,8 +6362,8 @@ export default function DashboardPage() {
                     boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)'
                   }}
                 >
-                  <i className="fas fa-cloud-arrow-down" />
-                  Export Full Database Backup (JSON)
+                  <i className="fas fa-file-code" />
+                  Export Full Database Backup (.SQL)
                 </a>
               </div>
             </div>
