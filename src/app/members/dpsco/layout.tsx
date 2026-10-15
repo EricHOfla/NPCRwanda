@@ -1,36 +1,19 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "District Paralympic Sports Committees (DPSCO) | NPC Rwanda",
-  description: "Directory and contacts for District Paralympic Sports Committees (DPSCO) coordinating grassroots para sports across all 30 districts of Rwanda.",
-  path: "/members/dpsco",
-});
+export const metadata: Metadata = {
+  title: 'DPSCO Members',
+  description:
+    'Disabled Persons Sports Clubs and Organisations (DPSCO) affiliated with NPC Rwanda — working at the grassroots to develop para-sport across Rwanda.',
+  keywords: ['NPC Rwanda', 'DPSCO', 'disabled persons', 'sports clubs', 'Paralympic', 'Rwanda'],
+  alternates: { canonical: 'https://npcrwanda.org/members/dpsco' },
+  openGraph: {
+    title: 'DPSCO Members | NPC Rwanda',
+    description: 'Disabled Persons Sports Clubs and Organisations affiliated with NPC Rwanda.',
+    url: 'https://npcrwanda.org/members/dpsco',
+    images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+  },
+};
 
 export default function DpscoLayout({ children }: { children: React.ReactNode }) {
-  const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    {
-        "name": "Home",
-        "url": "/"
-    },
-    {
-        "name": "Members",
-        "url": "/about"
-    },
-    {
-        "name": "DPSCO",
-        "url": "/members/dpsco"
-    }
-]);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

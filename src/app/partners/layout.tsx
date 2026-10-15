@@ -1,32 +1,19 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "Partners, Sponsors & Collaborators | NPC Rwanda",
-  description: "Our valued government, international, and private sector partners supporting the growth and success of Para sports in Rwanda.",
-  path: "/partners",
-});
+export const metadata: Metadata = {
+  title: 'Partners & Sponsors',
+  description:
+    'Meet the organisations, institutions, and sponsors supporting NPC Rwanda\'s mission to develop para-sport and empower athletes with disabilities across Rwanda.',
+  keywords: ['NPC Rwanda', 'partners', 'sponsors', 'Paralympic', 'Rwanda', 'support'],
+  alternates: { canonical: 'https://npcrwanda.org/partners' },
+  openGraph: {
+    title: 'Partners & Sponsors | NPC Rwanda',
+    description: 'Partners and sponsors enabling Rwanda\'s Paralympic movement.',
+    url: 'https://npcrwanda.org/partners',
+    images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+  },
+};
 
 export default function PartnersLayout({ children }: { children: React.ReactNode }) {
-  const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    {
-        "name": "Home",
-        "url": "/"
-    },
-    {
-        "name": "Partners",
-        "url": "/partners"
-    }
-]);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

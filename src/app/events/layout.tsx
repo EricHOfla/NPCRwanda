@@ -1,32 +1,19 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "Paralympic Events & Competitions Calendar | NPC Rwanda",
-  description: "Calendar of upcoming national and international Paralympic competitions, training camps, qualifiers, and community sporting events in Rwanda.",
-  path: "/events",
-});
+export const metadata: Metadata = {
+  title: 'Events Calendar',
+  description:
+    'Upcoming and past para-sport events organised by NPC Rwanda — competitions, training camps, community outreach, and international qualifiers.',
+  keywords: ['NPC Rwanda', 'events', 'calendar', 'Paralympic', 'Rwanda', 'competitions'],
+  alternates: { canonical: 'https://npcrwanda.org/events' },
+  openGraph: {
+    title: 'Events Calendar | NPC Rwanda',
+    description: 'Para-sport events, competitions, and activities organised by NPC Rwanda.',
+    url: 'https://npcrwanda.org/events',
+    images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+  },
+};
 
 export default function EventsLayout({ children }: { children: React.ReactNode }) {
-  const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    {
-        "name": "Home",
-        "url": "/"
-    },
-    {
-        "name": "Events Calendar",
-        "url": "/events"
-    }
-]);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

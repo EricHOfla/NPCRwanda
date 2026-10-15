@@ -1,32 +1,20 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "About Us | National Paralympic Committee of Rwanda",
-  description: "Learn about the mission, vision, values, and history of the National Paralympic Committee of Rwanda (NPC Rwanda) empowering athletes with disabilities.",
-  path: "/about",
-});
+export const metadata: Metadata = {
+  title: 'About NPC Rwanda',
+  description:
+    'Learn about the National Paralympic Committee of Rwanda — our history, mission, vision, core values, and the people driving para-sport excellence across Rwanda.',
+  keywords: ['NPC Rwanda', 'about', 'Paralympic', 'Rwanda', 'para-sport', 'mission', 'vision'],
+  alternates: { canonical: 'https://npcrwanda.org/about' },
+  openGraph: {
+    title: 'About NPC Rwanda',
+    description:
+      'Discover the history, mission, and values behind Rwanda\'s National Paralympic Committee.',
+    url: 'https://npcrwanda.org/about',
+    images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+  },
+};
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
-  const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    {
-        "name": "Home",
-        "url": "/"
-    },
-    {
-        "name": "About Us",
-        "url": "/about"
-    }
-]);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

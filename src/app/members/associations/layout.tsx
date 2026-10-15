@@ -1,36 +1,19 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { generatePageMetadata, getBreadcrumbJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "Disability Sports Associations | NPC Rwanda",
-  description: "Affiliated district and regional disability sports associations developing Paralympic sports across the provinces of Rwanda.",
-  path: "/members/associations",
-});
+export const metadata: Metadata = {
+  title: 'Member Associations',
+  description:
+    'NPC Rwanda member associations — sports clubs and disability associations affiliated with the National Paralympic Committee of Rwanda.',
+  keywords: ['NPC Rwanda', 'associations', 'members', 'clubs', 'Paralympic', 'Rwanda'],
+  alternates: { canonical: 'https://npcrwanda.org/members/associations' },
+  openGraph: {
+    title: 'Member Associations | NPC Rwanda',
+    description: 'Affiliated sports clubs and disability associations of NPC Rwanda.',
+    url: 'https://npcrwanda.org/members/associations',
+    images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+  },
+};
 
 export default function AssociationsLayout({ children }: { children: React.ReactNode }) {
-  const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    {
-        "name": "Home",
-        "url": "/"
-    },
-    {
-        "name": "Members",
-        "url": "/about"
-    },
-    {
-        "name": "Associations",
-        "url": "/members/associations"
-    }
-]);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

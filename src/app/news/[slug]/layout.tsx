@@ -1,156 +1,34 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import { prisma } from '@/lib/prisma';
-import {
-  generatePageMetadata,
-  getArticleJsonLd,
-  getBreadcrumbJsonLd,
-} from '@/lib/seo';
-
-import { normalizeSlug } from '@/lib/slug';
-
-interface ArticleLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ slug: string }>;
-}
-
-async function findArticleBySlug(slug: string) {
-  let decoded = slug;
-  try {
-    decoded = decodeURIComponent(slug);
-  } catch {}
-  const clean = normalizeSlug(slug);
-
-  // 1. Direct query
-  let article = await prisma.newsArticle.findFirst({
-    where: {
-      OR: [
-        { slug },
-        { slug: decoded },
-        { slug: clean },
-        { id: slug },
-      ],
-    },
-    select: {
-      id: true,
-      title: true,
-      desc: true,
-      img: true,
-      category: true,
-      createdAt: true,
-      updatedAt: true,
-      slug: true,
-    },
-  });
-
-  // 2. Normalized fallback
-  if (!article) {
-    const all = await prisma.newsArticle.findMany({
-      select: {
-        id: true,
-        title: true,
-        desc: true,
-        img: true,
-        category: true,
-        createdAt: true,
-        updatedAt: true,
-        slug: true,
-      },
-    });
-    article = all.find(a => 
-      a.id === slug ||
-      a.slug.toLowerCase() === slug.toLowerCase() ||
-      a.slug.toLowerCase() === decoded.toLowerCase() ||
-      normalizeSlug(a.slug) === clean
-    ) || null;
-  }
-
-  return article;
-}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }> | { slug: string };
 }): Promise<Metadata> {
-  const { slug } = await params;
-  try {
-    const article = await findArticleBySlug(slug);
+  const resolvedParams =
+    params && typeof (params as Promise<{ slug: string }>).then === 'function'
+      ? await (params as Promise<{ slug: string }>)
+      : (params as { slug: string });
 
-    if (!article) {
-      return generatePageMetadata({
-        title: 'Article Not Found',
-        description: 'The requested news article could not be found.',
-        path: `/news/${slug}`,
-        noIndex: true,
-      });
-    }
+  const slug = resolvedParams?.slug ?? '';
+  const title = slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 
-    return generatePageMetadata({
-      title: article.title,
-      description: article.desc || article.title,
-      path: `/news/${slug}`,
-      image: article.img || undefined,
-      type: 'article',
-      publishedTime: article.createdAt.toISOString(),
-      modifiedTime: article.updatedAt.toISOString(),
-      section: article.category || 'Sports',
-    });
-  } catch (error) {
-    console.error('[ArticleMetadata] Error loading article metadata:', error);
-    return generatePageMetadata({
-      title: 'News Article',
-      description: 'Read the latest Paralympic news from Rwanda.',
-      path: `/news/${slug}`,
-    });
-  }
+  return {
+    title,
+    description: `Read the full NPC Rwanda news article: ${title}. Stay updated on para-sport events, athlete achievements, and organizational news from Rwanda.`,
+    alternates: { canonical: `https://npcrwanda.org/news/${slug}` },
+    openGraph: {
+      title: `${title} | NPC Rwanda`,
+      description: `NPC Rwanda news: ${title}`,
+      url: `https://npcrwanda.org/news/${slug}`,
+      images: [{ url: 'https://npcrwanda.org/assets/img/og-default.jpg', width: 1200, height: 630 }],
+    },
+  };
 }
 
-export default async function ArticleLayout({
-  children,
-  params,
-}: ArticleLayoutProps) {
-  const { slug } = await params;
-  let articleJsonLd = null;
-  let articleTitle = 'News Article';
-
-  try {
-    const article = await findArticleBySlug(slug);
-
-    if (article) {
-      articleTitle = article.title;
-      articleJsonLd = getArticleJsonLd({
-        title: article.title,
-        description: article.desc || article.title,
-        url: `/news/${slug}`,
-        imageUrl: article.img,
-        datePublished: article.createdAt.toISOString(),
-        dateModified: article.updatedAt.toISOString(),
-      });
-    }
-  } catch (error) {
-    console.error('[ArticleLayout] Error preparing JSON-LD:', error);
-  }
-
-  const breadcrumbs = getBreadcrumbJsonLd([
-    { name: 'Home', url: '/' },
-    { name: 'News', url: '/news' },
-    { name: articleTitle, url: `/news/${slug}` },
-  ]);
-
-  return (
-    <>
-      {articleJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-        />
-      )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
-      />
-      {children}
-    </>
-  );
+export default function NewsArticleLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
