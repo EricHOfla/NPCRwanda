@@ -311,3 +311,47 @@ export function getBreadcrumbJsonLd(
     })),
   };
 }
+
+/**
+ * JobPosting JSON-LD Schema (Google for Jobs)
+ */
+export function getJobPostingJsonLd(job: {
+  title: string;
+  description: string;
+  slug: string;
+  location?: string;
+  deadline?: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}) {
+  const jobUrl = getAbsoluteUrl(`/careers/${encodeURIComponent(job.slug)}`);
+  const datePosted = job.createdAt ? new Date(job.createdAt).toISOString() : new Date().toISOString();
+  const validThrough = job.deadline ? new Date(job.deadline).toISOString() : undefined;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: job.title,
+    description: job.description,
+    datePosted,
+    ...(validThrough ? { validThrough } : {}),
+    employmentType: 'FULL_TIME',
+    hiringOrganization: {
+      '@type': 'SportsOrganization',
+      name: SITE_CONFIG.fullName,
+      sameAs: SITE_CONFIG.siteUrl,
+      logo: `${SITE_CONFIG.siteUrl}/assets/img/logo.png`,
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: SITE_CONFIG.address.streetAddress,
+        addressLocality: job.location || SITE_CONFIG.address.addressLocality,
+        addressRegion: SITE_CONFIG.address.addressRegion,
+        addressCountry: SITE_CONFIG.address.addressCountry,
+      },
+    },
+    url: jobUrl,
+  };
+}

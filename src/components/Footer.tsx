@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslation } from '../context/LanguageContext';
 import { useData } from '../context/DataContext';
 
@@ -12,6 +13,7 @@ export const Footer: React.FC = () => {
   const [subscribeEmail, setSubscribeEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState<{ text: string; success: boolean } | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +49,7 @@ export const Footer: React.FC = () => {
   const email = systemSettings.contactEmail || contactInfo?.email || '';
   const siteName = systemSettings.siteName || 'NPC Rwanda';
   const siteLogo = systemSettings.siteLogo || getSiteText('footer.logo', '/assets/img/logo.png');
+  const resolvedLogo = logoError ? '/assets/img/logo.png' : (siteLogo || '/assets/img/logo.png');
   const configuredSocialLinks = socialLinks
     .filter(s => s.active)
     .map(s => ({ ...s, url: systemSettings[s.platform] || s.url }));
@@ -59,12 +62,15 @@ export const Footer: React.FC = () => {
           {/* Column 1: Logo & Description */}
           <div className="col-lg-4">
             <div className="footer-logo d-flex align-items-center mb-4">
-              <img
-                src={siteLogo}
+              <Image
+                src={resolvedLogo}
                 alt={`${siteName} Logo`}
+                width={50}
+                height={50}
                 className="me-2"
                 style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
-                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
+                onError={() => setLogoError(true)}
+                unoptimized={resolvedLogo.startsWith('data:')}
               />
               <h5 className="mb-0">{siteName}</h5>
             </div>
@@ -125,6 +131,16 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li className="mb-2">
+                <Link className="footer-link" href="/contact">
+                  {t('nav.contact') || 'Contact Us'}
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link className="footer-link" href="/donate">
+                  {t('common.donate') || 'Support & Donate'}
+                </Link>
+              </li>
+              <li className="mb-2">
                 <a className="footer-link" href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
                   Webmail Login
                 </a>
@@ -139,6 +155,11 @@ export const Footer: React.FC = () => {
               <li className="mb-2">
                 <Link className="footer-link" href="/governance#board">
                   {t('system.board_members')}
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link className="footer-link" href="/leaders">
+                  {t('phrase.Our Leadership') || 'Our Leadership'}
                 </Link>
               </li>
               <li className="mb-2">

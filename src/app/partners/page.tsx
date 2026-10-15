@@ -1,9 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
+
+const PartnerLogo: React.FC<{ logo: string; name: string }> = ({ logo, name }) => {
+  const [hasError, setHasError] = useState(false);
+  const rawSrc = hasError || !logo ? '/assets/img/logo.png' : (logo.startsWith('http') || logo.startsWith('/') ? logo : `/assets/img/${logo}`);
+  return (
+    <div className="position-relative d-flex align-items-center justify-content-center" style={{ height: '90px', width: '100%' }}>
+      <Image
+        src={rawSrc}
+        alt={name}
+        fill
+        sizes="(max-width: 768px) 50vw, 25vw"
+        style={{ objectFit: 'contain' }}
+        onError={() => setHasError(true)}
+        unoptimized={rawSrc.startsWith('data:')}
+      />
+    </div>
+  );
+};
 
 export default function PartnersPage() {
   const { t } = useTranslation();
@@ -62,14 +81,7 @@ export default function PartnersPage() {
                 {govPartners.map(p => (
                   <div key={p.id} className="col-6 col-sm-4 col-md-3">
                     <div className="card h-100 border-0 shadow-xs text-center p-4 d-flex flex-column justify-content-between align-items-center" style={{ borderRadius: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-                      <div className="d-flex align-items-center justify-content-center" style={{ height: '100px', width: '100%' }}>
-                        <img 
-                          src={p.logo} 
-                          alt={p.name} 
-                          style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
-                        />
-                      </div>
+                      <PartnerLogo logo={p.logo} name={p.name} />
                       <div className="mt-3 w-100">
                         <h3 className="h6 fw-bold text-dark mb-2 text-truncate" title={p.name}>{p.name}</h3>
                         {p.website && (
@@ -95,14 +107,7 @@ export default function PartnersPage() {
                 {intPartners.map(p => (
                   <div key={p.id} className="col-6 col-sm-4 col-md-3">
                     <div className="card h-100 border-0 shadow-xs text-center p-4 d-flex flex-column justify-content-between align-items-center" style={{ borderRadius: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-                      <div className="d-flex align-items-center justify-content-center" style={{ height: '100px', width: '100%' }}>
-                        <img 
-                          src={p.logo} 
-                          alt={p.name} 
-                          style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
-                        />
-                      </div>
+                      <PartnerLogo logo={p.logo} name={p.name} />
                       <div className="mt-3 w-100">
                         <h3 className="h6 fw-bold text-dark mb-2 text-truncate" title={p.name}>{p.name}</h3>
                         {p.website && (
@@ -128,14 +133,7 @@ export default function PartnersPage() {
                 {ngoPartners.map(p => (
                   <div key={p.id} className="col-6 col-sm-4 col-md-3">
                     <div className="card h-100 border-0 shadow-xs text-center p-4 d-flex flex-column justify-content-between align-items-center" style={{ borderRadius: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-                      <div className="d-flex align-items-center justify-content-center" style={{ height: '100px', width: '100%' }}>
-                        <img 
-                          src={p.logo} 
-                          alt={p.name} 
-                          style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
-                        />
-                      </div>
+                      <PartnerLogo logo={p.logo} name={p.name} />
                       <div className="mt-3 w-100">
                         <h3 className="h6 fw-bold text-dark mb-2 text-truncate" title={p.name}>{p.name}</h3>
                         {p.website && (

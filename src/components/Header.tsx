@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '../context/LanguageContext';
 import { useData } from '../context/DataContext';
@@ -12,11 +13,13 @@ export const Header: React.FC = () => {
   const { systemSettings, contactInfo } = useData();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const email = systemSettings.contactEmail || contactInfo?.email || '';
   const phone = systemSettings.contactPhone || contactInfo?.phone || '';
   const siteName = systemSettings.siteName || 'NPC Rwanda';
   const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
+  const resolvedLogo = logoError ? '/assets/img/logo.png' : (siteLogo || '/assets/img/logo.png');
 
   useEffect(() => {
     // Dynamic import of bootstrap JS on client side for dropdowns
@@ -131,12 +134,16 @@ export const Header: React.FC = () => {
       <nav className={`navbar navbar-expand-lg navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
         <div className="container border-0">
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
-            <img
-              src={siteLogo}
+            <Image
+              src={resolvedLogo}
               alt={`${siteName} - ${siteSubtitle}`}
+              width={60}
+              height={60}
               className="me-2"
               style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
-              onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/logo.png'; }}
+              priority
+              onError={() => setLogoError(true)}
+              unoptimized={resolvedLogo.startsWith('data:')}
             />
             <div className="brand-text">
               <span className="d-block fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1.1rem', lineHeight: 1 }}>
@@ -257,11 +264,12 @@ export const Header: React.FC = () => {
               <li className="nav-item dropdown">
                 <Link
                   className={`nav-link dropdown-toggle ${isActive('/partners') || pathname.startsWith('/members') ? 'active' : ''}`}
-                  href="#"
+                  href="#members-menu"
                   id="membersMenu"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
+                  onClick={(e) => e.preventDefault()}
                 >
                   {t('nav.members') || 'Members'}
                 </Link>
@@ -348,6 +356,57 @@ export const Header: React.FC = () => {
               </li>
 
             </ul>
+
+            {/* Mobile-Only Actions: Language Selector & Primary CTAs */}
+            <div className="d-lg-none pt-3 mt-2 border-top">
+              <div className="d-flex align-items-center justify-content-between mb-3 px-1">
+                <span className="small text-muted fw-bold text-uppercase">
+                  <i className="fas fa-globe me-1"></i>Language:
+                </span>
+                <div className="btn-group btn-group-sm" role="group" aria-label="Mobile language selector">
+                  <button
+                    type="button"
+                    className={`btn px-3 py-1 ${lang === 'en' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setLang('en')}
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn px-3 py-1 ${lang === 'fr' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setLang('fr')}
+                  >
+                    FR
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn px-3 py-1 ${lang === 'rw' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setLang('rw')}
+                  >
+                    KIN
+                  </button>
+                </div>
+              </div>
+
+              <div className="d-grid gap-2">
+                <Link
+                  href="/volunteer"
+                  className="btn btn-sm btn-outline-primary fw-bold py-2"
+                  onClick={closeMobileMenu}
+                >
+                  <i className="fas fa-hand-holding-heart me-2"></i>
+                  {t('common.volunteer') || 'Volunteer with NPC'}
+                </Link>
+                <Link
+                  href="/donate"
+                  className="btn btn-sm btn-primary fw-bold py-2"
+                  onClick={closeMobileMenu}
+                >
+                  <i className="fas fa-heart me-2 text-warning"></i>
+                  {t('common.donate') || 'Support & Donate'}
+                </Link>
+              </div>
+            </div>
 
           </div>
         </div>

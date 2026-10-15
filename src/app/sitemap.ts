@@ -125,12 +125,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Dynamic news articles
+  // Dynamic news articles & announcements
   let articleRoutes: MetadataRoute.Sitemap = [];
   try {
     const articles = await prisma.newsArticle.findMany({
       select: {
         slug: true,
+        category: true,
         updatedAt: true,
       },
       where: {
@@ -143,15 +144,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     articleRoutes = articles
       .filter((article) => Boolean(article.slug))
-      .map((article) => ({
-        url: `${baseUrl}/news/${encodeURIComponent(article.slug)}`,
-        lastModified: article.updatedAt || new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      }));
+      .map((article) => {
+        const isAnnouncement = (article.category || '').toLowerCase().includes('announc');
+        const prefix = isAnnouncement ? '/announcements' : '/news';
+        return {
+          url: `${baseUrl}${prefix}/${encodeURIComponent(article.slug)}`,
+          lastModified: article.updatedAt || new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        };
+      });
   } catch (error) {
     console.error('[sitemap] Failed to fetch news articles for sitemap:', error);
   }
 
-  return [...staticRoutes, ...articleRoutes];
+  // Dynamic career positions
+  let careerRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const careers = await prisma.career.findMany({
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+      where: {
+        status: 'Open',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    careerRoutes = careers
+      .filter((job) => Boolean(job.slug))
+      .map((job) => ({
+        url: `${baseUrl}/careers/${encodeURIComponent(job.slug)}`,
+        lastModified: job.updatedAt || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      }));
+  } catch (error) {
+    console.error('[sitemap] Failed to fetch careers for sitemap:', error);
+  }
+
+  return [...staticRoutes, ...articleRoutes, ...careerRoutes];
 }
+

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
@@ -157,11 +158,13 @@ export default function AthletesPage() {
                     <div key={a.id} id={anchor} className="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay={`${(i % 3) * 100}`}>
                       <div className={`custom-card athlete-card p-4 h-100 text-center d-flex flex-column align-items-center ${isInactive ? 'opacity-75' : ''}`}>
                         <div className="athlete-thumb mb-3 position-relative">
-                          <img 
-                            src={a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`} 
+                          <Image 
+                            src={a.avatar && a.avatar.trim() ? (a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`) : '/assets/img/avatar-1.svg'} 
                             alt={`${a.name} portrait`} 
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/avatar-1.svg'; }}
-                            style={isInactive ? { filter: 'grayscale(20%)' } : {}}
+                            fill
+                            sizes="140px"
+                            style={{ objectFit: 'cover', ...(isInactive ? { filter: 'grayscale(20%)' } : {}) }}
+                            unoptimized={Boolean(a.avatar && a.avatar.startsWith('data:'))}
                           />
                         </div>
                         <h3 className="h5 fw-bold mb-1">{a.name}</h3>
