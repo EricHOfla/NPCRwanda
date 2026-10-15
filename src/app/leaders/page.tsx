@@ -62,11 +62,13 @@ const isExecutiveRole = (role: string) => {
 
 export default function LeadersPage() {
   const { t } = useTranslation();
-  const { leadership } = useData();
-  const [activeCommittee, setActiveCommittee] = useState('All');
+  const { leadership, siteContent } = useData();
+  const [activeCommittee, setActiveCommittee] = useState('Board of Directors');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
+
+  const mandatePeriod = siteContent['leadership.mandatePeriod'] || '2024–2028';
 
   // Distinct list of committees preserving standard statutory order
   const standardCommittees = ['Board of Directors', 'Staff Team', 'Audit Committee', 'Conflict Resolution Committee'];
@@ -176,7 +178,7 @@ export default function LeadersPage() {
             </div>
             <div className="col-6 col-md-3">
               <div className="p-3 rounded-3" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div className="h3 mb-0 fw-bold text-success">2024–2028</div>
+                <div className="h3 mb-0 fw-bold text-success">{mandatePeriod}</div>
                 <div className="small text-white-50">Mandate Period</div>
               </div>
             </div>
@@ -481,7 +483,7 @@ export default function LeadersPage() {
                               className="badge bg-light text-dark border px-2 py-1 rounded-pill"
                               style={{ fontSize: '0.72rem' }}
                             >
-                              Mandate: 2024–2028
+                              Mandate: {mandatePeriod}
                             </span>
                           </div>
                         </div>
@@ -502,49 +504,6 @@ export default function LeadersPage() {
               </div>
             </>
           )}
-
-          {/* ═══════════════════════════════════════════════════════════
-              STATUTORY GOVERNANCE & SAFEGUARDING COMMITMENT
-          ═══════════════════════════════════════════════════════════ */}
-          <div className="mt-5 p-4 p-md-5 rounded-4 bg-white border shadow-sm" data-aos="fade-up">
-            <div className="row g-4 align-items-center">
-              <div className="col-lg-8">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <span className="badge bg-primary text-white px-2 py-1 text-uppercase" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>
-                    Statutory Framework
-                  </span>
-                  <span className="small text-muted fw-semibold">IPC &amp; MINISPORTS Certified Governance</span>
-                </div>
-                <h3 className="h4 fw-bold text-dark mb-2">
-                  Commitment to Good Governance &amp; Athlete Safeguarding
-                </h3>
-                <p className="text-muted small mb-0" style={{ lineHeight: 1.7 }}>
-                  NPC Rwanda governing organs operate under democratic mandates ratified by our General Assembly. In alignment with the International Paralympic Committee (IPC) Handbook, Rwanda Governance Board (RGB), and the Ministry of Sports (MINISPORTS), our leaders champion transparency, zero tolerance for harassment, and total inclusion for all athletes with disabilities.
-                </p>
-              </div>
-
-              <div className="col-lg-4 text-lg-end">
-                <div className="d-flex flex-column flex-sm-row flex-lg-column gap-2 justify-content-lg-end">
-                  <Link
-                    href="/governance"
-                    className="btn btn-primary fw-bold px-4 py-2 rounded-pill d-inline-flex align-items-center justify-content-center gap-2 shadow-sm"
-                    style={{ fontSize: '0.88rem' }}
-                  >
-                    <i className="fas fa-file-contract" aria-hidden="true" />
-                    <span>View Strategic Plan &amp; Constitution</span>
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill d-inline-flex align-items-center justify-content-center gap-2"
-                    style={{ fontSize: '0.88rem' }}
-                  >
-                    <i className="fas fa-envelope" aria-hidden="true" />
-                    <span>Contact the Secretariat</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </section>

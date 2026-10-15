@@ -29,6 +29,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'about.bullet3': 'Inclusive Sports for All Abilities',
   'cta.title': 'Support Inclusive Sports in Rwanda',
   'cta.desc': 'Help us expand access, strengthen athlete pathways, and deliver excellence in para-sport.',
+  'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
   'about.heroImage': '/assets/img/curated/about-hero.jpg',

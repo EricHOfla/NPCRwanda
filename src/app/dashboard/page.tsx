@@ -2501,6 +2501,8 @@ export default function DashboardPage() {
                             handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
                           } else if (activeEditPage === 'npc-background') {
                             handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
+                          } else if (activeEditPage === 'leadership') {
+                            handleSectionSave(['leadership.mandatePeriod']);
                           }
                         }}
                         disabled={pageSaving}
@@ -3473,6 +3475,39 @@ export default function DashboardPage() {
                   {/* LEADERSHIP PAGE EDITOR */}
                   {activeEditPage === 'leadership' && (
                     <div>
+                      {/* Leadership Mandate & Tenure Period Setting */}
+                      <div className="custom-card p-4 mb-4">
+                        <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                          <div>
+                            <h4 className="h6 fw-bold mb-1 text-primary">
+                              <i className="fas fa-calendar-check me-2" />Leadership Mandate &amp; Tenure Period
+                            </h4>
+                            <p className="small text-muted mb-0">Configure the official tenure period displayed across the Leadership page header and profile cards.</p>
+                          </div>
+                          <button
+                            type="button"
+                            disabled={pageSaving}
+                            onClick={() => handleSectionSave(['leadership.mandatePeriod'])}
+                            className="btn btn-primary btn-sm fw-bold px-3"
+                          >
+                            <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-1`} /> {pageSaving ? 'Saving...' : 'Save Mandate'}
+                          </button>
+                        </div>
+                        <div className="row g-3 align-items-center">
+                          <div className="col-md-6">
+                            <label className="form-label small fw-bold">Mandate Period</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="2024–2028"
+                              value={siteForm['leadership.mandatePeriod'] !== undefined ? siteForm['leadership.mandatePeriod'] : (siteContent['leadership.mandatePeriod'] || '2024–2028')}
+                              onChange={e => setSiteForm({ ...siteForm, 'leadership.mandatePeriod': e.target.value })}
+                            />
+                            <small className="text-muted">Example: <strong>2024–2028</strong>. Updates live on leadership cards and KPIs.</small>
+                          </div>
+                        </div>
+                      </div>
+
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Leadership Directory ({leadership.length})</h3>
                         <button
