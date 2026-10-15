@@ -1386,8 +1386,10 @@ export default function DashboardPage() {
     { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50' },
     { label: 'Events Count', value: String(events.length), icon: 'fa-calendar-alt', color: '#673AB7' },
     { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935' },
-    { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000' },
-    { label: 'Partners Logos', value: String(partners.length), icon: 'fa-handshake', color: '#00838F' }
+    ...(!isEditor ? [
+      { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000' },
+      { label: 'Partners Logos', value: String(partners.length), icon: 'fa-handshake', color: '#00838F' },
+    ] : []),
   ];
 
   // Forms Submissions
@@ -2514,120 +2516,141 @@ export default function DashboardPage() {
               {/* Two-Column Grid */}
               <div className="row g-4">
                 
-                {/* Left Column: Recent Activity / Inbox */}
+                {/* Left Column: Recent Activity / Inbox — role-aware */}
                 <div className="col-lg-7">
                   <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '24px', height: '100%', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <div>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Inbox Activity</h3>
-                        <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Unread messages and inquiries requiring attention</p>
-                      </div>
-                      <button 
-                        onClick={() => setAdminTab('contacts')}
-                        className="btn btn-xs btn-outline-primary"
-                        style={{ fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: '6px' }}
-                      >
-                        Manage Inbox
-                      </button>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      {(() => {
-                        const items: { type: 'message' | 'volunteer' | 'donation'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
-                        
-                        contacts.filter(c => !c.read).slice(0, 3).forEach(c => {
-                          items.push({ type: 'message', raw: c, date: c.date, sender: c.name, title: `Message: ${c.subject}`, subtitle: c.message });
-                        });
-                        volunteers.filter(v => !v.read).slice(0, 3).forEach(v => {
-                          items.push({ type: 'volunteer', raw: v, date: 'New Application', sender: v.name, title: `Volunteer Registration`, subtitle: `Interested in ${v.interest}` });
-                        });
-                        donations.filter(d => !d.read).slice(0, 3).forEach(d => {
-                          items.push({ type: 'donation', raw: d, date: 'New Donation', sender: d.name, title: `Donation: ${d.supportType}`, subtitle: `Category: ${d.category}` });
-                        });
-
-                        // Sort message items or take top 4
-                        const displayItems = items.slice(0, 4);
-
-                        if (displayItems.length === 0) {
-                          return (
-                            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8' }}>
-                              <i className="far fa-folder-open" style={{ fontSize: '2.5rem', marginBottom: '12px', display: 'block', color: '#CBD5E1' }} />
-                              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Your inbox is completely clear!</span>
-                              <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>No unread messages or applications found.</p>
-                            </div>
-                          );
-                        }
-
-                        return displayItems.map((item, index) => {
-                          let badgeBg = '#E0F2FE';
-                          let badgeColor = '#0369A1';
-                          let icon = 'fa-envelope';
-                          if (item.type === 'volunteer') {
-                            badgeBg = '#D1FAE5';
-                            badgeColor = '#065F46';
-                            icon = 'fa-hands-helping';
-                          } else if (item.type === 'donation') {
-                            badgeBg = '#FEF3C7';
-                            badgeColor = '#92400E';
-                            icon = 'fa-hand-holding-usd';
-                          }
-
-                          return (
-                            <div 
-                              key={index}
-                              onClick={() => {
-                                setAdminTab('contacts');
-                                if (item.type === 'message') {
-                                  setInboxSubTab('messages');
-                                  setActiveMessage(item.raw);
-                                  markContactAsRead(item.raw.id);
-                                } else if (item.type === 'volunteer') {
-                                  setInboxSubTab('volunteers');
-                                  setActiveVolunteer(item.raw);
-                                  markVolunteerAsRead(item.raw.id);
-                                } else if (item.type === 'donation') {
-                                  setInboxSubTab('donations');
-                                  setActiveDonation(item.raw);
-                                  markDonationAsRead(item.raw.id);
-                                }
-                              }}
-                              style={{ 
-                                display: 'flex', 
-                                gap: '16px', 
-                                padding: '14px', 
-                                border: '1px solid #E8ECF0', 
-                                borderRadius: '10px',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                background: '#FFFFFF'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = '#cbd5e1';
-                                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.03)';
-                                e.currentTarget.style.backgroundColor = '#F8FAFC';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = '#E8ECF0';
-                                e.currentTarget.style.boxShadow = 'none';
-                                e.currentTarget.style.backgroundColor = '#FFFFFF';
-                              }}
-                            >
-                              <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: badgeBg, color: badgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <i className={`fas ${icon}`} style={{ fontSize: '1.1rem' }} />
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '2px' }}>
-                                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0F172A' }}>{item.sender}</span>
-                                  <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 600 }}>{item.date}</span>
+                    {isEditor ? (
+                      /* ── EDITOR: Recent Content Panel ── */
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                          <div>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>My Recent Content</h3>
+                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Latest news articles and events you can manage</p>
+                          </div>
+                          <button
+                            onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); }}
+                            className="btn btn-xs btn-outline-primary"
+                            style={{ fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: '6px' }}
+                          >
+                            Manage News
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {(() => {
+                            const recentNews = news.filter(n => !isAnnouncementCategory(n.category)).slice(0, 3);
+                            const recentEvents = events.slice(0, 2);
+                            const items = [
+                              ...recentNews.map(n => ({ type: 'news' as const, id: n.id, title: n.title, subtitle: n.category, date: n.date })),
+                              ...recentEvents.map(e => ({ type: 'event' as const, id: e.id, title: e.title, subtitle: e.location, date: e.date })),
+                            ].slice(0, 5);
+                            if (items.length === 0) {
+                              return (
+                                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8' }}>
+                                  <i className="fas fa-pen-to-square" style={{ fontSize: '2.5rem', marginBottom: '12px', display: 'block', color: '#CBD5E1' }} />
+                                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>No content published yet</span>
+                                  <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>Start by writing a news article or scheduling an event.</p>
                                 </div>
-                                <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: badgeColor, margin: '0 0 2px 0' }}>{item.title}</h4>
-                                <p style={{ fontSize: '0.75rem', color: '#64748B', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.subtitle}</p>
+                              );
+                            }
+                            return items.map((item, index) => (
+                              <div
+                                key={index}
+                                onClick={() => { setAdminTab('pages'); setActiveEditPage(item.type === 'news' ? 'news' : 'events'); }}
+                                style={{ display: 'flex', gap: '16px', padding: '14px', border: '1px solid #E8ECF0', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s ease', background: '#FFFFFF' }}
+                                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E8ECF0'; e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+                              >
+                                <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: item.type === 'news' ? '#D1FAE5' : '#E0F2FE', color: item.type === 'news' ? '#065F46' : '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                  <i className={`fas ${item.type === 'news' ? 'fa-newspaper' : 'fa-calendar-day'}`} style={{ fontSize: '1.1rem' }} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '2px' }}>
+                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: item.type === 'news' ? '#065F46' : '#0369A1' }}>{item.type === 'news' ? 'News' : 'Event'}</span>
+                                    <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 600 }}>{item.date ? new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}</span>
+                                  </div>
+                                  <h4 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A', margin: '0 0 2px 0', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.title}</h4>
+                                  <p style={{ fontSize: '0.75rem', color: '#64748B', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.subtitle}</p>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
+                            ));
+                          })()}
+                        </div>
+                      </>
+                    ) : (
+                      /* ── ADMIN / SUPER ADMIN: Inbox Panel ── */
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                          <div>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Inbox Activity</h3>
+                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Unread messages and inquiries requiring attention</p>
+                          </div>
+                          <button
+                            onClick={() => setAdminTab('contacts')}
+                            className="btn btn-xs btn-outline-primary"
+                            style={{ fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: '6px' }}
+                          >
+                            Manage Inbox
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {(() => {
+                            const items: { type: 'message' | 'volunteer' | 'donation'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
+                            contacts.filter(c => !c.read).slice(0, 3).forEach(c => {
+                              items.push({ type: 'message', raw: c, date: c.date, sender: c.name, title: `Message: ${c.subject}`, subtitle: c.message });
+                            });
+                            volunteers.filter(v => !v.read).slice(0, 3).forEach(v => {
+                              items.push({ type: 'volunteer', raw: v, date: 'New Application', sender: v.name, title: `Volunteer Registration`, subtitle: `Interested in ${v.interest}` });
+                            });
+                            donations.filter(d => !d.read).slice(0, 3).forEach(d => {
+                              items.push({ type: 'donation', raw: d, date: 'New Donation', sender: d.name, title: `Donation: ${d.supportType}`, subtitle: `Category: ${d.category}` });
+                            });
+                            const displayItems = items.slice(0, 4);
+                            if (displayItems.length === 0) {
+                              return (
+                                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8' }}>
+                                  <i className="far fa-folder-open" style={{ fontSize: '2.5rem', marginBottom: '12px', display: 'block', color: '#CBD5E1' }} />
+                                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Your inbox is completely clear!</span>
+                                  <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>No unread messages or applications found.</p>
+                                </div>
+                              );
+                            }
+                            return displayItems.map((item, index) => {
+                              let badgeBg = '#E0F2FE';
+                              let badgeColor = '#0369A1';
+                              let icon = 'fa-envelope';
+                              if (item.type === 'volunteer') { badgeBg = '#D1FAE5'; badgeColor = '#065F46'; icon = 'fa-hands-helping'; }
+                              else if (item.type === 'donation') { badgeBg = '#FEF3C7'; badgeColor = '#92400E'; icon = 'fa-hand-holding-usd'; }
+                              return (
+                                <div
+                                  key={index}
+                                  onClick={() => {
+                                    setAdminTab('contacts');
+                                    if (item.type === 'message') { setInboxSubTab('messages'); setActiveMessage(item.raw); markContactAsRead(item.raw.id); }
+                                    else if (item.type === 'volunteer') { setInboxSubTab('volunteers'); setActiveVolunteer(item.raw); markVolunteerAsRead(item.raw.id); }
+                                    else if (item.type === 'donation') { setInboxSubTab('donations'); setActiveDonation(item.raw); markDonationAsRead(item.raw.id); }
+                                  }}
+                                  style={{ display: 'flex', gap: '16px', padding: '14px', border: '1px solid #E8ECF0', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s ease', background: '#FFFFFF' }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.03)'; e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E8ECF0'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+                                >
+                                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: badgeBg, color: badgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    <i className={`fas ${icon}`} style={{ fontSize: '1.1rem' }} />
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '2px' }}>
+                                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0F172A' }}>{item.sender}</span>
+                                      <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 600 }}>{item.date}</span>
+                                    </div>
+                                    <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: badgeColor, margin: '0 0 2px 0' }}>{item.title}</h4>
+                                    <p style={{ fontSize: '0.75rem', color: '#64748B', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.subtitle}</p>
+                                  </div>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
