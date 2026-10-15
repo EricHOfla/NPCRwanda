@@ -233,7 +233,7 @@ export default function ResourcesPage() {
             <div className="spinner-border text-primary mb-3" role="status">
               <span className="visually-hidden">Loading official documents...</span>
             </div>
-            <h6 className="text-muted fw-bold">Retrieving official gazette and publications repository...</h6>
+            <h6 className="text-muted fw-bold">Retrieving official publications and documents repository...</h6>
           </div>
         ) : filteredResources.length === 0 ? (
           <div className="text-center py-5 bg-white rounded-4 border shadow-sm my-3 p-5">
@@ -250,7 +250,7 @@ export default function ResourcesPage() {
             </button>
           </div>
         ) : viewMode === 'table' ? (
-          /* Official Government Register / Gazette Table View */
+          /* Official Government Register Table View */
           <div className="card border rounded-4 shadow-sm overflow-hidden bg-white mb-4" data-aos="fade-up">
             <div className="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center gap-2">

@@ -2525,7 +2525,7 @@ export default function DashboardPage() {
                       { id: 'athletes', title: 'Athletes Page', desc: 'Manage national para-athletes profiles, sport classifications, and display stats.', icon: 'fa-person-running', bg: '#fdf2f8', border: '#fbcfe8' },
                       { id: 'sports', title: 'Sports Programs', icon: 'fa-volleyball', desc: 'Configure sitting volleyball, wheelchair basketball, and goalball program highlights.', bg: '#f5f3ff', border: '#ddd6fe' },
                       { id: 'news', title: 'News Room', icon: 'fa-newspaper', desc: 'Write articles and event blog posts with the visual Markdown rich-text editor.', bg: '#ecfdf5', border: '#a7f3d0' },
-                      { id: 'announcements', title: 'Official Gazette & Notices', desc: 'Publish official circulars, communiqués, gazette notices, and regulatory announcements.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
+                      { id: 'announcements', title: 'Official Announcements & Notices', desc: 'Publish official circulars, communiqués, public notices, and regulatory announcements.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'events', title: 'Events Calendar', icon: 'fa-calendar-days', desc: 'Schedule matches, championships, training camps, and featured event details.', bg: '#fef2f2', border: '#fecaca' },
                       { id: 'careers', title: 'Careers & Vacancies', icon: 'fa-briefcase', desc: 'Manage job vacancies, volunteer registrations, and applicant logs.', bg: '#f0fdfa', border: '#99f6e4' },
                       { id: 'contact', title: 'Contact & Footer', icon: 'fa-address-card', desc: 'Edit physical address, contact phone/email, map embeds, and social media links (footer & homepage social hub).', bg: '#fafaf9', border: '#e7e5e4' },
@@ -2837,7 +2837,7 @@ export default function DashboardPage() {
                   {activeEditPage === 'announcements' && (
                     <div className="border rounded-4 bg-white p-4 shadow-sm" style={{ maxWidth: '900px', margin: '0 auto' }}>
                       <div className="text-center py-4 bg-light mb-4 rounded-3 border-top border-3 border-primary">
-                        <span className="badge bg-danger px-3 py-1 mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>Official Gazette Preview</span>
+                        <span className="badge bg-danger px-3 py-1 mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>Official Announcements Preview</span>
                         <h2 className="fw-bold text-dark h4 mb-1">Official Announcements &amp; Public Notices</h2>
                         <span className="small text-muted">Previewing live registry of communiqués and circulars as displayed to the public</span>
                       </div>
@@ -4022,7 +4022,7 @@ export default function DashboardPage() {
                               </select>
                             </div>
                             <div className="col-md-4">
-                              <label className="form-label small fw-bold">Gazette Date (e.g. Oct 2026)</label>
+                              <label className="form-label small fw-bold">Publication Date (e.g. Oct 2026)</label>
                               <input type="text" className="form-control" value={newsForm.date} onChange={e => setNewsForm({ ...newsForm, date: e.target.value })} />
                             </div>
                             <div className="col-12">

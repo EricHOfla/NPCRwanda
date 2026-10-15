@@ -13,7 +13,7 @@ export default function AnnouncementsPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<'gazette' | 'cards'>('gazette');
+  const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
 
   const ITEMS_PER_PAGE = 8;
 
@@ -55,7 +55,7 @@ export default function AnnouncementsPage() {
 
   return (
     <main id="main-content" style={{ background: '#F8FAFC', minHeight: '100vh' }}>
-      {/* Official Government / Gazette Header */}
+      {/* Official Government / Announcements Header */}
       <header className="page-header" style={{ borderBottom: '3px solid #0072C6' }}>
         <div className="container">
           <nav aria-label="breadcrumb" data-aos="fade-up">
@@ -68,7 +68,7 @@ export default function AnnouncementsPage() {
           </nav>
           <div className="d-flex align-items-center gap-2 mb-2">
             <span className="badge px-3 py-1 bg-white text-dark fw-bold rounded-pill text-uppercase border" style={{ fontSize: '0.72rem', letterSpacing: '0.8px' }}>
-              <i className="fas fa-bullhorn text-primary me-1" /> Official Gazette &amp; Notices
+              <i className="fas fa-bullhorn text-primary me-1" /> Official Announcements &amp; Notices
             </span>
           </div>
           <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">
@@ -143,11 +143,11 @@ export default function AnnouncementsPage() {
               <div className="btn-group" role="group" aria-label="Format toggle">
                 <button
                   type="button"
-                  onClick={() => setViewMode('gazette')}
-                  className={`btn btn-sm ${viewMode === 'gazette' ? 'btn-dark' : 'btn-outline-secondary'}`}
-                  title="Official Gazette List View"
+                  onClick={() => setViewMode('list')}
+                  className={`btn btn-sm ${viewMode === 'list' ? 'btn-dark' : 'btn-outline-secondary'}`}
+                  title="Official Announcements List View"
                 >
-                  <i className="fas fa-list-check me-1" /> Gazette List
+                  <i className="fas fa-list-check me-1" /> List View
                 </button>
                 <button
                   type="button"
@@ -177,8 +177,8 @@ export default function AnnouncementsPage() {
               Reset Filters
             </button>
           </div>
-        ) : viewMode === 'gazette' ? (
-          /* Official Gazette Register Style (Government / Ministry Style) */
+        ) : viewMode === 'list' ? (
+          /* Official Announcements List Style (Government / Ministry Style) */
           <div className="card border rounded-4 shadow-sm overflow-hidden bg-white mb-4" data-aos="fade-up">
             <div className="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center gap-2">
@@ -270,7 +270,7 @@ export default function AnnouncementsPage() {
                 All notices published here represent official administrative communication of NPC Rwanda.
               </div>
               <div className="fw-semibold">
-                Official NPC Rwanda Gazette Registry
+                Official NPC Rwanda Public Registry
               </div>
             </div>
           </div>
