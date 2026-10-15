@@ -2554,7 +2554,7 @@ export default function DashboardPage() {
                       onClick={() => {
                         const target = activeEditPage || 'home';
                         if (target === 'home') {
-                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc']);
+                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc']);
                         } else if (target === 'about') {
                           handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
                         } else if (target === 'npc-background') {
@@ -3126,6 +3126,23 @@ export default function DashboardPage() {
                         </div>
 
                         <hr className="my-4" />
+                        <h5 className="small fw-bold text-muted mb-3"><i className="fas fa-image me-1 text-primary" />Hero Right Showcase Card:</h5>
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label small fw-bold">Showcase Badge</label>
+                            <input type="text" className="form-control" value={siteForm['hero.showcaseBadge'] || ''} onChange={e => setSiteForm({ ...siteForm, 'hero.showcaseBadge': e.target.value })} placeholder="Team Rwanda Spotlight" />
+                          </div>
+                          <div className="col-md-8">
+                            <label className="form-label small fw-bold">Showcase Title</label>
+                            <input type="text" className="form-control" value={siteForm['hero.showcaseTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'hero.showcaseTitle': e.target.value })} placeholder="Excellence in Motion: Leading Africa in Para-Sport" />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Showcase Description</label>
+                            <textarea className="form-control" rows={2} value={siteForm['hero.showcaseDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'hero.showcaseDesc': e.target.value })} placeholder="Showcasing Rwandan resilience, elite athletic pathways, and world-class achievements across continental and global championships." />
+                          </div>
+                        </div>
+
+                        <hr className="my-4" />
                         <h5 className="small fw-bold text-muted mb-3">Hero Stat items (Quick Info block):</h5>
                         <div className="row g-3">
                           <div className="col-md-6">
@@ -3171,19 +3188,23 @@ export default function DashboardPage() {
                         <hr />
                         <h5 className="small fw-bold text-muted mb-3">Counters numerical values:</h5>
                         <div className="row g-3">
-                          <div className="col-md-3">
+                          <div className="col-6 col-md">
                             <label className="form-label small fw-bold">Districts Count</label>
                             <input type="text" className="form-control" value={siteForm['stats.districts'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.districts': e.target.value })} />
                           </div>
-                          <div className="col-md-3">
+                          <div className="col-6 col-md">
                             <label className="form-label small fw-bold">Disciplines Count</label>
                             <input type="text" className="form-control" value={siteForm['stats.disciplines'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.disciplines': e.target.value })} />
                           </div>
-                          <div className="col-md-3">
+                          <div className="col-6 col-md">
+                            <label className="form-label small fw-bold">Athletes Count</label>
+                            <input type="text" className="form-control" value={siteForm['stats.athletes'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.athletes': e.target.value })} placeholder="500+" />
+                          </div>
+                          <div className="col-6 col-md">
                             <label className="form-label small fw-bold">Founded Year</label>
                             <input type="text" className="form-control" value={siteForm['stats.founded'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.founded': e.target.value })} />
                           </div>
-                          <div className="col-md-3">
+                          <div className="col-6 col-md">
                             <label className="form-label small fw-bold">Member Clubs</label>
                             <input type="text" className="form-control" value={siteForm['stats.clubs'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.clubs': e.target.value })} />
                           </div>
@@ -3277,7 +3298,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
-                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc'])}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}

@@ -353,6 +353,29 @@ async function runAutoMigration(): Promise<void> {
     // Safe ignore
   }
 
+  // Self-heal default site content keys if missing
+  try {
+    const essentialKeys: [string, string][] = [
+      ['hero.showcaseBadge', 'Team Rwanda Spotlight'],
+      ['hero.showcaseTitle', 'Excellence in Motion: Leading Africa in Para-Sport'],
+      ['hero.showcaseDesc', 'Showcasing Rwandan resilience, elite athletic pathways, and world-class achievements across continental and global championships.'],
+      ['stats.athletes', '500+'],
+      ['stats.districts', '30'],
+      ['stats.disciplines', '12+'],
+      ['stats.founded', '2001'],
+      ['stats.clubs', '30+'],
+      ['leadership.mandatePeriod', '2024–2028'],
+    ];
+    for (const [key, val] of essentialKeys) {
+      const exist = await prisma.siteContent.findUnique({ where: { key } });
+      if (!exist) {
+        await prisma.siteContent.create({ data: { key, value: val, type: 'text' } });
+      }
+    }
+  } catch {
+    // Safe ignore
+  }
+
   migrationExecuted = true;
 }
 

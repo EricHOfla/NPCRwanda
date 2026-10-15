@@ -80,11 +80,11 @@ export default function HomeClient() {
     { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
   ];
 
-  // Dynamic counts derived directly from database records
-  const districtsCount = dpscoContacts.length > 0 ? `${dpscoContacts.length}` : getSiteText('stats.districts', '30');
-  const athletesCount = athletes.length > 0 ? `${athletes.length}+` : getSiteText('stats.athletes', '500+');
-  const disciplinesCount = sports.length > 0 ? `${sports.length}` : getSiteText('stats.disciplines', '8+');
-  const clubsCount = npcClubs.length > 0 ? `${npcClubs.length}+` : getSiteText('stats.clubs', '30+');
+  // Dynamic counts derived directly from database records or admin siteContent
+  const districtsCount = siteContent['stats.districts'] || (dpscoContacts.length > 0 ? `${dpscoContacts.length}` : '30');
+  const athletesCount = siteContent['stats.athletes'] || (athletes.length > 0 ? `${athletes.length}+` : '0');
+  const disciplinesCount = siteContent['stats.disciplines'] || (sports.length > 0 ? `${sports.length}` : '0');
+  const clubsCount = siteContent['stats.clubs'] || (npcClubs.length > 0 ? `${npcClubs.length}+` : '0');
 
   return (
     <main id="main-content">

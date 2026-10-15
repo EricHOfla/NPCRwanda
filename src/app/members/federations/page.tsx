@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useData } from '@/context/DataContext';
 
 export default function NpcFederationsPage() {
-  const { npcFederations } = useData();
+  const { npcFederations, loading } = useData();
   const federations = npcFederations.filter(f => f.active);
 
   return (
@@ -37,7 +37,18 @@ export default function NpcFederationsPage() {
       {/* Main content */}
       <section className="py-5 bg-light">
         <div className="container">
-          <div className="row g-4">
+          {loading && federations.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading federations...</span>
+              </div>
+            </div>
+          ) : federations.length === 0 ? (
+            <div className="text-center py-5 text-muted">
+              <p>No affiliated sports federations listed at this time.</p>
+            </div>
+          ) : (
+            <div className="row g-4">
             {federations.map((fed, idx) => (
               <div key={idx} className="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={idx * 100}>
                 <div className="card h-100 border-0 shadow-sm p-4 d-flex flex-column justify-content-between" style={{ borderRadius: '12px' }}>
@@ -70,6 +81,7 @@ export default function NpcFederationsPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
     </main>
