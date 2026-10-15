@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -62,7 +62,7 @@ export default function HomeClient() {
   // Active verified partners from database
   const activePartners = partners.filter(p => p.active);
 
-  // Helper to parse YouTube link to embed URL � returns null if URL is not embeddable (e.g. channel page)
+  // Helper to parse YouTube link to embed URL ? returns null if URL is not embeddable (e.g. channel page)
   const formatYouTubeEmbed = (url: string): string | null => {
     if (!url) return null;
     if (url.includes('/embed/')) return url; // already an embed URL
@@ -70,7 +70,7 @@ export default function HomeClient() {
     if (plMatch) return `https://www.youtube-nocookie.com/embed/videoseries?list=${plMatch[1]}`; // playlist
     const vidMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
     if (vidMatch && vidMatch[1]) return `https://www.youtube-nocookie.com/embed/${vidMatch[1]}`; // single video
-    return null; // channel URL or unknown � not embeddable
+    return null; // channel URL or unknown ? not embeddable
   };
 
   const configuredSocials = socialLinks && socialLinks.length > 0 ? socialLinks.filter(s => s.active) : [
@@ -89,9 +89,9 @@ export default function HomeClient() {
   return (
     <main id="main-content">
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           1. LIVE INSTITUTIONAL BULLETIN TICKER (FROM DATABASE)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       {latestAnnouncement && (
         <aside className="pro-ngo-bulletin" aria-label="Official Announcement Bulletin">
           <div className="pro-ngo-container">
@@ -117,9 +117,9 @@ export default function HomeClient() {
         </aside>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           2. HERO SECTION (100% FROM DATABASE & CMS)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-hero" aria-label="Executive Institutional Introduction">
         <div className="pro-ngo-container">
           <div className="row align-items-center g-5">
@@ -185,41 +185,86 @@ export default function HomeClient() {
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Showcase (Distinct Words from Database/CMS) */}
+            {/* Right Column: Hero Visual Showcase from Database */}
             <div className="col-lg-5" data-aos="zoom-in" data-aos-delay="100">
-              <div className="pro-ngo-hero__showcase-wrap">
-                <div className="pro-ngo-hero__showcase">
+              <div className="pro-ngo-hero__showcase-wrap h-100">
+                <div 
+                  className="pro-ngo-hero__showcase h-100" 
+                  style={{ 
+                    position: 'relative', 
+                    borderRadius: '20px', 
+                    overflow: 'hidden', 
+                    minHeight: '480px',
+                    boxShadow: '0 20px 50px rgba(10, 37, 64, 0.16)',
+                    border: '4px solid #FFFFFF',
+                    background: '#0B1E38',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end'
+                  }}
+                >
                   <img
                     src={getSiteText('hero.image', '/assets/img/curated/home-hero.jpg')}
                     alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
                     className="pro-ngo-hero__showcase-img"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg';
                     }}
                   />
-                  <div className="pro-ngo-hero__showcase-gradient">
+                  
+                  {/* High contrast gradient so words and button are always razor sharp and clearly visible */}
+                  <div 
+                    className="pro-ngo-hero__showcase-gradient"
+                    style={{
+                      position: 'relative',
+                      zIndex: 3,
+                      background: 'linear-gradient(to top, rgba(6, 21, 43, 0.96) 0%, rgba(6, 21, 43, 0.72) 65%, rgba(6, 21, 43, 0.15) 100%)',
+                      padding: '30px 26px 26px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px'
+                    }}
+                  >
                     <div className="pro-ngo-hero__badge-row">
-                      <span className="pro-ngo-tag pro-ngo-tag--gold">
-                        <i className="fas fa-trophy" aria-hidden="true" /> {getSiteText('hero.showcaseBadge', t('phrase.Team Rwanda Spotlight'))}
+                      <span 
+                        className="badge rounded-pill text-dark fw-bold px-3 py-2 d-inline-flex align-items-center gap-1 shadow-sm"
+                        style={{ background: '#FFD700', fontSize: '0.78rem', letterSpacing: '0.5px' }}
+                      >
+                        <i className="fas fa-trophy" aria-hidden="true" />
+                        <span>{getSiteText('hero.showcaseBadge', t('phrase.Team Rwanda Spotlight'))}</span>
                       </span>
                     </div>
 
-                    <h3 className="pro-ngo-hero__showcase-title">
-                      {getSiteText('hero.showcaseTitle', getSiteText('about.vision', t('phrase.Excellence in Motion: Leading Africa in Para-Sport')))}
+                    <h3 
+                      className="pro-ngo-hero__showcase-title mb-0"
+                      style={{ fontSize: '1.28rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.3 }}
+                    >
+                      {getSiteText('hero.showcaseTitle', t('phrase.Excellence in Motion: Leading Africa in Para-Sport'))}
                     </h3>
 
-                    <p className="pro-ngo-hero__showcase-desc">
+                    <p 
+                      className="pro-ngo-hero__showcase-desc mb-2"
+                      style={{ fontSize: '0.86rem', color: '#E2E8F0', lineHeight: 1.55 }}
+                    >
                       {getSiteText(
                         'hero.showcaseDesc',
-                        t('phrase.From grassroots talent scouting in 30 districts to continental championships and the Paralympic podium, our athletes redefine what is possible.')
+                        t('phrase.From grassroots talent scouting across 30 districts to continental championships and the Paralympic podium.')
                       )}
                     </p>
 
-                    <div className="mt-2">
+                    <div className="pt-1">
                       <Link
                         href="/athletes"
                         className="btn btn-warning fw-bold text-dark px-4 py-2 d-inline-flex align-items-center gap-2 shadow rounded-pill"
-                        style={{ fontSize: '0.88rem' }}
+                        style={{ fontSize: '0.88rem', background: '#FFC107', borderColor: '#FFC107' }}
                       >
                         <span>{t('phrase.Meet Our Para-Athletes')}</span>
                         <i className="fas fa-arrow-right" aria-hidden="true" />
@@ -234,9 +279,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           3. STRATEGIC MISSION PILLARS (100% FROM DATABASE SITECONTENT)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-pillars" aria-label="Core Strategic Pillars">
         <div className="pro-ngo-container">
           
@@ -367,9 +412,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           5. WHO WE ARE (FROM DATABASE SITECONTENT)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-about" aria-label="About NPC Rwanda Preview">
         <div className="pro-ngo-container">
           <div className="row align-items-center g-5">
@@ -425,9 +470,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           6. SPORTS DISCIPLINES (FROM DATABASE SportDiscipline)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       {sports.length > 0 && (
         <section className="pro-ngo-sports" aria-label="Official Sport Disciplines">
           <div className="pro-ngo-container">
@@ -471,9 +516,9 @@ export default function HomeClient() {
         </section>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           7. ATHLETES SPOTLIGHT (FROM DATABASE Athlete)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       {athletes.length > 0 && (
         <section className="pro-ngo-champions" aria-label="Featured Para-Athletes">
           <div className="pro-ngo-container">
@@ -526,9 +571,9 @@ export default function HomeClient() {
         </section>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           8. MEDIA & OFFICIAL ANNOUNCEMENTS DISPATCH (FROM DATABASE NewsArticle & Event)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-operations" aria-label="News and Official Announcements">
         <div className="pro-ngo-container">
           <div className="row g-5">
@@ -699,7 +744,7 @@ export default function HomeClient() {
                             <h4 className="pro-ngo-fixture-title">{displayEvent.title}</h4>
                             <span className="pro-ngo-fixture-venue">
                               <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
-                              {displayEvent.location} · {displayEvent.category}
+                              {displayEvent.location} � {displayEvent.category}
                             </span>
                           </div>
                         </Link>
@@ -789,7 +834,7 @@ export default function HomeClient() {
                     </div>
                   </div>
                   <p className="small text-muted mb-3">
-                    Follow Rwanda’s para-athletes in training, continental qualification rounds, and community events across the nation.
+                    Follow Rwanda�s para-athletes in training, continental qualification rounds, and community events across the nation.
                   </p>
                   <a
                     href={configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/'}
@@ -832,9 +877,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           9. GOVERNANCE & AUDITED STATUTORY DOCUMENTS (FROM DATABASE)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-governance" aria-label="Governance and Transparency">
         <div className="pro-ngo-container">
           
@@ -911,9 +956,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           10. TARGETED COMMUNITY SUPPORT & GIVING (FROM DATABASE SITECONTENT)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       <section className="pro-ngo-support" aria-label="Support Our Mission">
         <div className="pro-ngo-container">
           
@@ -976,9 +1021,9 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
+      {/* -----------------------------------------------------------
           11. STRATEGIC PARTNERS (100% FROM DATABASE Partner)
-      ═══════════════════════════════════════════════════════════ */}
+      ----------------------------------------------------------- */}
       {activePartners.length > 0 && (
         <section className="pro-ngo-partners" aria-label="Institutional Partners">
           <div className="pro-ngo-container">
