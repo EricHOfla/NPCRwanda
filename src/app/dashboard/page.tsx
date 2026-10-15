@@ -929,6 +929,13 @@ export default function DashboardPage() {
   const isSuperAdmin = userRole === 'SUPER_ADMIN';
   const isAdmin = userRole === 'ADMIN' || isSuperAdmin;
   const isEditor = userRole === 'EDITOR';
+  const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
+  const isPageRestricted = (page: string | null) => {
+    if (isSuperAdmin) return false;
+    if (page === 'system') return true;
+    if (isEditor && !editorAllowedPages.includes(page || 'home')) return true;
+    return false;
+  };
 
   // Governance Document/Policy States & CRUD Operations
   const [govDocs, setGovDocs] = useState<any[]>([]);
@@ -2287,30 +2294,32 @@ export default function DashboardPage() {
                       Profile Settings
                     </button>
 
-                    <button
-                      onClick={() => {
-                        setAdminTab('settings');
-                        setProfileDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '8px 16px',
-                        textAlign: 'left',
-                        background: 'transparent',
-                        border: 'none',
-                        fontSize: '0.8rem',
-                        color: '#334155',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <i className="fas fa-sliders" style={{ color: '#64748B', width: '16px' }} />
-                      System Settings
-                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => {
+                          setAdminTab('settings');
+                          setProfileDropdownOpen(false);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          background: 'transparent',
+                          border: 'none',
+                          fontSize: '0.8rem',
+                          color: '#334155',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <i className="fas fa-sliders" style={{ color: '#64748B', width: '16px' }} />
+                        System Settings
+                      </button>
+                    )}
                   </div>
 
                   <div style={{ borderTop: '1px solid #F1F5F9', padding: '4px 0 0 0', marginTop: '4px' }}>
@@ -2353,57 +2362,11 @@ export default function DashboardPage() {
           {/* ──────────────────────────────
              TAB: OVERVIEW
              ────────────────────────────── */}
-          {/* Unauthorized Access Guard */}
-              {(!isAdmin && (adminTab === 'users' || adminTab === 'members' || adminTab === 'contacts' || adminTab === 'subscribers')) && (
-                <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                      <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
-                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>This section requires Administrator or higher privileges. Contact your Super Administrator for access.</p>
-                    </div>
-                    <div className="card-body text-center py-3">
-                      <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}>
-                        <i className="fas fa-arrow-left me-2" />Back to Overview
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {(!isSuperAdmin && (adminTab === 'settings' || (adminTab === 'pages' && activeEditPage === 'system'))) && (
-                <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                      <i className="fas fa-shield-halved" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Super Admin Only</h4>
-                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>System Settings and Configuration are restricted to Super Administrators only.</p>
-                    </div>
-                    <div className="card-body text-center py-3">
-                      <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}>
-                        <i className="fas fa-arrow-left me-2" />Back to Overview
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {(isEditor && adminTab === 'pages' && ['home', 'about', 'npc-background', 'leadership', 'governance', 'partners', 'contact'].includes(activeEditPage || '')) && (
-                <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                      <i className="fas fa-pen-slash" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Editor Access Restricted</h4>
-                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
-                        Editors can only manage: Athletes, Sports Programs, News Room, Announcements, Events, and Careers. Contact an Administrator for access to this page.
-                      </p>
-                    </div>
-                    <div className="card-body text-center py-3">
-                      <button className="btn btn-primary btn-sm" onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); }}>
-                        <i className="fas fa-arrow-left me-2" />Go to Athletes Directory
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+          {/* ── Access Guard Helper (rendered inline per restricted tab) ── */}
+          {(() => {
+            // Nothing rendered here — guards are applied per-tab below
+            return null;
+          })()}
 
           {adminTab === 'overview' && (
             <div>
@@ -2720,6 +2683,39 @@ export default function DashboardPage() {
              TAB: PAGES CMS
              ────────────────────────────── */}
           {adminTab === 'pages' && (
+            isPageRestricted(activeEditPage) ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className={`fas ${!isSuperAdmin && activeEditPage === 'system' ? 'fa-shield-halved' : 'fa-pen-slash'}`} style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>
+                      {!isSuperAdmin && activeEditPage === 'system' ? 'Super Admin Only' : 'Editor Access Restricted'}
+                    </h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
+                      {!isSuperAdmin && activeEditPage === 'system'
+                        ? 'System Components are restricted to Super Administrators only.'
+                        : 'Editors are authorized to manage: Athletes Directory, Sports Programs, News Room, Announcements, Events Calendar, and Careers & Vacancies only.'}
+                    </p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        if (isEditor) {
+                          setAdminTab('pages');
+                          setActiveEditPage('athletes');
+                        } else {
+                          setAdminTab('overview');
+                        }
+                      }}
+                    >
+                      <i className="fas fa-arrow-left me-2" />
+                      {isEditor ? 'Go to Athletes Directory' : 'Back to Overview'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div>
               {/* Page Editor Header Toolbar */}
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-white border rounded">
@@ -5191,12 +5187,27 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
+            )
           )}
 
           {/* ──────────────────────────────
              TAB: MEDIA LIBRARY
              ────────────────────────────── */}
           {adminTab === 'volunteers' && (
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Volunteer Applications require Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div>
               <div className="custom-card p-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
@@ -5291,21 +5302,51 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
+            )
           )}
 
           {/* ──────────────────────────────
              TAB: GOVERNANCE
              ────────────────────────────── */}
           {adminTab === 'governance' && (
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Governance & Policies require Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div>
               <p className="text-muted small">Governance Documents and Policies are fully database-driven. Use the Governance API endpoints or configure them in Settings.</p>
             </div>
+            )
           )}
 
           {/* ──────────────────────────────
              TAB: CONTACTS / INBOX
              ────────────────────────────── */}
           {adminTab === 'contacts' && (
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Inbox & Messages require Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div>
               <div className="mb-4 d-flex gap-2 border-bottom pb-2 flex-wrap">
                 {[
@@ -5749,6 +5790,7 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
+            )
           )}
 
           {/* ──────────────────────────────
@@ -5756,6 +5798,20 @@ export default function DashboardPage() {
              ────────────────────────────── */}
           
           {adminTab === 'members' && (
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Members Directory requires Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div className="animation-fade-in">
               <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                 <div>
@@ -5909,12 +5965,27 @@ export default function DashboardPage() {
               </div>
 
             </div>
+            )
           )}
 
           {/* ──────────────────────────────
              TAB: USERS MANAGEMENT
              ────────────────────────────── */}
           {adminTab === 'users' && (
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>User Management requires Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div className="animation-fade-in">
               {/* Header */}
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
@@ -6324,9 +6395,24 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            )
           )}
 
           {adminTab === 'settings' && (
+            !isSuperAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-shield-halved" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Super Admin Only</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>System Settings are restricted to Super Administrators only.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             <div style={{ maxWidth: '800px' }}>
               <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px', paddingBottom: '20px', borderBottom: '1px solid #F1F5F9' }}>
@@ -6489,6 +6575,7 @@ export default function DashboardPage() {
                 </form>
               </div>
             </div>
+            )
           )}
 
 
@@ -6496,7 +6583,22 @@ export default function DashboardPage() {
              TAB: SUBSCRIBERS
              ────────────────────────────── */}
           {adminTab === 'subscribers' && (
-            <SubscribersTab />
+            !isAdmin ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Subscribers management requires Administrator or higher privileges.</p>
+                  </div>
+                  <div className="card-body text-center py-3">
+                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <SubscribersTab />
+            )
           )}
 
           {/* ──────────────────────────────
