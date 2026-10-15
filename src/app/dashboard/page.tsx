@@ -99,7 +99,8 @@ type AdminTab =
   | 'profile'
   | 'pages'
   | 'volunteers'
-  | 'members';
+  | 'members'
+  | 'users';
 
 // Reusable Custom CMS Components
 interface CMSImageFieldProps {
@@ -900,6 +901,28 @@ export default function DashboardPage() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState('');
   const [profileError, setProfileError] = useState('');
+  const [currentUser, setCurrentUser] = useState<{ id?: string; name?: string; email?: string; role?: string }>({});
+
+  // System User Management States & CRUD
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userFormOpen, setUserFormOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [userForm, setUserForm] = useState<{
+    name: string;
+    email: string;
+    password: string;
+    role: 'SUPER_ADMIN' | 'ADMIN' | 'EDITOR';
+  }>({
+    name: '',
+    email: '',
+    password: '',
+    role: 'EDITOR',
+  });
+  const [userSaving, setUserSaving] = useState(false);
+  const [userMsg, setUserMsg] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
+  const [userSearch, setUserSearch] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState<string>('ALL');
 
   // Governance Document/Policy States & CRUD Operations
   const [govDocs, setGovDocs] = useState<any[]>([]);
@@ -973,6 +996,90 @@ export default function DashboardPage() {
     }
   };
 
+  // Fetch System Users
+  const fetchSystemUsers = useCallback(async () => {
+    try {
+      setUsersLoading(true);
+      const res = await fetch('/api/users');
+      if (res.ok) {
+        const data = await res.json();
+        setSystemUsers(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Fetch users error:', err);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, []);
+
+  const handleUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserSaving(true);
+    setUserMsg(null);
+    try {
+      const url = editingUserId ? `/api/users/${editingUserId}` : '/api/users';
+      const method = editingUserId ? 'PUT' : 'POST';
+      const payload: Record<string, any> = {
+        name: userForm.name.trim(),
+        email: userForm.email.trim(),
+        role: userForm.role,
+      };
+      if (userForm.password && userForm.password.trim()) {
+        payload.password = userForm.password;
+      }
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUserMsg({ type: 'danger', text: data.error || 'Failed to save user account' });
+      } else {
+        setUserMsg({ type: 'success', text: data.message || 'User saved successfully.' });
+        setUserFormOpen(false);
+        setEditingUserId(null);
+        setUserForm({ name: '', email: '', password: '', role: 'EDITOR' });
+        fetchSystemUsers();
+      }
+    } catch (err: any) {
+      setUserMsg({ type: 'danger', text: err.message || 'Network error saving user' });
+    } finally {
+      setUserSaving(false);
+    }
+  };
+
+  const handleEditUser = (u: any) => {
+    setEditingUserId(u.id);
+    setUserForm({
+      name: u.name,
+      email: u.email,
+      password: '',
+      role: u.role,
+    });
+    setUserMsg(null);
+    setUserFormOpen(true);
+  };
+
+  const handleDeleteUser = async (u: any) => {
+    if (!confirm(`Are you sure you want to permanently delete user account "${u.name}" (${u.email})?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/users/${u.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Failed to delete user account');
+      } else {
+        setUserMsg({ type: 'success', text: data.message || 'User deleted successfully.' });
+        fetchSystemUsers();
+      }
+    } catch (err) {
+      console.error('Delete user error:', err);
+      alert('Network error deleting user');
+    }
+  };
+
   // Fetch system settings with fallback to contactInfo
   const fetchSystemSettings = useCallback(async () => {
     try {
@@ -1034,6 +1141,7 @@ export default function DashboardPage() {
       }
       if (res.ok) {
         const data = await res.json();
+        setCurrentUser(data);
         setProfile(prev => ({ ...prev, name: data.name, email: data.email }));
         setAuthVerified(true);
         return true;
@@ -1051,9 +1159,10 @@ export default function DashboardPage() {
         fetchMediaAssets();
         fetchGovData();
         fetchProtectedData();
+        fetchSystemUsers();
       }
     });
-  }, [verifySession]);
+  }, [verifySession, fetchSystemUsers]);
 
   // Inactivity timeout (60 minutes) & periodic session check
   useEffect(() => {
@@ -1665,6 +1774,7 @@ export default function DashboardPage() {
             // Section: Management
             { type: 'header', label: 'MANAGEMENT' },
             { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' },
+            { id: 'users', type: 'tab', tabId: 'users', label: 'User Management', icon: 'fa-user-shield' },
             { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
             { id: 'subscribers', type: 'tab', tabId: 'subscribers', label: 'Subscribers', icon: 'fa-bell' },
 
@@ -1826,6 +1936,7 @@ export default function DashboardPage() {
                 activeEditPage === 'system' ? 'System Components' : 'Home Page Editor'
               )}
               {adminTab === 'members' && 'Members Directory'}
+              {adminTab === 'users' && 'System User Management & Access Control'}
               {adminTab === 'volunteers' && 'Volunteer Applications'}
               {adminTab === 'contacts' && 'Inbox & Feedback'}
               {adminTab === 'subscribers' && 'Newsletter Subscribers'}
@@ -5702,6 +5813,421 @@ export default function DashboardPage() {
                 </tbody></table></div>
               </div>
 
+            </div>
+          )}
+
+          {/* ──────────────────────────────
+             TAB: USERS MANAGEMENT
+             ────────────────────────────── */}
+          {adminTab === 'users' && (
+            <div className="animation-fade-in">
+              {/* Header */}
+              <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+                <div>
+                  <h2 className="h3 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i className="fas fa-user-shield text-primary" />
+                    <span>System User Management</span>
+                  </h2>
+                  <p className="text-muted mb-0 small">
+                    Register and manage administrator and editor accounts with scoped role-based access.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingUserId(null);
+                    setUserForm({ name: '', email: '', password: '', role: 'EDITOR' });
+                    setUserMsg(null);
+                    setUserFormOpen(true);
+                  }}
+                  className="btn btn-primary fw-bold px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm"
+                >
+                  <i className="fas fa-user-plus" />
+                  <span>Register New User</span>
+                </button>
+              </div>
+
+              {/* Alert Message */}
+              {userMsg && (
+                <div
+                  className={`alert alert-${userMsg.type} alert-dismissible fade show d-flex align-items-center gap-2 mb-4`}
+                  role="alert"
+                >
+                  <i className={`fas ${userMsg.type === 'success' ? 'fa-circle-check text-success' : 'fa-circle-exclamation text-danger'}`} />
+                  <div className="flex-grow-1">{userMsg.text}</div>
+                  <button type="button" className="btn-close" onClick={() => setUserMsg(null)} aria-label="Close" />
+                </div>
+              )}
+
+              {/* Informational Guidance Box: Where & How to Use */}
+              <div
+                className="p-4 rounded-4 mb-4"
+                style={{
+                  background: 'linear-gradient(135deg, #0B2545 0%, #134074 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 8px 24px rgba(11, 37, 69, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                }}
+              >
+                <div className="d-flex align-items-start gap-3">
+                  <div
+                    className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{ width: '44px', height: '44px', background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', fontSize: '1.25rem' }}
+                  >
+                    <i className="fas fa-circle-info" />
+                  </div>
+                  <div>
+                    <h3 className="h6 fw-bold mb-1 text-white">How & Where New Users Sign In</h3>
+                    <p className="small mb-3 text-white-50" style={{ lineHeight: 1.6 }}>
+                      When you register a new user here, share their registered email and the temporary password you set. They can immediately log into the administrative system via the standard portal at:
+                    </p>
+                    <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                      <span className="badge bg-dark bg-opacity-50 text-warning px-3 py-2 rounded-pill font-monospace small border border-warning border-opacity-25">
+                        <i className="fas fa-lock me-1" />
+                        /login &nbsp;•&nbsp; https://admin.npcrwanda.org/login
+                      </span>
+                      <a
+                        href="/login"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-light btn-sm rounded-pill fw-semibold px-3"
+                        style={{ fontSize: '0.78rem' }}
+                      >
+                        <i className="fas fa-arrow-up-right-from-square me-1" /> Open Login Page
+                      </a>
+                    </div>
+                    <small className="text-white-50 d-block">
+                      • <strong>Super Admin</strong>: Full administrative privileges, user management, and system configuration.<br />
+                      • <strong>Admin</strong>: Manages site content, members, announcements, athletes, and inquiries.<br />
+                      • <strong>Editor</strong>: Authorized to draft and publish news, competition events, and career listings.
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              {/* Expandable Register / Edit User Form Card */}
+              {userFormOpen && (
+                <div className="custom-card p-4 p-md-5 mb-4 bg-white border rounded-4 shadow-sm" style={{ borderLeft: '4px solid #0072C6' }}>
+                  <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                      <h3 className="h5 fw-bold text-dark mb-1">
+                        <i className={`fas ${editingUserId ? 'fa-user-pen text-primary' : 'fa-user-plus text-success'} me-2`} />
+                        {editingUserId ? 'Edit User Credentials & Access Role' : 'Register New System Administrator / Editor'}
+                      </h3>
+                      <p className="small text-muted mb-0">
+                        {editingUserId
+                          ? 'Update name, email, access tier, or provide a new password to reset their credentials.'
+                          : 'Provide name, email, temporary password, and access tier. The user can sign in immediately.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserFormOpen(false);
+                        setEditingUserId(null);
+                      }}
+                      className="btn btn-sm btn-outline-secondary rounded-circle"
+                      style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      aria-label="Close"
+                    >
+                      <i className="fas fa-times" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleUserSubmit}>
+                    <div className="row g-4">
+                      {/* Name */}
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark">
+                          Full Name <span className="text-danger">*</span>
+                        </label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">
+                            <i className="fas fa-user text-muted" />
+                          </span>
+                          <input
+                            type="text"
+                            className="form-control border-start-0"
+                            placeholder="e.g. Jean Damascene Ndayisaba"
+                            required
+                            value={userForm.name}
+                            onChange={e => setUserForm({ ...userForm, name: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Email */}
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark">
+                          Email Address <span className="text-danger">*</span>
+                        </label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">
+                            <i className="fas fa-envelope text-muted" />
+                          </span>
+                          <input
+                            type="email"
+                            className="form-control border-start-0"
+                            placeholder="e.g. j.damascene@npcrwanda.org"
+                            required
+                            value={userForm.email}
+                            onChange={e => setUserForm({ ...userForm, email: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Password */}
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark">
+                          {editingUserId ? 'New Password (leave empty to keep unchanged)' : 'Initial Password'} <span className={editingUserId ? 'text-muted' : 'text-danger'}>*</span>
+                        </label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">
+                            <i className="fas fa-key text-muted" />
+                          </span>
+                          <input
+                            type="password"
+                            className="form-control border-start-0"
+                            placeholder={editingUserId ? '•••••••• (leave blank to keep current)' : 'Min 6 characters'}
+                            required={!editingUserId}
+                            minLength={6}
+                            value={userForm.password}
+                            onChange={e => setUserForm({ ...userForm, password: e.target.value })}
+                          />
+                        </div>
+                        <small className="text-muted">Minimum 6 characters. User can change this after signing in.</small>
+                      </div>
+
+                      {/* Role */}
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark">
+                          System Role <span className="text-danger">*</span>
+                        </label>
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">
+                            <i className="fas fa-id-badge text-muted" />
+                          </span>
+                          <select
+                            className="form-select border-start-0"
+                            value={userForm.role}
+                            onChange={e => setUserForm({ ...userForm, role: e.target.value as any })}
+                          >
+                            <option value="EDITOR">Editor (Can create &amp; publish articles, events, sports)</option>
+                            <option value="ADMIN">Administrator (Can manage site content, members, announcements)</option>
+                            <option value="SUPER_ADMIN">Super Administrator (Full unrestricted system control)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Submit & Cancel Buttons */}
+                      <div className="col-12 pt-3 border-top d-flex gap-2">
+                        <button
+                          type="submit"
+                          disabled={userSaving}
+                          className="btn btn-primary fw-bold px-4 py-2 d-inline-flex align-items-center gap-2"
+                        >
+                          <i className={`fas ${userSaving ? 'fa-spinner fa-spin' : 'fa-check'}`} />
+                          <span>{userSaving ? 'Saving User...' : editingUserId ? 'Save User Changes' : 'Register User Account'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserFormOpen(false);
+                            setEditingUserId(null);
+                          }}
+                          className="btn btn-light border px-4 py-2 fw-semibold"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Users List & Filter Bar */}
+              <div className="card border rounded-4 shadow-sm bg-white overflow-hidden">
+                <div className="card-header bg-white border-bottom p-3 p-md-4">
+                  <div className="row g-3 align-items-center justify-content-between">
+                    <div className="col-md-5">
+                      <div className="input-group input-group-sm">
+                        <span className="input-group-text bg-light border-end-0">
+                          <i className="fas fa-search text-muted" />
+                        </span>
+                        <input
+                          type="text"
+                          className="form-control border-start-0"
+                          placeholder="Search users by name or email..."
+                          value={userSearch}
+                          onChange={e => setUserSearch(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-7 d-flex justify-content-md-end gap-2 flex-wrap">
+                      <div className="btn-group btn-group-sm">
+                        {['ALL', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].map(r => (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={() => setUserRoleFilter(r)}
+                            className={`btn ${userRoleFilter === r ? 'btn-primary' : 'btn-outline-secondary'}`}
+                          >
+                            {r === 'ALL' ? 'All Roles' : r.replace('_', ' ')}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="table-responsive">
+                  <table className="table table-hover align-middle mb-0">
+                    <thead className="table-light text-uppercase small text-muted" style={{ fontSize: '0.72rem', letterSpacing: '0.5px' }}>
+                      <tr>
+                        <th style={{ width: '40px' }} className="ps-4">#</th>
+                        <th>User Profile</th>
+                        <th>Email Address</th>
+                        <th>Assigned Role</th>
+                        <th>Registered Date</th>
+                        <th className="text-end pe-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usersLoading ? (
+                        <tr>
+                          <td colSpan={6} className="text-center py-5">
+                            <div className="spinner-border spinner-border-sm text-primary mb-2" role="status" />
+                            <div className="small text-muted">Loading system user registry...</div>
+                          </td>
+                        </tr>
+                      ) : (() => {
+                        const filtered = systemUsers.filter((u: any) => {
+                          const query = userSearch.toLowerCase().trim();
+                          const matchesQuery = !query || u.name?.toLowerCase().includes(query) || u.email?.toLowerCase().includes(query);
+                          const matchesRole = userRoleFilter === 'ALL' || u.role === userRoleFilter;
+                          return matchesQuery && matchesRole;
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={6} className="text-center py-5">
+                                <i className="fas fa-users-slash text-muted mb-2" style={{ fontSize: '2rem' }} />
+                                <div className="fw-semibold text-dark">No users match your filter criteria</div>
+                                <div className="small text-muted">Try adjusting your search query or role filter.</div>
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return filtered.map((u: any, idx: number) => {
+                          const isSelf = currentUser.email === u.email || currentUser.id === u.id;
+                          const initials = (u.name || 'NP')
+                            .split(/\s+/)
+                            .map((p: string) => p[0])
+                            .slice(0, 2)
+                            .join('')
+                            .toUpperCase();
+
+                          const roleBadge = (() => {
+                            switch (u.role) {
+                              case 'SUPER_ADMIN':
+                                return (
+                                  <span className="badge rounded-pill px-3 py-1.5 fw-bold" style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FCD34D' }}>
+                                    <i className="fas fa-crown text-warning me-1" /> Super Admin
+                                  </span>
+                                );
+                              case 'ADMIN':
+                                return (
+                                  <span className="badge rounded-pill px-3 py-1.5 fw-bold" style={{ background: '#EFF6FF', color: '#1E40AF', border: '1px solid #BFDBFE' }}>
+                                    <i className="fas fa-shield-halved text-primary me-1" /> Administrator
+                                  </span>
+                                );
+                              default:
+                                return (
+                                  <span className="badge rounded-pill px-3 py-1.5 fw-bold" style={{ background: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0' }}>
+                                    <i className="fas fa-pen-nib text-success me-1" /> Editor
+                                  </span>
+                                );
+                            }
+                          })();
+
+                          return (
+                            <tr key={u.id}>
+                              <td className="ps-4 text-muted small">{idx + 1}</td>
+                              <td>
+                                <div className="d-flex align-items-center gap-2">
+                                  <div
+                                    className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs flex-shrink-0"
+                                    style={{
+                                      width: '38px',
+                                      height: '38px',
+                                      background: u.role === 'SUPER_ADMIN' ? 'linear-gradient(135deg, #B45309 0%, #D97706 100%)' : 'linear-gradient(135deg, #0B2545 0%, #0072C6 100%)',
+                                      fontSize: '0.8rem',
+                                    }}
+                                  >
+                                    {initials}
+                                  </div>
+                                  <div>
+                                    <div className="fw-bold text-dark d-flex align-items-center gap-1">
+                                      <span>{u.name}</span>
+                                      {isSelf && (
+                                        <span className="badge bg-secondary-subtle text-secondary small" style={{ fontSize: '0.65rem' }}>
+                                          You
+                                        </span>
+                                      )}
+                                    </div>
+                                    <small className="text-muted d-block d-md-none">{u.email}</small>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="font-monospace small text-muted">{u.email}</td>
+                              <td>{roleBadge}</td>
+                              <td className="small text-muted">
+                                {u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
+                              </td>
+                              <td className="text-end pe-4">
+                                <div className="btn-group btn-group-sm">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditUser(u)}
+                                    className="btn btn-outline-primary btn-sm px-2.5"
+                                    title="Edit user details & password"
+                                  >
+                                    <i className="fas fa-pen-to-square me-1" /> Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteUser(u)}
+                                    disabled={isSelf}
+                                    className="btn btn-outline-danger btn-sm px-2.5"
+                                    title={isSelf ? 'Cannot delete your own active account' : 'Delete user account'}
+                                  >
+                                    <i className="fas fa-trash-can" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="card-footer bg-light p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <span className="small text-muted">
+                    Total Registered Users: <strong>{systemUsers.length}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={fetchSystemUsers}
+                    className="btn btn-link btn-sm text-decoration-none text-muted p-0"
+                  >
+                    <i className="fas fa-rotate me-1" /> Refresh list
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
