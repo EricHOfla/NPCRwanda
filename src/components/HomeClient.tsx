@@ -425,17 +425,24 @@ export default function HomeClient() {
       <section className="pro-ngo-about" aria-label="About NPC Rwanda Preview">
         <div className="pro-ngo-container">
           <div className="row align-items-center g-5">
-            <div className="col-lg-6" data-aos="fade-right">
-              <img
-                src={getSiteText('about.previewImage', '/assets/img/curated/about-hero.jpg')}
-                alt={getSiteText('about.previewTitle', 'About NPC Rwanda')}
-                className="pro-ngo-about__img"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/assets/img/curated/about-hero.jpg';
-                }}
-              />
-            </div>
-            <div className="col-lg-6" data-aos="fade-left">
+            {(() => {
+              const previewImg = siteContent['about.previewImage'];
+              const hasAboutImg = Boolean(previewImg && previewImg.trim() !== '' && !previewImg.includes('/assets/img/curated/'));
+              if (!hasAboutImg) return null;
+              return (
+                <div className="col-lg-6" data-aos="fade-right">
+                  <img
+                    src={previewImg}
+                    alt={getSiteText('about.previewTitle', 'About NPC Rwanda')}
+                    className="pro-ngo-about__img"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              );
+            })()}
+            <div className={Boolean(siteContent['about.previewImage'] && siteContent['about.previewImage'].trim() !== '' && !siteContent['about.previewImage'].includes('/assets/img/curated/')) ? 'col-lg-6' : 'col-lg-10 mx-auto'} data-aos="fade-left">
               <span className="pro-ngo-eyebrow">
                 {getSiteText('about.eyebrow', t('phrase.Who We Are'))}
               </span>
@@ -681,9 +688,9 @@ export default function HomeClient() {
             <div className="col-lg-5" data-aos="fade-up" data-aos-delay="100">
               
               {/* Panel 1: Official Announcements (Exactly 1) */}
-              <div className="pro-ngo-gazette-panel mb-4">
-                <div className="pro-ngo-gazette-panel__header">
-                  <h3 className="pro-ngo-gazette-panel__title">
+              <div className="pro-ngo-announcement-panel mb-4">
+                <div className="pro-ngo-announcement-panel__header">
+                  <h3 className="pro-ngo-announcement-panel__title">
                     <i className="fas fa-bullhorn text-danger" aria-hidden="true" />
                     <span>{t('phrase.Official Announcements')}</span>
                   </h3>
@@ -698,18 +705,18 @@ export default function HomeClient() {
                   <div>
                     <Link
                       href={`/announcements/${encodeURIComponent(displayAnnouncement.slug || displayAnnouncement.id)}`}
-                      className="pro-ngo-gazette-item"
+                      className="pro-ngo-announcement-item"
                     >
                       <i className="fas fa-file-lines text-danger mt-1" aria-hidden="true" />
                       <div>
-                        <span className="pro-ngo-gazette-item__badge">
+                        <span className="pro-ngo-announcement-item__badge">
                           {(displayAnnouncement.category || 'Official Circular').replace(/gazette/gi, 'Announcement')}
                         </span>
-                        <h4 className="pro-ngo-gazette-item__title">{t(displayAnnouncement.title)}</h4>
+                        <h4 className="pro-ngo-announcement-item__title">{t(displayAnnouncement.title)}</h4>
                         <p className="small text-muted mb-2 text-truncate" style={{ maxWidth: '320px' }}>
                           {t(displayAnnouncement.desc)}
                         </p>
-                        <span className="pro-ngo-gazette-item__date">
+                        <span className="pro-ngo-announcement-item__date">
                           <i className="fas fa-calendar-check me-1" aria-hidden="true" />
                           {displayAnnouncement.date}
                         </span>

@@ -24,7 +24,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'stats.founded': '2001',
   'stats.clubs': '30+',
   'stats.athletes': '500+',
-  'about.previewImage': '/assets/img/curated/about-hero.jpg',
+  'about.previewImage': '',
   'about.eyebrow': 'Who We Are',
   'about.previewTitle': 'Driving Inclusion Through Sport',
   'about.previewText': 'The National Paralympic Committee of Rwanda (NPC Rwanda) is a national non-governmental organization established in 2001. Our vision is to be the leading Paralympic nation in Africa, and our mission is to build a sustainable system that enables para-athletes to achieve their sporting aspirations.',
@@ -36,12 +36,12 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
-  'about.heroImage': '/assets/img/curated/about-hero.jpg',
+  'about.heroImage': '',
   'about.vision': 'To be the leading Paralympic nation in Africa.',
   'about.mission': 'To develop a sustainable Paralympic sport system in Rwanda for enabling Para-athletes to achieve their sporting aspirations in local and International sport arena.',
   'about.historyParagraph1': 'Founded in November 2001, the National Paralympic Committee of Rwanda has grown from a small group of advocates into a nationally coordinated movement. We have worked consistently to expand opportunities for athletes with disabilities while building a high-performance pathway that meets international standards.',
   'about.historyParagraph2': "Rwanda's first Paralympic participation was in Athens 2004. Since then, our athletes have continued to prove that disability is not inability, delivering strong performances and inspiring the nation through resilience and excellence.",
-  'about.historyImage': '/assets/img/curated/about-history.jpg',
+  'about.historyImage': '',
   'about.value.phrase.Courage': 'The courage to compete at the highest level and redefine what is possible.',
   'about.value.phrase.Determination': 'Relentless commitment to preparation, discipline, and sporting excellence.',
   'about.value.phrase.Equality': 'Ensuring fair access, respect, and opportunity for all athletes.',

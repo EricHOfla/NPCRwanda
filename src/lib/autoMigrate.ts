@@ -372,6 +372,15 @@ async function runAutoMigration(): Promise<void> {
         await prisma.siteContent.create({ data: { key, value: val, type: 'text' } });
       }
     }
+
+    // Wipe any legacy hardcoded placeholder image URLs
+    await prisma.siteContent.updateMany({
+      where: {
+        key: { in: ['about.heroImage', 'about.historyImage', 'about.previewImage', 'hero.image'] },
+        value: { contains: '/assets/img/curated/' },
+      },
+      data: { value: '' },
+    });
   } catch {
     // Safe ignore
   }

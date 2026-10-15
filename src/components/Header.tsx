@@ -9,11 +9,11 @@ import { useData } from '../context/DataContext';
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const { lang, setLang, t } = useTranslation();
-  const { systemSettings } = useData();
+  const { systemSettings, contactInfo } = useData();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const email = systemSettings.contactEmail || '';
-  const phone = systemSettings.contactPhone || '';
+  const email = systemSettings.contactEmail || contactInfo?.email || '';
+  const phone = systemSettings.contactPhone || contactInfo?.phone || '';
   const siteName = systemSettings.siteName || 'NPC Rwanda';
   const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
@@ -64,12 +64,16 @@ export const Header: React.FC = () => {
       <div className="topbar">
         <div className="container d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div className="d-flex flex-wrap align-items-center gap-3">
-            <a href={`mailto:${email}`} className="topbar-link">
-              <i className="fas fa-envelope me-1" aria-hidden="true"></i> {email}
-            </a>
-            <a href={`tel:${phone}`} className="topbar-link">
-              <i className="fas fa-phone me-1" aria-hidden="true"></i> {phone}
-            </a>
+            {email && (
+              <a href={`mailto:${email}`} className="topbar-link">
+                <i className="fas fa-envelope me-1" aria-hidden="true"></i> {email}
+              </a>
+            )}
+            {phone && (
+              <a href={`tel:${phone}`} className="topbar-link">
+                <i className="fas fa-phone me-1" aria-hidden="true"></i> {phone}
+              </a>
+            )}
           </div>
           <div className="d-flex flex-wrap align-items-center gap-3">
             {/* Language Switcher Dropdown */}

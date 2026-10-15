@@ -3656,8 +3656,8 @@ body.accessibility-center-text {
   color: #64748B;
 }
 
-/* Official Gazette Register Card */
-.pro-ngo-gazette-panel {
+/* Official Announcements Panel */
+.pro-ngo-announcement-panel {
   background: #F8FAFC;
   border-radius: 18px;
   border: 1px solid #E2E8F0;
@@ -3665,7 +3665,7 @@ body.accessibility-center-text {
   margin-bottom: 28px;
 }
 
-.pro-ngo-gazette-panel__header {
+.pro-ngo-announcement-panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3674,7 +3674,7 @@ body.accessibility-center-text {
   border-bottom: 2px solid #E2E8F0;
 }
 
-.pro-ngo-gazette-panel__title {
+.pro-ngo-announcement-panel__title {
   font-size: 1.05rem;
   font-weight: 800;
   color: #0F172A;
@@ -3684,7 +3684,7 @@ body.accessibility-center-text {
   margin: 0;
 }
 
-.pro-ngo-gazette-item {
+.pro-ngo-announcement-item {
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -3697,13 +3697,13 @@ body.accessibility-center-text {
   transition: all 0.2s ease;
 }
 
-.pro-ngo-gazette-item:hover {
+.pro-ngo-announcement-item:hover {
   border-color: #DC2626;
   box-shadow: 0 4px 15px rgba(220, 38, 38, 0.08);
   transform: translateX(3px);
 }
 
-.pro-ngo-gazette-item__badge {
+.pro-ngo-announcement-item__badge {
   font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -3716,7 +3716,7 @@ body.accessibility-center-text {
   margin-bottom: 4px;
 }
 
-.pro-ngo-gazette-item__title {
+.pro-ngo-announcement-item__title {
   font-size: 0.88rem;
   font-weight: 700;
   color: #1E293B;
@@ -3728,7 +3728,7 @@ body.accessibility-center-text {
   overflow: hidden;
 }
 
-.pro-ngo-gazette-item__date {
+.pro-ngo-announcement-item__date {
   font-size: 0.74rem;
   color: #64748B;
 }

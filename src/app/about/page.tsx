@@ -65,24 +65,33 @@ export default function AboutPage() {
       {/* History Section */}
       <section id="history">
         <div className="container">
-          <div className="row align-items-center g-5">
-            <div className="col-lg-6" data-aos="fade-right">
-              <h2 className="section-title text-start mb-4">{t('phrase.Our History')}</h2>
-              <p className="text-justify">
-                {getSiteText('about.historyParagraph1', t('phrase.Founded in November 2001, the National Paralympic Committee of Rwanda has grown from a small group of advocates into a nationally coordinated movement. We have worked consistently to expand opportunities for athletes with disabilities while building a high-performance pathway that meets international standards.'))}
-              </p>
-              <p className="text-justify">
-                {getSiteText('about.historyParagraph2', t("phrase.Rwanda's first Paralympic participation was in Athens 2004. Since then, our athletes have continued to prove that disability is not inability, delivering strong performances and inspiring the nation through resilience and excellence."))}
-              </p>
-            </div>
-            <div className="col-lg-6" data-aos="fade-left">
-              <img
-                src={getSiteText('about.historyImage', '/assets/img/curated/about-history.jpg')}
-                alt="Historical photo"
-                className="img-fluid rounded-4 shadow-medium"
-              />
-            </div>
-          </div>
+          {(() => {
+            const histImg = siteContent['about.historyImage'];
+            const hasHistImg = Boolean(histImg && histImg.trim() !== '' && !histImg.includes('/assets/img/curated/'));
+            return (
+              <div className="row align-items-center g-5">
+                <div className={hasHistImg ? "col-lg-6" : "col-lg-10 mx-auto"} data-aos="fade-right">
+                  <h2 className="section-title text-start mb-4">{t('phrase.Our History')}</h2>
+                  <p className="text-justify">
+                    {getSiteText('about.historyParagraph1', t('phrase.Founded in November 2001, the National Paralympic Committee of Rwanda has grown from a small group of advocates into a nationally coordinated movement. We have worked consistently to expand opportunities for athletes with disabilities while building a high-performance pathway that meets international standards.'))}
+                  </p>
+                  <p className="text-justify">
+                    {getSiteText('about.historyParagraph2', t("phrase.Rwanda's first Paralympic participation was in Athens 2004. Since then, our athletes have continued to prove that disability is not inability, delivering strong performances and inspiring the nation through resilience and excellence."))}
+                  </p>
+                </div>
+                {hasHistImg && (
+                  <div className="col-lg-6" data-aos="fade-left">
+                    <img
+                      src={histImg}
+                      alt="Historical photo"
+                      className="img-fluid rounded-4 shadow-medium"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
