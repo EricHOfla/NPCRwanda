@@ -203,22 +203,24 @@ export default function HomeClient() {
                     justifyContent: 'flex-end'
                   }}
                 >
-                  <img
-                    src={getSiteText('hero.image', '/assets/img/curated/home-hero.jpg')}
-                    alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
-                    className="pro-ngo-hero__showcase-img"
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block'
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg';
-                    }}
-                  />
+                  {siteContent['hero.image'] ? (
+                    <img
+                      src={siteContent['hero.image']}
+                      alt={getSiteText('hero.showcaseTitle', 'National Paralympic Committee of Rwanda')}
+                      className="pro-ngo-hero__showcase-img"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block'
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : null}
                   
                   {/* High contrast gradient so words and button are always razor sharp and clearly visible */}
                   <div 
