@@ -953,6 +953,39 @@ export async function sendDonationNotification(donation: { name: string; email: 
       html: adminHtml,
       replyTo: donation.email,
     });
+
+    // 2. Receipt to Contributor / Donor
+    const donorReceiptHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #0B2545 0%, #134074 100%); padding: 28px 24px; color: #fff; text-align: center;">
+          <h2 style="margin: 0; font-size: 20px; color: #FFA000;">Thank You for Your Support!</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #E2E8F0;">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p>Dear <strong>${donation.name}</strong>,</p>
+          <p>Thank you for reaching out to the National Paralympic Committee of Rwanda regarding <strong>${donation.supportType}</strong> (${donation.category}).</p>
+          <p>Your passion to empower Rwandan Para-athletes and support inclusive sports is deeply appreciated. Every contribution helps our athletes compete with pride on national and international stages.</p>
+          <div style="margin: 18px 0; padding: 16px; background: #F8FAFC; border-left: 4px solid #FFA000; border-radius: 4px;">
+            <p style="margin: 0; font-size: 12px; color: #64748B; font-weight: bold; text-transform: uppercase;">Inquiry Summary:</p>
+            <p style="margin: 6px 0 0; color: #334155;"><strong>Support Type:</strong> ${donation.supportType}</p>
+            <p style="margin: 4px 0 0; color: #334155;"><strong>Category:</strong> ${donation.category}</p>
+            <p style="margin: 4px 0 0; color: #334155; white-space: pre-wrap;">${donation.details}</p>
+          </div>
+          <p>Our Resource Mobilization and Partnerships team will review your message and contact you directly with documentation and next steps.</p>
+          <p style="margin-top: 24px; margin-bottom: 0;">Together for Inclusion and Excellence,<br /><strong>Resource Mobilization Office</strong><br />National Paralympic Committee of Rwanda<br /><a href="https://npcrwanda.org" style="color: #0072C6;">www.npcrwanda.org</a></p>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} National Paralympic Committee of Rwanda &bull; Amahoro National Stadium, Kigali
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: donation.email,
+      subject: `Thank You for Supporting NPC Rwanda`,
+      html: donorReceiptHtml,
+    });
   } catch (err: any) {
     console.error('[Donation] Error sending donation notification email:', err?.message || err);
   }

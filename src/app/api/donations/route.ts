@@ -48,14 +48,18 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send notifications in background
-    sendDonationNotification({
-      name: newInquiry.name,
-      email: newInquiry.email,
-      category: newInquiry.category,
-      supportType: newInquiry.supportType,
-      details: newInquiry.details,
-    }).catch(err => console.error('[Mailer] Donation alert error:', err));
+    // Send notifications to admin and donor receipt
+    try {
+      await sendDonationNotification({
+        name: newInquiry.name,
+        email: newInquiry.email,
+        category: newInquiry.category,
+        supportType: newInquiry.supportType,
+        details: newInquiry.details,
+      });
+    } catch (mailErr) {
+      console.error('[Mailer] Donation alert error:', mailErr);
+    }
 
     return NextResponse.json(newInquiry, { status: 201 });
   } catch (error) {

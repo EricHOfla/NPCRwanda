@@ -73,14 +73,18 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send notifications in background (don't block response)
-    sendContactNotification({
-      name: newMessage.name,
-      email: newMessage.email,
-      subject: newMessage.subject,
-      message: newMessage.message,
-      date: newMessage.date,
-    }).catch(err => console.error('[Mailer] Contact alert error:', err));
+    // Send notifications to admin and auto-responder to user
+    try {
+      await sendContactNotification({
+        name: newMessage.name,
+        email: newMessage.email,
+        subject: newMessage.subject,
+        message: newMessage.message,
+        date: newMessage.date,
+      });
+    } catch (err) {
+      console.error('[Mailer] Contact alert error:', err);
+    }
 
     return NextResponse.json(newMessage, { status: 201 });
   } catch (error) {

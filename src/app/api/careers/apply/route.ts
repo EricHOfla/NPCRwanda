@@ -153,13 +153,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Dispatch confirmation email to applicant in background
-    sendApplicationReceivedEmail({
-      id: application.id,
-      fullName: application.fullName,
-      email: application.email,
-      careerTitle: application.careerTitle,
-    }).catch(err => console.warn('[Recruitment] Background application receipt email error:', err));
+    // Dispatch confirmation email to applicant
+    try {
+      await sendApplicationReceivedEmail({
+        id: application.id,
+        fullName: application.fullName,
+        email: application.email,
+        careerTitle: application.careerTitle,
+      });
+    } catch (err) {
+      console.warn('[Recruitment] Background application receipt email error:', err);
+    }
 
     return NextResponse.json({
       success: true,

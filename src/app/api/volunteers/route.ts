@@ -48,14 +48,18 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send notifications in background
-    sendVolunteerNotification({
-      name: newApp.name,
-      email: newApp.email,
-      interest: newApp.interest,
-      skills: newApp.skills,
-      details: newApp.details,
-    }).catch(err => console.error('[Mailer] Volunteer alert error:', err));
+    // Send notifications to admin and receipt to volunteer
+    try {
+      await sendVolunteerNotification({
+        name: newApp.name,
+        email: newApp.email,
+        interest: newApp.interest,
+        skills: newApp.skills,
+        details: newApp.details,
+      });
+    } catch (err) {
+      console.error('[Mailer] Volunteer alert error:', err);
+    }
 
     return NextResponse.json(newApp, { status: 201 });
   } catch (error) {
