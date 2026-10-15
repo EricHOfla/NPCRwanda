@@ -61,6 +61,11 @@ export async function POST(request: NextRequest) {
       phone = (formData.get('phone') as string) || '';
       coverLetter = (formData.get('coverLetter') as string) || '';
 
+      const honeypot = (formData.get('website_url') as string) || '';
+      if (honeypot && honeypot.trim() !== '') {
+        return NextResponse.json({ success: true, message: 'Application submitted successfully.' }, { status: 200 });
+      }
+
       const resumeFile = formData.get('resume') as File | null;
       if (resumeFile && resumeFile.size > 0) {
         // Validate max 10MB
@@ -87,6 +92,9 @@ export async function POST(request: NextRequest) {
       }
     } else {
       const body = await request.json();
+      if (body.website_url && body.website_url.trim() !== '') {
+        return NextResponse.json({ success: true, message: 'Application submitted successfully.' }, { status: 200 });
+      }
       careerId = body.careerId || null;
       careerTitle = body.careerTitle || 'General Application';
       fullName = body.fullName || '';

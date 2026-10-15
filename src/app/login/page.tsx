@@ -7,10 +7,15 @@ import { isPublicHostname } from '@/lib/site-domain';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<'login' | 'forgot' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [sessionNotice, setSessionNotice] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +29,13 @@ export default function LoginPage() {
       const params = new URLSearchParams(window.location.search);
       if (params.get('expired') === 'true') {
         setSessionNotice('Your session has ended for your security. Please log in again to continue.');
+      }
+
+      const tokenParam = params.get('token');
+      const modeParam = params.get('mode');
+      if (tokenParam && modeParam === 'reset') {
+        setResetToken(tokenParam);
+        setMode('reset');
       }
     }
   }, []);
@@ -64,6 +76,59 @@ export default function LoginPage() {
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to submit request');
+      setSuccessMsg(data.message || 'Check your email for password reset instructions.');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken, newPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to reset password');
+      setSuccessMsg(data.message || 'Password reset successfully!');
+      setTimeout(() => {
+        setMode('login');
+        setSuccessMsg('You can now log in with your new password.');
+      }, 2500);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -443,14 +508,18 @@ export default function LoginPage() {
             </div>
 
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
-              Sign In to Your Account
+              {mode === 'login' && 'Sign In to Your Account'}
+              {mode === 'forgot' && 'Reset Account Password'}
+              {mode === 'reset' && 'Set New Password'}
             </h2>
             <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B' }}>
-              Enter your official credentials to access the administrative dashboard.
+              {mode === 'login' && 'Enter your official credentials to access the administrative dashboard.'}
+              {mode === 'forgot' && 'Provide your registered email address and we will dispatch a secure password reset link.'}
+              {mode === 'reset' && 'Provide a new secure password of at least 6 characters for your account.'}
             </p>
           </div>
 
-          {sessionNotice && (
+          {sessionNotice && mode === 'login' && (
             <div style={{
               padding: '12px 14px',
               background: '#FFFBEB',
@@ -466,6 +535,25 @@ export default function LoginPage() {
             }}>
               <i className="fas fa-clock-rotate-left fa-lg" style={{ color: '#D97706' }} />
               <span>{sessionNotice}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div style={{
+              padding: '12px 14px',
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              borderRadius: '10px',
+              color: '#065F46',
+              fontSize: '0.84rem',
+              marginBottom: '18px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}>
+              <i className="fas fa-circle-check fa-lg" style={{ color: '#059669' }} />
+              <span>{successMsg}</span>
             </div>
           )}
 
@@ -488,85 +576,230 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label
-                htmlFor="loginEmail"
-                style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}
-              >
-                Official Email Address
-              </label>
-              <div className="login-input-group">
-                <i className="fas fa-envelope login-input-icon" />
-                <input
-                  type="email"
-                  id="loginEmail"
-                  placeholder="admin@npcrwanda.org"
-                  className="login-input-field"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                  disabled={loading}
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          {/* MODE: LOGIN */}
+          {mode === 'login' && (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
                 <label
-                  htmlFor="loginPassword"
-                  style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', margin: 0 }}
+                  htmlFor="loginEmail"
+                  style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}
                 >
-                  Password
+                  Official Email Address
                 </label>
+                <div className="login-input-group">
+                  <i className="fas fa-envelope login-input-icon" />
+                  <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="admin@npcrwanda.org"
+                    className="login-input-field"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    disabled={loading}
+                    autoComplete="email"
+                  />
+                </div>
               </div>
-              <div className="login-input-group">
-                <i className="fas fa-lock login-input-icon" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="loginPassword"
-                  placeholder="Enter your account password"
-                  className="login-input-field"
-                  style={{ paddingRight: '46px' }}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  tabIndex={-1}
-                >
-                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
-                </button>
-              </div>
-            </div>
 
-            <button
-              type="submit"
-              className="login-submit-btn"
-              disabled={loading}
-              style={{ marginTop: '6px' }}
-            >
-              {loading ? (
-                <>
-                  <i className="fas fa-circle-notch fa-spin" />
-                  <span>Verifying Credentials...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In to Dashboard</span>
-                  <i className="fas fa-arrow-right" style={{ fontSize: '0.85rem' }} />
-                </>
-              )}
-            </button>
-          </form>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label
+                    htmlFor="loginPassword"
+                    style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', margin: 0 }}
+                  >
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => { setMode('forgot'); setError(''); setSuccessMsg(''); }}
+                    style={{ background: 'none', border: 'none', color: '#0072C6', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="login-input-group">
+                  <i className="fas fa-lock login-input-icon" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="loginPassword"
+                    placeholder="Enter your account password"
+                    className="login-input-field"
+                    style={{ paddingRight: '46px' }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="login-submit-btn"
+                disabled={loading}
+                style={{ marginTop: '6px' }}
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-circle-notch fa-spin" />
+                    <span>Verifying Credentials...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to Dashboard</span>
+                    <i className="fas fa-arrow-right" style={{ fontSize: '0.85rem' }} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* MODE: FORGOT PASSWORD */}
+          {mode === 'forgot' && (
+            <form onSubmit={handleForgotPassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label
+                  htmlFor="forgotEmail"
+                  style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}
+                >
+                  Enter Your Registered Email Address
+                </label>
+                <div className="login-input-group">
+                  <i className="fas fa-envelope login-input-icon" />
+                  <input
+                    type="email"
+                    id="forgotEmail"
+                    placeholder="your-name@npcrwanda.org"
+                    className="login-input-field"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    disabled={loading}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="login-submit-btn"
+                disabled={loading}
+                style={{ marginTop: '6px' }}
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-circle-notch fa-spin" />
+                    <span>Dispatching Reset Link...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane" />
+                    <span>Send Password Reset Link</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); }}
+                style={{ background: '#F1F5F9', border: 'none', borderRadius: '10px', padding: '12px', color: '#475569', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center' }}
+              >
+                <i className="fas fa-arrow-left me-2" /> Back to Sign In
+              </button>
+            </form>
+          )}
+
+          {/* MODE: RESET PASSWORD */}
+          {mode === 'reset' && (
+            <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label
+                  htmlFor="newPassword"
+                  style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}
+                >
+                  New Password (min 6 characters)
+                </label>
+                <div className="login-input-group">
+                  <i className="fas fa-lock login-input-icon" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="newPassword"
+                    placeholder="Create a strong password"
+                    className="login-input-field"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    autoFocus
+                    disabled={loading}
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  style={{ display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#334155' }}
+                >
+                  Confirm New Password
+                </label>
+                <div className="login-input-group">
+                  <i className="fas fa-shield-halved login-input-icon" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    placeholder="Re-type your new password"
+                    className="login-input-field"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="login-submit-btn"
+                disabled={loading}
+                style={{ marginTop: '6px' }}
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-circle-notch fa-spin" />
+                    <span>Updating Password...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-key" />
+                    <span>Set New Password & Proceed</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); }}
+                style={{ background: '#F1F5F9', border: 'none', borderRadius: '10px', padding: '12px', color: '#475569', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center' }}
+              >
+                Cancel & Return to Sign In
+              </button>
+            </form>
+          )}
 
           <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
             <a

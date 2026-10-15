@@ -51,6 +51,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    // Honeypot spam trap
+    if (body.website_url && String(body.website_url).trim() !== '') {
+      return NextResponse.json({ message: 'Subscribed successfully!' }, { status: 200 });
+    }
+
     const email = (body.email || '').trim().toLowerCase();
     const categories = Array.isArray(body.categories) && body.categories.length > 0 
       ? body.categories 

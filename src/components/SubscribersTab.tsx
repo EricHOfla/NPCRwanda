@@ -18,6 +18,50 @@ export default function SubscribersTab() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
 
+  // Broadcast campaign state
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [broadcastMsg, setBroadcastMsg] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
+  const [campaignForm, setCampaignForm] = useState({
+    subject: '',
+    contentHtml: '',
+    category: 'all',
+  });
+
+  const handleSendBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!campaignForm.subject.trim() || !campaignForm.contentHtml.trim()) return;
+
+    if (!confirm(`Are you sure you want to broadcast this newsletter to active subscribers?`)) return;
+
+    try {
+      setBroadcasting(true);
+      setBroadcastMsg(null);
+      const res = await fetch('/api/subscribers/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(campaignForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to dispatch campaign');
+
+      setBroadcastMsg({
+        type: 'success',
+        text: `Successfully broadcasted to ${data.count} subscriber${data.count === 1 ? '' : 's'}!`,
+      });
+      setCampaignForm({ subject: '', contentHtml: '', category: 'all' });
+      setTimeout(() => setComposeOpen(false), 3000);
+    } catch (err: any) {
+      setBroadcastMsg({
+        type: 'danger',
+        text: err?.message || 'Error broadcasting newsletter.',
+      });
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
   const fetchSubscribers = useCallback(async () => {
     try {
       setLoading(true);
@@ -82,11 +126,96 @@ export default function SubscribersTab() {
           <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <i className="fas fa-bell" style={{ fontSize: '1.3rem', color: '#2E7D32' }} />
           </div>
-          <div>
-            <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>Newsletter Subscribers</h3>
-            <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>Manage email subscribers and notification categories.</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>Newsletter Subscribers</h3>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>Manage email subscribers and broadcast newsletters.</p>
+            </div>
+            <button
+              onClick={() => setComposeOpen(true)}
+              className="btn btn-primary btn-sm fw-bold px-3 py-2 d-inline-flex align-items-center gap-2"
+              style={{ background: '#0072C6', borderColor: '#0072C6' }}
+            >
+              <i className="fas fa-paper-plane" /> Compose Broadcast
+            </button>
           </div>
         </div>
+
+        {/* Compose Newsletter Modal */}
+        {composeOpen && (
+          <div className="card p-4 mb-4 border shadow-sm" style={{ background: '#F8FAFC', borderRadius: '12px' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <h5 className="fw-bold mb-0 text-dark"><i className="fas fa-envelope-open-text text-primary me-2" />Dispatch Newsletter Campaign</h5>
+              <button type="button" className="btn-close" onClick={() => setComposeOpen(false)} aria-label="Close" />
+            </div>
+
+            {broadcastMsg && (
+              <div className={`alert alert-${broadcastMsg.type === 'success' ? 'success' : 'danger'} small py-2 mb-3`}>
+                {broadcastMsg.text}
+              </div>
+            )}
+
+            <form onSubmit={handleSendBroadcast}>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">Target Audience Category</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={campaignForm.category}
+                  onChange={e => setCampaignForm({ ...campaignForm, category: e.target.value })}
+                >
+                  <option value="all">All Active Subscribers ({activeCount} recipients)</option>
+                  <option value="news">News Updates Subscribers</option>
+                  <option value="events">Events & Competitions Subscribers</option>
+                  <option value="announcements">Announcements Subscribers</option>
+                  <option value="careers">Careers & Vacancies Subscribers</option>
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label small fw-bold">Campaign Subject Line <span className="text-danger">*</span></label>
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  required
+                  placeholder="e.g. NPC Rwanda Highlights: Road to Paris 2024"
+                  value={campaignForm.subject}
+                  onChange={e => setCampaignForm({ ...campaignForm, subject: e.target.value })}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label small fw-bold">Message Content (HTML or Plain Text) <span className="text-danger">*</span></label>
+                <textarea
+                  className="form-control form-control-sm"
+                  rows={6}
+                  required
+                  placeholder="<p>Dear Supporters and Athletes,</p><p>We are delighted to share our latest achievements and upcoming national championships...</p>"
+                  value={campaignForm.contentHtml}
+                  onChange={e => setCampaignForm({ ...campaignForm, contentHtml: e.target.value })}
+                />
+                <small className="text-muted">You can write standard HTML formatting (paragraphs, links, bold text). The official header, footer, and unsubscribe link are attached automatically.</small>
+              </div>
+
+              <div className="d-flex gap-2">
+                <button
+                  type="submit"
+                  disabled={broadcasting}
+                  className="btn btn-primary btn-sm fw-bold px-4 py-2"
+                >
+                  <i className={`fas ${broadcasting ? 'fa-spinner fa-spin' : 'fa-paper-plane'} me-2`} />
+                  {broadcasting ? 'Sending Campaign...' : 'Send to Subscribers'}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => setComposeOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* Stats row */}
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>

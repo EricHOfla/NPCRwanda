@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { sendDonationNotification } from '@/lib/mailer';
 
 const donationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -8,6 +9,7 @@ const donationSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   supportType: z.string().min(1, 'Support type is required'),
   details: z.string().min(1, 'Details are required'),
+  website_url: z.string().optional(), // Honeypot
 });
 
 export async function GET(request: Request) {
@@ -30,6 +32,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
+    // Honeypot spam trap
+    if (result.data.website_url && result.data.website_url.trim() !== '') {
+      return NextResponse.json({ success: true, message: 'Inquiry submitted.' }, { status: 200 });
+    }
+
     const newInquiry = await prisma.donationInquiry.create({
       data: {
         name: result.data.name,
@@ -40,6 +47,16 @@ export async function POST(request: Request) {
         read: false,
       },
     });
+
+    // Send notifications in background
+    sendDonationNotification({
+      name: newInquiry.name,
+      email: newInquiry.email,
+      category: newInquiry.category,
+      supportType: newInquiry.supportType,
+      details: newInquiry.details,
+    }).catch(err => console.error('[Mailer] Donation alert error:', err));
+
     return NextResponse.json(newInquiry, { status: 201 });
   } catch (error) {
     console.error('Create donation error:', error);

@@ -765,3 +765,312 @@ export async function sendApplicationStatusEmail(application: {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Contact Form: Admin Alert & User Confirmation Receipt
+// ─────────────────────────────────────────────────────────────
+export async function sendContactNotification(contact: { name: string; email: string; subject: string; message: string; date?: string }) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) return;
+
+    const currentYear = new Date().getFullYear();
+
+    // 1. Send Alert to Admin/Secretariat
+    const adminHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #0B2545; padding: 20px 24px; color: #fff;">
+          <h2 style="margin: 0; font-size: 18px;">📬 New Contact Inquiry Received</h2>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #FFA000;">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p><strong>From:</strong> ${contact.name} (&lt;<a href="mailto:${contact.email}">${contact.email}</a>&gt;)</p>
+          <p><strong>Subject:</strong> ${contact.subject}</p>
+          <p><strong>Date:</strong> ${contact.date || new Date().toLocaleString()}</p>
+          <div style="margin-top: 16px; padding: 16px; background: #F8FAFC; border-left: 4px solid #0072C6; border-radius: 4px;">
+            <p style="margin: 0; white-space: pre-wrap;">${contact.message}</p>
+          </div>
+          <div style="margin-top: 24px;">
+            <a href="mailto:${contact.email}?subject=Re: ${encodeURIComponent(contact.subject)}" style="display: inline-block; background: #0072C6; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">Reply to ${contact.name}</a>
+          </div>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} NPC Rwanda Administrative Notification
+        </div>
+      </div>
+    `;
+
+    // Try sending admin notification to sender of SMTP or fallback to info@npcrwanda.org
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: mailSetup.from,
+      subject: `[New Inquiry] ${contact.subject} - ${contact.name}`,
+      html: adminHtml,
+      replyTo: contact.email,
+    });
+
+    // 2. Send Automated Confirmation Receipt to the User
+    const userReceiptHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #0B2545; padding: 24px; color: #fff; text-align: center;">
+          <h2 style="margin: 0; font-size: 20px;">Thank You for Contacting NPC Rwanda</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #FFA000;">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p>Dear <strong>${contact.name}</strong>,</p>
+          <p>We have received your message regarding "<strong>${contact.subject}</strong>". Our secretariat team has logged your inquiry and will respond to you shortly.</p>
+          <div style="margin: 16px 0; padding: 16px; background: #F8FAFC; border-radius: 6px; border: 1px solid #E2E8F0;">
+            <p style="margin: 0; font-size: 12px; color: #64748B;">Summary of your message:</p>
+            <p style="margin: 8px 0 0; font-style: italic; color: #334155;">"${contact.message}"</p>
+          </div>
+          <p>If your matter is urgent, you can also reach our secretariat at Amahoro National Stadium, BP 2684 Kigali, Rwanda.</p>
+          <p style="margin-top: 24px; margin-bottom: 0;">Warm regards,<br /><strong>Secretariat Team</strong><br />National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} National Paralympic Committee of Rwanda &bull; <a href="https://npcrwanda.org" style="color: #0072C6;">www.npcrwanda.org</a>
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: contact.email,
+      subject: `Receipt: We received your message - NPC Rwanda`,
+      html: userReceiptHtml,
+    });
+  } catch (err: any) {
+    console.error('[Contact] Error sending notification email:', err?.message || err);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Volunteer Application: Admin Alert & Applicant Confirmation
+// ─────────────────────────────────────────────────────────────
+export async function sendVolunteerNotification(volunteer: { name: string; email: string; interest: string; skills: string; details: string }) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) return;
+
+    const currentYear = new Date().getFullYear();
+
+    // 1. Alert to Admin
+    const adminHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #065F46; padding: 20px 24px; color: #fff;">
+          <h2 style="margin: 0; font-size: 18px;">🤝 New Volunteer Application</h2>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #A7F3D0;">NPC Rwanda Community & Volunteer Network</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p><strong>Applicant:</strong> ${volunteer.name} (&lt;<a href="mailto:${volunteer.email}">${volunteer.email}</a>&gt;)</p>
+          <p><strong>Area of Interest:</strong> ${volunteer.interest}</p>
+          <p><strong>Key Skills:</strong> ${volunteer.skills}</p>
+          <div style="margin-top: 16px; padding: 16px; background: #F8FAFC; border-left: 4px solid #10B981; border-radius: 4px;">
+            <p style="margin: 0; font-size: 12px; color: #64748B;">Additional Details:</p>
+            <p style="margin: 4px 0 0; white-space: pre-wrap;">${volunteer.details}</p>
+          </div>
+          <div style="margin-top: 24px;">
+            <a href="mailto:${volunteer.email}?subject=NPC Rwanda Volunteer Application - ${encodeURIComponent(volunteer.interest)}" style="display: inline-block; background: #065F46; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">Contact Volunteer</a>
+          </div>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} NPC Rwanda Volunteer Portal
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: mailSetup.from,
+      subject: `[Volunteer Application] ${volunteer.name} - ${volunteer.interest}`,
+      html: adminHtml,
+      replyTo: volunteer.email,
+    });
+
+    // 2. Receipt to Volunteer
+    const volunteerReceiptHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #065F46; padding: 24px; color: #fff; text-align: center;">
+          <h2 style="margin: 0; font-size: 20px;">Thank You for Stepping Up!</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #A7F3D0;">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p>Dear <strong>${volunteer.name}</strong>,</p>
+          <p>Thank you for offering your passion and time to support Para-sports development in Rwanda. We have received your application to volunteer in <strong>${volunteer.interest}</strong>.</p>
+          <p>Our volunteer coordination team reviews all applications according to our scheduled events and community programs. We will reach out to you as opportunities aligned with your background arise.</p>
+          <p style="margin-top: 24px; margin-bottom: 0;">Together for Inclusion and Excellence,<br /><strong>Volunteer Coordination Team</strong><br />National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} National Paralympic Committee of Rwanda &bull; <a href="https://npcrwanda.org" style="color: #065F46;">www.npcrwanda.org</a>
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: volunteer.email,
+      subject: `Volunteer Application Received - NPC Rwanda`,
+      html: volunteerReceiptHtml,
+    });
+  } catch (err: any) {
+    console.error('[Volunteer] Error sending volunteer notification email:', err?.message || err);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Donation Inquiry: Admin Alert & Donor Receipt
+// ─────────────────────────────────────────────────────────────
+export async function sendDonationNotification(donation: { name: string; email: string; category: string; supportType: string; details: string }) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) return;
+
+    const currentYear = new Date().getFullYear();
+
+    const adminHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #92400E; padding: 20px 24px; color: #fff;">
+          <h2 style="margin: 0; font-size: 18px;">💛 New Donation / Partnership Inquiry</h2>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #FDE68A;">NPC Rwanda Resource Mobilization</p>
+        </div>
+        <div style="padding: 24px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p><strong>Contributor:</strong> ${donation.name} (&lt;<a href="mailto:${donation.email}">${donation.email}</a>&gt;)</p>
+          <p><strong>Category:</strong> ${donation.category}</p>
+          <p><strong>Support Type:</strong> ${donation.supportType}</p>
+          <div style="margin-top: 16px; padding: 16px; background: #FFFBEB; border-left: 4px solid #F59E0B; border-radius: 4px;">
+            <p style="margin: 0; font-size: 12px; color: #92400E;">Details / Pledge:</p>
+            <p style="margin: 4px 0 0; white-space: pre-wrap;">${donation.details}</p>
+          </div>
+          <div style="margin-top: 24px;">
+            <a href="mailto:${donation.email}?subject=NPC Rwanda Support & Partnership" style="display: inline-block; background: #92400E; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">Follow Up With Contributor</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: mailSetup.from,
+      subject: `[Support Inquiry] ${donation.name} - ${donation.supportType}`,
+      html: adminHtml,
+      replyTo: donation.email,
+    });
+  } catch (err: any) {
+    console.error('[Donation] Error sending donation notification email:', err?.message || err);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Password Reset Email
+// ─────────────────────────────────────────────────────────────
+export async function sendPasswordResetEmail(email: string, resetUrl: string, name: string) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) throw new Error('SMTP not configured.');
+
+    const currentYear = new Date().getFullYear();
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+        <div style="background: #0B2545; padding: 24px; color: #fff; text-align: center;">
+          <h2 style="margin: 0; font-size: 20px;">Password Reset Request</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #FFA000;">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding: 28px; color: #1E293B; line-height: 1.6; font-size: 14px;">
+          <p>Hello <strong>${name}</strong>,</p>
+          <p>We received a request to reset your password for the NPC Rwanda Administrative Dashboard. Click the button below to set a new password:</p>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="${resetUrl}" style="background: #0072C6; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">Reset My Password</a>
+          </div>
+          <p style="font-size: 13px; color: #64748B;">This password reset link will expire in <strong>1 hour</strong>. If you did not request this change, please ignore this email; your account remains secure.</p>
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 12px; color: #94A3B8; word-break: break-all;">
+            If the button doesn't work, copy and paste this link into your browser:<br />
+            <a href="${resetUrl}" style="color: #0072C6;">${resetUrl}</a>
+          </div>
+        </div>
+        <div style="background: #F1F5F9; padding: 12px 24px; font-size: 12px; color: #64748B; text-align: center;">
+          &copy; ${currentYear} National Paralympic Committee of Rwanda
+        </div>
+      </div>
+    `;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: email,
+      subject: `Reset Your Password - NPC Rwanda Admin`,
+      html,
+    });
+    return { success: true };
+  } catch (err: any) {
+    console.error('[Auth] Error sending password reset email:', err?.message || err);
+    throw err;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Custom Newsletter Broadcast to Subscribers
+// ─────────────────────────────────────────────────────────────
+export async function sendCustomNewsletter(campaign: { subject: string; contentHtml: string; category?: string }) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) throw new Error('SMTP is not configured.');
+
+    // Fetch active subscribers
+    const subscribers = await prisma.subscriber.findMany({
+      where: { active: true },
+      select: { email: true, token: true, categories: true },
+    });
+
+    if (subscribers.length === 0) {
+      return { success: true, count: 0, message: 'No active subscribers found.' };
+    }
+
+    const currentYear = new Date().getFullYear();
+    let sentCount = 0;
+
+    for (const sub of subscribers) {
+      // Check category match if specified
+      if (campaign.category && campaign.category !== 'all') {
+        if (!sub.categories.includes(campaign.category)) continue;
+      }
+
+      const unsubscribeUrl = sub.token
+        ? `https://npcrwanda.org/api/subscribers/unsubscribe?token=${sub.token}`
+        : `https://npcrwanda.org/api/subscribers/unsubscribe?email=${encodeURIComponent(sub.email)}`;
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; background: #fff;">
+          <div style="background: #0B2545; padding: 24px 32px; color: #fff; text-align: center;">
+            <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">NPC RWANDA OFFICIAL BULLETIN</h1>
+            <p style="margin: 6px 0 0; font-size: 13px; color: #FFA000; font-weight: 600;">National Paralympic Committee of Rwanda</p>
+          </div>
+          <div style="padding: 32px; color: #1E293B; line-height: 1.7; font-size: 15px;">
+            ${campaign.contentHtml}
+          </div>
+          <div style="background: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 32px; font-size: 12px; color: #64748B; text-align: center; line-height: 1.5;">
+            <p style="margin: 0 0 6px;">You are receiving this email because you subscribed to updates from the National Paralympic Committee of Rwanda.</p>
+            <p style="margin: 0;">
+              Amahoro National Stadium &bull; BP 2684 Kigali, Rwanda &bull; <a href="${unsubscribeUrl}" style="color: #DC2626; text-decoration: underline;">Unsubscribe</a>
+            </p>
+          </div>
+        </div>
+      `;
+
+      try {
+        await mailSetup.transporter.sendMail({
+          from: mailSetup.from,
+          to: sub.email,
+          subject: campaign.subject,
+          html,
+        });
+        sentCount++;
+      } catch (sendErr) {
+        console.warn(`Failed to send newsletter to ${sub.email}:`, sendErr);
+      }
+    }
+
+    return { success: true, count: sentCount, total: subscribers.length };
+  } catch (err: any) {
+    console.error('[Newsletter] Broadcast error:', err?.message || err);
+    throw err;
+  }
+}
+

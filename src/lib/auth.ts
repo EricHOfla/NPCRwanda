@@ -56,3 +56,26 @@ export async function getSessionUser(request?: NextRequest): Promise<JWTPayload 
 export function hasRequiredRole(userRole: string, allowedRoles: string[]): boolean {
   return allowedRoles.includes(userRole);
 }
+
+// Generate a 1-hour password reset token
+export async function signResetToken(email: string, userId: string): Promise<string> {
+  return new SignJWT({ email, userId, purpose: 'pwd_reset' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(key);
+}
+
+// Verify a password reset token
+export async function verifyResetToken(token: string): Promise<{ email: string; userId: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, key, {
+      algorithms: ['HS256'],
+    });
+    if (payload.purpose !== 'pwd_reset') return null;
+    return { email: payload.email as string, userId: payload.userId as string };
+  } catch {
+    return null;
+  }
+}
+

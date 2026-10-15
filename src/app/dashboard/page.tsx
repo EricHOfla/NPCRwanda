@@ -6528,6 +6528,44 @@ export default function DashboardPage() {
                   </div>
                 </form>
               </div>
+
+              {/* Database Backup & Disaster Recovery */}
+              <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', marginTop: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-database" style={{ fontSize: '1.3rem', color: '#D97706' }} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem', color: '#0f172a' }}>Database Backup & Disaster Recovery</h3>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748B' }}>Download a complete, structured JSON snapshot of all system collections.</p>
+                  </div>
+                </div>
+                <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: 1.6, marginBottom: '20px' }}>
+                  Generate an instant offline backup of all database tables including athletes, news articles, events, careers, governance records, contact inquiries, volunteer applications, and subscriber lists. All user credentials and passwords are automatically scrubbed for security.
+                </p>
+                <a
+                  href="/api/backup/export"
+                  download
+                  className="btn"
+                  style={{
+                    background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    padding: '11px 22px',
+                    borderRadius: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)'
+                  }}
+                >
+                  <i className="fas fa-cloud-arrow-down" />
+                  Export Full Database Backup (JSON)
+                </a>
+              </div>
             </div>
             )
           )}
