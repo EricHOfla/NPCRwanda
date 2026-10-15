@@ -6025,52 +6025,6 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* Informational Guidance Box: Where & How to Use */}
-              <div
-                className="p-4 rounded-4 mb-4"
-                style={{
-                  background: 'linear-gradient(135deg, #0B2545 0%, #134074 100%)',
-                  color: '#FFFFFF',
-                  boxShadow: '0 8px 24px rgba(11, 37, 69, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                }}
-              >
-                <div className="d-flex align-items-start gap-3">
-                  <div
-                    className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                    style={{ width: '44px', height: '44px', background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', fontSize: '1.25rem' }}
-                  >
-                    <i className="fas fa-circle-info" />
-                  </div>
-                  <div>
-                    <h3 className="h6 fw-bold mb-1 text-white">How & Where New Users Sign In</h3>
-                    <p className="small mb-3 text-white-50" style={{ lineHeight: 1.6 }}>
-                      When you register a new user here, share their registered email and the temporary password you set. They can immediately log into the administrative system via the standard portal at:
-                    </p>
-                    <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                      <span className="badge bg-dark bg-opacity-50 text-warning px-3 py-2 rounded-pill font-monospace small border border-warning border-opacity-25">
-                        <i className="fas fa-lock me-1" />
-                        /login &nbsp;•&nbsp; https://admin.npcrwanda.org/login
-                      </span>
-                      <a
-                        href="/login"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-outline-light btn-sm rounded-pill fw-semibold px-3"
-                        style={{ fontSize: '0.78rem' }}
-                      >
-                        <i className="fas fa-arrow-up-right-from-square me-1" /> Open Login Page
-                      </a>
-                    </div>
-                    <small className="text-white-50 d-block">
-                      • <strong>Super Admin</strong>: Full administrative privileges, user management, and system configuration.<br />
-                      • <strong>Admin</strong>: Manages site content, members, announcements, athletes, and inquiries.<br />
-                      • <strong>Editor</strong>: Authorized to draft and publish news, competition events, and career listings.
-                    </small>
-                  </div>
-                </div>
-              </div>
-
               {/* Expandable Register / Edit User Form Card */}
               {userFormOpen && (
                 <div className="custom-card p-4 p-md-5 mb-4 bg-white border rounded-4 shadow-sm" style={{ borderLeft: '4px solid #0072C6' }}>
