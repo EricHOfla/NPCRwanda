@@ -1761,21 +1761,26 @@ export default function DashboardPage() {
           {[
             { id: 'overview', type: 'tab', tabId: 'overview', label: 'Overview', icon: 'fa-chart-pie' },
 
-            // Section: Website Pages (all roles)
+            // Section: Website Pages
+            // Admin/Super Admin see all pages; Editor sees only content-publishing pages
             { type: 'header', label: 'WEBSITE PAGES' },
-            { id: 'page-home', type: 'page', tabId: 'pages', pageId: 'home', label: 'Home Page', icon: 'fa-house' },
-            { id: 'page-about', type: 'page', tabId: 'pages', pageId: 'about', label: 'About Us', icon: 'fa-circle-info' },
-            { id: 'page-background', type: 'page', tabId: 'pages', pageId: 'npc-background', label: 'NPC Background', icon: 'fa-book-open' },
-            { id: 'page-leadership', type: 'page', tabId: 'pages', pageId: 'leadership', label: 'Leadership', icon: 'fa-users' },
+            ...(!isEditor ? [
+              { id: 'page-home', type: 'page', tabId: 'pages', pageId: 'home', label: 'Home Page', icon: 'fa-house' } as const,
+              { id: 'page-about', type: 'page', tabId: 'pages', pageId: 'about', label: 'About Us', icon: 'fa-circle-info' } as const,
+              { id: 'page-background', type: 'page', tabId: 'pages', pageId: 'npc-background', label: 'NPC Background', icon: 'fa-book-open' } as const,
+              { id: 'page-leadership', type: 'page', tabId: 'pages', pageId: 'leadership', label: 'Leadership', icon: 'fa-users' } as const,
+            ] : []),
             { id: 'page-athletes', type: 'page', tabId: 'pages', pageId: 'athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
             { id: 'page-sports', type: 'page', tabId: 'pages', pageId: 'sports', label: 'Sports Programs', icon: 'fa-volleyball' },
             { id: 'page-news', type: 'page', tabId: 'pages', pageId: 'news', label: 'News Room', icon: 'fa-newspaper' },
             { id: 'page-announcements', type: 'page', tabId: 'pages', pageId: 'announcements', label: 'Announcements', icon: 'fa-bullhorn' },
             { id: 'page-events', type: 'page', tabId: 'pages', pageId: 'events', label: 'Events Calendar', icon: 'fa-calendar-days' },
             { id: 'page-careers', type: 'page', tabId: 'pages', pageId: 'careers', label: 'Careers & Vacancies', icon: 'fa-briefcase' },
-            { id: 'page-governance', type: 'page', tabId: 'pages', pageId: 'governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
-            { id: 'page-partners', type: 'page', tabId: 'pages', pageId: 'partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
-            { id: 'page-contact', type: 'page', tabId: 'pages', pageId: 'contact', label: 'Contact & Footer', icon: 'fa-address-card' },
+            ...(!isEditor ? [
+              { id: 'page-governance', type: 'page', tabId: 'pages', pageId: 'governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' } as const,
+              { id: 'page-partners', type: 'page', tabId: 'pages', pageId: 'partners', label: 'Partners & Sponsors', icon: 'fa-handshake' } as const,
+              { id: 'page-contact', type: 'page', tabId: 'pages', pageId: 'contact', label: 'Contact & Footer', icon: 'fa-address-card' } as const,
+            ] : []),
 
             // Section: Management (Admin and above only)
             ...(isAdmin ? [
@@ -2374,6 +2379,24 @@ export default function DashboardPage() {
                     <div className="card-body text-center py-3">
                       <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}>
                         <i className="fas fa-arrow-left me-2" />Back to Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {(isEditor && adminTab === 'pages' && ['home', 'about', 'npc-background', 'leadership', 'governance', 'partners', 'contact'].includes(activeEditPage || '')) && (
+                <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                  <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
+                    <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
+                      <i className="fas fa-pen-slash" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
+                      <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Editor Access Restricted</h4>
+                      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
+                        Editors can only manage: Athletes, Sports Programs, News Room, Announcements, Events, and Careers. Contact an Administrator for access to this page.
+                      </p>
+                    </div>
+                    <div className="card-body text-center py-3">
+                      <button className="btn btn-primary btn-sm" onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); }}>
+                        <i className="fas fa-arrow-left me-2" />Go to Athletes Directory
                       </button>
                     </div>
                   </div>
