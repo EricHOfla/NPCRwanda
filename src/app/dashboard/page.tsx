@@ -544,7 +544,7 @@ export default function DashboardPage() {
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [donationSearch, setDonationSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
-  const [activeEditPage, setActiveEditPage] = useState<string | null>(null);
+  const [activeEditPage, setActiveEditPage] = useState<string | null>('home');
   const [previewModeEnabled, setPreviewModeEnabled] = useState(false);
   const [mediaSearch, setMediaSearch] = useState('');
   const [contentSearch, setContentSearch] = useState('');
@@ -1645,22 +1645,56 @@ export default function DashboardPage() {
         <nav className="dashboard-sidebar-nav" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', padding: '12px 0', overflowY: 'auto' }}>
           {[
             { id: 'overview', type: 'tab', tabId: 'overview', label: 'Overview', icon: 'fa-chart-pie' },
-            { id: 'pages', type: 'page', tabId: 'pages', pageId: null, label: 'Pages CMS Hub', icon: 'fa-file-lines' },
-            { id: 'athletes', type: 'page', tabId: 'pages', pageId: 'athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
-            { id: 'sports', type: 'page', tabId: 'pages', pageId: 'sports', label: 'Sports Programs', icon: 'fa-volleyball' },
-            { id: 'news', type: 'page', tabId: 'pages', pageId: 'news', label: 'News Room', icon: 'fa-newspaper' },
-            { id: 'announcements', type: 'page', tabId: 'pages', pageId: 'announcements', label: 'Announcements', icon: 'fa-bullhorn' },
-            { id: 'events', type: 'page', tabId: 'pages', pageId: 'events', label: 'Events Scheduler', icon: 'fa-calendar-days' },
-            { id: 'governance', type: 'page', tabId: 'pages', pageId: 'governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
-            { id: 'leadership', type: 'page', tabId: 'pages', pageId: 'leadership', label: 'Leadership Directory', icon: 'fa-users' },
+            
+            // Section: Website Pages
+            { type: 'header', label: 'WEBSITE PAGES' },
+            { id: 'page-home', type: 'page', tabId: 'pages', pageId: 'home', label: 'Home Page', icon: 'fa-house' },
+            { id: 'page-about', type: 'page', tabId: 'pages', pageId: 'about', label: 'About Us', icon: 'fa-circle-info' },
+            { id: 'page-background', type: 'page', tabId: 'pages', pageId: 'npc-background', label: 'NPC Background', icon: 'fa-book-open' },
+            { id: 'page-leadership', type: 'page', tabId: 'pages', pageId: 'leadership', label: 'Leadership', icon: 'fa-users' },
+            { id: 'page-athletes', type: 'page', tabId: 'pages', pageId: 'athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
+            { id: 'page-sports', type: 'page', tabId: 'pages', pageId: 'sports', label: 'Sports Programs', icon: 'fa-volleyball' },
+            { id: 'page-news', type: 'page', tabId: 'pages', pageId: 'news', label: 'News Room', icon: 'fa-newspaper' },
+            { id: 'page-announcements', type: 'page', tabId: 'pages', pageId: 'announcements', label: 'Announcements', icon: 'fa-bullhorn' },
+            { id: 'page-events', type: 'page', tabId: 'pages', pageId: 'events', label: 'Events Calendar', icon: 'fa-calendar-days' },
+            { id: 'page-careers', type: 'page', tabId: 'pages', pageId: 'careers', label: 'Careers & Vacancies', icon: 'fa-briefcase' },
+            { id: 'page-governance', type: 'page', tabId: 'pages', pageId: 'governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
+            { id: 'page-partners', type: 'page', tabId: 'pages', pageId: 'partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
+            { id: 'page-contact', type: 'page', tabId: 'pages', pageId: 'contact', label: 'Contact & Footer', icon: 'fa-address-card' },
+
+            // Section: Management
+            { type: 'header', label: 'MANAGEMENT' },
             { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' },
             { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
             { id: 'subscribers', type: 'tab', tabId: 'subscribers', label: 'Subscribers', icon: 'fa-bell' },
+
+            // Section: Configuration
+            { type: 'header', label: 'CONFIGURATION' },
+            { id: 'page-system', type: 'page', tabId: 'pages', pageId: 'system', label: 'System Components', icon: 'fa-gears' },
             { id: 'settings', type: 'tab', tabId: 'settings', label: 'System Settings', icon: 'fa-sliders' },
-          ].map(item => {
+          ].map((item, idx) => {
+            if (item.type === 'header') {
+              if (!sidebarOpen) return <div key={`sep-${idx}`} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 12px' }} />;
+              return (
+                <div
+                  key={`header-${idx}`}
+                  style={{
+                    padding: '14px 24px 6px',
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    letterSpacing: '1px',
+                    color: 'rgba(255, 255, 255, 0.45)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {item.label}
+                </div>
+              );
+            }
+
             const isActive = item.type === 'tab'
               ? adminTab === item.tabId
-              : (adminTab === 'pages' && activeEditPage === item.pageId);
+              : (adminTab === 'pages' && (activeEditPage || 'home') === item.pageId);
 
             return (
               <button
@@ -1668,7 +1702,7 @@ export default function DashboardPage() {
                 onClick={() => {
                   setAdminTab(item.tabId as AdminTab);
                   if (item.type === 'page') {
-                    setActiveEditPage(item.pageId || null);
+                    setActiveEditPage(item.pageId || 'home');
                     setPreviewModeEnabled(false);
                   }
                   if (typeof window !== 'undefined' && window.innerWidth < 992) {
@@ -1692,21 +1726,21 @@ export default function DashboardPage() {
                   alignItems: 'center',
                   gap: '12px',
                   width: '100%',
-                  padding: sidebarOpen ? '12px 24px' : '14px 0',
+                  padding: sidebarOpen ? '10px 24px' : '12px 0',
                   justifyContent: sidebarOpen ? 'flex-start' : 'center',
                   background: isActive ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
                   border: 'none',
                   color: isActive ? '#FFF' : 'rgba(255,255,255,0.7)',
                   cursor: 'pointer',
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   fontWeight: isActive ? 600 : 400,
                   borderLeft: isActive ? '4px solid #FFA000' : '4px solid transparent',
                   transition: 'all 0.2s ease',
                   textAlign: 'left',
                 }}
               >
-                <i className={`fas ${item.icon}`} style={{ fontSize: '1rem', width: '20px', textAlign: 'center', color: isActive ? '#FFA000' : 'inherit' }} />
-                {sidebarOpen && <span>{item.label}</span>}
+                <i className={`fas ${item.icon}`} style={{ fontSize: '0.95rem', width: '20px', textAlign: 'center', color: isActive ? '#FFA000' : 'inherit' }} />
+                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
               </button>
             );
           })}
@@ -1776,7 +1810,21 @@ export default function DashboardPage() {
             </button>
             <h1 className="dashboard-topbar-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
               {adminTab === 'overview' && 'Admin Overview'}
-              {adminTab === 'pages' && 'Website CMS Hub'}
+              {adminTab === 'pages' && (
+                activeEditPage === 'about' ? 'About Us Page' :
+                activeEditPage === 'npc-background' ? 'NPC Background Page' :
+                activeEditPage === 'leadership' ? 'Leadership Directory & Mandate' :
+                activeEditPage === 'athletes' ? 'Athletes Directory' :
+                activeEditPage === 'sports' ? 'Sports Programs' :
+                activeEditPage === 'news' ? 'News Room' :
+                activeEditPage === 'announcements' ? 'Official Announcements & Notices' :
+                activeEditPage === 'events' ? 'Events Calendar' :
+                activeEditPage === 'careers' ? 'Careers & Vacancies' :
+                activeEditPage === 'contact' ? 'Contact & Footer Settings' :
+                activeEditPage === 'governance' ? 'Governance & Policies' :
+                activeEditPage === 'partners' ? 'Partners & Sponsors' :
+                activeEditPage === 'system' ? 'System Components' : 'Home Page Editor'
+              )}
               {adminTab === 'members' && 'Members Directory'}
               {adminTab === 'volunteers' && 'Volunteer Applications'}
               {adminTab === 'contacts' && 'Inbox & Feedback'}
@@ -2467,101 +2515,62 @@ export default function DashboardPage() {
              ────────────────────────────── */}
           {adminTab === 'pages' && (
             <div>
-              {/* Back button header if editing a page */}
-              {activeEditPage !== null && (
-                <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-white border rounded">
-                  <div className="d-flex align-items-center gap-3">
-                    <button 
-                      onClick={() => { setActiveEditPage(null); setPreviewModeEnabled(false); }} 
-                      className="btn btn-sm btn-outline-secondary"
-                    >
-                      <i className="fas fa-arrow-left me-1" /> Back to Pages
-                    </button>
-                    <h3 className="h6 fw-bold mb-0 text-dark">
-                      Editing Page: <span className="text-primary text-capitalize">{activeEditPage === 'about' ? 'About Us' : activeEditPage} Page</span>
-                    </h3>
-                  </div>
-                  <div className="d-flex gap-2">
-                    {/* Live Preview Toggle */}
+              {/* Page Editor Header Toolbar */}
+              <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-white border rounded">
+                <div className="d-flex align-items-center gap-2">
+                  <span className="badge bg-primary text-white px-3 py-2 text-uppercase fw-bold" style={{ fontSize: '0.72rem', letterSpacing: '0.5px' }}>
+                    PAGE EDITOR
+                  </span>
+                  <h3 className="h6 fw-bold mb-0 text-dark">
+                    {activeEditPage === 'home' ? 'Home Page Editor' :
+                     activeEditPage === 'about' ? 'About Us Page Editor' :
+                     activeEditPage === 'npc-background' ? 'NPC Background Page Editor' :
+                     activeEditPage === 'leadership' ? 'Leadership Directory & Mandate' :
+                     activeEditPage === 'athletes' ? 'Athletes Directory' :
+                     activeEditPage === 'sports' ? 'Sports Programs' :
+                     activeEditPage === 'news' ? 'News Room' :
+                     activeEditPage === 'announcements' ? 'Official Announcements & Notices' :
+                     activeEditPage === 'events' ? 'Events Calendar' :
+                     activeEditPage === 'careers' ? 'Careers & Vacancies' :
+                     activeEditPage === 'contact' ? 'Contact Info & Footer Settings' :
+                     activeEditPage === 'governance' ? 'Governance Documents & Policies' :
+                     activeEditPage === 'partners' ? 'Partners & Sponsors' :
+                     activeEditPage === 'system' ? 'System Components' : 'Home Page Editor'}
+                  </h3>
+                </div>
+                <div className="d-flex gap-2">
+                  {/* Live Preview Toggle */}
+                  <button 
+                    type="button" 
+                    onClick={() => setPreviewModeEnabled(!previewModeEnabled)} 
+                    className={`btn btn-sm ${previewModeEnabled ? 'btn-success' : 'btn-outline-success'} fw-semibold`}
+                  >
+                    <i className="fas fa-eye me-1" /> {previewModeEnabled ? 'Edit Form' : 'Live Preview'}
+                  </button>
+                  {/* Save section buttons trigger based on active edit page */}
+                  {['home', 'about', 'npc-background', 'leadership'].includes(activeEditPage || 'home') && (
                     <button 
                       type="button" 
-                      onClick={() => setPreviewModeEnabled(!previewModeEnabled)} 
-                      className={`btn btn-sm ${previewModeEnabled ? 'btn-success' : 'btn-outline-success'} fw-semibold`}
+                      onClick={() => {
+                        const target = activeEditPage || 'home';
+                        if (target === 'home') {
+                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc']);
+                        } else if (target === 'about') {
+                          handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
+                        } else if (target === 'npc-background') {
+                          handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
+                        } else if (target === 'leadership') {
+                          handleSectionSave(['leadership.mandatePeriod']);
+                        }
+                      }}
+                      disabled={pageSaving}
+                      className="btn btn-sm btn-primary fw-semibold px-4"
                     >
-                      <i className="fas fa-eye me-1" /> {previewModeEnabled ? 'Edit Form' : 'Live Preview'}
+                      <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-1`} /> {pageSaving ? 'Saving...' : 'Save Page Content'}
                     </button>
-                    {/* Save section buttons trigger based on active edit page */}
-                    {['home', 'about', 'npc-background'].includes(activeEditPage) && (
-                      <button 
-                        type="button" 
-                        onClick={() => {
-                          if (activeEditPage === 'home') {
-                            handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc']);
-                          } else if (activeEditPage === 'about') {
-                            handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
-                          } else if (activeEditPage === 'npc-background') {
-                            handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
-                          } else if (activeEditPage === 'leadership') {
-                            handleSectionSave(['leadership.mandatePeriod']);
-                          }
-                        }}
-                        disabled={pageSaving}
-                        className="btn btn-sm btn-primary fw-semibold px-4"
-                      >
-                        <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-1`} /> {pageSaving ? 'Saving...' : 'Save Page Content'}
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-              )}
-
-              {/* 1. Pages Listing Index Catalog */}
-              {activeEditPage === null && (
-                <div>
-                  <div className="row g-4">
-                    {[
-                      { id: 'home', title: 'Home Page', desc: 'Manage hero banner, impact stats, about section, CTA, and partner logos grid.', icon: 'fa-home', bg: '#eff6ff', border: '#bfdbfe' },
-                      { id: 'about', title: 'About Us Page', desc: 'Edit vision, mission, organization history details, core values, and strategic plan objectives.', icon: 'fa-circle-info', bg: '#f0fdf4', border: '#bbf7d0' },
-                      { id: 'npc-background', title: 'NPC Background Page', desc: 'Edit strategic objectives, SWOT analysis parameters, and Theory of Change.', icon: 'fa-circle-info', bg: '#f0fdf4', border: '#bbf7d0' },
-                      { id: 'leadership', title: 'Leadership Page', desc: 'Manage board of directors, internal audit committees, and conflict resolution boards.', icon: 'fa-users', bg: '#fffbeb', border: '#fde68a' },
-                      { id: 'athletes', title: 'Athletes Page', desc: 'Manage national para-athletes profiles, sport classifications, and display stats.', icon: 'fa-person-running', bg: '#fdf2f8', border: '#fbcfe8' },
-                      { id: 'sports', title: 'Sports Programs', icon: 'fa-volleyball', desc: 'Configure sitting volleyball, wheelchair basketball, and goalball program highlights.', bg: '#f5f3ff', border: '#ddd6fe' },
-                      { id: 'news', title: 'News Room', icon: 'fa-newspaper', desc: 'Write articles and event blog posts with the visual Markdown rich-text editor.', bg: '#ecfdf5', border: '#a7f3d0' },
-                      { id: 'announcements', title: 'Official Announcements & Notices', desc: 'Publish official circulars, communiqués, public notices, and regulatory announcements.', icon: 'fa-bullhorn', bg: '#fef2f2', border: '#fecaca' },
-                      { id: 'events', title: 'Events Calendar', icon: 'fa-calendar-days', desc: 'Schedule matches, championships, training camps, and featured event details.', bg: '#fef2f2', border: '#fecaca' },
-                      { id: 'careers', title: 'Careers & Vacancies', icon: 'fa-briefcase', desc: 'Manage job vacancies, volunteer registrations, and applicant logs.', bg: '#f0fdfa', border: '#99f6e4' },
-                      { id: 'contact', title: 'Contact & Footer', icon: 'fa-address-card', desc: 'Edit physical address, contact phone/email, map embeds, and social media links (footer & homepage social hub).', bg: '#fafaf9', border: '#e7e5e4' },
-                      { id: 'governance', title: 'Governance & Policies', icon: 'fa-scale-balanced', desc: 'Edit strategic plans, constitution document assets, and official policy manuals.', bg: '#f8fafc', border: '#cbd5e1' },
-                      { id: 'partners', title: 'Partners & Sponsors', icon: 'fa-handshake', desc: 'Manage sponsors list, Ministry of Sports logos, and corporate partners URLs.', bg: '#fff7ed', border: '#fed7aa' },
-                      { id: 'system', title: 'System Components', icon: 'fa-gears', desc: 'Define translation tags and metadata keys for the system components registry.', bg: '#f0fdfa', border: '#99f6e4' }
-                    ].map(p => (
-                      <div key={p.id} className="col-md-6 col-lg-4">
-                        <div className="card h-100 shadow-sm border-0" style={{ border: `1px solid ${p.border}`, borderRadius: '12px', background: p.bg }}>
-                          <div className="card-body p-4 d-flex flex-column justify-content-between">
-                            <div>
-                              <div className="d-flex align-items-center justify-content-between mb-3">
-                                <span className="small text-muted fw-bold uppercase">PAGE CONFIG</span>
-                                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fff', border: `1px solid ${p.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <i className={`fas ${p.icon} text-primary`} />
-                                </div>
-                              </div>
-                              <h4 className="h5 fw-bold text-dark mb-2">{p.title}</h4>
-                              <p className="small text-muted mb-4">{p.desc}</p>
-                            </div>
-                            <button 
-                              onClick={() => { setActiveEditPage(p.id); setPreviewModeEnabled(false); }} 
-                              className="btn btn-primary btn-sm fw-bold py-2 px-4 w-auto align-self-start"
-                              style={{ borderRadius: '8px' }}
-                            >
-                              <i className="fas fa-edit me-1" /> Edit Page Layout
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              </div>
 
               {/* 2. Visual rendering mockup based on page */}
               {activeEditPage !== null && previewModeEnabled && (
