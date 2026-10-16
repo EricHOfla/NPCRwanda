@@ -372,6 +372,7 @@ async function runAutoMigration(): Promise<void> {
       ['media.instagramSubtitle', 'Official Photo & Reel Updates'],
       ['media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation."],
       ['media.instagramUrl', 'https://www.instagram.com/npc.rwanda/'],
+      ['media.instagramPostUrl', ''],
     ];
     for (const [key, val] of essentialKeys) {
       const exist = await prisma.siteContent.findUnique({ where: { key } });

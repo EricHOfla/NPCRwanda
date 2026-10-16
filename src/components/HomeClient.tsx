@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import InstagramEmbed from '@/components/InstagramEmbed';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { isAnnouncementCategory } from '@/lib/newsUtils';
@@ -842,29 +843,81 @@ export default function HomeClient() {
                   const instaSubtitle = getSiteText('media.instagramSubtitle', 'Official Photo & Reel Updates');
                   const instaDesc = getSiteText('media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation.");
                   const instaUrl = getSiteText('media.instagramUrl', configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/');
+                  const instaPostUrl = getSiteText('media.instagramPostUrl', '');
+                  const hasPost = Boolean(instaPostUrl && instaPostUrl.includes('instagram.com'));
                   return (
-                    <div className="pro-ngo-social-card">
-                      <div className="d-flex align-items-center gap-3 mb-2">
-                        <div className="pro-ngo-social-card__icon pro-ngo-social-card__icon--instagram">
-                          <i className="fab fa-instagram" aria-hidden="true" />
-                        </div>
-                        <div>
-                          <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '1rem' }}>{instaTitle}</h4>
-                          <small className="text-muted">{instaSubtitle}</small>
-                        </div>
-                      </div>
-                      <p className="small text-muted mb-3">
-                        {instaDesc}
-                      </p>
-                      <a
-                        href={instaUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-sm btn-outline-dark fw-bold rounded-pill align-self-start"
-                      >
-                        <span>{t('phrase.Follow on Instagram')}</span>
-                        <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
-                      </a>
+                    <div className="pro-ngo-social-card" style={{ padding: hasPost ? '0' : undefined, overflow: 'hidden' }}>
+                      {hasPost ? (
+                        <>
+                          {/* Real Instagram post embed — same pattern as YouTube iframe */}
+                          <InstagramEmbed postUrl={instaPostUrl} />
+                          <div className="pro-ngo-video-card__body" style={{ padding: '12px 16px' }}>
+                            <div className="d-flex align-items-center justify-content-between mb-1">
+                              <span className="badge text-white px-2 py-1"
+                                style={{ background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}>
+                                <i className="fab fa-instagram me-1" aria-hidden="true" /> Instagram
+                              </span>
+                              <a
+                                href={instaUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm fw-bold rounded-pill"
+                                style={{ background: 'linear-gradient(135deg,#f09433,#bc1888)', color: '#fff', border: 'none' }}
+                              >
+                                <span>Follow</span>
+                                <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                              </a>
+                            </div>
+                            <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '0.95rem' }}>{instaTitle}</h4>
+                            <small className="text-muted">{instaSubtitle}</small>
+                          </div>
+                        </>
+                      ) : (
+                        /* Fallback — no post URL configured: styled gradient card with link */
+                        <>
+                          <a
+                            href={instaUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="d-flex flex-column align-items-center justify-content-center text-decoration-none"
+                            style={{
+                              background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                              minHeight: '180px',
+                              borderRadius: '12px 12px 0 0',
+                              padding: '2rem',
+                              textAlign: 'center',
+                            }}
+                          >
+                            <i className="fab fa-instagram" style={{ fontSize: '3.5rem', color: '#fff', marginBottom: '0.75rem' }} aria-hidden="true" />
+                            <span className="fw-bold text-white" style={{ fontSize: '1.1rem' }}>NPC Rwanda on Instagram</span>
+                            <span className="text-white-50 small mt-1">@npc.rwanda</span>
+                            <span className="btn btn-light btn-sm mt-3 rounded-pill fw-bold px-4" style={{ color: '#dc2743' }}>
+                              <i className="fab fa-instagram me-1" /> Follow Us
+                            </span>
+                          </a>
+                          <div className="pro-ngo-video-card__body">
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                              <span className="badge text-white px-2 py-1"
+                                style={{ background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' }}>
+                                <i className="fab fa-instagram me-1" aria-hidden="true" /> Instagram
+                              </span>
+                              <a
+                                href={instaUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm fw-bold rounded-pill"
+                                style={{ background: 'linear-gradient(135deg,#f09433,#bc1888)', color: '#fff', border: 'none' }}
+                              >
+                                <span>{t('phrase.Follow on Instagram')}</span>
+                                <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                              </a>
+                            </div>
+                            <h4 className="fw-bold mb-0 text-dark" style={{ fontSize: '0.95rem' }}>{instaTitle}</h4>
+                            <small className="text-muted">{instaSubtitle}</small>
+                            <p className="small text-muted mt-2 mb-0">{instaDesc}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   );
                 })()}

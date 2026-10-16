@@ -3418,6 +3418,11 @@ export default function DashboardPage() {
                             <label className="form-label small fw-bold">Instagram Profile Link</label>
                             <input type="text" className="form-control" value={siteForm['media.instagramUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramUrl': e.target.value })} placeholder="https://www.instagram.com/npc.rwanda/" />
                           </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Instagram Post / Reel URL to Embed</label>
+                            <input type="text" className="form-control" value={siteForm['media.instagramPostUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.instagramPostUrl': e.target.value })} placeholder="https://www.instagram.com/p/XXXXXXXXXX/ or /reel/XXXXXXXXXX/" />
+                            <div className="form-text">Paste any Instagram post or Reel URL here to embed it live on the homepage — just like YouTube. Leave blank to show the Follow button card instead.</div>
+                          </div>
                         </div>
                       </div>
 
@@ -3430,7 +3435,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
-                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl'])}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl', 'media.instagramPostUrl'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}
