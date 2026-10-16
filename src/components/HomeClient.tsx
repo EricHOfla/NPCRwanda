@@ -842,7 +842,7 @@ export default function HomeClient() {
                   const instaTitle = getSiteText('media.instagramTitle', 'Instagram @npc.rwanda');
                   const instaSubtitle = getSiteText('media.instagramSubtitle', 'Official Photo & Reel Updates');
                   const instaDesc = getSiteText('media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation.");
-                  const instaUrl = getSiteText('media.instagramUrl', configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/');
+                  const instaUrl = configuredSocials.find(s => s.platform === 'instagram')?.url || 'https://www.instagram.com/npc.rwanda/';
                   const instaPostUrl = getSiteText('media.instagramPostUrl', '');
                   const hasPost = Boolean(instaPostUrl && instaPostUrl.includes('instagram.com'));
                   return (
