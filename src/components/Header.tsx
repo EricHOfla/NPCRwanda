@@ -247,7 +247,7 @@ export const Header: React.FC = () => {
                   className="btn btn-sm btn-donate fw-bold py-2"
                   onClick={closeMobileMenu}
                 >
-                  <i className="fas fa-heart me-2 text-warning"></i>
+                  <i className="fas fa-heart me-2" aria-hidden="true"></i>
                   {t('common.donate') || 'Support & Donate'}
                 </Link>
               </div>
