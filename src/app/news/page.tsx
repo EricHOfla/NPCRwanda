@@ -46,7 +46,8 @@ export default function NewsPage() {
     const catMatch = activeCategory === 'All' || article.category?.toLowerCase() === activeCategory.toLowerCase();
     const searchMatch = !search ||
       article.title.toLowerCase().includes(search.toLowerCase()) ||
-      article.desc.toLowerCase().includes(search.toLowerCase());
+      article.desc.toLowerCase().includes(search.toLowerCase()) ||
+      article.category.toLowerCase().includes(search.toLowerCase());
     return catMatch && searchMatch;
   });
 
@@ -120,15 +121,19 @@ export default function NewsPage() {
                   <i className="fas fa-search text-muted"></i>
                 </span>
                 <input
-                  type="text"
+                  type="search"
+                  aria-label="Search news articles"
                   className="form-control bg-light border-0 py-2"
-                  placeholder="Search news..."
+                  placeholder="Search news and categories..."
                   value={search}
                   onChange={e => {
                     setSearch(e.target.value);
                     setCurrentPage(1);
                   }}
                 />
+                {search && (
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Clear news search">Clear</button>
+                )}
               </div>
             </div>
             <div className="col-md-7">
