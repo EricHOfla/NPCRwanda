@@ -80,7 +80,7 @@ export default function SportsPage() {
                   <div className="card-body">
                     <h3>{t(sport.title)}</h3>
                     <p className="small text-muted">{t(sport.desc)}</p>
-                    <Link href={`/sports#${sport.id}`} className="fw-bold text-primary text-decoration-none">
+                    <Link href={`/sports/${encodeURIComponent(sport.slug || sport.id)}`} className="fw-bold text-primary text-decoration-none">
                       {t('phrase.Learn More')} <i className="fas fa-arrow-right small" aria-hidden="true" />
                     </Link>
                   </div>
