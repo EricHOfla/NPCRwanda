@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
@@ -9,9 +9,16 @@ export default function NpcAssociationsPage() {
   const { t } = useTranslation();
 
   const { npcAssociations, npcClubs, loading } = useData();
+  const [search, setSearch] = useState('');
+  const query = search.trim().toLowerCase();
   const associations = npcAssociations.filter(a => a.active);
-
   const clubs = npcClubs.filter(c => c.active);
+  const filteredAssociations = associations.filter(a =>
+    !query || [a.name, a.acronym, a.desc, ...(a.activities || [])].some(value => value.toLowerCase().includes(query))
+  );
+  const filteredClubs = clubs.filter(c =>
+    !query || c.name.toLowerCase().includes(query) || c.location.toLowerCase().includes(query)
+  );
 
   return (
     <main id="main-content">
@@ -42,19 +49,46 @@ export default function NpcAssociationsPage() {
       {/* Main content */}
       <section className="py-5 bg-light">
         <div className="container">
+          <div className="bg-white border rounded-4 p-3 p-md-4 mb-4 shadow-sm">
+            <label htmlFor="member-directory-search" className="form-label fw-semibold mb-2">
+              Find an association or member club
+            </label>
+            <div className="input-group">
+              <span className="input-group-text bg-light border-end-0" aria-hidden="true">
+                <i className="fas fa-search text-muted"></i>
+              </span>
+              <input
+                id="member-directory-search"
+                type="search"
+                className="form-control border-start-0 py-2"
+                placeholder="Search by name, sport, activity, or location..."
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                aria-describedby="member-directory-count"
+              />
+              {search && (
+                <button type="button" className="btn btn-outline-secondary" onClick={() => setSearch('')}>
+                  Clear
+                </button>
+              )}
+            </div>
+            <p id="member-directory-count" className="small text-muted mt-2 mb-0" aria-live="polite">
+              Showing {filteredAssociations.length} of {associations.length} associations and {filteredClubs.length} of {clubs.length} member clubs.
+            </p>
+          </div>
           {loading && associations.length === 0 ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading associations...</span>
               </div>
             </div>
-          ) : associations.length === 0 ? (
+          ) : filteredAssociations.length === 0 ? (
             <div className="text-center py-5 text-muted mb-4">
-              <p>No active sports associations registered at this time.</p>
+              <p>No matching active associations found. Try another search.</p>
             </div>
           ) : (
             <div className="row g-4 mb-5">
-              {associations.map((assoc, idx) => (
+              {filteredAssociations.map((assoc, idx) => (
                 <div key={assoc.id || idx} className="col-md-6" data-aos="fade-up" data-aos-delay={idx * 100}>
                   <div className="card h-100 border-0 shadow-sm p-4" style={{ borderRadius: '12px' }}>
                     <div className="d-flex align-items-center mb-3">
@@ -96,11 +130,11 @@ export default function NpcAssociationsPage() {
           {/* Member Clubs Section */}
           <div className="mt-5" data-aos="fade-up">
             <h3 className="h4 fw-bold mb-4 text-dark border-bottom pb-2">Member Clubs & Founder Teams</h3>
-            {clubs.length === 0 ? (
-              <p className="text-muted">No member clubs listed at this time.</p>
+            {filteredClubs.length === 0 ? (
+              <p className="text-muted">No matching member clubs found. Try another search.</p>
             ) : (
             <div className="row g-3">
-              {clubs.map((club, idx) => (
+              {filteredClubs.map((club, idx) => (
                 <div key={idx} className="col-sm-6 col-md-4">
                   <div className="card border-0 shadow-xs p-3 h-100 d-flex flex-row align-items-center" style={{ borderRadius: '8px', background: '#fff' }}>
                     <div
