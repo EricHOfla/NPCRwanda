@@ -171,11 +171,10 @@ export const Header: React.FC = () => {
                   Who We Are
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
-                  <li><Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-landmark me-2" aria-hidden="true"></i>Who We Are</Link></li>
-                  <li><Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-book-open me-2" aria-hidden="true"></i>NPC Background</Link></li>
-                  <li><Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-star me-2" aria-hidden="true"></i>Core Values</Link></li>
-                  <li><Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-scale-balanced me-2" aria-hidden="true"></i>Governance &amp; Transparency</Link></li>
+                  <li><Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-landmark me-2" aria-hidden="true"></i>About Us</Link></li>
+                  <li><Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-book-open me-2" aria-hidden="true"></i>Background</Link></li>
                   <li><Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>Leadership</Link></li>
+                  <li><Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-scale-balanced me-2" aria-hidden="true"></i>Governance</Link></li>
                 </ul>
               </li>
 
