@@ -128,7 +128,7 @@ function EventCardMedia({
 
 export default function EventsPage() {
   const { t } = useTranslation();
-  const { events } = useData();
+  const { events, loading, error } = useData();
   const [activeStatus, setActiveStatus] = useState('All');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -225,7 +225,7 @@ export default function EventsPage() {
                   const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
                   return (
                     <div key={ev.id} className="col-lg-6" data-aos="fade-up" data-aos-delay={i * 100}>
-                      <div className="custom-card h-100 overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
+                      <div className="custom-card event-feature-card h-100 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
                         <EventCardMedia ev={ev} height="220px" statusConfig={sc} />
                         <div className="p-4">
                           <h3 className="h5 mb-2">{ev.title}</h3>
@@ -234,12 +234,22 @@ export default function EventsPage() {
                             <span><i className="fas fa-calendar me-1 text-primary"></i>{formatDate(ev.date)}{ev.endDate && ev.endDate !== ev.date ? ` – ${formatDate(ev.endDate)}` : ''}</span>
                             <span><i className="fas fa-map-marker-alt me-1 text-primary"></i>{ev.location}</span>
                           </div>
+                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
+                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                          </Link>
                         </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {activeStatus === 'Completed' && (
+            <div className="rounded-4 p-4 mb-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} aria-live="polite">
+              <h2 className="h5 fw-bold mb-1"><i className="fas fa-trophy text-warning me-2" aria-hidden="true" />Past Events &amp; Competition Results</h2>
+              <p className="small text-muted mb-0">Browse completed events and review results or highlights entered by NPC Rwanda administrators.</p>
             </div>
           )}
 
@@ -295,16 +305,21 @@ export default function EventsPage() {
               </div>
             </div>
             <div className="ms-md-auto">
-              <span className="small text-muted fw-semibold">{filtered.length} event{filtered.length !== 1 ? 's' : ''}</span>
+              <span className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '')}</span>
             </div>
           </div>
 
           {/* Events Grid */}
-          {filtered.length === 0 ? (
+          {loading && events.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
+              <h3 className="h6 text-muted">Loading events...</h3>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-5" data-aos="fade-up">
-              <i className="fas fa-calendar-times text-muted mb-3" style={{ fontSize: '3rem' }}></i>
-              <h3 className="h5 text-muted">No events found</h3>
-              <p className="small text-muted">Try changing the filters above.</p>
+              <i className="fas fa-calendar-times text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'Events are temporarily unavailable' : events.length === 0 ? 'No events have been published yet' : 'No events found'}</h3>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : events.length === 0 ? 'Please check back later for upcoming competitions and results.' : 'Try changing the filters above.'}</p>
             </div>
           ) : (
             <>
@@ -313,7 +328,7 @@ export default function EventsPage() {
                 const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
                 return (
                   <div key={ev.id} className="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
-                    <div className="custom-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E8EDF5' }}>
+                    <div className="custom-card event-list-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
                       <EventCardMedia ev={ev} height="170px" statusConfig={sc} />
                       <div className="p-4 flex-grow-1 d-flex flex-column">
                         <div className="d-flex align-items-center gap-2 mb-2">
@@ -332,6 +347,16 @@ export default function EventsPage() {
                           <div className="small text-muted">
                             <i className="fas fa-map-marker-alt me-2 text-primary"></i>{ev.location}
                           </div>
+                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
+                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                          </Link>
+                          {ev.status === 'Completed' && (ev.resultsSummary?.trim() || ev.results?.trim()) && (
+                            <div className="mt-3 p-3 rounded-3" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                              <h5 className="small fw-bold text-success mb-1"><i className="fas fa-trophy me-2" aria-hidden="true" />Competition Results</h5>
+                              {ev.resultsSummary?.trim() && <p className="fw-semibold text-dark mb-2">{ev.resultsSummary}</p>}
+                              {ev.results?.trim() && <p className="small text-muted mb-0" style={{ whiteSpace: 'pre-line', lineHeight: 1.6 }}>{ev.results}</p>}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

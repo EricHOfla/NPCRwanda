@@ -9,7 +9,7 @@ import Pagination from '@/components/Pagination';
 
 export default function AthletesPage() {
   const { t } = useTranslation();
-  const { athletes, sports } = useData();
+  const { athletes, sports, loading, error } = useData();
   const [activeSport, setActiveSport] = useState('All');
   const [activeStatus, setActiveStatus] = useState('All');
   const [search, setSearch] = useState('');
@@ -23,7 +23,8 @@ export default function AthletesPage() {
     const sportName = t(a.sport);
     const sportMatch = activeSport === 'All' || a.sport === activeSport || sportName === activeSport;
     const statusMatch = activeStatus === 'All' || (activeStatus === 'Active' ? (a.status === 'Active' || !a.status) : a.status === 'Inactive');
-    const searchMatch = !search || a.name.toLowerCase().includes(search.toLowerCase()) || sportName.toLowerCase().includes(search.toLowerCase());
+    const searchTerm = search.trim().toLowerCase();
+    const searchMatch = !searchTerm || [a.name, sportName, a.country, a.desc, a.achievements || ''].some(value => value.toLowerCase().includes(searchTerm));
     return sportMatch && statusMatch && searchMatch;
   });
 
@@ -135,12 +136,16 @@ export default function AthletesPage() {
           </div>
 
           {/* Athletes List */}
-          {athletes.length === 0 ? (
-            <div className="text-center py-5" data-aos="fade-up">
-              <div className="spinner-border text-primary mb-3" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
+          {loading && athletes.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
               <h3 className="h6 text-muted">Loading athlete profiles...</h3>
+            </div>
+          ) : athletes.length === 0 ? (
+            <div className="text-center py-5" data-aos="fade-up">
+              <i className="fas fa-users-slash text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'Athlete profiles are temporarily unavailable' : 'No athlete profiles available yet'}</h3>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : 'Please check back later for athlete updates.'}</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-5" data-aos="fade-up">
@@ -156,7 +161,7 @@ export default function AthletesPage() {
                   const isInactive = a.status === 'Inactive';
                   return (
                     <div key={a.id} id={anchor} className="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay={`${(i % 3) * 100}`}>
-                      <div className={`custom-card athlete-card p-4 h-100 text-center d-flex flex-column align-items-center ${isInactive ? 'opacity-75' : ''}`}>
+                      <div className={`custom-card athlete-card athlete-directory-card p-4 h-100 text-center d-flex flex-column align-items-center ${isInactive ? 'opacity-75' : ''}`}>
                         <div className="athlete-thumb mb-3 position-relative">
                           <Image 
                             src={a.avatar && a.avatar.trim() ? (a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`) : '/assets/img/avatar-1.svg'} 
@@ -178,7 +183,14 @@ export default function AthletesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="small text-muted mb-4 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(a.desc)}</p>
+                        <p className="small text-muted mb-3 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(a.desc)}</p>
+                        <Link
+                          href={`/athletes/${encodeURIComponent(a.id)}`}
+                          className="btn btn-outline-primary btn-sm rounded-pill px-4 mb-3"
+                          aria-label={`View profile of ${a.name}`}
+                        >
+                          View Profile <i className="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                        </Link>
                         
                         <div className="border-top pt-3 w-100 mt-auto d-flex justify-content-between align-items-center text-muted small">
                           <span><i className="fas fa-globe me-1"></i>{a.country}</span>

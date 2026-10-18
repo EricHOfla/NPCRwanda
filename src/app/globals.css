@@ -4383,3 +4383,137 @@ body.accessibility-center-text {
   }
 }
 
+
+
+/* ──────────────────────────────
+   18. DIRECTORY & DETAIL PAGE POLISH
+   Scoped to non-homepage pages.
+   ────────────────────────────── */
+.athlete-directory-card,
+.association-directory-card,
+.club-directory-card,
+.event-list-card,
+.event-feature-card,
+.event-info-card {
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(15, 35, 65, 0.055);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.athlete-directory-card:hover,
+.association-directory-card:hover,
+.club-directory-card:hover,
+.event-list-card:hover,
+.event-feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(11, 99, 182, 0.28);
+    box-shadow: 0 16px 34px rgba(15, 35, 65, 0.11);
+}
+
+.athlete-directory-card .athlete-thumb {
+    width: 140px;
+    height: 140px;
+    flex: 0 0 140px;
+    overflow: hidden;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #EFF6FF;
+    box-shadow: 0 0 0 1px #DCE8F5, 0 8px 18px rgba(15, 35, 65, 0.09);
+}
+
+.athlete-directory-card .athlete-thumb img {
+    transition: transform 250ms ease;
+}
+
+.athlete-directory-card:hover .athlete-thumb img {
+    transform: scale(1.045);
+}
+
+.athlete-profile-photo {
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 18px 44px rgba(15, 35, 65, 0.12) !important;
+}
+
+.athlete-profile-layout h2,
+.event-details-layout h2 {
+    letter-spacing: -0.02em;
+}
+
+.athlete-profile-layout .border.rounded-3 {
+    border-color: #DDE7F1 !important;
+    background: #F8FAFC;
+}
+
+.event-feature-card,
+.event-list-card {
+    overflow: hidden;
+}
+
+.event-feature-card > div:first-child,
+.event-list-card > div:first-child {
+    transition: filter 180ms ease;
+}
+
+.event-feature-card:hover > div:first-child,
+.event-list-card:hover > div:first-child {
+    filter: saturate(1.08);
+}
+
+.event-info-card {
+    position: sticky;
+    top: 110px;
+    border-color: #DDE7F1;
+}
+
+.association-directory-card {
+    padding: 1.5rem !important;
+}
+
+.association-directory-card h2 {
+    letter-spacing: -0.015em;
+}
+
+.club-directory-card {
+    min-height: 88px;
+    padding: 1rem !important;
+}
+
+.athlete-directory-card a:focus-visible,
+.event-list-card a:focus-visible,
+.event-feature-card a:focus-visible,
+.association-directory-card a:focus-visible,
+.club-directory-card a:focus-visible {
+    outline: 3px solid #FFD700;
+    outline-offset: 3px;
+}
+
+@media (max-width: 991.98px) {
+    .event-info-card {
+        position: static;
+    }
+
+    .athlete-profile-photo {
+        max-height: 560px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .athlete-directory-card,
+    .association-directory-card,
+    .club-directory-card,
+    .event-list-card,
+    .event-feature-card,
+    .athlete-directory-card .athlete-thumb img {
+        transition: none;
+    }
+
+    .athlete-directory-card:hover,
+    .association-directory-card:hover,
+    .club-directory-card:hover,
+    .event-list-card:hover,
+    .event-feature-card:hover {
+        transform: none;
+    }
+}

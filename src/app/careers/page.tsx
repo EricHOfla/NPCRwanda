@@ -7,7 +7,7 @@ import { useData } from '@/context/DataContext';
 
 export default function CareersPage() {
   const { t } = useTranslation();
-  const { careers } = useData();
+  const { careers, loading, error } = useData();
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
@@ -103,12 +103,16 @@ export default function CareersPage() {
           </div>
 
           {/* Careers List */}
-          {careers.length === 0 ? (
-            <div className="text-center py-5" data-aos="fade-up">
-              <div className="spinner-border text-primary mb-3" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
+          {loading && careers.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
               <h3 className="h6 text-muted">Loading careers...</h3>
+            </div>
+          ) : careers.length === 0 ? (
+            <div className="text-center py-5" data-aos="fade-up">
+              <i className="fas fa-folder-open text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'Career opportunities are temporarily unavailable' : 'No career opportunities published yet'}</h3>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : 'Please check back later for new vacancies.'}</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-5" data-aos="fade-up">

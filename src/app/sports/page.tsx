@@ -8,7 +8,7 @@ import Pagination from '@/components/Pagination';
 
 export default function SportsPage() {
   const { t } = useTranslation();
-  const { sports } = useData();
+  const { sports, loading, error } = useData();
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const ITEMS_PER_PAGE = 8;
@@ -54,6 +54,19 @@ export default function SportsPage() {
 
       <section className="py-5">
         <div className="container">
+          {loading && sports.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
+              <p className="text-muted mb-0">Loading sports programs...</p>
+            </div>
+          ) : sports.length === 0 ? (
+            <div className="text-center py-5">
+              <i className="fas fa-medal text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }} />
+              <h2 className="h5 text-muted">{error ? 'Sports programs are temporarily unavailable' : 'No sports programs published yet'}</h2>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : 'Please check back later for updates.'}</p>
+            </div>
+          ) : (
+          <>
           <div className="row g-4">
             {paginatedSports.map((sport, i) => (
               <div key={sport.id} id={sport.id} className="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay={`${i * 100}`}>
@@ -77,6 +90,8 @@ export default function SportsPage() {
           </div>
 
           <Pagination currentPage={visiblePage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="Sports pagination" />
+          </>
+          )}
         </div>
       </section>
     </main>

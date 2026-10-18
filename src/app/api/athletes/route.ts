@@ -12,6 +12,7 @@ const athleteSchema = z.object({
   country: z.string().default('Rwanda'),
   avatar: z.string().default('avatar-1.svg'),
   desc: z.string().min(1, 'Description is required'),
+  achievements: z.string().default(''),
 });
 
 // GET: Fetch list of athletes with optional search, status filtering, and pagination

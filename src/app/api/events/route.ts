@@ -16,6 +16,8 @@ const eventSchema = z.object({
   status: z.enum(['Upcoming', 'Ongoing', 'Completed', 'Cancelled']).default('Upcoming'),
   img: z.string().default(''),
   featured: z.boolean().default(false),
+  resultsSummary: z.string().default(''),
+  results: z.string().default(''),
 });
 
 export async function GET(request: Request) {

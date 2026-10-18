@@ -15,6 +15,7 @@ export interface Athlete {
   country: string;
   avatar: string;
   desc: string;
+  achievements?: string;
 }
 
 export interface NewsArticle {
@@ -139,6 +140,8 @@ export interface Event {
   status: string;
   img: string;
   featured: boolean;
+  resultsSummary?: string;
+  results?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
