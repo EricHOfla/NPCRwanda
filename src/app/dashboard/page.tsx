@@ -559,7 +559,8 @@ export default function DashboardPage() {
     status: 'Active',
     country: 'Rwanda',
     avatar: 'avatar-1.svg',
-    desc: ''
+    desc: '',
+    achievements: ''
   });
 
   const [newsFormOpen, setNewsFormOpen] = useState(false);
@@ -586,7 +587,9 @@ export default function DashboardPage() {
     category: 'National',
     status: 'Upcoming',
     img: '',
-    featured: false
+    featured: false,
+    resultsSummary: '',
+    results: ''
   });
 
   const [careerFormOpen, setCareerFormOpen] = useState(false);
@@ -1366,7 +1369,7 @@ export default function DashboardPage() {
     } else {
       await addAthlete(athleteForm);
     }
-    setAthleteForm({ name: '', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: 'avatar-1.svg', desc: '' });
+    setAthleteForm({ name: '', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: 'avatar-1.svg', desc: '', achievements: '' });
     setEditingAthleteId(null);
     setAthleteFormOpen(false);
   };
@@ -1378,7 +1381,8 @@ export default function DashboardPage() {
       status: a.status,
       country: a.country,
       avatar: a.avatar,
-      desc: a.desc
+      desc: a.desc,
+      achievements: a.achievements || ''
     });
     setEditingAthleteId(a.id);
     setAthleteFormOpen(true);
@@ -1435,7 +1439,9 @@ export default function DashboardPage() {
       category: 'National',
       status: 'Upcoming',
       img: '',
-      featured: false
+      featured: false,
+      resultsSummary: '',
+      results: ''
     });
     setEditingEventId(null);
     setEventFormOpen(false);
@@ -1451,7 +1457,9 @@ export default function DashboardPage() {
       category: ev.category,
       status: ev.status,
       img: ev.img,
-      featured: ev.featured
+      featured: ev.featured,
+      resultsSummary: ev.resultsSummary || '',
+      results: ev.results || ''
     });
     setEditingEventId(ev.id);
     setEventFormOpen(true);
@@ -3866,8 +3874,12 @@ export default function DashboardPage() {
                               />
                             </div>
                             <div className="col-md-12">
-                              <label className="form-label small fw-bold">Description / Achievements</label>
+                              <label className="form-label small fw-bold">Biography / Description</label>
                               <textarea className="form-control" rows={3} required value={athleteForm.desc} onChange={e => setAthleteForm({ ...athleteForm, desc: e.target.value })} />
+                            </div>
+                            <div className="col-md-12">
+                              <label className="form-label small fw-bold">Achievements and Career Highlights</label>
+                              <textarea className="form-control" rows={3} placeholder="Add medals, records, competitions, and notable achievements..." value={athleteForm.achievements} onChange={e => setAthleteForm({ ...athleteForm, achievements: e.target.value })} />
                             </div>
                             <div className="col-12">
                               <button type="submit" className="btn btn-primary btn-sm px-4">{editingAthleteId ? 'Update' : 'Create'}</button>
@@ -4293,7 +4305,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingEventId(null);
-                            setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: '', category: 'National', status: 'Upcoming', img: '', featured: false });
+                            setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: '', category: 'National', status: 'Upcoming', img: '', featured: false, resultsSummary: '', results: '' });
                             setEventFormOpen(!eventFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -4363,6 +4375,15 @@ export default function DashboardPage() {
                               <label className="form-label small fw-bold">Full Details</label>
                               <textarea className="form-control" rows={3} required value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} />
                             </div>
+                            <div className="col-md-6">
+                              <label className="form-label small fw-bold">Results Summary</label>
+                              <input type="text" className="form-control" placeholder="e.g. Rwanda won 4 medals" value={eventForm.resultsSummary} onChange={e => setEventForm({ ...eventForm, resultsSummary: e.target.value })} />
+                              <small className="text-muted">Shown publicly for completed events.</small>
+                            </div>
+                            <div className="col-md-12">
+                              <label className="form-label small fw-bold">Competition Results / Highlights</label>
+                              <textarea className="form-control" rows={4} placeholder="Add final scores, medal results, athlete performances, and highlights..." value={eventForm.results} onChange={e => setEventForm({ ...eventForm, results: e.target.value })} />
+                            </div>
                             <div className="col-12">
                               <button type="submit" className="btn btn-primary btn-sm px-4">{editingEventId ? 'Update' : 'Create'}</button>
                             </div>
@@ -4401,7 +4422,7 @@ export default function DashboardPage() {
                                   <td>
                                     <div className="d-flex gap-2">
                                       <button onClick={() => {
-                                        setEventForm({ title: e.title, description: e.description, date: e.date, endDate: e.endDate, location: e.location, category: e.category, status: e.status, img: e.img, featured: e.featured });
+                                        setEventForm({ title: e.title, description: e.description, date: e.date, endDate: e.endDate, location: e.location, category: e.category, status: e.status, img: e.img, featured: e.featured, resultsSummary: e.resultsSummary || '', results: e.results || '' });
                                         setEditingEventId(e.id);
                                         setEventFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
