@@ -389,7 +389,7 @@ export default function EventsPage() {
                   </button>
                 </div>
               </div>
-              <div className="event-calendar-grid" aria-label={calendarMonthLabel}>
+              <div className="event-calendar-grid" aria-label={calendarMonthLabel} tabIndex={0} role="group">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                   <div className="event-calendar-weekday" key={day}>{day}</div>
                 ))}
