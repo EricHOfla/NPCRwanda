@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.siteUrl),
   title: {
-    default: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
+    default: 'NPC Rwanda | Paralympic Sports & Inclusion',
     template: '%s | NPC Rwanda',
   },
   description: SITE_CONFIG.defaultDescription,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     canonical: SITE_CONFIG.siteUrl,
   },
   openGraph: {
-    title: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
+    title: 'NPC Rwanda | Paralympic Sports & Inclusion',
     description: SITE_CONFIG.defaultDescription,
     url: SITE_CONFIG.siteUrl,
     siteName: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
@@ -44,15 +44,13 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://npcrwanda.org/assets/img/logo.png',
-        width: 1200,
-        height: 630,
         alt: 'National Paralympic Committee of Rwanda (NPC Rwanda) Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'National Paralympic Committee of Rwanda (NPC Rwanda)',
+    title: 'NPC Rwanda | Paralympic Sports & Inclusion',
     description: SITE_CONFIG.defaultDescription,
     site: '@npcrwanda',
     creator: '@npcrwanda',
