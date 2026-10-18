@@ -72,9 +72,9 @@ export default function AthleteProfilePage() {
 
       <section className="py-5">
         <div className="container">
-          <div className="row g-4 g-lg-5 align-items-start">
+          <div className="row g-4 g-lg-5 align-items-start athlete-profile-layout">
             <div className="col-lg-5">
-              <div className="position-relative overflow-hidden rounded-4 shadow-sm bg-light" style={{ minHeight: '320px', aspectRatio: '4 / 5' }}>
+              <div className="athlete-profile-photo position-relative overflow-hidden rounded-4 shadow-sm bg-light" style={{ minHeight: '320px', aspectRatio: '4 / 5' }}>
                 <Image
                   src={imageSrc}
                   alt={`${athlete.name} portrait`}
