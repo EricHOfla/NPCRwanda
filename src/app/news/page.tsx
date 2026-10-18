@@ -198,7 +198,11 @@ export default function NewsPage() {
                           alt={article.title}
                           className="img-fluid w-100"
                           style={{ height: '200px', objectFit: 'cover' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
+                          onError={(e) => {
+                            const image = e.currentTarget as HTMLImageElement;
+                            image.onerror = null;
+                            image.src = '/assets/img/curated/sports-hero.jpg';
+                          }}
                         />
                         <span
                           className="badge position-absolute top-0 end-0 m-2 fw-semibold"
