@@ -86,6 +86,10 @@ export default function HomeClient() {
   const athletesCount = siteContent['stats.athletes'] || (athletes.length > 0 ? `${athletes.length}+` : '0');
   const disciplinesCount = siteContent['stats.disciplines'] || (sports.length > 0 ? `${sports.length}` : '0');
   const clubsCount = siteContent['stats.clubs'] || (npcClubs.length > 0 ? `${npcClubs.length}+` : '0');
+  const hasMetricValue = (value: string) => value.trim() !== '' && !/^0+(?:\.0+)?\+?$/.test(value.trim());
+  const hasAthletesCount = hasMetricValue(athletesCount);
+  const hasDisciplinesCount = hasMetricValue(disciplinesCount);
+  const hasClubsCount = hasMetricValue(clubsCount);
 
   return (
     <main id="main-content">
@@ -171,18 +175,24 @@ export default function HomeClient() {
                   <div className="pro-ngo-hero__kpi-num">{districtsCount}</div>
                   <div className="pro-ngo-hero__kpi-label">{t('phrase.Districts (DPSCO)')}</div>
                 </div>
-                <div className="pro-ngo-hero__kpi-card">
-                  <div className="pro-ngo-hero__kpi-num">{athletesCount}</div>
-                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Registered Athletes')}</div>
-                </div>
-                <div className="pro-ngo-hero__kpi-card">
-                  <div className="pro-ngo-hero__kpi-num">{disciplinesCount}</div>
-                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Sport Disciplines')}</div>
-                </div>
-                <div className="pro-ngo-hero__kpi-card">
-                  <div className="pro-ngo-hero__kpi-num">{clubsCount}</div>
-                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Member Clubs')}</div>
-                </div>
+                {hasAthletesCount && (
+                  <div className="pro-ngo-hero__kpi-card">
+                    <div className="pro-ngo-hero__kpi-num">{athletesCount}</div>
+                    <div className="pro-ngo-hero__kpi-label">{t('phrase.Registered Athletes')}</div>
+                  </div>
+                )}
+                {hasDisciplinesCount && (
+                  <div className="pro-ngo-hero__kpi-card">
+                    <div className="pro-ngo-hero__kpi-num">{disciplinesCount}</div>
+                    <div className="pro-ngo-hero__kpi-label">{t('phrase.Sport Disciplines')}</div>
+                  </div>
+                )}
+                {hasClubsCount && (
+                  <div className="pro-ngo-hero__kpi-card">
+                    <div className="pro-ngo-hero__kpi-num">{clubsCount}</div>
+                    <div className="pro-ngo-hero__kpi-label">{t('phrase.Member Clubs')}</div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -325,9 +335,11 @@ export default function HomeClient() {
                 </p>
               </div>
               <div className="pro-ngo-bento-card__footer">
-                <span className="pro-ngo-bento-card__metric">
-                  <i className="fas fa-check-circle" aria-hidden="true" /> {clubsCount} {t('phrase.Member Clubs')}
-                </span>
+                {hasClubsCount && (
+                  <span className="pro-ngo-bento-card__metric">
+                    <i className="fas fa-check-circle" aria-hidden="true" /> {clubsCount} {t('phrase.Member Clubs')}
+                  </span>
+                )}
                 <Link href="/members/dpsco" className="pro-ngo-bento-card__link">
                   <span>{t('phrase.Explore DPSCO')}</span>
                   <i className="fas fa-arrow-right" aria-hidden="true" />
@@ -341,9 +353,11 @@ export default function HomeClient() {
                 <div className="pro-ngo-bento-card__icon-box" style={{ background: 'rgba(0, 114, 198, 0.1)', color: '#0072C6' }}>
                   <i className="fas fa-trophy" aria-hidden="true" />
                 </div>
-                <span className="pro-ngo-tag pro-ngo-tag--blue mb-3">
-                  {disciplinesCount} {t('phrase.Sport Disciplines')}
-                </span>
+                {hasDisciplinesCount && (
+                  <span className="pro-ngo-tag pro-ngo-tag--blue mb-3">
+                    {disciplinesCount} {t('phrase.Sport Disciplines')}
+                  </span>
+                )}
                 <h3 className="pro-ngo-bento-card__title">
                   {getSiteText('hero.stat2.title', t('phrase.High Performance'))}
                 </h3>
@@ -352,9 +366,11 @@ export default function HomeClient() {
                 </p>
               </div>
               <div className="pro-ngo-bento-card__footer">
-                <span className="pro-ngo-bento-card__metric">
-                  <i className="fas fa-medal" aria-hidden="true" /> {athletesCount} {t('phrase.Athletes')}
-                </span>
+                {hasAthletesCount && (
+                  <span className="pro-ngo-bento-card__metric">
+                    <i className="fas fa-medal" aria-hidden="true" /> {athletesCount} {t('phrase.Athletes')}
+                  </span>
+                )}
                 <Link href="/sports" className="pro-ngo-bento-card__link">
                   <span>{t('phrase.View Sports')}</span>
                   <i className="fas fa-arrow-right" aria-hidden="true" />
@@ -407,7 +423,8 @@ export default function HomeClient() {
               </div>
               <div className="pro-ngo-bento-card__footer">
                 <span className="pro-ngo-bento-card__metric">
-                  <i className="fas fa-globe" aria-hidden="true" /> {activePartners.length} Active Partners
+                  <i className="fas fa-globe" aria-hidden="true" />
+                  {activePartners.length > 0 ? `${activePartners.length} Active Partners` : 'Partner Network'}
                 </span>
                 <Link href="/partners" className="pro-ngo-bento-card__link">
                   <span>{t('phrase.Our Partners')}</span>
@@ -681,7 +698,14 @@ export default function HomeClient() {
                   )}
                 </div>
               ) : (
-                <p className="text-muted">{t('phrase.No published news available.')}</p>
+                <div className="pro-ngo-empty-state">
+                  <span className="pro-ngo-empty-state__icon" aria-hidden="true"><i className="fas fa-newspaper" /></span>
+                  <div>
+                    <h3 className="pro-ngo-empty-state__title">News updates are coming soon</h3>
+                    <p className="pro-ngo-empty-state__text">Visit the news page for the latest published stories from NPC Rwanda.</p>
+                    <Link href="/news" className="pro-ngo-empty-state__link">Explore all news <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></Link>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -701,7 +725,10 @@ export default function HomeClient() {
                 </div>
 
                 {!displayAnnouncement ? (
-                  <p className="text-muted small mb-0">{t('phrase.No official notices published.')}</p>
+                  <div className="pro-ngo-compact-empty">
+                    <i className="fas fa-bullhorn" aria-hidden="true" />
+                    <span>No new notices right now.</span>
+                  </div>
                 ) : (
                   <div>
                     <Link
@@ -740,7 +767,11 @@ export default function HomeClient() {
                 </div>
 
                 {!displayEvent ? (
-                  <p className="text-white-50 small mb-0">{t('phrase.No upcoming fixtures scheduled.')}</p>
+                  <div className="pro-ngo-compact-empty pro-ngo-compact-empty--dark">
+                    <i className="fas fa-calendar-days" aria-hidden="true" />
+                    <span>No upcoming events have been published yet.</span>
+                    <Link href="/events">View event calendar <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></Link>
+                  </div>
                 ) : (
                   <div>
                     {(() => {
