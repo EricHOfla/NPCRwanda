@@ -9,7 +9,7 @@ import Pagination from '@/components/Pagination';
 
 export default function AthletesPage() {
   const { t } = useTranslation();
-  const { athletes, sports } = useData();
+  const { athletes, sports, loading, error } = useData();
   const [activeSport, setActiveSport] = useState('All');
   const [activeStatus, setActiveStatus] = useState('All');
   const [search, setSearch] = useState('');
@@ -136,12 +136,16 @@ export default function AthletesPage() {
           </div>
 
           {/* Athletes List */}
-          {athletes.length === 0 ? (
-            <div className="text-center py-5" data-aos="fade-up">
-              <div className="spinner-border text-primary mb-3" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
+          {loading && athletes.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
               <h3 className="h6 text-muted">Loading athlete profiles...</h3>
+            </div>
+          ) : athletes.length === 0 ? (
+            <div className="text-center py-5" data-aos="fade-up">
+              <i className="fas fa-users-slash text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'Athlete profiles are temporarily unavailable' : 'No athlete profiles available yet'}</h3>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : 'Please check back later for athlete updates.'}</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-5" data-aos="fade-up">
