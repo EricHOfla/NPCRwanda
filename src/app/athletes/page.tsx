@@ -24,7 +24,7 @@ export default function AthletesPage() {
     const sportMatch = activeSport === 'All' || a.sport === activeSport || sportName === activeSport;
     const statusMatch = activeStatus === 'All' || (activeStatus === 'Active' ? (a.status === 'Active' || !a.status) : a.status === 'Inactive');
     const searchTerm = search.trim().toLowerCase();
-    const searchMatch = !searchTerm || [a.name, sportName, a.country, a.desc, a.achievements || ''].some(value => value.toLowerCase().includes(searchTerm));
+    const searchMatch = !searchTerm || [a.name, sportName, a.country, a.desc, a.achievements].some(value => String(value || '').toLowerCase().includes(searchTerm));
     return sportMatch && statusMatch && searchMatch;
   });
 
