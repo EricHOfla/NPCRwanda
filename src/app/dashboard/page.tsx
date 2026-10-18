@@ -3829,7 +3829,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setEditingAthleteId(null);
-                            setAthleteForm({ name: '', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: 'avatar-1.svg', desc: '' });
+                            setAthleteForm({ name: '', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: 'avatar-1.svg', desc: '', achievements: '' });
                             setAthleteFormOpen(!athleteFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -3915,7 +3915,7 @@ export default function DashboardPage() {
                                   <td>
                                     <div className="d-flex gap-2">
                                       <button onClick={() => {
-                                        setAthleteForm({ name: a.name, sport: a.sport, status: a.status, country: a.country, avatar: a.avatar, desc: a.desc });
+                                        setAthleteForm({ name: a.name, sport: a.sport, status: a.status, country: a.country, avatar: a.avatar, desc: a.desc, achievements: a.achievements || '' });
                                         setEditingAthleteId(a.id);
                                         setAthleteFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
