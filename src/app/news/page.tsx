@@ -19,7 +19,7 @@ export default function NewsPage() {
 
   // News only: filter out announcements
   const newsOnly = React.useMemo(() => {
-    return news.filter(n => !isAnnouncementCategory(n.category));
+    return news.filter(n => !isAnnouncementCategory(n.category || ''));
   }, [news]);
 
   // Categories derived purely from real news data — no hardcoded list
@@ -43,11 +43,10 @@ export default function NewsPage() {
   const pool = !isFiltering ? published.slice(1) : published;
 
   const filtered = pool.filter(article => {
-    const catMatch = activeCategory === 'All' || article.category?.toLowerCase() === activeCategory.toLowerCase();
-    const searchMatch = !search ||
-      article.title.toLowerCase().includes(search.toLowerCase()) ||
-      article.desc.toLowerCase().includes(search.toLowerCase()) ||
-      article.category.toLowerCase().includes(search.toLowerCase());
+    const catMatch = activeCategory === 'All' || String(article.category || '').toLowerCase() === activeCategory.toLowerCase();
+    const searchTerm = search.trim().toLowerCase();
+    const searchMatch = !searchTerm ||
+      [article.title, article.desc, article.category].some(value => String(value || '').toLowerCase().includes(searchTerm));
     return catMatch && searchMatch;
   });
 
@@ -88,7 +87,7 @@ export default function NewsPage() {
               <div className="row g-0 custom-card overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
                 <div className="col-lg-6">
                   <img
-                    src={featured.img.startsWith('http') || featured.img.startsWith('/') ? featured.img : `/assets/img/curated/${featured.img}`}
+                    src={(featured.img || '').startsWith('http') || (featured.img || '').startsWith('/') ? (featured.img || '/assets/img/curated/sports-hero.jpg') : `/assets/img/curated/${featured.img || 'sports-hero.jpg'}`}
                     alt={featured.title}
                     className="w-100 h-100"
                     style={{ objectFit: 'cover', minHeight: '300px' }}
@@ -179,6 +178,10 @@ export default function NewsPage() {
               <h3 className="h5 text-muted">No results found</h3>
               <p className="text-muted small">Try a different search term or category.</p>
             </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-4" aria-live="polite">
+              <p className="text-muted mb-0">The featured story is shown above. More articles will appear here when published.</p>
+            </div>
           ) : (
             <>
               <div className="row g-4">
@@ -187,7 +190,7 @@ export default function NewsPage() {
                     <div className="custom-card news-card h-100 d-flex flex-column">
                       <div className="news-img position-relative">
                         <img
-                          src={article.img.startsWith('http') || article.img.startsWith('/') ? article.img : `/assets/img/curated/${article.img}`}
+                          src={(article.img || '').startsWith('http') || (article.img || '').startsWith('/') ? (article.img || '/assets/img/curated/sports-hero.jpg') : `/assets/img/curated/${article.img || 'sports-hero.jpg'}`}
                           alt={article.title}
                           className="img-fluid w-100"
                           style={{ height: '200px', objectFit: 'cover' }}
