@@ -79,17 +79,18 @@ export const Footer: React.FC = () => {
             </p>
             {/* Social media icons dynamically loaded */}
             {configuredSocialLinks.length > 0 && (
-              <div className="d-flex gap-3 mt-3">
+              <div className="footer-socials d-flex flex-wrap gap-2 mt-3" aria-label="NPC Rwanda social media">
                 {configuredSocialLinks.map(s => (
-                  <a 
-                    key={s.id} 
-                    href={s.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="footer-social-link text-white opacity-75"
+                  <a
+                    key={s.id}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-social-link"
                     title={s.platform}
+                    aria-label={s.platform}
                   >
-                    <i className={`fab ${s.icon} fa-lg`}></i>
+                    <i className={`fab ${s.icon} fa-lg`} aria-hidden="true"></i>
                   </a>
                 ))}
               </div>
@@ -140,11 +141,6 @@ export const Footer: React.FC = () => {
                   {t('common.donate') || 'Support & Donate'}
                 </Link>
               </li>
-              <li className="mb-2">
-                <a className="footer-link" href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
-                  Webmail Login
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -184,16 +180,38 @@ export const Footer: React.FC = () => {
           <div className="col-lg-4">
             <h5>{t('footer.contact_info')}</h5>
             <ul className="list-unstyled small">
-              <li className="mb-3">
-                <i className="fas fa-location-dot me-3 text-accent-yellow"></i> {address}
-              </li>
-              <li className="mb-3">
-                <i className="fas fa-phone me-3 text-accent-yellow"></i> {phone}
-              </li>
-              <li className="mb-3">
-                <i className="fas fa-envelope me-3 text-accent-yellow"></i> {email}
-              </li>
+              {address && (
+                <li className="footer-contact-item mb-3">
+                  <i className="fas fa-location-dot me-3 text-accent-yellow" aria-hidden="true"></i>
+                  <span>{address}</span>
+                </li>
+              )}
+              {phone && (
+                <li className="footer-contact-item mb-3">
+                  <i className="fas fa-phone me-3 text-accent-yellow" aria-hidden="true"></i>
+                  <a href={`tel:${phone}`} className="footer-link">{phone}</a>
+                </li>
+              )}
+              {email && (
+                <li className="footer-contact-item mb-3">
+                  <i className="fas fa-envelope me-3 text-accent-yellow" aria-hidden="true"></i>
+                  <a href={`mailto:${email}`} className="footer-link">{email}</a>
+                </li>
+              )}
             </ul>
+            <a
+              className="footer-webmail-btn mt-2"
+              href="https://webmail.npcrwanda.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fas fa-envelope-open-text" aria-hidden="true"></i>
+              <span>Webmail Login</span>
+              <i className="fas fa-arrow-up-right-from-square footer-webmail-external" aria-hidden="true"></i>
+            </a>
+            <p className="footer-webmail-note small mt-2 mb-0">
+              Access your official NPC Rwanda email account.
+            </p>
           </div>
         </div>
 
