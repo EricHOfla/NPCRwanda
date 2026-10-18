@@ -178,7 +178,14 @@ export default function AthletesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="small text-muted mb-4 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(a.desc)}</p>
+                        <p className="small text-muted mb-3 flex-grow-1" style={{ lineHeight: 1.6 }}>{t(a.desc)}</p>
+                        <Link
+                          href={`/athletes/${encodeURIComponent(a.id)}`}
+                          className="btn btn-outline-primary btn-sm rounded-pill px-4 mb-3"
+                          aria-label={`View profile of ${a.name}`}
+                        >
+                          View Profile <i className="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                        </Link>
                         
                         <div className="border-top pt-3 w-100 mt-auto d-flex justify-content-between align-items-center text-muted small">
                           <span><i className="fas fa-globe me-1"></i>{a.country}</span>
