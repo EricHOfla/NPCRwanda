@@ -10,7 +10,7 @@ import { useData } from '../context/DataContext';
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const { lang, setLang, t } = useTranslation();
-  const { systemSettings, contactInfo } = useData();
+  const { systemSettings, contactInfo, socialLinks } = useData();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -20,6 +20,10 @@ export const Header: React.FC = () => {
   const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
   const resolvedLogo = logoError ? '/assets/img/logo.png' : (siteLogo || '/assets/img/logo.png');
+  const configuredSocialLinks = socialLinks
+    .filter((social) => social.active && social.url)
+    .map((social) => ({ ...social, url: systemSettings[social.platform] || social.url }))
+    .filter((social) => Boolean(social.url));
 
   useEffect(() => {
     // Dynamic import of bootstrap JS on client side for dropdowns
@@ -63,23 +67,39 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky-top shadow-sm w-100" style={{ zIndex: 1020 }}>
-      {/* Topbar */}
+      {/* Topbar: contact, configured social accounts, and language */}
       <div className="topbar">
-        <div className="container d-flex flex-wrap justify-content-between align-items-center gap-2">
-          <div className="d-flex flex-wrap align-items-center gap-3">
+        <div className="container topbar-inner d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div className="topbar-contact d-flex flex-wrap align-items-center gap-3">
             {email && (
               <a href={`mailto:${email}`} className="topbar-link">
-                <i className="fas fa-envelope me-1" aria-hidden="true"></i> {email}
+                <i className="fas fa-envelope me-1" aria-hidden="true"></i><span>{email}</span>
               </a>
             )}
             {phone && (
               <a href={`tel:${phone}`} className="topbar-link">
-                <i className="fas fa-phone me-1" aria-hidden="true"></i> {phone}
+                <i className="fas fa-phone me-1" aria-hidden="true"></i><span>{phone}</span>
               </a>
             )}
           </div>
-          <div className="d-flex flex-wrap align-items-center gap-3">
-            {/* Language Switcher Dropdown */}
+          <div className="topbar-tools d-flex align-items-center gap-3">
+            {configuredSocialLinks.length > 0 && (
+              <div className="topbar-socials d-flex align-items-center gap-2" aria-label="NPC Rwanda social media">
+                {configuredSocialLinks.map((social) => (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="topbar-social-link"
+                    aria-label={social.platform}
+                    title={social.platform}
+                  >
+                    <i className={`fab ${social.icon}`} aria-hidden="true"></i>
+                  </a>
+                ))}
+              </div>
+            )}
             <div className="lang-switcher dropdown" aria-label={t('phrase.Language selector')}>
               <button
                 className="btn btn-sm btn-light dropdown-toggle"
@@ -91,47 +111,17 @@ export const Header: React.FC = () => {
                 <span>{lang === 'en' ? 'EN' : lang === 'fr' ? 'FR' : 'KIN'}</span>
               </button>
               <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
-                <li>
-                  <button
-                    className={`dropdown-item lang-btn ${lang === 'en' ? 'active' : ''}`}
-                    type="button"
-                    onClick={() => setLang('en')}
-                  >
-                    English
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`dropdown-item lang-btn ${lang === 'fr' ? 'active' : ''}`}
-                    type="button"
-                    onClick={() => setLang('fr')}
-                  >
-                    Français
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`dropdown-item lang-btn ${lang === 'rw' ? 'active' : ''}`}
-                    type="button"
-                    onClick={() => setLang('rw')}
-                  >
-                    Kinyarwanda
-                  </button>
-                </li>
+                <li><button className={`dropdown-item lang-btn ${lang === 'en' ? 'active' : ''}`} type="button" onClick={() => setLang('en')}>English</button></li>
+                <li><button className={`dropdown-item lang-btn ${lang === 'fr' ? 'active' : ''}`} type="button" onClick={() => setLang('fr')}>Français</button></li>
+                <li><button className={`dropdown-item lang-btn ${lang === 'rw' ? 'active' : ''}`} type="button" onClick={() => setLang('rw')}>Kinyarwanda</button></li>
               </ul>
             </div>
-            <Link href="/volunteer" className="topbar-link" onClick={closeMobileMenu}>
-              {t('common.volunteer')}
-            </Link>
-            <Link href="/donate" className="topbar-link" onClick={closeMobileMenu}>
-              {t('common.donate')}
-            </Link>
           </div>
         </div>
       </div>
 
       {/* Main Navbar */}
-      <nav className={`navbar navbar-expand-lg navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
+      <nav className={`navbar navbar-expand-xl navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
         <div className="container border-0">
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <Image
@@ -170,224 +160,72 @@ export const Header: React.FC = () => {
 
           <div className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`} id="navbarNav" onClick={handleNavContainerClick}>
             <ul className="navbar-nav mx-auto">
-
-              {/* Home */}
               <li className="nav-item">
                 <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.home')}
                 </Link>
               </li>
 
-              {/* About (dropdown) */}
               <li className="nav-item dropdown">
-                <Link
-                  className={`nav-link dropdown-toggle ${isActive('/about') ? 'active' : ''}`}
-                  href="/about"
-                  id="aboutMenu"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {t('nav.about')}
+                <Link className={`nav-link dropdown-toggle ${isActive('/about') || isActive('/npc-background') || isActive('/governance') || isActive('/leaders') ? 'active' : ''}`} href="/about" id="aboutMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  About
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
-                  <li>
-                    <Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-landmark me-2 text-primary opacity-75"></i>
-                      {t('phrase.Our History') || 'Our History'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/about#vision-mission" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-eye me-2 text-primary opacity-75"></i>
-                      {t('phrase.Our Vision') || 'Vision & Mission'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-circle-info me-2 text-primary opacity-75"></i>
-                      NPC Background & SWOT
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-heart me-2 text-primary opacity-75"></i>
-                      {t('phrase.Core Values') || 'Core Values'}
-                    </Link>
-                  </li>
+                  <li><Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-landmark me-2" aria-hidden="true"></i>Who We Are</Link></li>
+                  <li><Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-circle-info me-2" aria-hidden="true"></i>NPC Background</Link></li>
+                  <li><Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-scale-balanced me-2" aria-hidden="true"></i>Governance & Transparency</Link></li>
+                  <li><Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>Leadership</Link></li>
+                  <li><Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-heart me-2" aria-hidden="true"></i>Core Values</Link></li>
                 </ul>
               </li>
 
-              {/* Sports */}
-              <li className="nav-item">
-                <Link href="/sports" className={`nav-link ${isActive('/sports') ? 'active' : ''}`} onClick={closeMobileMenu}>
-                  {t('nav.sports')}
-                </Link>
-              </li>
-
-              {/* Athletes */}
-              <li className="nav-item">
-                <Link href="/athletes" className={`nav-link ${isActive('/athletes') ? 'active' : ''}`} onClick={closeMobileMenu}>
-                  {t('nav.athletes')}
-                </Link>
-              </li>
-
-              {/* Governance (dropdown) */}
               <li className="nav-item dropdown">
-                <Link
-                  className={`nav-link dropdown-toggle ${isActive('/governance') || isActive('/leaders') ? 'active' : ''}`}
-                  href="/governance"
-                  id="governanceMenu"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {t('nav.governance')}
+                <Link className={`nav-link dropdown-toggle ${isActive('/sports') || isActive('/athletes') || isActive('/members') || isActive('/partners') ? 'active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Sports & Athletes
                 </Link>
-                <ul className="dropdown-menu" aria-labelledby="governanceMenu">
-                  <li>
-                    <Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-shield-alt me-2 text-primary opacity-75"></i>
-                      {t('phrase.Governance & Transparency') || 'Governance & Transparency'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-users me-2 text-primary opacity-75"></i>
-                      {t('phrase.Our Leadership') || 'Leaders'}
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Members (dropdown) */}
-              <li className="nav-item dropdown">
-                <Link
-                  className={`nav-link dropdown-toggle ${isActive('/partners') || pathname.startsWith('/members') ? 'active' : ''}`}
-                  href="#members-menu"
-                  id="membersMenu"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  {t('nav.members') || 'Members'}
-                </Link>
-                <ul className="dropdown-menu" aria-labelledby="membersMenu">
-                  <li>
-                    <Link href="/partners" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-handshake me-2 text-primary opacity-75"></i>
-                      {t('nav.partners') || 'Partners'}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/members/associations" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-users me-2 text-primary opacity-75"></i>
-                      NPC Associations
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/members/federations" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-medal me-2 text-primary opacity-75"></i>
-                      NPC Federations
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/members/dpsco" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-map-marker-alt me-2 text-primary opacity-75"></i>
-                      DPSCO Contacts
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Publications (dropdown) */}
-              <li className="nav-item dropdown">
-                <Link
-                  className={`nav-link dropdown-toggle ${isActive('/announcements') || isActive('/news') || isActive('/events') || isActive('/careers') ? 'active' : ''}`}
-                  href="/announcements"
-                  id="publicationsMenu"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  Publications
-                </Link>
-                <ul className="dropdown-menu" aria-labelledby="publicationsMenu">
-                  <li>
-                    <Link href="/announcements" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-bullhorn me-2 text-primary opacity-75"></i>
-                      Announcements
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/news" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-newspaper me-2 text-primary opacity-75"></i>
-                      {t('nav.news')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/events" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-calendar-alt me-2 text-primary opacity-75"></i>
-                      {t('nav.events')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/resources" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-folder-open me-2 text-primary opacity-75"></i>
-                      Resources & Files
-                    </Link>
-                  </li>
+                <ul className="dropdown-menu" aria-labelledby="sportsMembersMenu">
+                  <li><Link href="/sports" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-medal me-2" aria-hidden="true"></i>Sports</Link></li>
+                  <li><Link href="/athletes" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-person-running me-2" aria-hidden="true"></i>Athletes</Link></li>
                   <li><hr className="dropdown-divider" /></li>
-                  <li>
-                    <Link href="/careers" className="dropdown-item" onClick={closeMobileMenu}>
-                      <i className="fas fa-briefcase me-2 text-primary opacity-75"></i>
-                      Careers & Positions
-                    </Link>
-                  </li>
+                  <li><Link href="/partners" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-handshake me-2" aria-hidden="true"></i>Partners</Link></li>
+                  <li><Link href="/members/associations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>NPC Associations</Link></li>
+                  <li><Link href="/members/federations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-people-group me-2" aria-hidden="true"></i>NPC Federations</Link></li>
+                  <li><Link href="/members/dpsco" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-location-dot me-2" aria-hidden="true"></i>DPSCO Contacts</Link></li>
                 </ul>
               </li>
 
-              {/* Contact */}
-              <li className="nav-item">
-                <Link href="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} onClick={closeMobileMenu}>
-                  {t('nav.contact')}
+              <li className="nav-item dropdown">
+                <Link className={`nav-link dropdown-toggle ${isActive('/announcements') || isActive('/news') || isActive('/events') || isActive('/resources') ? 'active' : ''}`} href="/news" id="newsResourcesMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  News & Resources
                 </Link>
+                <ul className="dropdown-menu" aria-labelledby="newsResourcesMenu">
+                  <li><Link href="/news" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-newspaper me-2" aria-hidden="true"></i>News</Link></li>
+                  <li><Link href="/announcements" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-bullhorn me-2" aria-hidden="true"></i>Announcements</Link></li>
+                  <li><Link href="/events" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-calendar-days me-2" aria-hidden="true"></i>Events & Results</Link></li>
+                  <li><Link href="/resources" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-folder-open me-2" aria-hidden="true"></i>Publications & Resources</Link></li>
+                </ul>
               </li>
 
+              <li className="nav-item dropdown">
+                <Link className={`nav-link dropdown-toggle ${isActive('/careers') || isActive('/volunteer') || isActive('/contact') ? 'active' : ''}`} href="/contact" id="getInvolvedMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Get Involved
+                </Link>
+                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="getInvolvedMenu">
+                  <li><Link href="/careers" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-briefcase me-2" aria-hidden="true"></i>Careers</Link></li>
+                  <li><Link href="/volunteer" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-hand-holding-heart me-2" aria-hidden="true"></i>Volunteer</Link></li>
+                  <li><Link href="/contact" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-envelope me-2" aria-hidden="true"></i>Contact Us</Link></li>
+                </ul>
+              </li>
             </ul>
 
-            {/* Mobile-Only Actions: Language Selector & Primary CTAs */}
-            <div className="d-lg-none pt-3 mt-2 border-top">
-              <div className="d-flex align-items-center justify-content-between mb-3 px-1">
-                <span className="small text-muted fw-bold text-uppercase">
-                  <i className="fas fa-globe me-1"></i>Language:
-                </span>
-                <div className="btn-group btn-group-sm" role="group" aria-label="Mobile language selector">
-                  <button
-                    type="button"
-                    className={`btn px-3 py-1 ${lang === 'en' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setLang('en')}
-                  >
-                    EN
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn px-3 py-1 ${lang === 'fr' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setLang('fr')}
-                  >
-                    FR
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn px-3 py-1 ${lang === 'rw' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setLang('rw')}
-                  >
-                    KIN
-                  </button>
-                </div>
-              </div>
+            <div className="header-desktop-cta d-none d-xl-flex ms-lg-3">
+              <Link href="/donate" className="btn btn-donate" onClick={closeMobileMenu}>
+                <i className="fas fa-heart me-2" aria-hidden="true"></i>{t('common.donate') || 'Donate'}
+              </Link>
+            </div>
 
+            {/* Mobile-Only Actions: keep primary actions reachable in the expanded menu */}
+            <div className="header-mobile-cta d-xl-none pt-3 mt-2 border-top">
               <div className="d-grid gap-2">
                 <Link
                   href="/volunteer"
