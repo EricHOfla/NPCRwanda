@@ -4626,3 +4626,108 @@ body.accessibility-center-text {
     transform: none;
   }
 }
+
+
+/* Responsive event calendar view. */
+.event-calendar {
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 35, 65, .045);
+}
+.event-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid #E2E8F0;
+  border-left: 1px solid #E2E8F0;
+}
+.event-calendar-weekday {
+  padding: 10px 6px;
+  background: #F8FAFC;
+  color: #475569;
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-right: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+.event-calendar-day {
+  min-width: 0;
+  min-height: 118px;
+  padding: 8px;
+  border-right: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+.event-calendar-day.is-empty {
+  background: #F8FAFC;
+}
+.event-calendar-date {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  color: #0F172A;
+  font-size: .8rem;
+  font-weight: 800;
+}
+.event-calendar-day-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.event-calendar-item {
+  display: block;
+  overflow: hidden;
+  padding: 5px 6px;
+  border-radius: 5px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: .7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.event-calendar-item:hover,
+.event-calendar-item:focus-visible {
+  background: #DBEAFE;
+  color: #1E40AF;
+  text-decoration: underline;
+}
+.event-calendar-more {
+  color: #64748B;
+  font-size: .68rem;
+  font-weight: 700;
+}
+@media (max-width: 767.98px) {
+  .event-calendar {
+    padding: 10px;
+  }
+  .event-calendar-weekday {
+    padding: 8px 2px;
+    font-size: .62rem;
+  }
+  .event-calendar-day {
+    min-height: 78px;
+    padding: 3px;
+  }
+  .event-calendar-date {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 3px;
+    font-size: .72rem;
+  }
+  .event-calendar-item {
+    padding: 3px 2px;
+    font-size: .58rem;
+    line-height: 1.15;
+  }
+  .event-calendar-more {
+    font-size: .58rem;
+  }
+}
