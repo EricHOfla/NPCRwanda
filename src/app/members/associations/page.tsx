@@ -90,7 +90,7 @@ export default function NpcAssociationsPage() {
             <div className="row g-4 mb-5">
               {filteredAssociations.map((assoc, idx) => (
                 <div key={assoc.id || idx} className="col-md-6" data-aos="fade-up" data-aos-delay={idx * 100}>
-                  <div className="card h-100 border-0 shadow-sm p-4" style={{ borderRadius: '12px' }}>
+                  <div className="card association-directory-card h-100 border-0 shadow-sm p-4" style={{ borderRadius: '16px' }}>
                     <div className="d-flex align-items-center mb-3">
                       <div
                         className="d-flex align-items-center justify-content-center text-white me-3"
@@ -136,7 +136,7 @@ export default function NpcAssociationsPage() {
             <div className="row g-3">
               {filteredClubs.map((club, idx) => (
                 <div key={idx} className="col-sm-6 col-md-4">
-                  <div className="card border-0 shadow-xs p-3 h-100 d-flex flex-row align-items-center" style={{ borderRadius: '8px', background: '#fff' }}>
+                  <div className="card club-directory-card border-0 shadow-xs p-3 h-100 d-flex flex-row align-items-center" style={{ borderRadius: '12px', background: '#fff' }}>
                     <div
                       className="d-flex align-items-center justify-content-center text-primary bg-primary-soft me-3"
                       style={{ width: '40px', height: '40px', borderRadius: '8px' }}
