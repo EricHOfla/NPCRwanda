@@ -36,7 +36,7 @@ export default function NewsPage() {
   }, [newsOnly]);
 
   const published = newsOnly.filter(n => n.status === 'Published' || !n.status);
-  const isFiltering = Boolean(search || activeCategory !== 'All');
+  const isFiltering = Boolean(search.trim() || activeCategory !== 'All');
 
   // When not filtering, feature the first item; when filtering, include all matching items in the grid
   const featured = !isFiltering ? published[0] : null;
