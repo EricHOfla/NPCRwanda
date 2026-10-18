@@ -10,6 +10,7 @@ const athleteUpdateSchema = z.object({
   country: z.string().optional(),
   avatar: z.string().optional(),
   desc: z.string().min(1, 'Description is required').optional(),
+  achievements: z.string().optional(),
 });
 
 // GET: Fetch a single athlete
