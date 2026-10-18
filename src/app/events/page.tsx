@@ -388,15 +388,15 @@ export default function EventsPage() {
                   </button>
                 </div>
               </div>
-              <div className="event-calendar-grid" role="grid" aria-label={calendarMonthLabel}>
+              <div className="event-calendar-grid" aria-label={calendarMonthLabel}>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div className="event-calendar-weekday" role="columnheader" key={day}>{day}</div>
+                  <div className="event-calendar-weekday" key={day}>{day}</div>
                 ))}
                 {calendarCells.map((day, index) => {
-                  if (day === null) return <div className="event-calendar-day is-empty" role="gridcell" aria-hidden="true" key={`empty-${index}`} />;
+                  if (day === null) return <div className="event-calendar-day is-empty" aria-hidden="true" key={`empty-${index}`} />;
                   const dayEvents = getCalendarEvents(day);
                   return (
-                    <div className="event-calendar-day" role="gridcell" aria-label={`${calendarMonthLabel} ${day}, ${dayEvents.length} events`} key={day}>
+                    <div className="event-calendar-day" key={day}>
                       <span className="event-calendar-date">{day}</span>
                       <div className="event-calendar-day-items">
                         {dayEvents.slice(0, 2).map(item => (
