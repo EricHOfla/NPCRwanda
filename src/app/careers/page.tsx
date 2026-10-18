@@ -153,7 +153,9 @@ export default function CareersPage() {
                       <Link href={`/careers/${job.slug}#apply`} className="btn btn-primary btn-sm fw-semibold px-4">
                         {t('phrase.Apply')} <i className="fas fa-arrow-right ms-1"></i>
                       </Link>
-                      <span className="small text-muted">View role details <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
+                      <Link href={`/careers/${job.slug}`} className="small text-primary text-decoration-none fw-semibold">
+                        View role details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                      </Link>
                     </div>
                   </div>
                 </div>
