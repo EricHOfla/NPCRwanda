@@ -172,25 +172,17 @@ export const Header: React.FC = () => {
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
                   <li><Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-landmark me-2" aria-hidden="true"></i>Who We Are</Link></li>
-                  <li><Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-circle-info me-2" aria-hidden="true"></i>NPC Background</Link></li>
-                  <li><Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-scale-balanced me-2" aria-hidden="true"></i>Governance & Transparency</Link></li>
                   <li><Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>Leadership</Link></li>
-                  <li><Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-heart me-2" aria-hidden="true"></i>Core Values</Link></li>
                 </ul>
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle ${isActive('/sports') || isActive('/athletes') || isActive('/members') || isActive('/partners') ? 'active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle ${isActive('/sports') || isActive('/athletes') ? 'active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Sports & Athletes
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="sportsMembersMenu">
                   <li><Link href="/sports" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-medal me-2" aria-hidden="true"></i>Sports</Link></li>
                   <li><Link href="/athletes" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-person-running me-2" aria-hidden="true"></i>Athletes</Link></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><Link href="/partners" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-handshake me-2" aria-hidden="true"></i>Partners</Link></li>
-                  <li><Link href="/members/associations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>NPC Associations</Link></li>
-                  <li><Link href="/members/federations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-people-group me-2" aria-hidden="true"></i>NPC Federations</Link></li>
-                  <li><Link href="/members/dpsco" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-location-dot me-2" aria-hidden="true"></i>DPSCO Contacts</Link></li>
                 </ul>
               </li>
 
@@ -202,7 +194,7 @@ export const Header: React.FC = () => {
                   <li><Link href="/news" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-newspaper me-2" aria-hidden="true"></i>News</Link></li>
                   <li><Link href="/announcements" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-bullhorn me-2" aria-hidden="true"></i>Announcements</Link></li>
                   <li><Link href="/events" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-calendar-days me-2" aria-hidden="true"></i>Events & Results</Link></li>
-                  <li><Link href="/resources" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-folder-open me-2" aria-hidden="true"></i>Publications & Resources</Link></li>
+                  <li><Link href="/resources" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-folder-open me-2" aria-hidden="true"></i>Resources</Link></li>
                 </ul>
               </li>
 
