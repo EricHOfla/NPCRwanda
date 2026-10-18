@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
+import { Event } from '@/context/DataContext';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
   Upcoming:  { bg: '#EFF6FF', text: '#1D4ED8', icon: 'fa-clock' },
@@ -44,7 +45,7 @@ function EventCardMedia({
   height = '180px',
   statusConfig,
 }: {
-  ev: any;
+  ev: Event;
   height?: string;
   statusConfig: { bg: string; text: string; icon: string };
 }) {
