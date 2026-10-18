@@ -17,7 +17,7 @@ export default function SportDetailsPage() {
   const params = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { sports, athletes, loading, error } = useData();
-  const slug = decodeURIComponent(params.slug || '');
+  const slug = params.slug || '';
   const sport = sports.find(item => item.slug === slug || item.id === slug);
   const relatedAthletes = sport
     ? athletes.filter(athlete => athlete.sport === sport.title || t(athlete.sport) === t(sport.title))
@@ -68,7 +68,11 @@ export default function SportDetailsPage() {
                   src={getSportImageSrc(sport.img)}
                   alt={t(sport.title)}
                   className="sport-detail-image"
-                  onError={event => { (event.currentTarget as HTMLImageElement).src = '/assets/img/curated/index-sport-1.jpg'; }}
+                  onError={event => {
+                    const image = event.currentTarget as HTMLImageElement;
+                    image.onerror = null;
+                    image.src = '/assets/img/curated/index-sport-1.jpg';
+                  }}
                 />
               </div>
             </div>
@@ -106,7 +110,11 @@ export default function SportDetailsPage() {
                         src={athlete.avatar?.startsWith('http') || athlete.avatar?.startsWith('/') ? athlete.avatar : athlete.avatar ? `/assets/img/${athlete.avatar}` : '/assets/img/avatar-1.svg'}
                         alt=""
                         loading="lazy"
-                        onError={event => { (event.currentTarget as HTMLImageElement).src = '/assets/img/avatar-1.svg'; }}
+                        onError={event => {
+                          const image = event.currentTarget as HTMLImageElement;
+                          image.onerror = null;
+                          image.src = '/assets/img/avatar-1.svg';
+                        }}
                       />
                       <span className="min-w-0">
                         <strong>{athlete.name}</strong>
