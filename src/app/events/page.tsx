@@ -225,7 +225,7 @@ export default function EventsPage() {
                   const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
                   return (
                     <div key={ev.id} className="col-lg-6" data-aos="fade-up" data-aos-delay={i * 100}>
-                      <div className="custom-card h-100 overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
+                      <div className="custom-card event-feature-card h-100 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
                         <EventCardMedia ev={ev} height="220px" statusConfig={sc} />
                         <div className="p-4">
                           <h3 className="h5 mb-2">{ev.title}</h3>
@@ -323,7 +323,7 @@ export default function EventsPage() {
                 const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
                 return (
                   <div key={ev.id} className="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
-                    <div className="custom-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E8EDF5' }}>
+                    <div className="custom-card event-list-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
                       <EventCardMedia ev={ev} height="170px" statusConfig={sc} />
                       <div className="p-4 flex-grow-1 d-flex flex-column">
                         <div className="d-flex align-items-center gap-2 mb-2">
