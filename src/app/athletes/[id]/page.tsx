@@ -102,6 +102,16 @@ export default function AthleteProfilePage() {
                 {t(athlete.desc) || 'More information about this athlete will be added soon.'}
               </p>
 
+              {athlete.achievements?.trim() && (
+                <section className="rounded-4 p-4 my-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }} aria-labelledby="athlete-achievements">
+                  <h2 id="athlete-achievements" className="h5 fw-bold mb-3">
+                    <i className="fas fa-medal text-success me-2" aria-hidden="true" />
+                    Achievements and Career Highlights
+                  </h2>
+                  <p className="mb-0 text-dark" style={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>{athlete.achievements}</p>
+                </section>
+              )}
+
               <div className="row g-3 my-4">
                 <div className="col-sm-6">
                   <div className="border rounded-3 p-3 h-100">
