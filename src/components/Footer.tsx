@@ -212,10 +212,6 @@ export const Footer: React.FC = () => {
             <p className="footer-webmail-note small mt-2 mb-0">
               Access your official NPC Rwanda email account.
             </p>
-        </div>
-
-        {/* Newsletter Subscription Row */}
-            </ul>
           </div>
         </div>
 
