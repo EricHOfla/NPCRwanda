@@ -6,10 +6,10 @@ export const SITE_CONFIG = {
   fullName: 'National Paralympic Committee of Rwanda',
   shortName: 'NPC Rwanda',
   siteUrl: 'https://npcrwanda.org',
-  defaultTitle: 'NPC Rwanda - National Paralympic Committee of Rwanda | Official Website',
+  defaultTitle: 'NPC Rwanda | Paralympic Sports & Inclusion',
   titleTemplate: '%s | NPC Rwanda',
   defaultDescription:
-    'Official website of the National Paralympic Committee of Rwanda - NPC Rwanda (NPCRwanda). Dedicated to Paralympic sports, sitting volleyball, empowering Rwandan para-athletes, and driving national inclusion through athletic excellence.',
+    'Official NPC Rwanda site: discover para-sports, athletes, events, and our work for inclusion through sport.',
   defaultOgImage: 'https://npcrwanda.org/assets/img/logo.png',
   locale: 'en_RW',
   address: {
