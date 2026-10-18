@@ -142,14 +142,14 @@ export default function EventsPage() {
   const ITEMS_PER_PAGE = 6;
 
   const statuses = ['All', 'Upcoming', 'Ongoing', 'Completed', 'Cancelled'];
-  const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
+  const categories = ['All', ...Array.from(new Set(events.map(e => e.category).filter((category): category is string => Boolean(category))))];
 
   const query = search.trim().toLowerCase();
   const filtered = events.filter(ev => {
     const statusMatch = activeStatus === 'All' || ev.status === activeStatus;
     const catMatch = activeCategory === 'All' || ev.category === activeCategory;
     const searchMatch = !query || [ev.title, ev.description, ev.location, ev.category, ev.status]
-      .some(value => (value || '').toLowerCase().includes(query));
+      .some(value => String(value || '').toLowerCase().includes(query));
     return statusMatch && catMatch && searchMatch;
   });
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -177,9 +177,10 @@ export default function EventsPage() {
   const upcoming = events.filter(e => e.status === 'Upcoming').length;
   const ongoing  = events.filter(e => e.status === 'Ongoing').length;
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
