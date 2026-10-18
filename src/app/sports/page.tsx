@@ -75,7 +75,11 @@ export default function SportsPage() {
                     src={getSportImageSrc(sport.img)}
                     alt={t(sport.title)}
                     className="card-img-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/index-sport-1.jpg'; }}
+                    onError={(e) => {
+                      const image = e.currentTarget as HTMLImageElement;
+                      image.onerror = null;
+                      image.src = '/assets/img/curated/index-sport-1.jpg';
+                    }}
                   />
                   <div className="card-body">
                     <h3>{t(sport.title)}</h3>
