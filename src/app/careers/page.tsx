@@ -11,7 +11,8 @@ export default function CareersPage() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const openCareers = careers.filter(c => {
     if (c.status !== 'Open') return false;
     if (c.deadline && c.deadline < todayStr) return false;
@@ -19,9 +20,9 @@ export default function CareersPage() {
   });
 
   const filtered = openCareers.filter(job => {
-    const titleText = t(job.title);
-    const descText = t(job.desc);
-    const locText = t(job.location);
+    const titleText = t(job.title || '');
+    const descText = t(job.desc || '');
+    const locText = t(job.location || '');
     
     const searchMatch = !search || 
       titleText.toLowerCase().includes(search.toLowerCase()) || 
