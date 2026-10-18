@@ -1893,11 +1893,15 @@ button:focus-visible,
 }
 
 .btn-donate {
-    background: linear-gradient(135deg, var(--agitos-red), var(--accent-yellow), var(--accent-green));
+    background: var(--primary-blue);
+    color: var(--white);
 }
 
-.btn-donate:hover {
-    background: linear-gradient(135deg, var(--agitos-red), var(--primary-blue), var(--accent-green));
+.btn-donate:hover,
+.btn-donate:focus,
+.btn-donate:active {
+    background: var(--primary-blue);
+    color: var(--white);
 }
 
 .section-title::after {
