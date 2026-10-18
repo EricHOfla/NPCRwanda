@@ -91,7 +91,11 @@ export default function NewsPage() {
                     alt={featured.title}
                     className="w-100 h-100"
                     style={{ objectFit: 'cover', minHeight: '300px' }}
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
+                    onError={(e) => {
+                      const image = e.currentTarget as HTMLImageElement;
+                      image.onerror = null;
+                      image.src = '/assets/img/curated/sports-hero.jpg';
+                    }}
                   />
                 </div>
                 <div className="col-lg-6 d-flex flex-column justify-content-center p-4 p-lg-5">
