@@ -60,7 +60,7 @@ export const Footer: React.FC = () => {
       <div className="container">
         <div className="row g-5">
           {/* Column 1: Logo & Description */}
-          <div className="col-lg-4">
+          <div className="col-lg-3">
             <div className="footer-logo d-flex align-items-center mb-4">
               <Image
                 src={resolvedLogo}
