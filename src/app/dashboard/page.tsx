@@ -2384,6 +2384,7 @@ export default function DashboardPage() {
                 {STATS.map(stat => (
                   <div key={stat.label} className="col-sm-6 col-md-4 col-lg-2">
                     <div 
+                      className="dashboard-stat-card"
                       style={{ 
                         background: '#ffffff', 
                         borderRadius: '12px', 
