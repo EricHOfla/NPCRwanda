@@ -4643,6 +4643,10 @@ body.accessibility-center-text {
   border-top: 1px solid #E2E8F0;
   border-left: 1px solid #E2E8F0;
 }
+.event-calendar-grid:focus-visible {
+  outline: 3px solid #FFD700;
+  outline-offset: 3px;
+}
 .event-calendar-weekday {
   padding: 10px 6px;
   background: #F8FAFC;
