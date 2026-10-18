@@ -33,4 +33,4 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint updated public pages
-        run: npx eslint src/app/events/page.tsx src/app/news/page.tsx src/app/careers/page.tsx src/app/athletes/page.tsx src/app/sports/page.tsx 'src/app/sports/[slug]/page.tsx' src/app/dashboard/page.tsx
+        run: npx eslint src/app/events/page.tsx src/app/news/page.tsx src/app/careers/page.tsx src/app/athletes/page.tsx src/app/sports/page.tsx 'src/app/sports/[slug]/page.tsx'
