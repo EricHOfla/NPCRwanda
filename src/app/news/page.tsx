@@ -10,7 +10,7 @@ import { isAnnouncementCategory } from '@/lib/newsUtils';
 
 export default function NewsPage() {
   const { t } = useTranslation();
-  const { news } = useData();
+  const { news, loading, error } = useData();
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -157,11 +157,16 @@ export default function NewsPage() {
           </div>
 
           {/* Articles Grid */}
-          {published.length === 0 ? (
+          {loading && news.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
+              <p className="text-muted mb-0">Loading news and updates...</p>
+            </div>
+          ) : published.length === 0 ? (
             <div className="text-center py-5">
-              <i className="fas fa-newspaper text-muted mb-3" style={{ fontSize: '3rem' }}></i>
-              <h3 className="h5 text-muted">No articles published yet</h3>
-              <p className="text-muted small">Check back soon for the latest news from NPC Rwanda.</p>
+              <i className="fas fa-newspaper text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'News is temporarily unavailable' : 'No articles published yet'}</h3>
+              <p className="text-muted small">{error ? 'Please try again in a moment.' : 'Check back soon for the latest news from NPC Rwanda.'}</p>
             </div>
           ) : filtered.length === 0 && (search || activeCategory !== 'All') ? (
             <div className="text-center py-5">

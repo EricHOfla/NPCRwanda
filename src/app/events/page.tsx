@@ -131,6 +131,7 @@ export default function EventsPage() {
   const { events, loading, error } = useData();
   const [activeStatus, setActiveStatus] = useState('All');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 6;
@@ -138,10 +139,13 @@ export default function EventsPage() {
   const statuses = ['All', 'Upcoming', 'Ongoing', 'Completed', 'Cancelled'];
   const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
 
+  const query = search.trim().toLowerCase();
   const filtered = events.filter(ev => {
     const statusMatch = activeStatus === 'All' || ev.status === activeStatus;
     const catMatch = activeCategory === 'All' || ev.category === activeCategory;
-    return statusMatch && catMatch;
+    const searchMatch = !query || [ev.title, ev.description, ev.location, ev.category, ev.status]
+      .some(value => (value || '').toLowerCase().includes(query));
+    return statusMatch && catMatch && searchMatch;
   });
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));
@@ -254,7 +258,23 @@ export default function EventsPage() {
           )}
 
           {/* Filters */}
-          <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
+          <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-3 p-md-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
+            <div className="event-search-field">
+              <label htmlFor="event-directory-search" className="small fw-bold text-muted mb-2 text-uppercase d-block" style={{ letterSpacing: '0.5px' }}>Search events</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white border-end-0" aria-hidden="true"><i className="fas fa-search text-muted" /></span>
+                <input
+                  id="event-directory-search"
+                  type="search"
+                  className="form-control border-start-0"
+                  placeholder="Search title, venue, or category"
+                  value={search}
+                  onChange={event => { setSearch(event.target.value); setCurrentPage(1); }}
+                  aria-describedby="event-filter-count"
+                />
+                {search && <button type="button" className="btn btn-outline-secondary" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Clear event search">Clear</button>}
+              </div>
+            </div>
             <div>
               <p className="small fw-bold text-muted mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Status</p>
               <div className="d-flex flex-wrap gap-2">
@@ -305,7 +325,10 @@ export default function EventsPage() {
               </div>
             </div>
             <div className="ms-md-auto">
-              <span className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '')}</span>
+              <span id="event-filter-count" className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '') + ' found'}</span>
+              {(search || activeStatus !== 'All' || activeCategory !== 'All') && (
+                <button type="button" className="btn btn-link btn-sm p-0 ms-2" onClick={() => { setSearch(''); setActiveStatus('All'); setActiveCategory('All'); setCurrentPage(1); }}>Reset filters</button>
+              )}
             </div>
           </div>
 

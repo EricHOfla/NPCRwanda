@@ -25,7 +25,8 @@ export default function CareersPage() {
     
     const searchMatch = !search || 
       titleText.toLowerCase().includes(search.toLowerCase()) || 
-      descText.toLowerCase().includes(search.toLowerCase());
+      descText.toLowerCase().includes(search.toLowerCase()) ||
+      locText.toLowerCase().includes(search.toLowerCase());
 
     const filterMatch = activeFilter === 'All' || 
       (activeFilter === 'Kigali' && locText.toLowerCase().includes('kigali')) ||
@@ -147,7 +148,7 @@ export default function CareersPage() {
                       <Link href={`/careers/${job.slug}#apply`} className="btn btn-primary btn-sm fw-semibold px-4">
                         {t('phrase.Apply')} <i className="fas fa-arrow-right ms-1"></i>
                       </Link>
-                      <span className="small text-muted">Full-Time</span>
+                      <span className="small text-muted">View role details <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
                     </div>
                   </div>
                 </div>
