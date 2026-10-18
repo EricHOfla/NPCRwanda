@@ -4517,3 +4517,235 @@ body.accessibility-center-text {
         transform: none;
     }
 }
+
+
+/* Event directory search: responsive sizing without changing the homepage. */
+.event-search-field {
+  flex: 1 1 240px;
+  min-width: 0;
+  max-width: 360px;
+}
+
+@media (max-width: 767.98px) {
+  .event-search-field {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+
+/* Sports program detail pages: scoped responsive layout. */
+.sport-detail-page .sport-detail-image-wrap {
+  overflow: hidden;
+  border-radius: 20px;
+  background: #EFF6FF;
+  border: 1px solid #DDE7F1;
+  box-shadow: 0 16px 40px rgba(15, 35, 65, 0.10);
+}
+.sport-detail-page .sport-detail-image {
+  display: block;
+  width: 100%;
+  max-height: 560px;
+  min-height: 300px;
+  object-fit: cover;
+}
+.sport-detail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  color: #0B63B6;
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.sport-detail-description {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.sport-detail-empty {
+  background: #F8FAFC;
+  border: 1px dashed #CBD5E1;
+}
+.sport-detail-athlete-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  min-width: 0;
+  padding: 14px;
+  color: #0F172A;
+  text-decoration: none;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.sport-detail-athlete-card:hover {
+  color: #0F172A;
+  border-color: #93C5FD;
+  box-shadow: 0 8px 20px rgba(15, 35, 65, .08);
+  transform: translateY(-2px);
+}
+.sport-detail-athlete-card img {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #EFF6FF;
+}
+.sport-detail-athlete-card strong,
+.sport-detail-athlete-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sport-detail-athlete-card small {
+  margin-top: 3px;
+  color: #64748B;
+}
+.sport-detail-athlete-card:focus-visible {
+  outline: 3px solid #FFD700;
+  outline-offset: 3px;
+}
+@media (max-width: 575.98px) {
+  .sport-detail-page .sport-detail-image {
+    min-height: 220px;
+    max-height: 360px;
+  }
+  .sport-detail-athlete-card {
+    padding: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sport-detail-athlete-card {
+    transition: none;
+  }
+  .sport-detail-athlete-card:hover {
+    transform: none;
+  }
+}
+
+
+/* Responsive event calendar view. */
+.event-calendar {
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 35, 65, .045);
+  min-width: 0;
+}
+.event-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid #E2E8F0;
+  border-left: 1px solid #E2E8F0;
+}
+.event-calendar-grid:focus-visible {
+  outline: 3px solid #FFD700;
+  outline-offset: 3px;
+}
+.event-calendar-weekday {
+  padding: 10px 6px;
+  background: #F8FAFC;
+  color: #475569;
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-right: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+.event-calendar-day {
+  min-width: 0;
+  min-height: 118px;
+  padding: 8px;
+  border-right: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+.event-calendar-day.is-empty {
+  background: #F8FAFC;
+}
+.event-calendar-date {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  color: #0F172A;
+  font-size: .8rem;
+  font-weight: 800;
+}
+.event-calendar-day-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.event-calendar-item {
+  display: block;
+  overflow: hidden;
+  padding: 5px 6px;
+  border-radius: 5px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: .7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.event-calendar-item:hover,
+.event-calendar-item:focus-visible {
+  background: #DBEAFE;
+  color: #1E40AF;
+  text-decoration: underline;
+}
+.event-calendar-more {
+  color: #64748B;
+  font-size: .68rem;
+  font-weight: 700;
+}
+@media (max-width: 767.98px) {
+  .event-calendar {
+    padding: 10px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  /* Keep the seven-day grid readable on narrow phones instead of squeezing labels. */
+  .event-calendar-grid {
+    min-width: 560px;
+  }
+  .event-calendar-weekday {
+    padding: 8px 4px;
+    font-size: .7rem;
+  }
+  .event-calendar-day {
+    min-height: 82px;
+    padding: 5px;
+  }
+  .event-calendar-date {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    font-size: .75rem;
+  }
+  .event-calendar-item {
+    padding: 4px;
+    font-size: .68rem;
+    line-height: 1.2;
+  }
+  .event-calendar-more {
+    font-size: .65rem;
+  }
+}
+
+
+/* Keyboard focus for interactive dashboard overview metrics. */
+.dashboard-stat-card:focus-visible {
+  outline: 3px solid #FFD700;
+  outline-offset: 3px;
+}

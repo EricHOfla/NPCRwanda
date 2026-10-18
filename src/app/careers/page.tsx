@@ -11,7 +11,8 @@ export default function CareersPage() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const openCareers = careers.filter(c => {
     if (c.status !== 'Open') return false;
     if (c.deadline && c.deadline < todayStr) return false;
@@ -19,13 +20,14 @@ export default function CareersPage() {
   });
 
   const filtered = openCareers.filter(job => {
-    const titleText = t(job.title);
-    const descText = t(job.desc);
-    const locText = t(job.location);
+    const titleText = t(job.title || '');
+    const descText = t(job.desc || '');
+    const locText = t(job.location || '');
     
     const searchMatch = !search || 
       titleText.toLowerCase().includes(search.toLowerCase()) || 
-      descText.toLowerCase().includes(search.toLowerCase());
+      descText.toLowerCase().includes(search.toLowerCase()) ||
+      locText.toLowerCase().includes(search.toLowerCase());
 
     const filterMatch = activeFilter === 'All' || 
       (activeFilter === 'Kigali' && locText.toLowerCase().includes('kigali')) ||
@@ -71,12 +73,16 @@ export default function CareersPage() {
                   <i className="fas fa-search text-muted"></i>
                 </span>
                 <input
-                  type="text"
+                  type="search"
+                  aria-label="Search career opportunities"
                   className="form-control border-start-0 py-2"
-                  placeholder="Search listings..."
+                  placeholder="Search title, description, or location..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
+                {search && (
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => setSearch('')} aria-label="Clear career search">Clear</button>
+                )}
               </div>
             </div>
             <div className="col-md-7">
@@ -147,7 +153,7 @@ export default function CareersPage() {
                       <Link href={`/careers/${job.slug}#apply`} className="btn btn-primary btn-sm fw-semibold px-4">
                         {t('phrase.Apply')} <i className="fas fa-arrow-right ms-1"></i>
                       </Link>
-                      <span className="small text-muted">Full-Time</span>
+                      <span className="small text-muted">View role details <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
                     </div>
                   </div>
                 </div>
@@ -159,7 +165,7 @@ export default function CareersPage() {
           <div className="text-center py-5 mt-4" data-aos="fade-up">
             <div className="d-inline-flex flex-column align-items-center gap-3 p-4 rounded-4" style={{ background: '#EFF6FF', border: '1px solid #BFDBFE' }}>
               <i className="fas fa-handshake text-primary" style={{ fontSize: '2rem' }}></i>
-              <p className="mb-0 fw-semibold text-dark">Don't see a role that fits? Volunteer with us instead!</p>
+              <p className="mb-0 fw-semibold text-dark">Don&apos;t see a role that fits? Volunteer with us instead!</p>
               <Link href="/volunteer" className="btn btn-primary px-4 fw-semibold">
                 <i className="fas fa-users me-2"></i>Join as Volunteer
               </Link>

@@ -1,0 +1,39 @@
+name: Code quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck-and-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: Type-check application
+        run: npx tsc --noEmit
+
+      - name: Build Next.js application without a production database
+        run: npm run build
+
+      - name: Lint updated public pages
+        run: npx eslint src/app/events/page.tsx src/app/news/page.tsx src/app/careers/page.tsx src/app/athletes/page.tsx src/app/sports/page.tsx 'src/app/sports/[slug]/page.tsx'

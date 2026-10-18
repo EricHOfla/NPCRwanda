@@ -1351,13 +1351,13 @@ export default function DashboardPage() {
   };
 
   const STATS = [
-    { label: 'Total Athletes', value: String(athletes.length), icon: 'fa-person-running', color: '#0072C6' },
-    { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50' },
-    { label: 'Events Count', value: String(events.length), icon: 'fa-calendar-alt', color: '#673AB7' },
-    { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935' },
+    { label: 'Total Athletes', value: String(athletes.length), icon: 'fa-person-running', color: '#0072C6', action: () => { setAdminTab('pages'); setActiveEditPage('athletes'); } },
+    { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50', action: () => { setAdminTab('pages'); setActiveEditPage('news'); } },
+    { label: 'Events Count', value: String(events.length), icon: 'fa-calendar-alt', color: '#673AB7', action: () => { setAdminTab('pages'); setActiveEditPage('events'); } },
+    { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935', action: () => { setAdminTab('pages'); setActiveEditPage('careers'); } },
     ...(!isEditor ? [
-      { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000' },
-      { label: 'Partners Logos', value: String(partners.length), icon: 'fa-handshake', color: '#00838F' },
+      { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000', action: () => setAdminTab('contacts') },
+      { label: 'Partners Logos', value: String(partners.length), icon: 'fa-handshake', color: '#00838F', action: () => { setAdminTab('pages'); setActiveEditPage('partners'); } },
     ] : []),
   ];
 
@@ -2384,6 +2384,7 @@ export default function DashboardPage() {
                 {STATS.map(stat => (
                   <div key={stat.label} className="col-sm-6 col-md-4 col-lg-2">
                     <div 
+                      className="dashboard-stat-card"
                       style={{ 
                         background: '#ffffff', 
                         borderRadius: '12px', 
@@ -2395,6 +2396,16 @@ export default function DashboardPage() {
                         boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                         transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
                         cursor: 'pointer'
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Open ${stat.label.toLowerCase()} management`}
+                      onClick={stat.action}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          stat.action();
+                        }
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';

@@ -75,12 +75,16 @@ export default function SportsPage() {
                     src={getSportImageSrc(sport.img)}
                     alt={t(sport.title)}
                     className="card-img-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/index-sport-1.jpg'; }}
+                    onError={(e) => {
+                      const image = e.currentTarget as HTMLImageElement;
+                      image.onerror = null;
+                      image.src = '/assets/img/curated/index-sport-1.jpg';
+                    }}
                   />
                   <div className="card-body">
                     <h3>{t(sport.title)}</h3>
                     <p className="small text-muted">{t(sport.desc)}</p>
-                    <Link href={`/sports#${sport.id}`} className="fw-bold text-primary text-decoration-none">
+                    <Link href={`/sports/${encodeURIComponent(sport.slug || sport.id)}`} className="fw-bold text-primary text-decoration-none">
                       {t('phrase.Learn More')} <i className="fas fa-arrow-right small" aria-hidden="true" />
                     </Link>
                   </div>

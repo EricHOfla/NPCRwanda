@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
+import { Event } from '@/context/DataContext';
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
   Upcoming:  { bg: '#EFF6FF', text: '#1D4ED8', icon: 'fa-clock' },
@@ -44,7 +45,7 @@ function EventCardMedia({
   height = '180px',
   statusConfig,
 }: {
-  ev: any;
+  ev: Event;
   height?: string;
   statusConfig: { bg: string; text: string; icon: string };
 }) {
@@ -131,29 +132,56 @@ export default function EventsPage() {
   const { events, loading, error } = useData();
   const [activeStatus, setActiveStatus] = useState('All');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
   const ITEMS_PER_PAGE = 6;
 
   const statuses = ['All', 'Upcoming', 'Ongoing', 'Completed', 'Cancelled'];
-  const categories = ['All', ...Array.from(new Set(events.map(e => e.category)))];
+  const categories = ['All', ...Array.from(new Set(events.map(e => e.category).filter((category): category is string => Boolean(category))))];
 
+  const query = search.trim().toLowerCase();
   const filtered = events.filter(ev => {
     const statusMatch = activeStatus === 'All' || ev.status === activeStatus;
     const catMatch = activeCategory === 'All' || ev.category === activeCategory;
-    return statusMatch && catMatch;
+    const searchMatch = !query || [ev.title, ev.description, ev.location, ev.category, ev.status]
+      .some(value => String(value || '').toLowerCase().includes(query));
+    return statusMatch && catMatch && searchMatch;
   });
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));
   const paginatedEvents = filtered.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
+  const calendarYear = calendarMonth.getFullYear();
+  const calendarMonthIndex = calendarMonth.getMonth();
+  const calendarDaysInMonth = new Date(calendarYear, calendarMonthIndex + 1, 0).getDate();
+  const calendarStartOffset = new Date(calendarYear, calendarMonthIndex, 1).getDay();
+  const calendarCells = Array.from(
+    { length: calendarStartOffset + calendarDaysInMonth },
+    (_, index) => index < calendarStartOffset ? null : index - calendarStartOffset + 1
+  );
+  const calendarMonthLabel = calendarMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const getCalendarEvents = (day: number) => filtered.filter(item => {
+    if (!item.date) return false;
+    const date = new Date(item.date);
+    return !Number.isNaN(date.getTime()) &&
+      date.getFullYear() === calendarYear &&
+      date.getMonth() === calendarMonthIndex &&
+      date.getDate() === day;
+  });
 
   const featured = events.filter(e => e.featured);
   const upcoming = events.filter(e => e.status === 'Upcoming').length;
   const ongoing  = events.filter(e => e.status === 'Ongoing').length;
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
@@ -254,7 +282,23 @@ export default function EventsPage() {
           )}
 
           {/* Filters */}
-          <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
+          <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-3 p-md-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
+            <div className="event-search-field">
+              <label htmlFor="event-directory-search" className="small fw-bold text-muted mb-2 text-uppercase d-block" style={{ letterSpacing: '0.5px' }}>Search events</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white border-end-0" aria-hidden="true"><i className="fas fa-search text-muted" /></span>
+                <input
+                  id="event-directory-search"
+                  type="search"
+                  className="form-control border-start-0"
+                  placeholder="Search title, venue, or category"
+                  value={search}
+                  onChange={event => { setSearch(event.target.value); setCurrentPage(1); }}
+                  aria-describedby="event-filter-count"
+                />
+                {search && <button type="button" className="btn btn-outline-secondary" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Clear event search">Clear</button>}
+              </div>
+            </div>
             <div>
               <p className="small fw-bold text-muted mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Status</p>
               <div className="d-flex flex-wrap gap-2">
@@ -304,8 +348,19 @@ export default function EventsPage() {
                 ))}
               </div>
             </div>
-            <div className="ms-md-auto">
-              <span className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '')}</span>
+            <div className="d-flex flex-wrap align-items-center gap-2 ms-md-auto">
+              <span id="event-filter-count" className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '') + ' found'}</span>
+              {(search || activeStatus !== 'All' || activeCategory !== 'All') && (
+                <button type="button" className="btn btn-link btn-sm p-0" onClick={() => { setSearch(''); setActiveStatus('All'); setActiveCategory('All'); setCurrentPage(1); }}>Reset filters</button>
+              )}
+              <div className="btn-group btn-group-sm" role="group" aria-label="Event display mode">
+                <button type="button" className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+                  <i className="fas fa-grip me-1" aria-hidden="true" />List
+                </button>
+                <button type="button" className={`btn ${viewMode === 'calendar' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={viewMode === 'calendar'} onClick={() => setViewMode('calendar')}>
+                  <i className="fas fa-calendar-days me-1" aria-hidden="true" />Calendar
+                </button>
+              </div>
             </div>
           </div>
 
@@ -321,6 +376,48 @@ export default function EventsPage() {
               <h3 className="h5 text-muted">{error ? 'Events are temporarily unavailable' : events.length === 0 ? 'No events have been published yet' : 'No events found'}</h3>
               <p className="small text-muted">{error ? 'Please try again in a moment.' : events.length === 0 ? 'Please check back later for upcoming competitions and results.' : 'Try changing the filters above.'}</p>
             </div>
+          ) : viewMode === 'calendar' ? (
+            <section className="event-calendar" aria-label="Events calendar">
+              <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <h2 className="h4 fw-bold mb-0">{calendarMonthLabel}</h2>
+                <div className="d-flex gap-2">
+                  <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setCalendarMonth(new Date(calendarYear, calendarMonthIndex - 1, 1))} aria-label="Previous month">
+                    <i className="fas fa-chevron-left" aria-hidden="true" /> <span className="d-none d-sm-inline">Previous</span>
+                  </button>
+                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => { const now = new Date(); setCalendarMonth(new Date(now.getFullYear(), now.getMonth(), 1)); }}>Today</button>
+                  <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setCalendarMonth(new Date(calendarYear, calendarMonthIndex + 1, 1))} aria-label="Next month">
+                    <span className="d-none d-sm-inline">Next</span> <i className="fas fa-chevron-right" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+              <div className="event-calendar-grid" aria-label={calendarMonthLabel} tabIndex={0} role="group">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div className="event-calendar-weekday" key={day}>{day}</div>
+                ))}
+                {calendarCells.map((day, index) => {
+                  if (day === null) return <div className="event-calendar-day is-empty" aria-hidden="true" key={`empty-${index}`} />;
+                  const dayEvents = getCalendarEvents(day);
+                  return (
+                    <div className="event-calendar-day" key={day}>
+                      <span className="event-calendar-date">{day}</span>
+                      <div className="event-calendar-day-items">
+                        {dayEvents.slice(0, 2).map(item => (
+                          <Link key={item.id} href={`/events/${encodeURIComponent(item.id)}`} className="event-calendar-item" title={item.title}>
+                            {item.title}
+                          </Link>
+                        ))}
+                        {dayEvents.length > 2 && <span className="event-calendar-more">+{dayEvents.length - 2} more</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {!filtered.some(item => {
+                if (!item.date) return false;
+                const date = new Date(item.date);
+                return !Number.isNaN(date.getTime()) && date.getFullYear() === calendarYear && date.getMonth() === calendarMonthIndex;
+              }) && <p className="text-muted small mt-3 mb-0">No events in this month match the current filters. Try another month or reset your filters.</p>}
+            </section>
           ) : (
             <>
               <div className="row g-4">

@@ -10,7 +10,7 @@ import { isAnnouncementCategory } from '@/lib/newsUtils';
 
 export default function NewsPage() {
   const { t } = useTranslation();
-  const { news } = useData();
+  const { news, loading, error } = useData();
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +19,7 @@ export default function NewsPage() {
 
   // News only: filter out announcements
   const newsOnly = React.useMemo(() => {
-    return news.filter(n => !isAnnouncementCategory(n.category));
+    return news.filter(n => !isAnnouncementCategory(n.category || ''));
   }, [news]);
 
   // Categories derived purely from real news data — no hardcoded list
@@ -36,17 +36,17 @@ export default function NewsPage() {
   }, [newsOnly]);
 
   const published = newsOnly.filter(n => n.status === 'Published' || !n.status);
-  const isFiltering = Boolean(search || activeCategory !== 'All');
+  const isFiltering = Boolean(search.trim() || activeCategory !== 'All');
 
   // When not filtering, feature the first item; when filtering, include all matching items in the grid
   const featured = !isFiltering ? published[0] : null;
   const pool = !isFiltering ? published.slice(1) : published;
 
   const filtered = pool.filter(article => {
-    const catMatch = activeCategory === 'All' || article.category?.toLowerCase() === activeCategory.toLowerCase();
-    const searchMatch = !search ||
-      article.title.toLowerCase().includes(search.toLowerCase()) ||
-      article.desc.toLowerCase().includes(search.toLowerCase());
+    const catMatch = activeCategory === 'All' || String(article.category || '').toLowerCase() === activeCategory.toLowerCase();
+    const searchTerm = search.trim().toLowerCase();
+    const searchMatch = !searchTerm ||
+      [article.title, article.desc, article.category].some(value => String(value || '').toLowerCase().includes(searchTerm));
     return catMatch && searchMatch;
   });
 
@@ -87,11 +87,15 @@ export default function NewsPage() {
               <div className="row g-0 custom-card overflow-hidden" style={{ border: '2px solid #E8EDF5' }}>
                 <div className="col-lg-6">
                   <img
-                    src={featured.img.startsWith('http') || featured.img.startsWith('/') ? featured.img : `/assets/img/curated/${featured.img}`}
+                    src={(featured.img || '').startsWith('http') || (featured.img || '').startsWith('/') ? (featured.img || '/assets/img/curated/sports-hero.jpg') : `/assets/img/curated/${featured.img || 'sports-hero.jpg'}`}
                     alt={featured.title}
                     className="w-100 h-100"
                     style={{ objectFit: 'cover', minHeight: '300px' }}
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
+                    onError={(e) => {
+                      const image = e.currentTarget as HTMLImageElement;
+                      image.onerror = null;
+                      image.src = '/assets/img/curated/sports-hero.jpg';
+                    }}
                   />
                 </div>
                 <div className="col-lg-6 d-flex flex-column justify-content-center p-4 p-lg-5">
@@ -120,15 +124,19 @@ export default function NewsPage() {
                   <i className="fas fa-search text-muted"></i>
                 </span>
                 <input
-                  type="text"
+                  type="search"
+                  aria-label="Search news articles"
                   className="form-control bg-light border-0 py-2"
-                  placeholder="Search news..."
+                  placeholder="Search news and categories..."
                   value={search}
                   onChange={e => {
                     setSearch(e.target.value);
                     setCurrentPage(1);
                   }}
                 />
+                {search && (
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Clear news search">Clear</button>
+                )}
               </div>
             </div>
             <div className="col-md-7">
@@ -157,17 +165,26 @@ export default function NewsPage() {
           </div>
 
           {/* Articles Grid */}
-          {published.length === 0 ? (
+          {loading && news.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
+              <p className="text-muted mb-0">Loading news and updates...</p>
+            </div>
+          ) : published.length === 0 ? (
             <div className="text-center py-5">
-              <i className="fas fa-newspaper text-muted mb-3" style={{ fontSize: '3rem' }}></i>
-              <h3 className="h5 text-muted">No articles published yet</h3>
-              <p className="text-muted small">Check back soon for the latest news from NPC Rwanda.</p>
+              <i className="fas fa-newspaper text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'News is temporarily unavailable' : 'No articles published yet'}</h3>
+              <p className="text-muted small">{error ? 'Please try again in a moment.' : 'Check back soon for the latest news from NPC Rwanda.'}</p>
             </div>
           ) : filtered.length === 0 && (search || activeCategory !== 'All') ? (
             <div className="text-center py-5">
               <i className="fas fa-search text-muted mb-3" style={{ fontSize: '3rem' }}></i>
               <h3 className="h5 text-muted">No results found</h3>
               <p className="text-muted small">Try a different search term or category.</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-4" aria-live="polite">
+              <p className="text-muted mb-0">The featured story is shown above. More articles will appear here when published.</p>
             </div>
           ) : (
             <>
@@ -177,11 +194,15 @@ export default function NewsPage() {
                     <div className="custom-card news-card h-100 d-flex flex-column">
                       <div className="news-img position-relative">
                         <img
-                          src={article.img.startsWith('http') || article.img.startsWith('/') ? article.img : `/assets/img/curated/${article.img}`}
+                          src={(article.img || '').startsWith('http') || (article.img || '').startsWith('/') ? (article.img || '/assets/img/curated/sports-hero.jpg') : `/assets/img/curated/${article.img || 'sports-hero.jpg'}`}
                           alt={article.title}
                           className="img-fluid w-100"
                           style={{ height: '200px', objectFit: 'cover' }}
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/sports-hero.jpg'; }}
+                          onError={(e) => {
+                            const image = e.currentTarget as HTMLImageElement;
+                            image.onerror = null;
+                            image.src = '/assets/img/curated/sports-hero.jpg';
+                          }}
                         />
                         <span
                           className="badge position-absolute top-0 end-0 m-2 fw-semibold"
