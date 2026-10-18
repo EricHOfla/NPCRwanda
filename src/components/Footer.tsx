@@ -60,7 +60,7 @@ export const Footer: React.FC = () => {
       <div className="container">
         <div className="row g-5">
           {/* Column 1: Logo & Description */}
-          <div className="col-lg-4">
+          <div className="col-lg-3">
             <div className="footer-logo d-flex align-items-center mb-4">
               <Image
                 src={resolvedLogo}
@@ -97,88 +97,49 @@ export const Footer: React.FC = () => {
             )}
           </div>
 
-          {/* Column 2: Quick Links */}
+          {/* Column 2: Explore */}
           <div className="col-6 col-lg-2">
-            <h5>{t('footer.quick_links')}</h5>
+            <h5>Explore</h5>
             <ul className="list-unstyled small">
-              <li className="mb-2">
-                <Link className="footer-link" href="/">
-                  {t('nav.home')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/about">
-                  {t('footer.about_npc')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/sports">
-                  {t('footer.sports_programs')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/athletes">
-                  {t('footer.our_athletes')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/news">
-                  {t('nav.news_events')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/careers">
-                  {t('nav.careers')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/contact">
-                  {t('nav.contact') || 'Contact Us'}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/donate">
-                  {t('common.donate') || 'Support & Donate'}
-                </Link>
-              </li>
+              <li className="mb-2"><Link className="footer-link" href="/">Home</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/about">Who We Are</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/npc-background">NPC Background</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/leaders">Leadership</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/sports">Sports</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/athletes">Athletes</Link></li>
             </ul>
           </div>
 
-          {/* Column 3: Governance */}
+          {/* Column 3: Members & Governance */}
           <div className="col-6 col-lg-2">
-            <h5>{t('nav.governance')}</h5>
+            <h5>Members &amp; Governance</h5>
             <ul className="list-unstyled small">
-              <li className="mb-2">
-                <Link className="footer-link" href="/governance#board">
-                  {t('system.board_members')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/leaders">
-                  {t('phrase.Our Leadership') || 'Our Leadership'}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/governance#reports">
-                  {t('footer.annual_reports')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/governance#policies">
-                  {t('footer.policies')}
-                </Link>
-              </li>
-              <li className="mb-2">
-                <Link className="footer-link" href="/governance#strategic-plan">
-                  {t('footer.strategic_plan')}
-                </Link>
-              </li>
+              <li className="mb-2"><Link className="footer-link" href="/partners">Partners</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/members/associations">NPC Associations</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/members/federations">NPC Federations</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/members/dpsco">DPSCO Contacts</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/governance">Governance &amp; Transparency</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/governance#reports">Reports &amp; Policies</Link></li>
             </ul>
           </div>
 
-          {/* Column 4: Contact Info */}
-          <div className="col-lg-4">
-            <h5>{t('footer.contact_info')}</h5>
+          {/* Column 4: News & Resources */}
+          <div className="col-6 col-lg-2">
+            <h5>News &amp; Resources</h5>
+            <ul className="list-unstyled small">
+              <li className="mb-2"><Link className="footer-link" href="/news">News</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/announcements">Announcements</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/events">Events &amp; Results</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/resources">Publications &amp; Resources</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/careers">Careers</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/volunteer">Volunteer</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/donate">Support &amp; Donate</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 5: Contact */}
+          <div className="col-lg-3">
+            <h5>Contact NPC Rwanda</h5>
             <ul className="list-unstyled small">
               {address && (
                 <li className="footer-contact-item mb-3">
@@ -199,19 +160,12 @@ export const Footer: React.FC = () => {
                 </li>
               )}
             </ul>
-            <a
-              className="footer-webmail-btn mt-2"
-              href="https://webmail.npcrwanda.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a className="footer-webmail-btn mt-2" href="https://webmail.npcrwanda.org/" target="_blank" rel="noopener noreferrer">
               <i className="fas fa-envelope-open-text" aria-hidden="true"></i>
-              <span>Webmail Login</span>
+              <span>Official Webmail</span>
               <i className="fas fa-arrow-up-right-from-square footer-webmail-external" aria-hidden="true"></i>
             </a>
-            <p className="footer-webmail-note small mt-2 mb-0">
-              Access your official NPC Rwanda email account.
-            </p>
+            <p className="footer-webmail-note small mt-2 mb-0">Access your official NPC Rwanda email account.</p>
           </div>
         </div>
 

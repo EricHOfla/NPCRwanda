@@ -168,10 +168,13 @@ export const Header: React.FC = () => {
 
               <li className="nav-item dropdown">
                 <Link className={`nav-link dropdown-toggle ${isActive('/about') || isActive('/npc-background') || isActive('/governance') || isActive('/leaders') ? 'active' : ''}`} href="/about" id="aboutMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  About
+                  Who We Are
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
                   <li><Link href="/about#history" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-landmark me-2" aria-hidden="true"></i>Who We Are</Link></li>
+                  <li><Link href="/npc-background" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-book-open me-2" aria-hidden="true"></i>NPC Background</Link></li>
+                  <li><Link href="/about#core-values" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-star me-2" aria-hidden="true"></i>Core Values</Link></li>
+                  <li><Link href="/governance" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-scale-balanced me-2" aria-hidden="true"></i>Governance &amp; Transparency</Link></li>
                   <li><Link href="/leaders" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-users me-2" aria-hidden="true"></i>Leadership</Link></li>
                 </ul>
               </li>
@@ -183,6 +186,18 @@ export const Header: React.FC = () => {
                 <ul className="dropdown-menu" aria-labelledby="sportsMembersMenu">
                   <li><Link href="/sports" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-medal me-2" aria-hidden="true"></i>Sports</Link></li>
                   <li><Link href="/athletes" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-person-running me-2" aria-hidden="true"></i>Athletes</Link></li>
+                </ul>
+              </li>
+
+              <li className="nav-item dropdown">
+                <Link className={`nav-link dropdown-toggle ${isActive('/partners') || isActive('/members') ? 'active' : ''}`} href="/partners" id="membersPartnersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Members &amp; Partners
+                </Link>
+                <ul className="dropdown-menu" aria-labelledby="membersPartnersMenu">
+                  <li><Link href="/partners" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-handshake me-2" aria-hidden="true"></i>Partners</Link></li>
+                  <li><Link href="/members/associations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-people-group me-2" aria-hidden="true"></i>NPC Associations</Link></li>
+                  <li><Link href="/members/federations" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-flag me-2" aria-hidden="true"></i>NPC Federations</Link></li>
+                  <li><Link href="/members/dpsco" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-address-card me-2" aria-hidden="true"></i>DPSCO Contacts</Link></li>
                 </ul>
               </li>
 
@@ -229,10 +244,10 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   href="/donate"
-                  className="btn btn-sm btn-primary fw-bold py-2"
+                  className="btn btn-sm btn-donate fw-bold py-2"
                   onClick={closeMobileMenu}
                 >
-                  <i className="fas fa-heart me-2 text-warning"></i>
+                  <i className="fas fa-heart me-2" aria-hidden="true"></i>
                   {t('common.donate') || 'Support & Donate'}
                 </Link>
               </div>
