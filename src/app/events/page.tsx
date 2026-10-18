@@ -234,6 +234,9 @@ export default function EventsPage() {
                             <span><i className="fas fa-calendar me-1 text-primary"></i>{formatDate(ev.date)}{ev.endDate && ev.endDate !== ev.date ? ` – ${formatDate(ev.endDate)}` : ''}</span>
                             <span><i className="fas fa-map-marker-alt me-1 text-primary"></i>{ev.location}</span>
                           </div>
+                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
+                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -339,6 +342,9 @@ export default function EventsPage() {
                           <div className="small text-muted">
                             <i className="fas fa-map-marker-alt me-2 text-primary"></i>{ev.location}
                           </div>
+                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
+                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
+                          </Link>
                           {ev.status === 'Completed' && (ev.resultsSummary?.trim() || ev.results?.trim()) && (
                             <div className="mt-3 p-3 rounded-3" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                               <h5 className="small fw-bold text-success mb-1"><i className="fas fa-trophy me-2" aria-hidden="true" />Competition Results</h5>
