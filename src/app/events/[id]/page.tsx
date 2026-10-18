@@ -81,7 +81,7 @@ export default function EventDetailsPage() {
 
       <section className="py-5">
         <div className="container">
-          <div className="row g-4 g-lg-5 align-items-start">
+          <div className="row g-4 g-lg-5 align-items-start event-details-layout">
             <div className="col-lg-7">
               {cover ? (
                 <img src={cover} alt={event.title} className="w-100 rounded-4 shadow-sm" style={{ maxHeight: '460px', objectFit: 'cover' }} />
@@ -110,7 +110,7 @@ export default function EventDetailsPage() {
             </div>
 
             <aside className="col-lg-5">
-              <div className="custom-card p-4">
+              <div className="custom-card event-info-card p-4">
                 <h2 className="h5 fw-bold mb-4">Event information</h2>
                 <div className="d-flex gap-3 mb-4">
                   <i className="fas fa-calendar text-primary mt-1" aria-hidden="true" />
