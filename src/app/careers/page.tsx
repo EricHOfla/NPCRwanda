@@ -165,7 +165,7 @@ export default function CareersPage() {
           <div className="text-center py-5 mt-4" data-aos="fade-up">
             <div className="d-inline-flex flex-column align-items-center gap-3 p-4 rounded-4" style={{ background: '#EFF6FF', border: '1px solid #BFDBFE' }}>
               <i className="fas fa-handshake text-primary" style={{ fontSize: '2rem' }}></i>
-              <p className="mb-0 fw-semibold text-dark">Don't see a role that fits? Volunteer with us instead!</p>
+              <p className="mb-0 fw-semibold text-dark">Don&apos;t see a role that fits? Volunteer with us instead!</p>
               <Link href="/volunteer" className="btn btn-primary px-4 fw-semibold">
                 <i className="fas fa-users me-2"></i>Join as Volunteer
               </Link>
