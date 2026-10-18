@@ -157,7 +157,7 @@ export default function AthletesPage() {
                   const isInactive = a.status === 'Inactive';
                   return (
                     <div key={a.id} id={anchor} className="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay={`${(i % 3) * 100}`}>
-                      <div className={`custom-card athlete-card p-4 h-100 text-center d-flex flex-column align-items-center ${isInactive ? 'opacity-75' : ''}`}>
+                      <div className={`custom-card athlete-card athlete-directory-card p-4 h-100 text-center d-flex flex-column align-items-center ${isInactive ? 'opacity-75' : ''}`}>
                         <div className="athlete-thumb mb-3 position-relative">
                           <Image 
                             src={a.avatar && a.avatar.trim() ? (a.avatar.startsWith('http') || a.avatar.startsWith('/') ? a.avatar : `/assets/img/${a.avatar}`) : '/assets/img/avatar-1.svg'} 
