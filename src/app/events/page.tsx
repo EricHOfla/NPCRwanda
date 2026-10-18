@@ -128,7 +128,7 @@ function EventCardMedia({
 
 export default function EventsPage() {
   const { t } = useTranslation();
-  const { events } = useData();
+  const { events, loading, error } = useData();
   const [activeStatus, setActiveStatus] = useState('All');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -305,16 +305,21 @@ export default function EventsPage() {
               </div>
             </div>
             <div className="ms-md-auto">
-              <span className="small text-muted fw-semibold">{filtered.length} event{filtered.length !== 1 ? 's' : ''}</span>
+              <span className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '')}</span>
             </div>
           </div>
 
           {/* Events Grid */}
-          {filtered.length === 0 ? (
+          {loading && events.length === 0 ? (
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
+              <h3 className="h6 text-muted">Loading events...</h3>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-5" data-aos="fade-up">
-              <i className="fas fa-calendar-times text-muted mb-3" style={{ fontSize: '3rem' }}></i>
-              <h3 className="h5 text-muted">No events found</h3>
-              <p className="small text-muted">Try changing the filters above.</p>
+              <i className="fas fa-calendar-times text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
+              <h3 className="h5 text-muted">{error ? 'Events are temporarily unavailable' : events.length === 0 ? 'No events have been published yet' : 'No events found'}</h3>
+              <p className="small text-muted">{error ? 'Please try again in a moment.' : events.length === 0 ? 'Please check back later for upcoming competitions and results.' : 'Try changing the filters above.'}</p>
             </div>
           ) : (
             <>
