@@ -32,9 +32,10 @@ model Athlete {
   status    String   @default("Active") // e.g. "Active", "Inactive"
   country   String   @default("Rwanda")
   avatar    String
-  desc      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  desc         String
+  achievements String   @default("") @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([status])
 }
@@ -210,8 +211,10 @@ model Event {
   category    String   @default("National")
   status      String   @default("Upcoming") // "Upcoming", "Ongoing", "Completed", "Cancelled"
   img         String   @default("sports-hero.jpg")
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  featured      Boolean  @default(false)
+  resultsSummary String   @default("")
+  results        String   @default("") @db.Text
+  createdAt     DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([status])
