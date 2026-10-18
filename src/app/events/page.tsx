@@ -243,6 +243,13 @@ export default function EventsPage() {
             </div>
           )}
 
+          {activeStatus === 'Completed' && (
+            <div className="rounded-4 p-4 mb-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} aria-live="polite">
+              <h2 className="h5 fw-bold mb-1"><i className="fas fa-trophy text-warning me-2" aria-hidden="true" />Past Events &amp; Competition Results</h2>
+              <p className="small text-muted mb-0">Browse completed events and review results or highlights entered by NPC Rwanda administrators.</p>
+            </div>
+          )}
+
           {/* Filters */}
           <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
             <div>
@@ -332,6 +339,13 @@ export default function EventsPage() {
                           <div className="small text-muted">
                             <i className="fas fa-map-marker-alt me-2 text-primary"></i>{ev.location}
                           </div>
+                          {ev.status === 'Completed' && (ev.resultsSummary?.trim() || ev.results?.trim()) && (
+                            <div className="mt-3 p-3 rounded-3" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                              <h5 className="small fw-bold text-success mb-1"><i className="fas fa-trophy me-2" aria-hidden="true" />Competition Results</h5>
+                              {ev.resultsSummary?.trim() && <p className="fw-semibold text-dark mb-2">{ev.resultsSummary}</p>}
+                              {ev.results?.trim() && <p className="small text-muted mb-0" style={{ whiteSpace: 'pre-line', lineHeight: 1.6 }}>{ev.results}</p>}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
