@@ -424,7 +424,7 @@ export default function HomeClient() {
               <div className="pro-ngo-bento-card__footer">
                 <span className="pro-ngo-bento-card__metric">
                   <i className="fas fa-globe" aria-hidden="true" />
-                  {activePartners.length > 0 ? `${activePartners.length} Active Partners` : 'Building Partnerships'}
+                  {activePartners.length > 0 ? `${activePartners.length} Active Partners` : 'Partner Network'}
                 </span>
                 <Link href="/partners" className="pro-ngo-bento-card__link">
                   <span>{t('phrase.Our Partners')}</span>
