@@ -4749,3 +4749,132 @@ body.accessibility-center-text {
   outline: 3px solid #FFD700;
   outline-offset: 3px;
 }
+
+
+/* Header refresh: compact contact/social topbar and clear responsive navigation */
+.topbar-inner {
+    min-height: 34px;
+}
+
+.topbar-tools {
+    margin-left: auto;
+}
+
+.topbar-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.topbar-social-link:hover,
+.topbar-social-link:focus-visible {
+    color: #10253f;
+    background-color: var(--accent-yellow);
+    transform: translateY(-1px);
+}
+
+.topbar-social-link:focus-visible,
+.topbar-link:focus-visible {
+    outline: 2px solid var(--accent-yellow);
+    outline-offset: 3px;
+}
+
+.header-desktop-cta .btn-donate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0.68rem 1.1rem;
+    font-size: 0.85rem;
+}
+
+#main-nav .navbar-nav {
+    gap: 0.1rem;
+}
+
+#main-nav .nav-link {
+    white-space: nowrap;
+}
+
+#main-nav .navbar-brand {
+    min-width: 0;
+}
+
+#main-nav .navbar-brand .brand-text {
+    max-width: 245px;
+}
+
+#main-nav .navbar-brand small {
+    display: block;
+    line-height: 1.25;
+}
+
+@media (max-width: 1199.98px) {
+    #main-nav .navbar-collapse {
+        padding-top: 0.75rem;
+    }
+
+    #main-nav .navbar-nav {
+        align-items: stretch;
+    }
+
+    #main-nav .navbar-nav .nav-link {
+        padding: 0.7rem 0.8rem !important;
+        margin: 0;
+    }
+
+    #main-nav .navbar-nav .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: none;
+        margin: 0 0 0.5rem 0.5rem;
+        max-width: calc(100% - 0.5rem);
+    }
+
+    #main-nav .header-mobile-cta {
+        padding-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .topbar {
+        padding: 0.3rem 0;
+    }
+
+    .topbar-inner {
+        justify-content: flex-end !important;
+        min-height: 30px;
+    }
+
+    .topbar-contact,
+    .topbar-socials {
+        display: none !important;
+    }
+
+    .topbar-tools {
+        gap: 0 !important;
+    }
+
+    #main-nav .navbar-brand img {
+        max-width: 48px;
+        max-height: 48px;
+    }
+
+    #main-nav .navbar-brand .brand-text {
+        max-width: 210px;
+    }
+
+    #main-nav .navbar-brand .brand-text span {
+        font-size: 1rem !important;
+    }
+
+    #main-nav .navbar-brand small {
+        font-size: 0.55rem !important;
+        letter-spacing: 0.15px !important;
+    }
+}
