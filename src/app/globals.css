@@ -5120,3 +5120,146 @@ body.accessibility-center-text {
         height: 38px;
     }
 }
+
+
+/* Admin mobile responsiveness: keep data and actions accessible on narrow screens.
+   Scoped to the admin dashboard so public pages and desktop layouts remain unchanged. */
+.admin-dashboard-root,
+.admin-dashboard-root * {
+    min-width: 0;
+}
+
+.admin-dashboard-root {
+    width: 100%;
+    max-width: 100%;
+}
+
+.admin-dashboard-root img,
+.admin-dashboard-root canvas,
+.admin-dashboard-root svg {
+    max-width: 100%;
+}
+
+.admin-dashboard-root .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.admin-dashboard-root table {
+    max-width: 100%;
+}
+
+.admin-dashboard-root .table-responsive > table {
+    min-width: 640px;
+}
+
+.admin-dashboard-root td,
+.admin-dashboard-root th {
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.admin-dashboard-root button,
+.admin-dashboard-root .btn,
+.admin-dashboard-root a.btn {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    touch-action: manipulation;
+}
+
+.admin-dashboard-root .btn-group,
+.admin-dashboard-root .d-flex,
+.admin-dashboard-root [class*="actions"],
+.admin-dashboard-root [class*="Actions"] {
+    min-width: 0;
+}
+
+.admin-dashboard-root .btn-group {
+    flex-wrap: wrap;
+}
+
+.admin-dashboard-root input,
+.admin-dashboard-root select,
+.admin-dashboard-root textarea,
+.admin-dashboard-root .form-control,
+.admin-dashboard-root .form-select {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.admin-dashboard-root .modal-dialog {
+    width: auto;
+    max-width: calc(100% - 1rem);
+    margin: 0.5rem auto;
+}
+
+.admin-dashboard-root .modal-content {
+    max-width: 100%;
+    max-height: calc(100dvh - 1rem);
+    overflow-y: auto;
+}
+
+@media (max-width: 767.98px) {
+    .admin-dashboard-root {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .admin-dashboard-root .card,
+    .admin-dashboard-root .card-body {
+        min-width: 0;
+    }
+
+    .admin-dashboard-root .card-body {
+        padding: 0.9rem;
+    }
+
+    .admin-dashboard-root .table-responsive > table {
+        min-width: 620px;
+    }
+
+    .admin-dashboard-root .btn-group,
+    .admin-dashboard-root [class*="actions"],
+    .admin-dashboard-root [class*="Actions"] {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .admin-dashboard-root .btn,
+    .admin-dashboard-root button.btn {
+        min-height: 36px;
+        padding: 0.4rem 0.65rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    .admin-dashboard-root .row {
+        --bs-gutter-x: 0.75rem;
+    }
+
+    .admin-dashboard-root .form-control,
+    .admin-dashboard-root .form-select {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-dashboard-root .card-body {
+        padding: 0.7rem;
+    }
+
+    .admin-dashboard-root .table-responsive > table {
+        min-width: 580px;
+    }
+
+    .admin-dashboard-root .btn,
+    .admin-dashboard-root button.btn {
+        padding: 0.35rem 0.55rem !important;
+        font-size: 0.76rem !important;
+    }
+}
