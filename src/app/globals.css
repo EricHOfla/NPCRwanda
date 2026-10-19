@@ -5356,3 +5356,50 @@ body.accessibility-center-text {
         font-size: 0.68rem !important;
     }
 }
+
+
+/* Keep News and Events admin tables usable on small screens. */
+@media (max-width: 767.98px) {
+    .admin-dashboard-root .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-dashboard-root .table-responsive > table {
+        width: max-content;
+        min-width: 700px;
+    }
+
+    .admin-dashboard-root .table-responsive th,
+    .admin-dashboard-root .table-responsive td {
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .admin-dashboard-root .table-responsive td:last-child {
+        min-width: 112px;
+    }
+
+    .admin-dashboard-root .table-responsive td .btn-group,
+    .admin-dashboard-root .table-responsive td [class*="action"],
+    .admin-dashboard-root .table-responsive td [class*="Action"] {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .admin-dashboard-root .table-responsive td .btn,
+    .admin-dashboard-root .table-responsive td button,
+    .admin-dashboard-root .table-responsive td a.btn {
+        flex: 0 0 auto;
+        min-width: max-content;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-dashboard-root .table-responsive > table {
+        min-width: 660px;
+    }
+}
