@@ -119,7 +119,7 @@ export default function SubscribersTab() {
   };
 
   return (
-    <div style={{ maxWidth: '960px' }}>
+    <div className="admin-subscribers-tab" style={{ maxWidth: '960px' }}>
       {/* Header card */}
       <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '28px 32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #F1F5F9' }}>

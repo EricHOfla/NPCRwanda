@@ -5263,3 +5263,96 @@ body.accessibility-center-text {
         font-size: 0.76rem !important;
     }
 }
+
+
+/* Fine-tune admin action buttons and newsletter subscriber layout on phones. */
+@media (max-width: 767.98px) {
+    .admin-dashboard-root td .btn,
+    .admin-dashboard-root td button,
+    .admin-dashboard-root td a.btn {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-height: 30px;
+        padding: 0.25rem 0.45rem !important;
+        font-size: 0.72rem !important;
+        line-height: 1.2;
+        white-space: nowrap !important;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .admin-dashboard-root td .btn-group,
+    .admin-dashboard-root td [class*="action"],
+    .admin-dashboard-root td [class*="Action"] {
+        flex-wrap: nowrap;
+        gap: 0.3rem;
+    }
+
+    .admin-subscribers-tab {
+        width: 100%;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
+
+    .admin-subscribers-tab > div {
+        padding: 14px !important;
+        min-width: 0;
+    }
+
+    .admin-subscribers-tab > div > div:first-child {
+        align-items: flex-start !important;
+    }
+
+    .admin-subscribers-tab table {
+        width: 100%;
+        min-width: 620px;
+        table-layout: auto;
+    }
+
+    .admin-subscribers-tab th,
+    .admin-subscribers-tab td {
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .admin-subscribers-tab td:first-child {
+        min-width: 210px;
+    }
+
+    .admin-subscribers-tab td:last-child > div {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .admin-subscribers-tab td:last-child button {
+        width: auto;
+        min-height: 30px;
+        padding: 5px 8px !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-dashboard-root td .btn,
+    .admin-dashboard-root td button,
+    .admin-dashboard-root td a.btn {
+        padding: 0.22rem 0.35rem !important;
+        font-size: 0.68rem !important;
+    }
+
+    .admin-subscribers-tab > div {
+        padding: 10px !important;
+    }
+
+    .admin-subscribers-tab td:last-child button {
+        padding: 4px 6px !important;
+        font-size: 0.68rem !important;
+    }
+}
