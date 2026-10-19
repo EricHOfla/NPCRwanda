@@ -5356,3 +5356,55 @@ body.accessibility-center-text {
         font-size: 0.68rem !important;
     }
 }
+
+
+/* News and Events admin tables: preserve readable columns and accessible actions on phones. */
+@media (max-width: 767.98px) {
+    .admin-dashboard-root .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-dashboard-root .table-responsive table {
+        width: max-content;
+        min-width: 700px;
+        table-layout: auto;
+    }
+
+    .admin-dashboard-root .table-responsive th,
+    .admin-dashboard-root .table-responsive td {
+        white-space: nowrap;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
+    .admin-dashboard-root .table-responsive td:last-child {
+        min-width: 112px;
+        white-space: nowrap;
+    }
+
+    .admin-dashboard-root .table-responsive td:last-child > div,
+    .admin-dashboard-root .table-responsive td:last-child .btn-group {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    .admin-dashboard-root .table-responsive td:last-child button,
+    .admin-dashboard-root .table-responsive td:last-child .btn,
+    .admin-dashboard-root .table-responsive td:last-child a.btn {
+        flex: 0 0 auto;
+        min-width: max-content;
+        white-space: nowrap !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-dashboard-root .table-responsive table {
+        min-width: 660px;
+    }
+}
