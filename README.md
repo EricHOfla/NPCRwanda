@@ -13,6 +13,15 @@ The **National Paralympic Committee of Rwanda (NPC Rwanda)** is the official bod
 
 This repository contains the source code for the official NPC Rwanda digital platform — a full-stack web application providing public information, news, events, athlete profiles, and an internal content management system.
 
+## 🎯 Platform Goals
+
+The platform is designed to help NPC Rwanda:
+
+- **Share reliable information** about the committee, its activities, and Paralympic sport in Rwanda.
+- **Highlight athletes and achievements** through athlete profiles, news, and event updates.
+- **Make resources easier to find** by organizing governance documents, sports information, and opportunities.
+- **Keep content current** through an internal admin dashboard for authorized staff.
+
 ---
 
 ## 🌐 Platform Features
@@ -24,7 +33,7 @@ This repository contains the source code for the official NPC Rwanda digital pla
 - **Sports Information** — Rwanda's Paralympic sports disciplines
 - **Members & Partners** — Federations, Clubs, Associations, and DPSCO contacts
 - **Careers** — Job and volunteer opportunities within NPC Rwanda
-- **Admin Dashboard** — Internal CMS for managing all website content
+- **Admin Dashboard** — Internal CMS for managing website content
 
 ---
 
