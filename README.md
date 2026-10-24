@@ -35,6 +35,15 @@ The platform is designed to help NPC Rwanda:
 - **Careers** — Job and volunteer opportunities within NPC Rwanda
 - **Admin Dashboard** — Internal CMS for managing website content
 
+## ♿ Content and Usability Guidelines
+
+When maintaining the platform, aim to:
+
+- Use clear, respectful language when writing about athletes and disability sport.
+- Keep navigation and page layouts usable on both mobile devices and desktop screens.
+- Provide descriptive titles and links so visitors can find information and resources easily.
+- Manage public-facing content through the admin dashboard where that functionality is available.
+
 ---
 
 ## 🛠️ Technology
