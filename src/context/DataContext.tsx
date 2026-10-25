@@ -1278,13 +1278,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Messages/Volunteer/Donation Management
   const markMessageRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/contacts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the message status. Please try again.');
+        return;
+      }
       setMessages(prev => prev.map(m => (m.id === id ? { ...m, read } : m)));
+    } catch (error) {
+      console.error('Update contact message status failed:', error);
+      alert('Could not update the message status. Please check your connection and try again.');
     }
   };
 
@@ -1315,13 +1324,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const markVolunteerRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/volunteers/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/volunteers/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the volunteer application status. Please try again.');
+        return;
+      }
       setVolunteers(prev => prev.map(v => (v.id === id ? { ...v, read } : v)));
+    } catch (error) {
+      console.error('Update volunteer application status failed:', error);
+      alert('Could not update the volunteer application status. Please check your connection and try again.');
     }
   };
 
@@ -1350,13 +1368,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const markDonationRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/donations/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/donations/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the donation inquiry status. Please try again.');
+        return;
+      }
       setDonations(prev => prev.map(d => (d.id === id ? { ...d, read } : d)));
+    } catch (error) {
+      console.error('Update donation inquiry status failed:', error);
+      alert('Could not update the donation inquiry status. Please check your connection and try again.');
     }
   };
 
