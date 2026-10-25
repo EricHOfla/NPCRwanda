@@ -5136,7 +5136,7 @@ export default function DashboardPage() {
                       {!activeVolunteer.read && (
                         <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                       )}
-                      <button onClick={() => { deleteVolunteerApplication(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete Application</button>
+                      <button onClick={async () => { if (await deleteVolunteerApplication(activeVolunteer.id)) setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete Application</button>
                     </div>
                   </div>
                 )}
@@ -5179,7 +5179,7 @@ export default function DashboardPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={() => deleteVolunteerApplication(v.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                  <button onClick={async () => { await deleteVolunteerApplication(v.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
                                 </div>
                               </td>
                             </tr>
@@ -5362,7 +5362,7 @@ export default function DashboardPage() {
                     {!activeMessage.read && (
                       <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={() => { deleteContactMessage(activeMessage.id); setActiveMessage(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await deleteContactMessage(activeMessage.id)) setActiveMessage(null); }} className="btn btn-danger btn-sm">Delete</button>
                   </div>
                 </div>
               )}
@@ -5380,7 +5380,7 @@ export default function DashboardPage() {
                     {!activeVolunteer.read && (
                       <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={() => { deleteVolunteerApplication(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await deleteVolunteerApplication(activeVolunteer.id)) setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete</button>
                   </div>
                 </div>
               )}
@@ -5398,7 +5398,7 @@ export default function DashboardPage() {
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={() => { deleteDonationInquiry(activeDonation.id); setActiveDonation(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await deleteDonationInquiry(activeDonation.id)) setActiveDonation(null); }} className="btn btn-danger btn-sm">Delete</button>
                   </div>
                 </div>
               )}
@@ -5429,7 +5429,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={() => deleteContactMessage(c.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await deleteContactMessage(c.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
                               </div>
                             </td>
                           </tr>
@@ -5465,7 +5465,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={() => deleteVolunteerApplication(v.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await deleteVolunteerApplication(v.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
                               </div>
                             </td>
                           </tr>
@@ -5501,7 +5501,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={() => deleteDonationInquiry(d.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await deleteDonationInquiry(d.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
                               </div>
                             </td>
                           </tr>

@@ -286,11 +286,11 @@ interface DataContextType {
   addVolunteerApplication: (app: Omit<VolunteerApplication, 'id' | 'read'>) => Promise<void>;
   addDonationInquiry: (inquiry: Omit<DonationInquiry, 'id' | 'read'>) => Promise<void>;
   markMessageRead: (id: string, read: boolean) => Promise<void>;
-  deleteMessage: (id: string) => Promise<void>;
+  deleteMessage: (id: string) => Promise<boolean>;
   markVolunteerRead: (id: string, read: boolean) => Promise<void>;
-  deleteVolunteer: (id: string) => Promise<void>;
+  deleteVolunteer: (id: string) => Promise<boolean>;
   markDonationRead: (id: string, read: boolean) => Promise<void>;
-  deleteDonation: (id: string) => Promise<void>;
+  deleteDonation: (id: string) => Promise<boolean>;
 
   // Sports Actions
   addSport: (sport: Omit<SportDiscipline, 'id'>) => Promise<void>;
@@ -357,11 +357,11 @@ interface DataContextType {
   contacts: ContactMessage[];
   closeCareer: (id: string) => Promise<void>;
   markContactAsRead: (id: string, read?: boolean) => Promise<void>;
-  deleteContactMessage: (id: string) => Promise<void>;
+  deleteContactMessage: (id: string) => Promise<boolean>;
   markVolunteerAsRead: (id: string, read?: boolean) => Promise<void>;
-  deleteVolunteerApplication: (id: string) => Promise<void>;
+  deleteVolunteerApplication: (id: string) => Promise<boolean>;
   markDonationAsRead: (id: string, read?: boolean) => Promise<void>;
-  deleteDonationInquiry: (id: string) => Promise<void>;
+  deleteDonationInquiry: (id: string) => Promise<boolean>;
   saveSiteContent: (key: string, value: string, type?: string) => Promise<void>;
   addNpcAssociation: (item: Omit<NpcAssociation, 'id'>) => Promise<void>;
   updateNpcAssociation: (item: NpcAssociation) => Promise<void>;
@@ -488,21 +488,37 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await refetch();
   }, [refetch]);
 
-  // Fetch Protected Data (Messages, Volunteers, Donations, Media) for dashboard
+  // Fetch protected dashboard data without allowing browser-cached GET responses.
+  // If any endpoint fails, preserve the current state instead of replacing it with empty lists.
   const fetchProtectedData = async () => {
     try {
-      const messagesRequest = fetch('/api/contacts').then(r => r.ok ? r.json() : []);
-      const remainingRequests = Promise.all([
-        fetch('/api/volunteers').then(r => r.ok ? r.json() : []),
-        fetch('/api/donations').then(r => r.ok ? r.json() : []),
-        fetch('/api/media').then(r => r.ok ? r.json() : []),
-        fetch('/api/job-applications').then(r => r.ok ? r.json() : []),
+      const responses = await Promise.all([
+        fetch('/api/contacts', { cache: 'no-store' }),
+        fetch('/api/volunteers', { cache: 'no-store' }),
+        fetch('/api/donations', { cache: 'no-store' }),
+        fetch('/api/media', { cache: 'no-store' }),
+        fetch('/api/job-applications', { cache: 'no-store' }),
       ]);
 
-      const messagesData = await messagesRequest;
-      setMessages(messagesData);
+      const failedResponse = responses.find(response => !response.ok);
+      if (failedResponse) {
+        throw new Error(`Dashboard data request failed (${failedResponse.status})`);
+      }
 
-      const [volunteersData, donationsData, mediaData, jobApplicationsData] = await remainingRequests;
+      const [messagesData, volunteersData, donationsData, mediaData, jobApplicationsData] =
+        await Promise.all(responses.map(response => response.json()));
+
+      if (
+        !Array.isArray(messagesData) ||
+        !Array.isArray(volunteersData) ||
+        !Array.isArray(donationsData) ||
+        !Array.isArray(mediaData) ||
+        !Array.isArray(jobApplicationsData)
+      ) {
+        throw new Error('A dashboard data endpoint returned an unexpected response.');
+      }
+
+      setMessages(messagesData);
       setVolunteers(volunteersData);
       setDonations(donationsData);
       setMediaAssets(mediaData);
@@ -1242,12 +1258,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const deleteMessage = async (id: string) => {
-    const res = await fetch(`/api/contacts/${id}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
+  const deleteMessage = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(result.error || `Failed to delete contact message (${res.status})`);
+        return false;
+      }
       setMessages(prev => prev.filter(m => m.id !== id));
+      return true;
+    } catch (error) {
+      console.error('Delete contact message request failed:', error);
+      alert('Could not delete the contact message. Please check your connection and try again.');
+      return false;
     }
   };
 
@@ -1262,12 +1289,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const deleteVolunteer = async (id: string) => {
-    const res = await fetch(`/api/volunteers/${id}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
+  const deleteVolunteer = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/volunteers/${id}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(result.error || `Failed to delete volunteer application (${res.status})`);
+        return false;
+      }
       setVolunteers(prev => prev.filter(v => v.id !== id));
+      return true;
+    } catch (error) {
+      console.error('Delete volunteer application request failed:', error);
+      alert('Could not delete the volunteer application. Please check your connection and try again.');
+      return false;
     }
   };
 
@@ -1282,12 +1320,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const deleteDonation = async (id: string) => {
-    const res = await fetch(`/api/donations/${id}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
+  const deleteDonation = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/donations/${id}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(result.error || `Failed to delete donation inquiry (${res.status})`);
+        return false;
+      }
       setDonations(prev => prev.filter(d => d.id !== id));
+      return true;
+    } catch (error) {
+      console.error('Delete donation inquiry request failed:', error);
+      alert('Could not delete the donation inquiry. Please check your connection and try again.');
+      return false;
     }
   };
 

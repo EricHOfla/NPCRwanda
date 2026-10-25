@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendDonationNotification } from '@/lib/mailer';
 
+const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 const donationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
@@ -17,10 +19,10 @@ export async function GET(request: Request) {
     const donations = await prisma.donationInquiry.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json(donations);
+    return NextResponse.json(donations, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error('Fetch donations error:', error);
-    return NextResponse.json({ error: 'Failed to fetch donation inquiries' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch donation inquiries' }, { status: 500, headers: NO_STORE_HEADERS });
   }
 }
 

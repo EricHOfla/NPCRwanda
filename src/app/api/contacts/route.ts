@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendContactNotification } from '@/lib/mailer';
 
+const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 // Contact Message validation schema with anti-spam honeypot
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -29,12 +31,12 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(messages);
+    return NextResponse.json(messages, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error('Fetch contact messages error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch contact messages' },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }

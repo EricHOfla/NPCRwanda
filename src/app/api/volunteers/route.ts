@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendVolunteerNotification } from '@/lib/mailer';
 
+const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 const volunteerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
@@ -17,10 +19,10 @@ export async function GET(request: Request) {
     const volunteers = await prisma.volunteerApplication.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json(volunteers);
+    return NextResponse.json(volunteers, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error('Fetch volunteers error:', error);
-    return NextResponse.json({ error: 'Failed to fetch volunteer applications' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch volunteer applications' }, { status: 500, headers: NO_STORE_HEADERS });
   }
 }
 
