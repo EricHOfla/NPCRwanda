@@ -11,7 +11,6 @@ async function main() {
   await prisma.athlete.deleteMany({});
   await prisma.newsArticle.deleteMany({});
   await prisma.career.deleteMany({});
-  await prisma.contactMessage.deleteMany({});
   await prisma.sportDiscipline.deleteMany({});
   await prisma.leader.deleteMany({});
   await prisma.systemComponent.deleteMany({});
@@ -185,44 +184,9 @@ async function main() {
   }
   console.log('Careers seeded successfully');
 
-  // 6. Contact Messages
-  const contacts = [
-    { name: 'Alain Bizimungu', email: 'alain@minisports.gov.rw', subject: 'Ministry Sponsorship Inquiry', message: 'Hello, we would like to discuss possible government funding for the 2026 Paralympic Games preparation program. Can we schedule a meeting?', date: 'Jul 2026', read: false },
-    { name: 'Marie Uwase', email: 'marie.uwase@gmail.com', subject: 'Volunteer Application', message: 'Hi there, I am a physiotherapist student wishing to volunteer in the athlete support clinics during the upcoming national championship.', date: 'Jul 2026', read: true },
-    { name: 'Robert Niyonsenga', email: 'robert@rwandatv.rw', subject: 'Media Partnership Request', message: 'Dear NPC team, we represent Rwanda TV wishing to provide live coverage of the sitting volleyball championship next month.', date: 'Jun 2026', read: false },
-    { name: 'Juliana Habimana', email: 'juliana@businessrwanda.com', subject: 'Corporate Sponsorship Proposal', message: 'Greetings, our company is interested in sponsoring the para-athletics development program. What are the partnership opportunities?', date: 'Jun 2026', read: true },
-    { name: 'David Mutua', email: 'david@ipc.org', subject: 'Training Camp Coordination', message: 'Hello, IPC wants to coordinate a coaching development workshop for your district coordinators. Is March 2026 suitable?', date: 'May 2026', read: true },
-    { name: 'Sophie Mbambazi', email: 'sophie@inclusivedev.org', subject: 'Inclusion Program Partnership', message: 'We are an NGO focused on disability inclusion in sports. We would like to explore partnership opportunities with NPC Rwanda.', date: 'May 2026', read: false },
-    { name: 'Peter Kabuye', email: 'peter@coach-academy.rw', subject: 'Coach Certification Program', message: 'We offer international coaching certification programs. Would NPC Rwanda be interested in enrolling coaches in our courses?', date: 'Apr 2026', read: true },
-    { name: 'Angela Uwimbabazi', email: 'angela@disabilityrights.rw', subject: 'Policy Consultation Request', message: 'Hello, we are consulting on disability rights policies and would like input from NPC Rwanda on safeguarding and inclusion standards.', date: 'Apr 2026', read: false },
-  ];
-
-  for (const contact of contacts) {
-    await prisma.contactMessage.create({ data: contact });
-  }
-  console.log('Contact messages seeded successfully');
-
-  // 6b. Volunteer Applications
-  const volunteersList = [
-    { name: 'Marie Uwase', email: 'marie.uwase@gmail.com', interest: 'Medical & Rehabilitation', skills: 'Physiotherapy student, First Aid certified', details: 'I would like to volunteer in athlete support clinics during national events.', read: false },
-    { name: 'Jean Paul Habineza', email: 'jp.habineza@yahoo.fr', interest: 'Event Coordination', skills: 'Event logistics, IT support, Bilingual (FR/EN)', details: 'Eager to assist with organizing regional tournaments and athlete registration.', read: true },
-    { name: 'Clarisse Mutoni', email: 'clarisse.mutoni@gmail.com', interest: 'Media & Photography', skills: 'Photography, Social Media, Content creation', details: 'Experienced in sports media and photo editing. Available for weekend games.', read: false },
-  ];
-  for (const vol of volunteersList) {
-    await prisma.volunteerApplication.create({ data: vol });
-  }
-  console.log('Volunteer applications seeded successfully');
-
-  // 6c. Donation Inquiries
-  const donationsList = [
-    { name: 'Juliana Habimana', email: 'juliana@businessrwanda.com', category: 'Corporate Sponsorship', supportType: 'Financial Grant', details: 'Interested in sponsoring the Para Athletics national development program with annual grant.', read: false },
-    { name: 'Kigali Sports Supplies Ltd', email: 'info@kigalisports.rw', category: 'Equipment Partner', supportType: 'Equipment Donation', details: 'We wish to donate 10 specialized wheelchairs and sitting volleyball gear for district clubs.', read: true },
-    { name: 'Dr. Eric Ndayishimiye', email: 'eric.ndayishimiye@health.gov.rw', category: 'Individual Donor', supportType: 'Medical Supplies', details: 'Offering monthly sports physiotherapy kits and first aid supplies for national squad.', read: false },
-  ];
-  for (const don of donationsList) {
-    await prisma.donationInquiry.create({ data: don });
-  }
-  console.log('Donation inquiries seeded successfully');
+  // Public submissions are real user data. Do not delete or seed contact messages,
+  // volunteer applications, or donation inquiries from this development seed script.
+  // These records must only be created by public form submissions and managed in the admin panel.
 
   // 7. Sports (Disciplines)
   const sports = [
