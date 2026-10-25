@@ -4,11 +4,13 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 0,                        // Always refetch from server (IndexedDB shows instantly while fetching)
-        gcTime: 24 * 60 * 60 * 1000,        // Keep in IndexedDB for 24h
-        refetchOnWindowFocus: true,          // Refetch when tab is focused (catches admin changes)
+        // Reuse persisted data and avoid repeated requests while navigating the site.
+        // Admin mutations invalidate the public bundle immediately when content changes.
+        staleTime: 60 * 1000,
+        gcTime: 24 * 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
         refetchOnReconnect: true,
-        retry: 2,
+        retry: 1,
       },
     },
   });
