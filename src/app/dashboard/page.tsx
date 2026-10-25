@@ -474,6 +474,7 @@ export default function DashboardPage() {
     updateEvent,
     deleteEvent,
     addCareer,
+    updateCareer,
     deleteCareer,
     closeCareer,
     markContactAsRead,
@@ -593,6 +594,8 @@ export default function DashboardPage() {
   });
 
   const [careerFormOpen, setCareerFormOpen] = useState(false);
+  const [editingCareerId, setEditingCareerId] = useState<string | null>(null);
+  const [careerFormError, setCareerFormError] = useState('');
   const [careerForm, setCareerForm] = useState({
     title: '',
     location: 'Kigali',
@@ -1467,15 +1470,42 @@ export default function DashboardPage() {
 
   const handleCareerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const slugValue = careerForm.slug || careerForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    await addCareer({
+    setCareerFormError('');
+    const slugValue = (careerForm.slug.trim() || careerForm.title.toLowerCase())
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const payload = {
       ...careerForm,
       slug: slugValue,
       deadline: careerForm.deadline || null,
-      applicants: 0,
+      applicants: editingCareerId ? careers.find(c => c.id === editingCareerId)?.applicants ?? 0 : 0,
+    };
+
+    try {
+      if (editingCareerId) {
+        await updateCareer({ id: editingCareerId, ...payload });
+      } else {
+        await addCareer(payload);
+      }
+      setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
+      setEditingCareerId(null);
+      setCareerFormOpen(false);
+    } catch (err) {
+      setCareerFormError(err instanceof Error ? err.message : 'Could not save this vacancy. Your changes are still in the form.');
+    }
+  };
+
+  const handleEditCareerClick = (career: Career) => {
+    setCareerForm({
+      title: career.title || '',
+      location: career.location || 'Kigali',
+      status: career.status || 'Open',
+      desc: career.desc || '',
+      slug: career.slug || '',
+      deadline: career.deadline ? String(career.deadline).slice(0, 10) : '',
     });
-    setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
-    setCareerFormOpen(false);
+    setCareerFormError('');
+    setEditingCareerId(career.id);
+    setCareerFormOpen(true);
   };
 
   const handleSportSubmit = async (e: React.FormEvent) => {
@@ -4470,6 +4500,8 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
+                            setEditingCareerId(null);
+                            setCareerFormError('');
                             setCareerFormOpen(!careerFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -4481,7 +4513,8 @@ export default function DashboardPage() {
 
                       {careerFormOpen && (
                         <div className="custom-card p-4 mb-4">
-                          <h4 className="h6 fw-bold mb-3">Add Vacancy</h4>
+                          <h4 className="h6 fw-bold mb-3">{editingCareerId ? 'Edit Vacancy' : 'Add Vacancy'}</h4>
+                          {careerFormError && <div className="alert alert-danger py-2" role="alert">{careerFormError}</div>}
                           <form onSubmit={handleCareerSubmit} className="row g-3">
                             <div className="col-md-6">
                               <label className="form-label small fw-bold">Position Title</label>
@@ -4493,7 +4526,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Slug URL</label>
-                              <input type="text" className="form-control" required value={careerForm.slug} onChange={e => setCareerForm({ ...careerForm, slug: e.target.value })} />
+                              <input type="text" className="form-control" value={careerForm.slug} onChange={e => setCareerForm({ ...careerForm, slug: e.target.value })} placeholder="Leave blank to generate from title" />
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Status</label>
@@ -4520,7 +4553,8 @@ export default function DashboardPage() {
                               <textarea className="form-control" rows={3} required value={careerForm.desc} onChange={e => setCareerForm({ ...careerForm, desc: e.target.value })} />
                             </div>
                             <div className="col-12">
-                              <button type="submit" className="btn btn-primary btn-sm px-4">Register Position</button>
+                              <button type="submit" className="btn btn-primary btn-sm px-4">{editingCareerId ? 'Save Changes' : 'Register Position'}</button>
+                              <button type="button" className="btn btn-outline-secondary btn-sm ms-2" onClick={() => { setCareerFormOpen(false); setEditingCareerId(null); setCareerFormError(''); }}>Cancel</button>
                             </div>
                           </form>
                         </div>
@@ -4587,6 +4621,9 @@ export default function DashboardPage() {
                                     </td>
                                     <td>
                                       <div className="d-flex align-items-center gap-2">
+                                        <button type="button" onClick={() => handleEditCareerClick(c)} className="btn btn-sm btn-outline-primary py-1" title="Edit vacancy">
+                                          <i className="fas fa-edit me-1" />Edit
+                                        </button>
                                         {c.status === 'Open' && (
                                           <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1" title="Close vacancy">
                                             Close
