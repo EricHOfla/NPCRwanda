@@ -72,11 +72,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.contactMessage.delete({
-      where: { id },
-    });
+    // Make DELETE idempotent: retries after a client timeout should not turn an
+    // already-completed deletion into a misleading failure.
+    await prisma.contactMessage.deleteMany({ where: { id } });
 
-    return NextResponse.json({ message: 'Message deleted successfully' });
+    return NextResponse.json({ message: 'Message deleted successfully' }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
     console.error('Delete message error:', error);
     return NextResponse.json(
