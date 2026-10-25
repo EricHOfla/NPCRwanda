@@ -5437,3 +5437,141 @@ body.accessibility-center-text {
     flex-wrap: nowrap;
   }
 }
+
+
+/* ==========================================================================
+   ADMIN DASHBOARD RESPONSIVE LAYOUT — all admin sections
+   Keep the content column shrinkable inside the flex shell, and allow wide
+   data tables to scroll inside their own panels instead of clipping actions.
+   ========================================================================== */
+.admin-dashboard-root {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-dashboard-root > * {
+  min-width: 0;
+}
+
+.admin-dashboard-root .dashboard-main-content {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-dashboard-root .dashboard-main-content > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-dashboard-root .table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.admin-dashboard-root .table-responsive > table,
+.admin-dashboard-root .table-responsive table.table {
+  width: 100%;
+  min-width: 760px;
+}
+
+.admin-dashboard-root .table-responsive th,
+.admin-dashboard-root .table-responsive td {
+  vertical-align: middle;
+}
+
+.admin-dashboard-root .table-responsive td {
+  overflow-wrap: anywhere;
+}
+
+.admin-dashboard-root .table-responsive td:last-child,
+.admin-dashboard-root .table-responsive th:last-child {
+  white-space: nowrap;
+}
+
+.admin-dashboard-root .table-responsive td .d-flex {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.admin-dashboard-root .card,
+.admin-dashboard-root .custom-card,
+.admin-dashboard-root .row,
+.admin-dashboard-root [class*="col-"] {
+  min-width: 0;
+}
+
+.admin-dashboard-root img,
+.admin-dashboard-root video,
+.admin-dashboard-root iframe {
+  max-width: 100%;
+}
+
+.admin-dashboard-root input,
+.admin-dashboard-root select,
+.admin-dashboard-root textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .admin-dashboard-root .dashboard-main-content {
+    padding: clamp(24px, 2vw, 36px) !important;
+  }
+
+  .admin-dashboard-root .table-responsive table.table {
+    min-width: 860px;
+  }
+
+  .admin-dashboard-root .dashboard-topbar {
+    min-width: 0;
+  }
+
+  .admin-dashboard-root .dashboard-topbar-title {
+    max-width: min(70vw, 900px);
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .admin-dashboard-root .dashboard-main-content {
+    padding: 20px !important;
+  }
+
+  .admin-dashboard-root .card,
+  .admin-dashboard-root .custom-card {
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-dashboard-root .dashboard-main-content {
+    padding: 12px !important;
+  }
+
+  .admin-dashboard-root .card,
+  .admin-dashboard-root .custom-card {
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .admin-dashboard-root .table-responsive table.table {
+    min-width: 680px;
+  }
+
+  .admin-dashboard-root .table-responsive th,
+  .admin-dashboard-root .table-responsive td {
+    padding: 8px 10px !important;
+  }
+
+  .admin-dashboard-root .table-responsive td:last-child .btn {
+    white-space: nowrap;
+  }
+}
+
