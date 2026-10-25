@@ -145,6 +145,9 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
+
+  useEffect(() => setPreviewError(false), [value]);
 
   const fileAccept = accept || (isDocument 
     ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.odt,.ods,.odp,image/*,application/*' 
@@ -183,12 +186,20 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
       {value && value !== '#' ? (
         <div className="mb-2 p-2 border rounded bg-light d-flex align-items-center gap-3">
           {isImg ? (
-            <img 
-              src={getFullImageUrl(value)} 
-              style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0' }} 
-              alt="Preview" 
-              onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg'; }}
-            />
+            <>
+              {previewError ? (
+                <div role="status" className="d-flex align-items-center justify-content-center text-muted border rounded" style={{ width: '80px', height: '60px', flexShrink: 0, fontSize: '0.65rem', textAlign: 'center', background: '#f8fafc' }}>
+                  <span><i className="fas fa-image-slash d-block mb-1" />Preview unavailable</span>
+                </div>
+              ) : (
+                <img
+                  src={getFullImageUrl(value)}
+                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0', flexShrink: 0 }}
+                  alt="Selected image preview"
+                  onError={() => setPreviewError(true)}
+                />
+              )}
+            </>
           ) : (
             <div 
               style={{ 
