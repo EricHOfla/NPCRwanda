@@ -145,6 +145,9 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
+
+  useEffect(() => setPreviewError(false), [value]);
 
   const fileAccept = accept || (isDocument 
     ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.odt,.ods,.odp,image/*,application/*' 
@@ -183,12 +186,20 @@ const CMSImageField: React.FC<CMSImageFieldProps> = ({
       {value && value !== '#' ? (
         <div className="mb-2 p-2 border rounded bg-light d-flex align-items-center gap-3">
           {isImg ? (
-            <img 
-              src={getFullImageUrl(value)} 
-              style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0' }} 
-              alt="Preview" 
-              onError={(e) => { (e.target as HTMLImageElement).src = '/assets/img/curated/home-hero.jpg'; }}
-            />
+            <>
+              {previewError ? (
+                <div role="status" className="d-flex align-items-center justify-content-center text-muted border rounded" style={{ width: '80px', height: '60px', flexShrink: 0, fontSize: '0.65rem', textAlign: 'center', background: '#f8fafc' }}>
+                  <span><i className="fas fa-image-slash d-block mb-1" />Preview unavailable</span>
+                </div>
+              ) : (
+                <img
+                  src={getFullImageUrl(value)}
+                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', background: '#e2e8f0', flexShrink: 0 }}
+                  alt="Selected image preview"
+                  onError={() => setPreviewError(true)}
+                />
+              )}
+            </>
           ) : (
             <div 
               style={{ 
@@ -474,6 +485,7 @@ export default function DashboardPage() {
     updateEvent,
     deleteEvent,
     addCareer,
+    updateCareer,
     deleteCareer,
     closeCareer,
     markContactAsRead,
@@ -593,6 +605,8 @@ export default function DashboardPage() {
   });
 
   const [careerFormOpen, setCareerFormOpen] = useState(false);
+  const [editingCareerId, setEditingCareerId] = useState<string | null>(null);
+  const [careerFormError, setCareerFormError] = useState('');
   const [careerForm, setCareerForm] = useState({
     title: '',
     location: 'Kigali',
@@ -715,6 +729,18 @@ export default function DashboardPage() {
   const [activeJobApplication, setActiveJobApplication] = useState<JobApplication | null>(null);
   const [jobAppSearch, setJobAppSearch] = useState('');
   const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
+
+  // Track pending deletion per submission so the correct row/button shows progress.
+  const [deletingSubmissionIds, setDeletingSubmissionIds] = useState<string[]>([]);
+  const runSubmissionDelete = async (id: string, remove: (id: string) => Promise<boolean>) => {
+    if (deletingSubmissionIds.includes(id)) return false;
+    setDeletingSubmissionIds(prev => [...prev, id]);
+    try {
+      return await remove(id);
+    } finally {
+      setDeletingSubmissionIds(prev => prev.filter(itemId => itemId !== id));
+    }
+  };
 
   // Track whether tab/page state has been restored on client mount
   const isTabInitializedRef = useRef(false);
@@ -1467,15 +1493,42 @@ export default function DashboardPage() {
 
   const handleCareerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const slugValue = careerForm.slug || careerForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    await addCareer({
+    setCareerFormError('');
+    const slugValue = (careerForm.slug.trim() || careerForm.title.toLowerCase())
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const payload = {
       ...careerForm,
       slug: slugValue,
       deadline: careerForm.deadline || null,
-      applicants: 0,
+      applicants: editingCareerId ? careers.find(c => c.id === editingCareerId)?.applicants ?? 0 : 0,
+    };
+
+    try {
+      if (editingCareerId) {
+        await updateCareer({ id: editingCareerId, ...payload });
+      } else {
+        await addCareer(payload);
+      }
+      setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
+      setEditingCareerId(null);
+      setCareerFormOpen(false);
+    } catch (err) {
+      setCareerFormError(err instanceof Error ? err.message : 'Could not save this vacancy. Your changes are still in the form.');
+    }
+  };
+
+  const handleEditCareerClick = (career: Career) => {
+    setCareerForm({
+      title: career.title || '',
+      location: career.location || 'Kigali',
+      status: career.status || 'Open',
+      desc: career.desc || '',
+      slug: career.slug || '',
+      deadline: career.deadline ? String(career.deadline).slice(0, 10) : '',
     });
-    setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
-    setCareerFormOpen(false);
+    setCareerFormError('');
+    setEditingCareerId(career.id);
+    setCareerFormOpen(true);
   };
 
   const handleSportSubmit = async (e: React.FormEvent) => {
@@ -4470,6 +4523,8 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             setCareerForm({ title: '', location: 'Kigali', status: 'Open', desc: '', slug: '', deadline: '' });
+                            setEditingCareerId(null);
+                            setCareerFormError('');
                             setCareerFormOpen(!careerFormOpen);
                           }}
                           className="btn btn-primary btn-sm fw-bold px-3"
@@ -4481,7 +4536,8 @@ export default function DashboardPage() {
 
                       {careerFormOpen && (
                         <div className="custom-card p-4 mb-4">
-                          <h4 className="h6 fw-bold mb-3">Add Vacancy</h4>
+                          <h4 className="h6 fw-bold mb-3">{editingCareerId ? 'Edit Vacancy' : 'Add Vacancy'}</h4>
+                          {careerFormError && <div className="alert alert-danger py-2" role="alert">{careerFormError}</div>}
                           <form onSubmit={handleCareerSubmit} className="row g-3">
                             <div className="col-md-6">
                               <label className="form-label small fw-bold">Position Title</label>
@@ -4493,7 +4549,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Slug URL</label>
-                              <input type="text" className="form-control" required value={careerForm.slug} onChange={e => setCareerForm({ ...careerForm, slug: e.target.value })} />
+                              <input type="text" className="form-control" value={careerForm.slug} onChange={e => setCareerForm({ ...careerForm, slug: e.target.value })} placeholder="Leave blank to generate from title" />
                             </div>
                             <div className="col-md-4">
                               <label className="form-label small fw-bold">Status</label>
@@ -4520,7 +4576,8 @@ export default function DashboardPage() {
                               <textarea className="form-control" rows={3} required value={careerForm.desc} onChange={e => setCareerForm({ ...careerForm, desc: e.target.value })} />
                             </div>
                             <div className="col-12">
-                              <button type="submit" className="btn btn-primary btn-sm px-4">Register Position</button>
+                              <button type="submit" className="btn btn-primary btn-sm px-4">{editingCareerId ? 'Save Changes' : 'Register Position'}</button>
+                              <button type="button" className="btn btn-outline-secondary btn-sm ms-2" onClick={() => { setCareerFormOpen(false); setEditingCareerId(null); setCareerFormError(''); }}>Cancel</button>
                             </div>
                           </form>
                         </div>
@@ -4587,6 +4644,9 @@ export default function DashboardPage() {
                                     </td>
                                     <td>
                                       <div className="d-flex align-items-center gap-2">
+                                        <button type="button" onClick={() => handleEditCareerClick(c)} className="btn btn-sm btn-outline-primary py-1" title="Edit vacancy">
+                                          <i className="fas fa-edit me-1" />Edit
+                                        </button>
                                         {c.status === 'Open' && (
                                           <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1" title="Close vacancy">
                                             Close
@@ -5179,7 +5239,7 @@ export default function DashboardPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={async () => { await deleteVolunteerApplication(v.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                  <button onClick={async () => { await runSubmissionDelete(v.id, deleteVolunteerApplication); }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                                 </div>
                               </td>
                             </tr>
@@ -5362,7 +5422,7 @@ export default function DashboardPage() {
                     {!activeMessage.read && (
                       <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteContactMessage(activeMessage.id)) setActiveMessage(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage)) setActiveMessage(null); }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5380,7 +5440,7 @@ export default function DashboardPage() {
                     {!activeVolunteer.read && (
                       <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteVolunteerApplication(activeVolunteer.id)) setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5398,7 +5458,7 @@ export default function DashboardPage() {
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteDonationInquiry(activeDonation.id)) setActiveDonation(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry)) setActiveDonation(null); }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5418,7 +5478,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {contacts.map(c => (
+                        {contacts.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No messages have been received yet.</td></tr> : contacts.map(c => (
                           <tr key={c.id}>
                             <td className="fw-semibold small">{c.name}</td>
                             <td className="small">{c.subject}</td>
@@ -5429,7 +5489,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await deleteContactMessage(c.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await runSubmissionDelete(c.id, deleteContactMessage); }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5454,7 +5514,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {volunteers.map(v => (
+                        {volunteers.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No volunteer applications have been received yet.</td></tr> : volunteers.map(v => (
                           <tr key={v.id}>
                             <td className="fw-semibold small">{v.name}</td>
                             <td className="small">{v.interest}</td>
@@ -5490,7 +5550,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {donations.map(d => (
+                        {donations.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No donation inquiries have been received yet.</td></tr> : donations.map(d => (
                           <tr key={d.id}>
                             <td className="fw-semibold small">{d.name}</td>
                             <td className="small">{d.category}</td>
@@ -5501,7 +5561,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await deleteDonationInquiry(d.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await runSubmissionDelete(d.id, deleteDonationInquiry); }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>

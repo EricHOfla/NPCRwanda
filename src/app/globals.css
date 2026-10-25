@@ -5403,3 +5403,37 @@ body.accessibility-center-text {
         min-width: 660px;
     }
 }
+
+
+/* Final admin polish: keep subscriber tables scrollable instead of clipping them. */
+.admin-subscribers-tab {
+  overflow: visible !important;
+}
+.admin-subscribers-tab > div:last-child {
+  min-width: 0;
+}
+.admin-subscribers-tab > div:last-child > div[style*="overflow-x"] {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.admin-subscribers-tab table {
+  min-width: 680px;
+}
+.admin-subscribers-tab button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.admin-subscribers-tab [role="alert"] {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767.98px) {
+  .admin-subscribers-tab table {
+    min-width: 680px;
+  }
+  .admin-subscribers-tab td:last-child > div {
+    flex-wrap: nowrap;
+  }
+}

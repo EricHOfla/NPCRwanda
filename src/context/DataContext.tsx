@@ -554,6 +554,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add athlete');
+      throw new Error(err.error || 'Failed to add athlete');
     }
   };
 
@@ -570,6 +571,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update athlete');
+      throw new Error(err.error || 'Failed to update athlete');
     }
   };
 
@@ -583,6 +585,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete athlete');
+      throw new Error(err.error || 'Failed to delete athlete');
     }
   };
 
@@ -600,6 +603,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add news');
+      throw new Error(err.error || 'Failed to add news');
     }
   };
 
@@ -616,6 +620,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update news');
+      throw new Error(err.error || 'Failed to update news');
     }
   };
 
@@ -629,6 +634,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete news');
+      throw new Error(err.error || 'Failed to delete news');
     }
   };
 
@@ -644,8 +650,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCareers(prev => [created, ...prev]);
       invalidatePublicBundle();
     } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to add career');
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to add career. Your form values have been kept so you can try again.');
     }
   };
 
@@ -660,8 +666,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCareers(prev => prev.map(c => (c.id === updated.id ? updated : c)));
       invalidatePublicBundle();
     } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to update career');
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update career. Your form values have been kept so you can try again.');
     }
   };
 
@@ -675,6 +681,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete career');
+      throw new Error(err.error || 'Failed to delete career');
     }
   };
 
@@ -692,6 +699,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add sport');
+      throw new Error(err.error || 'Failed to add sport');
     }
   };
 
@@ -708,6 +716,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update sport');
+      throw new Error(err.error || 'Failed to update sport');
     }
   };
 
@@ -721,6 +730,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete sport');
+      throw new Error(err.error || 'Failed to delete sport');
     }
   };
 
@@ -738,6 +748,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add leader');
+      throw new Error(err.error || 'Failed to add leader');
     }
   };
 
@@ -754,6 +765,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update leader');
+      throw new Error(err.error || 'Failed to update leader');
     }
   };
 
@@ -767,6 +779,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete leader');
+      throw new Error(err.error || 'Failed to delete leader');
     }
   };
 
@@ -784,6 +797,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add event');
+      throw new Error(err.error || 'Failed to add event');
     }
   };
 
@@ -800,6 +814,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update event');
+      throw new Error(err.error || 'Failed to update event');
     }
   };
 
@@ -813,6 +828,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete event');
+      throw new Error(err.error || 'Failed to delete event');
     }
   };
 
@@ -830,6 +846,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add document');
+      throw new Error(err.error || 'Failed to add document');
     }
   };
 
@@ -846,6 +863,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update document');
+      throw new Error(err.error || 'Failed to update document');
     }
   };
 
@@ -859,6 +877,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete document');
+      throw new Error(err.error || 'Failed to delete document');
     }
   };
 
@@ -875,6 +894,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add policy');
+      throw new Error(err.error || 'Failed to add policy');
     }
   };
 
@@ -891,6 +911,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update policy');
+      throw new Error(err.error || 'Failed to update policy');
     }
   };
 
@@ -904,6 +925,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete policy');
+      throw new Error(err.error || 'Failed to delete policy');
     }
   };
 
@@ -921,6 +943,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add partner');
+      throw new Error(err.error || 'Failed to add partner');
     }
   };
 
@@ -937,6 +960,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update partner');
+      throw new Error(err.error || 'Failed to update partner');
     }
   };
 
@@ -950,6 +974,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete partner');
+      throw new Error(err.error || 'Failed to delete partner');
     }
   };
 
@@ -976,6 +1001,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update site content');
+      throw new Error(err.error || 'Failed to update site content');
     }
   };
 
@@ -1002,6 +1028,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update contact info');
+      throw new Error(err.error || 'Failed to update contact info');
     }
   };
 
@@ -1018,6 +1045,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add social link');
+      throw new Error(err.error || 'Failed to add social link');
     }
   };
 
@@ -1034,6 +1062,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update social link');
+      throw new Error(err.error || 'Failed to update social link');
     }
   };
 
@@ -1047,6 +1076,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete social link');
+      throw new Error(err.error || 'Failed to delete social link');
     }
   };
 
@@ -1248,13 +1278,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Messages/Volunteer/Donation Management
   const markMessageRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/contacts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the message status. Please try again.');
+        return;
+      }
       setMessages(prev => prev.map(m => (m.id === id ? { ...m, read } : m)));
+    } catch (error) {
+      console.error('Update contact message status failed:', error);
+      alert('Could not update the message status. Please check your connection and try again.');
     }
   };
 
@@ -1263,7 +1302,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/contacts/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(15000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1274,21 +1313,33 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete contact message request failed:', error);
+      // A timed-out request may still have completed on the server. Refresh before asking
+      // the admin to retry so the UI reflects the database rather than stale local state.
+      await fetchProtectedData();
       alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
-        : 'Could not delete the contact message. Please check your connection and try again.');
+        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
+        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
       return false;
     }
   };
 
   const markVolunteerRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/volunteers/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/volunteers/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the volunteer application status. Please try again.');
+        return;
+      }
       setVolunteers(prev => prev.map(v => (v.id === id ? { ...v, read } : v)));
+    } catch (error) {
+      console.error('Update volunteer application status failed:', error);
+      alert('Could not update the volunteer application status. Please check your connection and try again.');
     }
   };
 
@@ -1297,7 +1348,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/volunteers/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(15000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1308,21 +1359,31 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete volunteer application request failed:', error);
+      await fetchProtectedData();
       alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
-        : 'Could not delete the volunteer application. Please check your connection and try again.');
+        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
+        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
       return false;
     }
   };
 
   const markDonationRead = async (id: string, read: boolean) => {
-    const res = await fetch(`/api/donations/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ read }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/donations/${id}`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        alert(result.error || 'Could not update the donation inquiry status. Please try again.');
+        return;
+      }
       setDonations(prev => prev.map(d => (d.id === id ? { ...d, read } : d)));
+    } catch (error) {
+      console.error('Update donation inquiry status failed:', error);
+      alert('Could not update the donation inquiry status. Please check your connection and try again.');
     }
   };
 
@@ -1331,7 +1392,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/donations/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(15000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1342,9 +1403,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete donation inquiry request failed:', error);
+      await fetchProtectedData();
       alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
-        : 'Could not delete the donation inquiry. Please check your connection and try again.');
+        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
+        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
       return false;
     }
   };
@@ -1425,6 +1487,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add association');
+      throw new Error(err.error || 'Failed to add association');
     }
   };
 
@@ -1441,6 +1504,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update association');
+      throw new Error(err.error || 'Failed to update association');
     }
   };
 
@@ -1452,6 +1516,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete association');
+      throw new Error(err.error || 'Failed to delete association');
     }
   };
 
@@ -1469,6 +1534,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add club');
+      throw new Error(err.error || 'Failed to add club');
     }
   };
 
@@ -1485,6 +1551,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update club');
+      throw new Error(err.error || 'Failed to update club');
     }
   };
 
@@ -1496,6 +1563,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete club');
+      throw new Error(err.error || 'Failed to delete club');
     }
   };
 
@@ -1513,6 +1581,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add federation');
+      throw new Error(err.error || 'Failed to add federation');
     }
   };
 
@@ -1529,6 +1598,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update federation');
+      throw new Error(err.error || 'Failed to update federation');
     }
   };
 
@@ -1540,6 +1610,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete federation');
+      throw new Error(err.error || 'Failed to delete federation');
     }
   };
 
@@ -1557,6 +1628,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to add DPSCO contact');
+      throw new Error(err.error || 'Failed to add DPSCO contact');
     }
   };
 
@@ -1573,6 +1645,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to update DPSCO contact');
+      throw new Error(err.error || 'Failed to update DPSCO contact');
     }
   };
 
@@ -1584,6 +1657,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const err = await res.json();
       alert(err.error || 'Failed to delete DPSCO contact');
+      throw new Error(err.error || 'Failed to delete DPSCO contact');
     }
   };
 
