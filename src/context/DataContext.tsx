@@ -427,14 +427,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   } = useQuery({
     queryKey: PUBLIC_BUNDLE_QUERY_KEY,
     queryFn: async () => {
-      const res = await fetch('/api/bundle');
+      const res = await fetch('/api/bundle', { cache: 'no-store' });
       if (!res.ok) {
         throw new Error(`Failed to fetch public bundle (status ${res.status})`);
       }
       return res.json();
     },
-    // staleTime: 0 (inherited from global config) — always refetch fresh data
-    // gcTime: 24h (inherited from global config) — keep in IndexedDB
+    // Cached data renders immediately; the shared query defaults refresh it every 60 seconds.
+    // Mutations invalidate this key when public content changes.
   });
 
   const invalidatePublicBundle = useCallback(() => {
