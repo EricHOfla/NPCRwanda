@@ -46,9 +46,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.donationInquiry.delete({ where: { id } });
-    return NextResponse.json({ message: 'Deleted successfully' });
+    // Make DELETE idempotent so retrying after a client timeout is safe.
+    await prisma.donationInquiry.deleteMany({ where: { id } });
+    return NextResponse.json({ message: 'Deleted successfully' }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   }
 }
