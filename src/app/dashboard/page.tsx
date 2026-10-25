@@ -730,6 +730,18 @@ export default function DashboardPage() {
   const [jobAppSearch, setJobAppSearch] = useState('');
   const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
 
+  // Track pending deletion per submission so the correct row/button shows progress.
+  const [deletingSubmissionIds, setDeletingSubmissionIds] = useState<string[]>([]);
+  const runSubmissionDelete = async (id: string, remove: (id: string) => Promise<boolean>) => {
+    if (deletingSubmissionIds.includes(id)) return false;
+    setDeletingSubmissionIds(prev => [...prev, id]);
+    try {
+      return await remove(id);
+    } finally {
+      setDeletingSubmissionIds(prev => prev.filter(itemId => itemId !== id));
+    }
+  };
+
   // Track whether tab/page state has been restored on client mount
   const isTabInitializedRef = useRef(false);
 
@@ -5227,7 +5239,7 @@ export default function DashboardPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={async () => { await deleteVolunteerApplication(v.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                  <button onClick={async () => { await runSubmissionDelete(v.id, deleteVolunteerApplication); }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                                 </div>
                               </td>
                             </tr>
@@ -5410,7 +5422,7 @@ export default function DashboardPage() {
                     {!activeMessage.read && (
                       <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteContactMessage(activeMessage.id)) setActiveMessage(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage)) setActiveMessage(null); }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5428,7 +5440,7 @@ export default function DashboardPage() {
                     {!activeVolunteer.read && (
                       <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteVolunteerApplication(activeVolunteer.id)) setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5446,7 +5458,7 @@ export default function DashboardPage() {
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await deleteDonationInquiry(activeDonation.id)) setActiveDonation(null); }} className="btn btn-danger btn-sm">Delete</button>
+                    <button onClick={async () => { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry)) setActiveDonation(null); }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete'}</button>
                   </div>
                 </div>
               )}
@@ -5466,7 +5478,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {contacts.map(c => (
+                        {contacts.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No messages have been received yet.</td></tr> : contacts.map(c => (
                           <tr key={c.id}>
                             <td className="fw-semibold small">{c.name}</td>
                             <td className="small">{c.subject}</td>
@@ -5477,7 +5489,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await deleteContactMessage(c.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await runSubmissionDelete(c.id, deleteContactMessage); }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5502,7 +5514,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {volunteers.map(v => (
+                        {volunteers.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No volunteer applications have been received yet.</td></tr> : volunteers.map(v => (
                           <tr key={v.id}>
                             <td className="fw-semibold small">{v.name}</td>
                             <td className="small">{v.interest}</td>
@@ -5538,7 +5550,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {donations.map(d => (
+                        {donations.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No donation inquiries have been received yet.</td></tr> : donations.map(d => (
                           <tr key={d.id}>
                             <td className="fw-semibold small">{d.name}</td>
                             <td className="small">{d.category}</td>
@@ -5549,7 +5561,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await deleteDonationInquiry(d.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { await runSubmissionDelete(d.id, deleteDonationInquiry); }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
