@@ -2,6 +2,8 @@ import { prisma } from './prisma';
 
 let migrationExecuted = false;
 let migrationRunningPromise: Promise<void> | null = null;
+// Avoid querying and recalculating every event status on every public page request.
+let lastEventStatusCheckAt = 0;
 
 const MIGRATION_STATEMENTS = [
   // 1. Table creation statements (safe if already exist)
@@ -423,6 +425,12 @@ export function ensureAutoMigrated(): Promise<void> {
  * Uses a single bulk UPDATE per status bucket for efficiency.
  */
 export async function autoUpdateEventStatuses(): Promise<void> {
+  // Event dates change daily; a one-minute cooldown avoids redundant database reads
+  // when many visitors request the public bundle at the same time.
+  const now = Date.now();
+  if (now - lastEventStatusCheckAt < 60_000) return;
+  lastEventStatusCheckAt = now;
+
   try {
     const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
 
