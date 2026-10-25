@@ -1263,6 +1263,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/contacts/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1273,7 +1274,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete contact message request failed:', error);
-      alert('Could not delete the contact message. Please check your connection and try again.');
+      alert(error instanceof DOMException && error.name === 'TimeoutError'
+        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
+        : 'Could not delete the contact message. Please check your connection and try again.');
       return false;
     }
   };
@@ -1294,6 +1297,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/volunteers/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1304,7 +1308,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete volunteer application request failed:', error);
-      alert('Could not delete the volunteer application. Please check your connection and try again.');
+      alert(error instanceof DOMException && error.name === 'TimeoutError'
+        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
+        : 'Could not delete the volunteer application. Please check your connection and try again.');
       return false;
     }
   };
@@ -1325,6 +1331,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`/api/donations/${id}`, {
         method: 'DELETE',
         cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
       });
       const result = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -1335,7 +1342,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (error) {
       console.error('Delete donation inquiry request failed:', error);
-      alert('Could not delete the donation inquiry. Please check your connection and try again.');
+      alert(error instanceof DOMException && error.name === 'TimeoutError'
+        ? 'Deletion is taking too long. The server did not respond within 5 seconds. Please try again.'
+        : 'Could not delete the donation inquiry. Please check your connection and try again.');
       return false;
     }
   };
