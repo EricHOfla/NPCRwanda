@@ -644,8 +644,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCareers(prev => [created, ...prev]);
       invalidatePublicBundle();
     } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to add career');
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to add career. Your form values have been kept so you can try again.');
     }
   };
 
@@ -660,8 +660,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCareers(prev => prev.map(c => (c.id === updated.id ? updated : c)));
       invalidatePublicBundle();
     } else {
-      const err = await res.json();
-      alert(err.error || 'Failed to update career');
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update career. Your form values have been kept so you can try again.');
     }
   };
 
