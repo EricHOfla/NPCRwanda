@@ -15,6 +15,8 @@ export default function SubscribersTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionMsg, setActionMsg] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [pendingSubscriberId, setPendingSubscriberId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
 
@@ -68,7 +70,9 @@ export default function SubscribersTab() {
       const res = await fetch('/api/subscribers');
       if (!res.ok) throw new Error('Failed to load subscribers');
       const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('The subscribers endpoint returned unexpected data.');
       setSubscribers(data);
+      setError('');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error loading subscribers');
     } finally {
@@ -80,25 +84,41 @@ export default function SubscribersTab() {
 
   const handleDelete = async (id: string, email: string) => {
     if (!confirm(`Remove subscriber "${email}"?`)) return;
-    const res = await fetch(`/api/subscribers/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setActionMsg(`Removed ${email}`);
+    setPendingSubscriberId(id);
+    setActionError('');
+    setActionMsg('');
+    try {
+      const res = await fetch(`/api/subscribers/${id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Could not remove ${email} (HTTP ${res.status}).`);
       setSubscribers(prev => prev.filter(s => s.id !== id));
-      setTimeout(() => setActionMsg(''), 3000);
+      setActionMsg(`Removed ${email}`);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not remove subscriber. Check your connection and try again.');
+    } finally {
+      setPendingSubscriberId(null);
     }
   };
 
   const handleToggle = async (id: string, currentActive: boolean) => {
-    const res = await fetch(`/api/subscribers/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ active: !currentActive }),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setSubscribers(prev => prev.map(s => s.id === id ? { ...s, active: updated.active } : s));
-      setActionMsg(`Subscriber ${updated.active ? 'activated' : 'deactivated'}`);
-      setTimeout(() => setActionMsg(''), 3000);
+    setPendingSubscriberId(id);
+    setActionError('');
+    setActionMsg('');
+    try {
+      const res = await fetch(`/api/subscribers/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: !currentActive }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Could not update subscriber (HTTP ${res.status}).`);
+      if (typeof data.active !== 'boolean') throw new Error('The server returned an unexpected subscriber status.');
+      setSubscribers(prev => prev.map(s => s.id === id ? { ...s, active: data.active } : s));
+      setActionMsg(`Subscriber ${data.active ? 'activated' : 'deactivated'}`);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not update subscriber. Check your connection and try again.');
+    } finally {
+      setPendingSubscriberId(null);
     }
   };
 
@@ -242,6 +262,11 @@ export default function SubscribersTab() {
             <i className="fas fa-circle-check me-2" />{actionMsg}
           </div>
         )}
+        {actionError && (
+          <div role="alert" style={{ padding: '10px 16px', background: '#FFEBEE', border: '1px solid #FFCDD2', borderRadius: '8px', color: '#C62828', fontSize: '0.85rem', marginBottom: '16px' }}>
+            <i className="fas fa-triangle-exclamation me-2" />{actionError}
+          </div>
+        )}
         {error && (
           <div style={{ padding: '10px 16px', background: '#FFEBEE', border: '1px solid #FFCDD2', borderRadius: '8px', color: '#C62828', fontSize: '0.85rem', marginBottom: '16px' }}>
             <i className="fas fa-triangle-exclamation me-2" />{error}
@@ -273,6 +298,7 @@ export default function SubscribersTab() {
           </select>
           <button
             onClick={fetchSubscribers}
+            disabled={loading}
             style={{ background: '#F1F5F9', border: 'none', borderRadius: '8px', padding: '8px 16px', color: '#475569', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}
           >
             <i className="fas fa-rotate-right me-1" />Refresh
@@ -331,6 +357,7 @@ export default function SubscribersTab() {
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button
                           onClick={() => handleToggle(sub.id, sub.active)}
+                          disabled={pendingSubscriberId !== null}
                           title={sub.active ? 'Deactivate' : 'Activate'}
                           style={{ background: sub.active ? '#FFF3E0' : '#E8F5E9', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', color: sub.active ? '#E65100' : '#2E7D32', fontSize: '0.8rem', fontWeight: 600 }}
                         >
@@ -339,6 +366,7 @@ export default function SubscribersTab() {
                         </button>
                         <button
                           onClick={() => handleDelete(sub.id, sub.email)}
+                          disabled={pendingSubscriberId !== null}
                           title="Remove subscriber"
                           style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', color: '#C62828', fontSize: '0.8rem', fontWeight: 600 }}
                         >
