@@ -4821,7 +4821,7 @@ body.accessibility-center-text {
     line-height: 1.25;
 }
 
-@media (max-width: 1199.98px) {
+@media (max-width: 1399.98px) {
     #main-nav .navbar-collapse {
         padding-top: 0.75rem;
     }
