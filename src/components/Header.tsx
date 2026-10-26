@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Main Navbar */}
-      <nav className={`navbar navbar-expand-xxl navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
+      <nav className={`navbar navbar-expand-xl navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
         <div className="container border-0">
           <Link href="/" className="navbar-brand d-flex align-items-center" onClick={closeMobileMenu}>
             <Image
@@ -224,14 +224,14 @@ export const Header: React.FC = () => {
               </li>
             </ul>
 
-            <div className="header-desktop-cta d-none d-xxl-flex ms-lg-3">
+            <div className="header-desktop-cta d-none d-xl-flex ms-lg-3">
               <Link href="/donate" className="btn btn-donate" onClick={closeMobileMenu}>
                 <i className="fas fa-heart me-2" aria-hidden="true"></i>{t('common.donate') || 'Donate'}
               </Link>
             </div>
 
             {/* Mobile-Only Actions: keep primary actions reachable in the expanded menu */}
-            <div className="header-mobile-cta d-xxl-none pt-3 mt-2 border-top">
+            <div className="header-mobile-cta d-xl-none pt-3 mt-2 border-top">
               <div className="d-grid gap-2">
                 <Link
                   href="/volunteer"
