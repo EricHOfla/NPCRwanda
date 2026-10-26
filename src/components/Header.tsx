@@ -17,7 +17,7 @@ export const Header: React.FC = () => {
   const email = systemSettings.contactEmail || contactInfo?.email || '';
   const phone = systemSettings.contactPhone || contactInfo?.phone || '';
   const siteName = systemSettings.siteName || 'NPC Rwanda';
-  const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA';
+  const siteSubtitle = systemSettings.siteSubtitle || 'NATIONAL PARALYMPIC COMMITTEE';
   const siteLogo = systemSettings.siteLogo || '/assets/img/logo.png';
   const resolvedLogo = logoError ? '/assets/img/logo.png' : (siteLogo || '/assets/img/logo.png');
   const configuredSocialLinks = socialLinks
@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
                 {siteName}
               </span>
               {siteSubtitle && (
-                <small className="text-muted text-uppercase" style={{ fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.4px' }}>
+                <small className="text-muted text-uppercase" style={{ fontWeight: 600 }}>
                   {siteSubtitle}
                 </small>
               )}
