@@ -5548,11 +5548,11 @@ body.accessibility-center-text {
         justify-content: center !important;
         align-items: center !important;
         margin: 0 auto !important;
-        gap: 0.35rem !important;
+        gap: 0.1rem !important;
     }
 
     #main-nav .navbar-nav .nav-link {
-        padding: 0.5rem 0.55rem !important;
+        padding: 0.5rem 0.35rem !important;
         font-size: 0.9rem !important;
         white-space: nowrap !important;
     }
