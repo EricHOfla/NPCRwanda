@@ -4818,7 +4818,12 @@ body.accessibility-center-text {
 
 #main-nav .navbar-brand small {
     display: block;
+    font-size: 0.72rem !important;
     line-height: 1.25;
+    letter-spacing: 0.15px !important;
+    white-space: normal;
+    overflow-wrap: normal;
+    text-wrap: pretty;
 }
 
 @media (max-width: 1199.98px) {
@@ -4880,11 +4885,12 @@ body.accessibility-center-text {
     }
 
     #main-nav .navbar-brand small {
-        font-size: 0.68rem !important;
+        font-size: 0.7rem !important;
         line-height: 1.25;
-        letter-spacing: 0.05px !important;
+        letter-spacing: 0.1px !important;
         white-space: normal;
-        overflow-wrap: anywhere;
+        overflow-wrap: normal;
+        text-wrap: pretty;
     }
 }
 
