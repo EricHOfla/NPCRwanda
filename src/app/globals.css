@@ -5485,9 +5485,17 @@ body.accessibility-center-text {
         overflow-wrap: anywhere;
     }
 
-    #main-nav .navbar-nav {
+    #main-nav .navbar-collapse {
         flex: 1 1 auto;
         min-width: 0;
+        align-items: center;
+    }
+
+    #main-nav .navbar-nav {
+        flex: 0 1 auto;
+        min-width: 0;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 
     #main-nav .navbar-nav .nav-link {
@@ -5502,5 +5510,36 @@ body.accessibility-center-text {
 
     #main-nav .header-desktop-cta .btn-donate {
         padding: 0.55rem 0.7rem;
+    }
+}
+
+
+/* Desktop navbar alignment: brand left, primary links centered, Donate right. */
+@media (min-width: 1200px) {
+    #main-nav > .container {
+        display: flex;
+        align-items: center;
+    }
+
+    #main-nav .navbar-brand {
+        flex: 0 0 auto;
+    }
+
+    #main-nav .navbar-collapse {
+        flex: 1 1 auto;
+        min-width: 0;
+        align-items: center;
+    }
+
+    #main-nav .navbar-nav {
+        flex: 0 1 auto;
+        min-width: 0;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    #main-nav .header-desktop-cta {
+        flex: 0 0 auto;
+        margin-left: auto !important;
     }
 }
