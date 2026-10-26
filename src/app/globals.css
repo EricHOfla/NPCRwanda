@@ -4880,8 +4880,11 @@ body.accessibility-center-text {
     }
 
     #main-nav .navbar-brand small {
-        font-size: 0.55rem !important;
-        letter-spacing: 0.15px !important;
+        font-size: 0.68rem !important;
+        line-height: 1.25;
+        letter-spacing: 0.05px !important;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 }
 
