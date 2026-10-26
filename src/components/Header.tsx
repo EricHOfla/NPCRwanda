@@ -120,16 +120,15 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Navbar — 3-column: [Logo | Nav links centered | Donate] */}
+      {/* Main Navbar — 3-column layout */}
       <nav className={`navbar navbar-expand-xl navbar-light bg-white border-0${isScrolled ? ' scrolled' : ''}`} id="main-nav">
-        <div className="container border-0" style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="container border-0">
 
-          {/* LEFT: Logo + Brand — fixed, does not compress center */}
+          {/* LEFT: Logo + Organization Title & Subtitle */}
           <Link
             href="/"
             className="navbar-brand d-flex align-items-center flex-shrink-0"
             onClick={closeMobileMenu}
-            style={{ marginRight: '2rem' }}
           >
             <Image
               src={resolvedLogo}
@@ -166,23 +165,22 @@ export const Header: React.FC = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          {/* Collapsible section: CENTER links + RIGHT donate */}
+          {/* Collapsible section */}
           <div
             className={`collapse navbar-collapse ${isNavOpen ? 'show' : ''}`}
             id="navbarNav"
             onClick={handleNavContainerClick}
-            style={{ flex: 1, minWidth: 0 }}
           >
-            {/* CENTER: nav links truly centred in the remaining space */}
-            <ul className="navbar-nav mx-auto" style={{ gap: '0.15rem' }}>
+            {/* CENTER: 6 Nav Links with small spacing */}
+            <ul className="navbar-nav">
               <li className="nav-item">
-                <Link href="/" className={`nav-link px-2${isActive('/') ? ' active' : ''}`} onClick={closeMobileMenu}>
+                <Link href="/" className={`nav-link${isActive('/') ? ' active' : ''}`} onClick={closeMobileMenu}>
                   {t('nav.home')}
                 </Link>
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle px-2${isActive('/about') || isActive('/npc-background') || isActive('/governance') || isActive('/leaders') ? ' active' : ''}`} href="/about" id="aboutMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/about') || isActive('/npc-background') || isActive('/governance') || isActive('/leaders') ? ' active' : ''}`} href="/about" id="aboutMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Who We Are
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="aboutMenu">
@@ -194,7 +192,7 @@ export const Header: React.FC = () => {
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle px-2${isActive('/sports') || isActive('/athletes') ? ' active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/sports') || isActive('/athletes') ? ' active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Sports &amp; Athletes
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="sportsMembersMenu">
@@ -204,7 +202,7 @@ export const Header: React.FC = () => {
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle px-2${isActive('/partners') || isActive('/members') ? ' active' : ''}`} href="/partners" id="membersPartnersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/partners') || isActive('/members') ? ' active' : ''}`} href="/partners" id="membersPartnersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Members &amp; Partners
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="membersPartnersMenu">
@@ -216,7 +214,7 @@ export const Header: React.FC = () => {
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle px-2${isActive('/announcements') || isActive('/news') || isActive('/events') || isActive('/resources') ? ' active' : ''}`} href="/news" id="newsResourcesMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/announcements') || isActive('/news') || isActive('/events') || isActive('/resources') ? ' active' : ''}`} href="/news" id="newsResourcesMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   News &amp; Resources
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="newsResourcesMenu">
@@ -228,7 +226,7 @@ export const Header: React.FC = () => {
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle px-2${isActive('/careers') || isActive('/volunteer') || isActive('/contact') ? ' active' : ''}`} href="/contact" id="getInvolvedMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/careers') || isActive('/volunteer') || isActive('/contact') ? ' active' : ''}`} href="/contact" id="getInvolvedMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Get Involved
                 </Link>
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="getInvolvedMenu">
@@ -240,13 +238,13 @@ export const Header: React.FC = () => {
             </ul>
 
             {/* RIGHT: Donate button — desktop only */}
-            <div className="header-desktop-cta d-none d-xl-flex flex-shrink-0" style={{ marginLeft: '2rem' }}>
+            <div className="header-desktop-cta d-none d-xl-flex flex-shrink-0">
               <Link href="/donate" className="btn btn-donate" onClick={closeMobileMenu}>
                 <i className="fas fa-heart me-2" aria-hidden="true"></i>{t('common.donate') || 'Donate'}
               </Link>
             </div>
 
-            {/* Mobile-Only Actions: keep primary actions reachable in the expanded menu */}
+            {/* Mobile-Only Actions */}
             <div className="header-mobile-cta d-xl-none pt-3 mt-2 border-top">
               <div className="d-grid gap-2">
                 <Link
