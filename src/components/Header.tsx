@@ -142,12 +142,12 @@ export const Header: React.FC = () => {
               onError={() => setLogoError(true)}
               unoptimized={resolvedLogo.startsWith('data:')}
             />
-            <div className="brand-text">
-              <span className="d-block fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1rem', lineHeight: 1 }}>
+            <div className="brand-text d-flex flex-column justify-content-center">
+              <span className="fw-bold" style={{ color: 'var(--dark-blue)', fontSize: '1.05rem', lineHeight: 1.15 }}>
                 {siteName}
               </span>
               {siteSubtitle && (
-                <small className="text-muted text-uppercase" style={{ fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.04em' }}>
+                <small className="text-muted text-uppercase mt-1" style={{ fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.04em', lineHeight: 1.2 }}>
                   {siteSubtitle}
                 </small>
               )}
