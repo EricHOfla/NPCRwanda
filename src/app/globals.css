@@ -4821,7 +4821,7 @@ body.accessibility-center-text {
     line-height: 1.25;
 }
 
-@media (max-width: 1399.98px) {
+@media (max-width: 1199.98px) {
     #main-nav .navbar-collapse {
         padding-top: 0.75rem;
     }
@@ -5436,4 +5436,62 @@ body.accessibility-center-text {
   .admin-subscribers-tab td:last-child > div {
     flex-wrap: nowrap;
   }
+}
+
+
+/* Preserve the original desktop navbar design while preventing the brand subtitle
+   from colliding with navigation links at narrower desktop widths. */
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+    #main-nav > .container {
+        gap: 0.5rem;
+    }
+
+    #main-nav .navbar-brand {
+        flex: 0 1 190px;
+        max-width: 190px;
+        margin-right: 0.5rem;
+    }
+
+    #main-nav .navbar-brand img {
+        flex: 0 0 auto;
+        max-width: 48px;
+        max-height: 48px;
+    }
+
+    #main-nav .navbar-brand .brand-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 135px;
+    }
+
+    #main-nav .navbar-brand .brand-text span {
+        font-size: 1rem !important;
+    }
+
+    #main-nav .navbar-brand small {
+        font-size: 0.5rem !important;
+        line-height: 1.2;
+        letter-spacing: 0.1px !important;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    #main-nav .navbar-nav {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    #main-nav .navbar-nav .nav-link {
+        padding-right: 0.4rem;
+        padding-left: 0.4rem;
+        font-size: 0.88rem;
+    }
+
+    #main-nav .header-desktop-cta {
+        margin-left: 0.25rem !important;
+    }
+
+    #main-nav .header-desktop-cta .btn-donate {
+        padding: 0.55rem 0.7rem;
+    }
 }
