@@ -60,6 +60,14 @@ export default function SportsDevelopmentPage() {
     }
   }
 
+  const medalSummary = results.reduce((totals, item) => {
+    const medal = (item.medal || '').toLowerCase();
+    if (medal.includes('gold')) totals.gold += 1;
+    else if (medal.includes('silver')) totals.silver += 1;
+    else if (medal.includes('bronze')) totals.bronze += 1;
+    return totals;
+  }, { gold: 0, silver: 0, bronze: 0 });
+
   const field = (label: string, value: string, onChange: (v: string) => void, type = 'text', required = true) => (
     <div className="mb-3">
       <label className="form-label fw-semibold">{label}{required ? ' *' : ''}</label>
@@ -117,7 +125,7 @@ export default function SportsDevelopmentPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-4 shadow-sm p-4 mb-5">
+          <div id="event-registration" className="bg-white rounded-4 shadow-sm p-4 mb-5">
             <span className="text-primary fw-bold small text-uppercase">Join an event</span><h2 className="h4 fw-bold">Event registration enquiry</h2><p className="text-muted small">Submit your details for an upcoming event. The event team will confirm your registration.</p>
             {events.length === 0 ? <p className="text-muted mb-0">There are no events currently accepting registration. Visit the <Link href="/events">events page</Link> for updates.</p> : <form onSubmit={(e: FormEvent) => { e.preventDefault(); void submitForm('/api/event-registrations', 'registration', registration, () => setRegistration(emptyRegistration)); }}>
               <div className="row"><div className="col-md-6 mb-3"><label className="form-label fw-semibold">Event *</label><select className={inputClass} required value={registration.eventId} onChange={e => setRegistration(s => ({ ...s, eventId: e.target.value }))}><option value="">Choose an event</option>{events.map(ev => <option key={ev.id} value={ev.id}>{ev.title} — {ev.date} ({ev.location})</option>)}</select></div><div className="col-md-6">{field('Full name', registration.fullName, v => setRegistration(s => ({ ...s, fullName: v })))}</div><div className="col-md-6">{field('Email', registration.email, v => setRegistration(s => ({ ...s, email: v })), 'email')}</div><div className="col-md-6">{field('Phone', registration.phone, v => setRegistration(s => ({ ...s, phone: v })), 'tel')}</div><div className="col-md-6">{field('Organisation / club', registration.organization, v => setRegistration(s => ({ ...s, organization: v })), 'text', false)}</div><div className="col-12 mb-3"><label className="form-label fw-semibold">Accessibility requirements (optional)</label><textarea className={inputClass} rows={2} value={registration.accessibilityNeeds} onChange={e => setRegistration(s => ({ ...s, accessibilityNeeds: e.target.value }))} placeholder="Please tell us about any access or support requirements." /></div></div>
@@ -126,6 +134,7 @@ export default function SportsDevelopmentPage() {
           </div>
 
           <div className="mb-5"><div className="mb-3"><span className="text-primary fw-bold small text-uppercase">Performance</span><h2 className="h3 fw-bold mb-1">Competition results</h2><p className="text-muted mb-0">Published achievements and results from NPC Rwanda competitions.</p></div>
+            {results.length > 0 && <div className="row g-3 mb-3"><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.gold}</div><div className="small text-muted">Gold medals</div></div></div><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.silver}</div><div className="small text-muted">Silver medals</div></div></div><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.bronze}</div><div className="small text-muted">Bronze medals</div></div></div></div>}
             {results.length === 0 ? <div className="bg-white border rounded-3 p-4 text-muted">Competition results will appear here when they are published.</div> : <div className="table-responsive bg-white rounded-3 shadow-sm"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Competition</th><th>Athlete</th><th>Sport</th><th>Result</th><th>Date</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td className="fw-semibold">{r.eventTitle}</td><td>{r.athleteName}</td><td>{r.sport}</td><td>{r.medal || r.position || r.result || '—'}</td><td>{r.competitionDate}</td></tr>)}</tbody></table></div>}
           </div>
 
