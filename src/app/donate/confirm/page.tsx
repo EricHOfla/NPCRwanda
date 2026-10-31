@@ -10,6 +10,9 @@ export default function DonationConfirmationPage() {
   const [message, setMessage] = useState('We are confirming your payment with the payment provider.');
   const [amount, setAmount] = useState<number | null>(null);
   const [currency, setCurrency] = useState('RWF');
+  const [donorAmount, setDonorAmount] = useState<number | null>(null);
+  const [donorCurrency, setDonorCurrency] = useState('RWF');
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [txRef, setTxRef] = useState('');
 
   const verify = useCallback(async () => {
@@ -42,6 +45,9 @@ export default function DonationConfirmationPage() {
       const result = await response.json().catch(() => ({}));
       setAmount(typeof result.amount === 'number' ? result.amount : null);
       setCurrency(typeof result.currency === 'string' ? result.currency : 'RWF');
+      setDonorAmount(typeof result.donorAmount === 'number' ? result.donorAmount : (typeof result.amount === 'number' ? result.amount : null));
+      setDonorCurrency(typeof result.donorCurrency === 'string' ? result.donorCurrency : (typeof result.currency === 'string' ? result.currency : 'RWF'));
+      setExchangeRate(typeof result.exchangeRate === 'number' ? result.exchangeRate : null);
       if (result.status === 'SUCCESSFUL') {
         setState('SUCCESSFUL');
         setMessage('Thank you. Your donation payment has been verified and recorded successfully.');
@@ -72,7 +78,12 @@ export default function DonationConfirmationPage() {
         <p className="text-uppercase fw-bold small mb-2" style={{ letterSpacing: '.12em', color: '#17649e' }}>NPC Rwanda Donations</p>
         <h1 className="h3 fw-bold mb-3">{successful ? 'Donation confirmed' : failed ? 'Payment not confirmed' : 'Confirming your donation'}</h1>
         <p className="text-muted mb-4" role="status" aria-live="polite">{message}</p>
-        {amount !== null && successful && <p className="h5 fw-bold mb-3">{currency} {new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'en-RW').format(amount)}</p>}
+        {amount !== null && successful && (
+          <div className="mb-3">
+            <p className="h5 fw-bold mb-1">Donation: {donorCurrency} {new Intl.NumberFormat(donorCurrency === 'USD' ? 'en-US' : 'en-RW').format(donorAmount ?? amount)}</p>
+            {donorCurrency !== currency && <><p className="text-muted mb-1">Mobile-money charge: {currency} {new Intl.NumberFormat('en-RW').format(amount)}</p>{exchangeRate !== null && <small className="text-muted">Exchange rate: 1 USD = {exchangeRate.toLocaleString('en-US')} RWF</small>}</>}
+          </div>
+        )}
         {txRef && <p className="small text-muted mb-4">Reference: <span className="font-monospace">{txRef}</span></p>}
         {!successful && state !== 'FAILED' && (
           <button type="button" className="btn btn-outline-primary px-4 me-2" onClick={() => void verify()}>Check payment status</button>
