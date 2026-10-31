@@ -546,7 +546,7 @@ export default function LoginPage() {
           )}
 
           {successMsg && (
-            <div style={{
+            <div role="status" aria-live="polite" style={{
               padding: '12px 14px',
               background: '#ECFDF5',
               border: '1px solid #A7F3D0',
@@ -565,7 +565,7 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <div style={{
+            <div role="alert" aria-live="assertive" style={{
               padding: '12px 14px',
               background: '#FEF2F2',
               border: '1px solid #FECACA',
@@ -816,7 +816,7 @@ export default function LoginPage() {
             </a>
 
             <span style={{ color: '#94A3B8', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <i className="fas fa-shield-alt text-success" /> 256-Bit SSL Secured
+              <i className="fas fa-circle-check" aria-hidden="true" /> NPC Rwanda Admin Portal
             </span>
           </div>
         </div>
