@@ -1,14 +1,23 @@
-
 name: Deploy NPCRwanda
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+# Never run two deployments against the same VPS at the same time.
+concurrency:
+  group: npcrwanda-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
 
     steps:
       - name: Deploy to VPS
@@ -17,10 +26,10 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 15m
+          command_timeout: 30m
 
           script: |
-            set -e
+            set -Eeuo pipefail
 
             cd /var/www/NPCRwanda
 
@@ -28,8 +37,16 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            echo "🧹 Removing stale dependencies..."
+            rm -rf node_modules
+
             echo "📦 Installing dependencies..."
-            npm ci
+            if ! npm ci --no-audit --no-fund; then
+              echo "⚠️ Dependency installation failed. Cleaning npm cache and retrying once..."
+              rm -rf node_modules
+              npm cache clean --force
+              npm ci --no-audit --no-fund
+            fi
 
             echo "🔧 Generating Prisma Client..."
             npx prisma generate
@@ -42,12 +59,12 @@ jobs:
 
             echo "♻️ Restarting PM2..."
             pm2 restart npcrwanda
-
-            echo "💾 Saving PM2..."
             pm2 save
 
             echo "🔄 Reloading Nginx..."
             systemctl reload nginx
 
-            echo "✅ Deployment completed successfully!"
+            echo "🔎 Checking application process..."
+            pm2 describe npcrwanda
 
+            echo "✅ Deployment completed successfully!"
