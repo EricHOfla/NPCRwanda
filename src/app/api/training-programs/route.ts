@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,7 @@ const schema = z.object({
 
 export async function GET() {
   try {
+    await ensureAutoMigrated();
     const data = await prisma.trainingProgram.findMany({
       where: { status: 'Published' },
       orderBy: [{ featured: 'desc' }, { startDate: 'asc' }, { createdAt: 'desc' }],
@@ -33,6 +35,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    await ensureAutoMigrated();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
     const data = await prisma.trainingProgram.create({ data: parsed.data });
