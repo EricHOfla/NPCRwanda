@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { isPublicHostname } from '@/lib/site-domain';
 
 export default function LoginPage() {
@@ -93,8 +92,8 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to submit request');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'We could not process your request. Please try again.');
       setSuccessMsg(data.message || 'Check your email for password reset instructions.');
     } catch (err: any) {
       setError(err.message || 'An error occurred.');
@@ -120,8 +119,8 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: resetToken, newPassword }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to reset password');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'We could not reset your password. Please try again.');
       setSuccessMsg(data.message || 'Password reset successfully!');
       setTimeout(() => {
         setMode('login');
@@ -304,6 +303,14 @@ export default function LoginPage() {
           justify-content: center;
           transition: color 0.2s ease;
           border-radius: 8px;
+        }
+
+        .password-toggle-btn:focus-visible,
+        .login-submit-btn:focus-visible,
+        .login-form-panel button:focus-visible,
+        .login-form-panel a:focus-visible {
+          outline: 3px solid #FAD201;
+          outline-offset: 3px;
         }
 
         .password-toggle-btn:hover {
@@ -638,8 +645,7 @@ export default function LoginPage() {
                     className="password-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
-                  >
+                    >
                     <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
                   </button>
                 </div>
