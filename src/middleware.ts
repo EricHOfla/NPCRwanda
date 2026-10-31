@@ -78,16 +78,22 @@ export async function middleware(request: NextRequest) {
     const method = request.method;
     let requiresAuth = false;
 
+    const isAdminApiRoute = pathname.startsWith('/api/admin/');
     const isPublicFormRoute =
       pathname.startsWith('/api/contacts') ||
       pathname.startsWith('/api/volunteers') ||
       pathname.startsWith('/api/donations') ||
+      pathname.startsWith('/api/athlete-enquiries') ||
+      pathname.startsWith('/api/event-registrations') ||
+      pathname.startsWith('/api/sponsor-enquiries') ||
       pathname === '/api/subscribers';
 
     const isUnsubscribeRoute = pathname.startsWith('/api/subscribers/unsubscribe');
     const isSettingsRoute = pathname.startsWith('/api/system-settings');
 
-    if (isUnsubscribeRoute) {
+    if (isAdminApiRoute) {
+      requiresAuth = true;
+    } else if (isUnsubscribeRoute) {
       requiresAuth = false;
     } else if (isPublicFormRoute) {
       if (['GET', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
