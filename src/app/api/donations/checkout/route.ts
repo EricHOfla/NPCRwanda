@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     if (input.paymentMethod === 'mobile_money_rwanda' && input.currency === 'USD') {
       exchangeRate = Number(process.env.USD_RWF_MOBILE_MONEY_RATE);
       exchangeRateDate = process.env.USD_RWF_MOBILE_MONEY_RATE_DATE || null;
-      if (!Number.isFinite(exchangeRate) || exchangeRate <= 1 || exchangeRate >= 100000 || !exchangeRateDate || !/^\\d{4}-\\d{2}-\\d{2}$/.test(exchangeRateDate)) {
+      if (!Number.isFinite(exchangeRate) || exchangeRate <= 1 || exchangeRate >= 100000 || !exchangeRateDate || !/^\d{4}-\d{2}-\d{2}$/.test(exchangeRateDate)) {
         return NextResponse.json({ error: 'USD to RWF mobile-money conversion is not configured yet. Please choose RWF or pay by card.' }, { status: 503 });
       }
       chargedAmount = Math.ceil(input.amount * exchangeRate);
