@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
       volunteerApplications,
       jobApplications,
       donationInquiries,
+      donationPayments,
       systemSettings,
       governanceDocuments,
       governancePolicies,
@@ -111,6 +112,7 @@ export async function GET(request: NextRequest) {
       prisma.volunteerApplication.findMany(),
       prisma.jobApplication.findMany(),
       prisma.donationInquiry.findMany(),
+      prisma.donationPayment.findMany(),
       prisma.systemSetting.findMany(),
       prisma.governanceDocument.findMany(),
       prisma.governancePolicy.findMany(),
@@ -146,6 +148,7 @@ export async function GET(request: NextRequest) {
       volunteerApplications.length +
       jobApplications.length +
       donationInquiries.length +
+      donationPayments.length +
       systemSettings.length +
       governanceDocuments.length +
       governancePolicies.length +
@@ -192,6 +195,7 @@ export async function GET(request: NextRequest) {
     sql += generateTableInserts('VolunteerApplication', volunteerApplications);
     sql += generateTableInserts('JobApplication', jobApplications);
     sql += generateTableInserts('DonationInquiry', donationInquiries);
+    sql += generateTableInserts('DonationPayment', donationPayments);
     sql += generateTableInserts('SystemSetting', systemSettings);
     sql += generateTableInserts('GovernanceDocument', governanceDocuments);
     sql += generateTableInserts('GovernancePolicy', governancePolicies);
