@@ -24,9 +24,9 @@ export default function DonationConfirmationPage() {
       return;
     }
 
-    if (!reference || !transactionId) {
+    if (!reference) {
       setState('PENDING');
-      setMessage('Your payment request has been received. We are waiting for the provider confirmation. If you approved the mobile money prompt, please allow a short time for the update.');
+      setMessage('We could not find a payment reference in this return link. If you completed a payment, contact NPC Rwanda with your payment details.');
       return;
     }
 
@@ -35,7 +35,7 @@ export default function DonationConfirmationPage() {
       const response = await fetch('/api/donations/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tx_ref: reference, transaction_id: transactionId }),
+        body: JSON.stringify({ tx_ref: reference, ...(transactionId ? { transaction_id: transactionId } : {}) }),
         cache: 'no-store',
       });
       const result = await response.json().catch(() => ({}));
