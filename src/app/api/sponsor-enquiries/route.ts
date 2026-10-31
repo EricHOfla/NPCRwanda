@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
+    await ensureAutoMigrated();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
     const item = await prisma.sponsorInquiry.create({ data: parsed.data });
