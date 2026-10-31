@@ -5,9 +5,9 @@ export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const [payments, successfulTotal, successfulCount, pendingCount, failedCount] = await Promise.all([
+    const [payments, successfulTotals, successfulCount, pendingCount, failedCount] = await Promise.all([
       prisma.donationPayment.findMany({ orderBy: { createdAt: 'desc' }, take: 250 }),
-      prisma.donationPayment.aggregate({ where: { status: 'SUCCESSFUL' }, _sum: { amount: true } }),
+      prisma.donationPayment.groupBy({ by: ['currency'], where: { status: 'SUCCESSFUL' }, _sum: { amount: true } }),
       prisma.donationPayment.count({ where: { status: 'SUCCESSFUL' } }),
       prisma.donationPayment.count({ where: { status: 'PENDING' } }),
       prisma.donationPayment.count({ where: { status: 'FAILED' } }),
@@ -19,7 +19,8 @@ export async function GET() {
         providerId: payment.providerId ? payment.providerId.toString() : null,
       })),
       summary: {
-        successfulAmount: successfulTotal._sum.amount || 0,
+        successfulRwfAmount: successfulTotals.find((item) => item.currency === 'RWF')?._sum.amount || 0,
+        successfulUsdAmount: successfulTotals.find((item) => item.currency === 'USD')?._sum.amount || 0,
         successfulCount,
         pendingCount,
         failedCount,

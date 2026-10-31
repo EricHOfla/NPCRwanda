@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const payment = await prisma.donationPayment.findUnique({ where: { txRef: parsed.data.tx_ref } });
     if (!payment) return NextResponse.json({ error: 'Donation reference was not found.' }, { status: 404 });
     if (payment.status === 'SUCCESSFUL' || payment.status === 'FAILED') {
-      return NextResponse.json({ tx_ref: payment.txRef, status: payment.status, amount: payment.amount, currency: payment.currency }, { headers: { 'Cache-Control': 'no-store' } });
+      return NextResponse.json({ tx_ref: payment.txRef, status: payment.status, amount: payment.amount, currency: payment.currency, donorAmount: payment.donorAmount ?? payment.amount, donorCurrency: payment.donorCurrency ?? payment.currency, exchangeRate: payment.exchangeRate, exchangeRateDate: payment.exchangeRateDate }, { headers: { 'Cache-Control': 'no-store' } });
     }
 
     const transactionId = parsed.data.transaction_id || payment.providerId?.toString();
@@ -32,6 +32,10 @@ export async function POST(request: Request) {
       status: donation.status,
       amount: donation.amount,
       currency: donation.currency,
+      donorAmount: donation.donorAmount ?? donation.amount,
+      donorCurrency: donation.donorCurrency ?? donation.currency,
+      exchangeRate: donation.exchangeRate,
+      exchangeRateDate: donation.exchangeRateDate,
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('[Donation verify] Verification failed:', error);

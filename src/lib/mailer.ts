@@ -1115,6 +1115,9 @@ export async function sendVerifiedDonationReceipt(donation: {
   email: string;
   amount: number;
   currency: string;
+  donorAmount?: number;
+  donorCurrency?: string;
+  exchangeRate?: number | null;
   supportType: string;
   txRef: string;
 }) {
@@ -1131,6 +1134,11 @@ export async function sendVerifiedDonationReceipt(donation: {
     const purpose = escapeHtml(donation.supportType);
     const reference = escapeHtml(donation.txRef);
     const amount = new Intl.NumberFormat('en-RW').format(donation.amount);
+    const originalAmount = new Intl.NumberFormat(donation.donorCurrency === 'USD' ? 'en-US' : 'en-RW').format(donation.donorAmount ?? donation.amount);
+    const donorCurrency = donation.donorCurrency || donation.currency;
+    const conversionSummary = donorCurrency !== donation.currency
+      ? `<p style="margin:0"><strong>Donation:</strong> ${donorCurrency} ${originalAmount}</p><p style="margin:6px 0"><strong>Mobile-money charge:</strong> ${donation.currency} ${amount}</p><p style="margin:0"><strong>Exchange rate:</strong> 1 USD = ${donation.exchangeRate} RWF</p>`
+      : `<p style="margin:0"><strong>Amount:</strong> ${donation.currency} ${amount}</p>`;
     const year = new Date().getFullYear();
 
     const donorHtml = `
@@ -1143,7 +1151,7 @@ export async function sendVerifiedDonationReceipt(donation: {
           <p>Dear <strong>${name}</strong>,</p>
           <p>Your donation payment has been successfully verified. Thank you for supporting inclusive sport in Rwanda.</p>
           <div style="background:#f3f7fb;border-radius:10px;padding:18px;margin:20px 0">
-            <p style="margin:0"><strong>Amount:</strong> ${donation.currency} ${amount}</p>
+            ${conversionSummary}
             <p style="margin:6px 0"><strong>Purpose:</strong> ${purpose}</p>
             <p style="margin:0"><strong>Payment reference:</strong> ${reference}</p>
           </div>
@@ -1163,8 +1171,8 @@ export async function sendVerifiedDonationReceipt(donation: {
     await mailSetup.transporter.sendMail({
       from: mailSetup.from,
       to: mailSetup.from,
-      subject: `[Verified Donation] ${donation.currency} ${amount} - ${reference}`,
-      text: `A donation payment has been verified. Donor: ${donation.name}; Email: ${donation.email}; Amount: ${donation.currency} ${amount}; Purpose: ${donation.supportType}; Reference: ${donation.txRef}.`,
+      subject: `[Verified Donation] ${donorCurrency} ${originalAmount} - ${reference}`,
+      text: `A donation payment has been verified. Donor: ${donation.name}; Email: ${donation.email}; Donation: ${donorCurrency} ${originalAmount}; Charged: ${donation.currency} ${amount}; Exchange rate: ${donation.exchangeRate || 'N/A'}; Purpose: ${donation.supportType}; Reference: ${donation.txRef}.`,
       replyTo: donation.email,
     });
   } catch (error) {

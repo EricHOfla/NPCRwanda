@@ -9,7 +9,8 @@ const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(254),
   phone: z.string().trim().min(9).max(20),
-  amount: z.number().int().min(1000).max(100000000),
+  amount: z.number().int().min(1).max(100000000),
+  currency: z.enum(['RWF', 'USD']).default('RWF'),
   supportType: z.string().trim().min(2).max(80),
   frequency: z.enum(['One-time', 'Monthly pledge']),
   anonymous: z.boolean().default(false),
@@ -29,6 +30,25 @@ export async function POST(request: Request) {
     }
 
     const input = parsed.data;
+    if (input.amount < (input.currency === 'USD' ? 1 : 1000)) {
+      return NextResponse.json({ error: input.currency === 'USD' ? 'Minimum donation is USD 1.' : 'Minimum donation is RWF 1,000.' }, { status: 400 });
+    }
+    let exchangeRate: number | null = null;
+    let exchangeRateDate: string | null = null;
+    let chargedAmount = input.amount;
+    const chargedCurrency = input.paymentMethod === 'mobile_money_rwanda' ? 'RWF' : input.currency;
+    if (input.paymentMethod === 'mobile_money_rwanda' && input.currency === 'USD') {
+      exchangeRate = Number(process.env.USD_RWF_MOBILE_MONEY_RATE);
+      exchangeRateDate = process.env.USD_RWF_MOBILE_MONEY_RATE_DATE || null;
+      const rateAgeDays = exchangeRateDate ? Math.floor((Date.now() - Date.parse(`${exchangeRateDate}T00:00:00Z`)) / 86400000) : Number.NaN;
+      if (!Number.isFinite(exchangeRate) || exchangeRate <= 1 || exchangeRate >= 100000 || !exchangeRateDate || !/^\d{4}-\d{2}-\d{2}$/.test(exchangeRateDate) || !Number.isFinite(rateAgeDays) || rateAgeDays < 0 || rateAgeDays > 7) {
+        return NextResponse.json({ error: 'USD to RWF mobile-money conversion is not configured yet. Please choose RWF or pay by card.' }, { status: 503 });
+      }
+      chargedAmount = Math.ceil(input.amount * exchangeRate);
+    }
+    if (input.paymentMethod === 'mobile_money_rwanda' && chargedAmount < 1000) {
+      return NextResponse.json({ error: 'The converted mobile-money donation must be at least RWF 1,000.' }, { status: 400 });
+    }
     const txRef = `NPC-DON-${randomUUID()}`;
     const origin = new URL(request.url).origin;
     const callbackUrl = new URL('/donate/confirm', origin).toString();
@@ -39,8 +59,12 @@ export async function POST(request: Request) {
         name: input.name,
         email: input.email,
         phone: input.phone,
-        amount: input.amount,
-        currency: 'RWF',
+        amount: chargedAmount,
+        currency: chargedCurrency,
+        donorAmount: input.amount,
+        donorCurrency: input.currency,
+        exchangeRate,
+        exchangeRateDate,
         supportType: input.supportType,
         frequency: input.frequency,
         anonymous: input.anonymous,
@@ -52,7 +76,7 @@ export async function POST(request: Request) {
     const payload = input.paymentMethod === 'mobile_money_rwanda'
       ? {
           phone_number: input.phone,
-          amount: input.amount,
+          amount: chargedAmount,
           currency: 'RWF',
           email: input.email,
           tx_ref: txRef,
@@ -64,7 +88,7 @@ export async function POST(request: Request) {
       : {
           tx_ref: txRef,
           amount: input.amount,
-          currency: 'RWF',
+          currency: input.currency,
           redirect_url: callbackUrl,
           payment_options: 'card',
           customer: { email: input.email, name: input.name, phonenumber: input.phone },
@@ -119,8 +143,14 @@ export async function POST(request: Request) {
       txRef,
       status: 'PENDING',
       checkoutUrl,
+      donorAmount: input.amount,
+      donorCurrency: input.currency,
+      chargedAmount,
+      chargedCurrency,
+      exchangeRate,
+      exchangeRateDate,
       message: input.paymentMethod === 'mobile_money_rwanda'
-        ? 'Approve the payment request on your phone. Do not close this page until you have completed the prompt.'
+        ? `Approve the RWF ${new Intl.NumberFormat('en-RW').format(chargedAmount)} payment request on your phone.`
         : 'Continue to the secure card payment page.',
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {

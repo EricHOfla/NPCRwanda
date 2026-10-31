@@ -69,6 +69,9 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
         email: donation.email,
         amount: donation.amount,
         currency: donation.currency,
+        donorAmount: donation.donorAmount ?? donation.amount,
+        donorCurrency: donation.donorCurrency ?? donation.currency,
+        exchangeRate: donation.exchangeRate,
         supportType: donation.supportType,
         txRef: donation.txRef,
       });

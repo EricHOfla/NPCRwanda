@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const PURPOSES = [
@@ -11,10 +11,11 @@ const PURPOSES = [
   { value: 'Youth Para-sports', label: 'Youth para-sports', description: 'Create pathways for young people with disabilities.' },
 ];
 
-const money = (value: number) => new Intl.NumberFormat('en-RW', { maximumFractionDigits: 0 }).format(value);
+const money = (value: number, currency: 'RWF' | 'USD') => new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'en-RW', { maximumFractionDigits: 0 }).format(value);
 
 export default function DonatePage() {
   const [customAmount, setCustomAmount] = useState('');
+  const [currency, setCurrency] = useState<'RWF' | 'USD'>('RWF');
   const [purpose, setPurpose] = useState('General Support');
   const [paymentMethod, setPaymentMethod] = useState<'mobile_money_rwanda' | 'card'>('mobile_money_rwanda');
   const [name, setName] = useState('');
@@ -23,15 +24,40 @@ export default function DonatePage() {
   const [anonymous, setAnonymous] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [exchangeRateDate, setExchangeRateDate] = useState('');
+  const [exchangeRateError, setExchangeRateError] = useState('');
 
   const selectedAmount = Number(customAmount);
+
+  useEffect(() => {
+    if (currency !== 'USD' || paymentMethod !== 'mobile_money_rwanda') {
+      setExchangeRate(null);
+      setExchangeRateDate('');
+      setExchangeRateError('');
+      return;
+    }
+    let active = true;
+    fetch('/api/donations/exchange-rate', { cache: 'no-store' })
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Exchange rate is unavailable.');
+        if (active) { setExchangeRate(Number(result.rate)); setExchangeRateDate(String(result.rateDate || '')); }
+      })
+      .catch((err) => { if (active) { setExchangeRate(null); setExchangeRateError(err instanceof Error ? err.message : 'Exchange rate is unavailable.'); } });
+    return () => { active = false; };
+  }, [currency, paymentMethod]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
 
-    if (!Number.isSafeInteger(selectedAmount) || selectedAmount < 1000) {
-      setError('Please enter an amount of at least RWF 1,000.');
+    if (!Number.isSafeInteger(selectedAmount) || selectedAmount < (currency === 'USD' ? 1 : 1000)) {
+      setError(currency === 'USD' ? 'Please enter at least USD 1.' : 'Please enter an amount of at least RWF 1,000.');
+      return;
+    }
+    if (currency === 'USD' && paymentMethod === 'mobile_money_rwanda' && exchangeRate === null) {
+      setError('USD to RWF conversion is not available right now. Please choose card or try again later.');
       return;
     }
     if (!/^\+?[0-9\s()-]{9,20}$/.test(phone.trim())) {
@@ -49,6 +75,7 @@ export default function DonatePage() {
           email: email.trim(),
           phone: phone.trim(),
           amount: selectedAmount,
+          currency,
           supportType: purpose,
           frequency: 'One-time',
           anonymous,
@@ -116,7 +143,7 @@ export default function DonatePage() {
                     <h2>Make a donation</h2>
                     <p>Enter the amount you would like to contribute and complete your secure payment.</p>
                   </div>
-                  <span className="donation-currency">RWF</span>
+                  <span className="donation-currency">{currency}</span>
                 </div>
 
                 {error && <div className="alert alert-danger" role="alert" aria-live="assertive">{error}</div>}
@@ -124,12 +151,19 @@ export default function DonatePage() {
                 <form onSubmit={handleSubmit}>
                   <fieldset className="mb-4">
                     <legend className="donation-label">1. Enter your donation amount</legend>
+                    <label htmlFor="donationCurrency" className="form-label small fw-semibold">Donation currency</label>
+                    <select id="donationCurrency" className="form-select mb-3" value={currency} onChange={(event) => setCurrency(event.target.value as 'RWF' | 'USD')}><option value="RWF">Rwandan Franc (RWF)</option><option value="USD">US Dollar (USD)</option></select>
                     <label htmlFor="customAmount" className="form-label small fw-semibold">How much would you like to contribute?</label>
                     <div className="input-group donation-custom-amount">
-                      <span className="input-group-text">RWF</span>
-                      <input id="customAmount" type="number" min="1000" step="1" inputMode="numeric" className="form-control" placeholder="Enter any amount" value={customAmount} onChange={(event) => setCustomAmount(event.target.value)} />
+                      <span className="input-group-text">{currency}</span>
+                      <input id="customAmount" type="number" min={currency === 'USD' ? 1 : 1000} step="1" inputMode="numeric" className="form-control" placeholder="Enter any amount" value={customAmount} onChange={(event) => setCustomAmount(event.target.value)} />
                     </div>
-                    <small className="text-muted">Minimum donation: RWF 1,000.</small>
+                    <small className="text-muted d-block">Minimum donation: {currency === 'USD' ? 'USD 1' : 'RWF 1,000'}.</small>
+                    {currency === 'USD' && paymentMethod === 'mobile_money_rwanda' && (
+                      <div className="small mt-2" aria-live="polite">
+                        {exchangeRate !== null ? <span>Estimated mobile-money charge: <strong>RWF {money(Math.ceil((Number.isFinite(selectedAmount) ? selectedAmount : 0) * exchangeRate), 'RWF')}</strong> · Rate: 1 USD = {exchangeRate.toLocaleString('en-US')} RWF · Updated {exchangeRateDate}</span> : <span className="text-muted">{exchangeRateError || 'Loading the current conversion rate…'}</span>}
+                      </div>
+                    )}
                   </fieldset>
 
                   <fieldset className="mb-4">
@@ -177,7 +211,7 @@ export default function DonatePage() {
                         <label className={`donation-payment-option ${paymentMethod === 'mobile_money_rwanda' ? 'selected' : ''}`}>
                           <input type="radio" name="paymentMethod" value="mobile_money_rwanda" checked={paymentMethod === 'mobile_money_rwanda'} onChange={() => setPaymentMethod('mobile_money_rwanda')} />
                           <span className="payment-method-icon"><i className="fas fa-mobile-alt" aria-hidden="true" /></span>
-                          <span><strong>Mobile Money</strong><small>MTN MoMo & Airtel Money</small></span>
+                          <span><strong>Mobile Money</strong><small>MTN MoMo & Airtel Money · RWF charge</small></span>
                           <i className="fas fa-check-circle payment-selected-icon" aria-hidden="true" />
                         </label>
                       </div>
@@ -185,7 +219,7 @@ export default function DonatePage() {
                         <label className={`donation-payment-option ${paymentMethod === 'card' ? 'selected' : ''}`}>
                           <input type="radio" name="paymentMethod" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} />
                           <span className="payment-method-icon"><i className="far fa-credit-card" aria-hidden="true" /></span>
-                          <span><strong>Bank card</strong><small>Visa & Mastercard where enabled</small></span>
+                          <span><strong>Bank card</strong><small>Visa & Mastercard · Pay in RWF or USD</small></span>
                           <i className="fas fa-check-circle payment-selected-icon" aria-hidden="true" />
                         </label>
                       </div>
@@ -194,7 +228,7 @@ export default function DonatePage() {
 
                   <div className="donation-total-row">
                     <span>Your donation</span>
-                    <strong>RWF {money(Number.isFinite(selectedAmount) ? selectedAmount : 0)}</strong>
+                    <strong>{currency} {money(Number.isFinite(selectedAmount) ? selectedAmount : 0, currency)}</strong>
                   </div>
                   <button type="submit" className="btn donation-submit-btn w-100" disabled={loading}>
                     {loading ? <><span className="spinner-border spinner-border-sm me-2" role="status" />Connecting securely...</> : <>Continue to secure payment <i className="fas fa-arrow-right ms-2" aria-hidden="true" /></>}
