@@ -169,6 +169,33 @@ model DonationInquiry {
   @@index([read])
 }
 
+model DonationPayment {
+  id               String   @id @default(uuid())
+  txRef            String   @unique
+  name             String
+  email            String
+  phone            String
+  amount           Int
+  currency         String   @default("RWF")
+  supportType      String
+  frequency        String   @default("One-time")
+  anonymous        Boolean  @default(false)
+  paymentMethod    String
+  status           String   @default("PENDING")
+  provider         String   @default("FLUTTERWAVE")
+  providerId       BigInt?
+  providerRef      String?
+  checkoutUrl      String?
+  failureReason    String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  verifiedAt       DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}
+
 model SystemSetting {
   id        String   @id @default(uuid())
   key       String   @unique
