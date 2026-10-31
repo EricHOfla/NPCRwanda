@@ -5,13 +5,12 @@ export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const [payments, total] = await Promise.all([
+    const [payments, successfulTotal, successfulCount, pendingCount, failedCount] = await Promise.all([
       prisma.donationPayment.findMany({ orderBy: { createdAt: 'desc' }, take: 250 }),
-      prisma.donationPayment.aggregate({
-        where: { status: 'SUCCESSFUL' },
-        _sum: { amount: true },
-        _count: { _all: true },
-      }),
+      prisma.donationPayment.aggregate({ where: { status: 'SUCCESSFUL' }, _sum: { amount: true } }),
+      prisma.donationPayment.count({ where: { status: 'SUCCESSFUL' } }),
+      prisma.donationPayment.count({ where: { status: 'PENDING' } }),
+      prisma.donationPayment.count({ where: { status: 'FAILED' } }),
     ]);
 
     return NextResponse.json({
@@ -20,10 +19,10 @@ export async function GET() {
         providerId: payment.providerId ? payment.providerId.toString() : null,
       })),
       summary: {
-        successfulAmount: total._sum.amount || 0,
-        successfulCount: total._count._all,
-        pendingCount: payments.filter((payment) => payment.status === 'PENDING').length,
-        failedCount: payments.filter((payment) => payment.status === 'FAILED').length,
+        successfulAmount: successfulTotal._sum.amount || 0,
+        successfulCount,
+        pendingCount,
+        failedCount,
       },
     }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
