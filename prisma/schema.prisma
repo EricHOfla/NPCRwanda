@@ -177,6 +177,10 @@ model DonationPayment {
   phone            String
   amount           Int
   currency         String   @default("RWF")
+  donorAmount      Int?
+  donorCurrency    String?
+  exchangeRate     Float?
+  exchangeRateDate String?
   supportType      String
   frequency        String   @default("One-time")
   anonymous        Boolean  @default(false)
