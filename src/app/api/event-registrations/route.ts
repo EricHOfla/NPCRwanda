@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { autoUpdateEventStatuses, ensureAutoMigrated } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +17,7 @@ const schema = z.object({
 export async function POST(request: Request) {
   try {
     await ensureAutoMigrated();
+    await autoUpdateEventStatuses();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
     const event = await prisma.event.findUnique({ where: { id: parsed.data.eventId } });
