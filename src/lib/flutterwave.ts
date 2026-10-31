@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 
 const FLUTTERWAVE_API = 'https://api.flutterwave.com/v3';
@@ -83,5 +84,5 @@ export function isValidFlutterwaveWebhook(signature: string | null): boolean {
   if (!secretHash || !signature) return false;
   const a = Buffer.from(secretHash);
   const b = Buffer.from(signature);
-  return a.length === b.length && require('node:crypto').timingSafeEqual(a, b);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
