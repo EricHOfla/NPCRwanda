@@ -74,7 +74,7 @@ export default function CommunityManagementPage() {
   return <main className="container-fluid py-4 px-3 px-lg-4" style={{ maxWidth: 1500 }}>
     <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
       <div><Link href="/dashboard" className="small text-decoration-none"><i className="fas fa-arrow-left me-2" />Back to main dashboard</Link><h1 className="h3 fw-bold mt-2 mb-1">Sports & Community Management</h1><p className="text-muted mb-0">Manage programmes, results, gallery content and public enquiries.</p></div>
-      <button className="btn btn-outline-primary" onClick={() => void load()} disabled={loading}><i className="fas fa-rotate me-2" />Refresh data</button>
+      <div className="d-flex gap-2 flex-wrap"><Link href="/dashboard/donations" className="btn btn-primary"><i className="fas fa-hand-holding-heart me-2" />Donation payments</Link><button className="btn btn-outline-primary" onClick={() => void load()} disabled={loading}><i className="fas fa-rotate me-2" />Refresh data</button></div>
     </div>
     {error && <div className="alert alert-danger" role="alert">{error}</div>}{success && <div className="alert alert-success" role="status">{success}</div>}
     <div className="row g-3 mb-4">{(['programmes','results','gallery','athleteEnquiries','eventRegistrations','sponsorEnquiries'] as (keyof Data)[]).map(k => <div className="col-6 col-md-4 col-xl-2" key={k}><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted text-capitalize">{k.replace(/([A-Z])/g,' $1')}</div><div className="h3 fw-bold mb-0">{data[k].length}</div></div></div></div>)}</div>

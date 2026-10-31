@@ -1106,4 +1106,68 @@ export async function sendCustomNewsletter(campaign: { subject: string; contentH
     throw err;
   }
 }
+ 
+// ─────────────────────────────────────────────────────────────
+// Verified Donation Payment: Donor Receipt & Admin Notification
+// ─────────────────────────────────────────────────────────────
+export async function sendVerifiedDonationReceipt(donation: {
+  name: string;
+  email: string;
+  amount: number;
+  currency: string;
+  supportType: string;
+  txRef: string;
+}) {
+  try {
+    const mailSetup = await getTransporter();
+    if (!mailSetup) return;
 
+    const htmlEntities: Record<string, string> = {
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    };
+    const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
+    const name = escapeHtml(donation.name);
+    const email = escapeHtml(donation.email);
+    const purpose = escapeHtml(donation.supportType);
+    const reference = escapeHtml(donation.txRef);
+    const amount = new Intl.NumberFormat('en-RW').format(donation.amount);
+    const year = new Date().getFullYear();
+
+    const donorHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;color:#17243a">
+        <div style="background:#0b3158;padding:28px;color:#fff;text-align:center">
+          <h1 style="font-size:22px;margin:0;color:#f2c94c">Thank you for your generosity</h1>
+          <p style="margin:8px 0 0;color:#dce8f4">National Paralympic Committee of Rwanda</p>
+        </div>
+        <div style="padding:28px;line-height:1.7">
+          <p>Dear <strong>${name}</strong>,</p>
+          <p>Your donation payment has been successfully verified. Thank you for supporting inclusive sport in Rwanda.</p>
+          <div style="background:#f3f7fb;border-radius:10px;padding:18px;margin:20px 0">
+            <p style="margin:0"><strong>Amount:</strong> ${donation.currency} ${amount}</p>
+            <p style="margin:6px 0"><strong>Purpose:</strong> ${purpose}</p>
+            <p style="margin:0"><strong>Payment reference:</strong> ${reference}</p>
+          </div>
+          <p>Please keep this email as your payment confirmation. For any questions, contact NPC Rwanda through <a href="https://npcrwanda.org/contact">our contact page</a>.</p>
+          <p>With gratitude,<br/><strong>NPC Rwanda Team</strong></p>
+        </div>
+        <div style="background:#f1f5f9;padding:12px;text-align:center;font-size:12px;color:#64748b">© ${year} National Paralympic Committee of Rwanda · npcrwanda.org</div>
+      </div>`;
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: donation.email,
+      subject: 'Your NPC Rwanda donation payment is confirmed',
+      html: donorHtml,
+    });
+
+    await mailSetup.transporter.sendMail({
+      from: mailSetup.from,
+      to: mailSetup.from,
+      subject: `[Verified Donation] ${donation.currency} ${amount} - ${reference}`,
+      text: `A donation payment has been verified. Donor: ${donation.name}; Email: ${donation.email}; Amount: ${donation.currency} ${amount}; Purpose: ${donation.supportType}; Reference: ${donation.txRef}.`,
+      replyTo: donation.email,
+    });
+  } catch (error) {
+    console.error('[Donation] Verified payment receipt email failed:', error);
+  }
+}
