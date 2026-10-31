@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,7 @@ type ItemType = typeof types[number];
 
 export async function GET() {
   try {
+    await ensureAutoMigrated();
     const [programmes, results, gallery, athleteEnquiries, eventRegistrations, sponsorEnquiries] = await Promise.all([
       prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.competitionResult.findMany({ orderBy: { competitionDate: 'desc' } }),
@@ -33,6 +35,7 @@ const updateSchema = z.object({
 
 export async function PATCH(request: Request) {
   try {
+    await ensureAutoMigrated();
     const parsed = updateSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid update request' }, { status: 400 });
     const { type, id, status, published } = parsed.data;
@@ -68,6 +71,7 @@ export async function PATCH(request: Request) {
 const deleteSchema = z.object({ type: z.enum(types), id: z.string().min(1) });
 export async function DELETE(request: Request) {
   try {
+    await ensureAutoMigrated();
     const parsed = deleteSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid delete request' }, { status: 400 });
     const { type, id } = parsed.data;
