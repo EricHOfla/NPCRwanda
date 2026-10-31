@@ -44,7 +44,7 @@ export default function SportsDevelopmentPage() {
     return () => { active = false; };
   }, []);
 
-  async function submitForm<T extends Record<string, string>>(endpoint: string, kind: string, values: T, reset: () => void) {
+  async function submitForm<T extends object>(endpoint: string, kind: string, values: T, reset: () => void) {
     setSubmitting(kind);
     setNotice(null);
     try {
