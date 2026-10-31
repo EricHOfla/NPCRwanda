@@ -339,3 +339,111 @@ model Subscriber {
   @@index([email])
   @@index([active])
 }
+
+model TrainingProgram {
+  id          String   @id @default(uuid())
+  title       String
+  sport       String
+  description String   @db.Text
+  location    String
+  schedule    String   @default("")
+  startDate   String   @default("")
+  endDate     String   @default("")
+  eligibility String   @default("") @db.Text
+  contactEmail String  @default("")
+  status      String   @default("Draft")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([sport])
+}
+
+model CompetitionResult {
+  id              String   @id @default(uuid())
+  eventTitle      String
+  competitionDate String
+  athleteName     String
+  sport           String
+  category        String   @default("")
+  position        String   @default("")
+  medal           String   @default("")
+  result          String   @default("")
+  notes           String   @default("") @db.Text
+  published       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([published])
+  @@index([competitionDate])
+  @@index([sport])
+}
+
+model AthleteEnquiry {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  phone     String
+  district  String
+  sport     String
+  ageRange  String   @default("")
+  message   String   @db.Text
+  status    String   @default("New")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EventRegistration {
+  id                  String   @id @default(uuid())
+  eventId             String
+  eventTitle          String
+  fullName            String
+  email               String
+  phone               String
+  organization        String   @default("")
+  accessibilityNeeds String   @default("") @db.Text
+  status              String   @default("Pending")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([status])
+}
+
+model SponsorInquiry {
+  id          String   @id @default(uuid())
+  organization String
+  contactName String
+  email       String
+  phone       String   @default("")
+  supportType String
+  message     String   @db.Text
+  status      String   @default("New")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GalleryItem {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @default("") @db.Text
+  mediaUrl    String
+  mediaType   String   @default("image")
+  category    String   @default("General")
+  eventDate   String   @default("")
+  published   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([category])
+}
+

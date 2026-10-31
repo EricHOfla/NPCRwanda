@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 
@@ -416,6 +417,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [dpscoContacts, setDpscoContacts] = useState<DpscoContact[]>([]);
 
   const queryClient = useQueryClient();
+  const pathname = usePathname();
 
   // Fetch Public Data via TanStack Query with IndexedDB persistence
   const {
@@ -426,6 +428,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refetch,
   } = useQuery({
     queryKey: PUBLIC_BUNDLE_QUERY_KEY,
+    // The login screen has no public content to display; avoid a full database bundle request there.
+    enabled: pathname !== '/login',
     queryFn: async () => {
       const res = await fetch('/api/bundle', { cache: 'no-store' });
       if (!res.ok) {

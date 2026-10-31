@@ -299,6 +299,58 @@ const MIGRATION_STATEMENTS = [
   `ALTER TABLE "JobApplication" ADD COLUMN IF NOT EXISTS "read" BOOLEAN NOT NULL DEFAULT false`,
   `ALTER TABLE "Subscriber" ADD COLUMN IF NOT EXISTS "categories" TEXT[] DEFAULT ARRAY['news', 'events', 'careers', 'announcements']::TEXT[]`,
   `ALTER TABLE "Subscriber" ADD COLUMN IF NOT EXISTS "token" TEXT`,
+  `CREATE TABLE IF NOT EXISTS "TrainingProgram" (
+    "id" TEXT PRIMARY KEY, "title" TEXT NOT NULL, "sport" TEXT NOT NULL, "description" TEXT NOT NULL,
+    "location" TEXT NOT NULL, "schedule" TEXT NOT NULL DEFAULT '', "startDate" TEXT NOT NULL DEFAULT '',
+    "endDate" TEXT NOT NULL DEFAULT '', "eligibility" TEXT NOT NULL DEFAULT '', "contactEmail" TEXT NOT NULL DEFAULT '',
+    "status" TEXT NOT NULL DEFAULT 'Draft', "featured" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "TrainingProgram_status_idx" ON "TrainingProgram"("status")`,
+  `CREATE INDEX IF NOT EXISTS "TrainingProgram_sport_idx" ON "TrainingProgram"("sport")`,
+  `CREATE TABLE IF NOT EXISTS "CompetitionResult" (
+    "id" TEXT PRIMARY KEY, "eventTitle" TEXT NOT NULL, "competitionDate" TEXT NOT NULL,
+    "athleteName" TEXT NOT NULL, "sport" TEXT NOT NULL, "category" TEXT NOT NULL DEFAULT '',
+    "position" TEXT NOT NULL DEFAULT '', "medal" TEXT NOT NULL DEFAULT '', "result" TEXT NOT NULL DEFAULT '',
+    "notes" TEXT NOT NULL DEFAULT '', "published" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "CompetitionResult_published_idx" ON "CompetitionResult"("published")`,
+  `CREATE INDEX IF NOT EXISTS "CompetitionResult_competitionDate_idx" ON "CompetitionResult"("competitionDate")`,
+  `CREATE INDEX IF NOT EXISTS "CompetitionResult_sport_idx" ON "CompetitionResult"("sport")`,
+  `CREATE TABLE IF NOT EXISTS "AthleteEnquiry" (
+    "id" TEXT PRIMARY KEY, "fullName" TEXT NOT NULL, "email" TEXT NOT NULL, "phone" TEXT NOT NULL,
+    "district" TEXT NOT NULL, "sport" TEXT NOT NULL, "ageRange" TEXT NOT NULL DEFAULT '',
+    "message" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'New',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "AthleteEnquiry_status_idx" ON "AthleteEnquiry"("status")`,
+  `CREATE INDEX IF NOT EXISTS "AthleteEnquiry_createdAt_idx" ON "AthleteEnquiry"("createdAt")`,
+  `CREATE TABLE IF NOT EXISTS "EventRegistration" (
+    "id" TEXT PRIMARY KEY, "eventId" TEXT NOT NULL, "eventTitle" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL, "email" TEXT NOT NULL, "phone" TEXT NOT NULL,
+    "organization" TEXT NOT NULL DEFAULT '', "accessibilityNeeds" TEXT NOT NULL DEFAULT '',
+    "status" TEXT NOT NULL DEFAULT 'Pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "EventRegistration_eventId_idx" ON "EventRegistration"("eventId")`,
+  `CREATE INDEX IF NOT EXISTS "EventRegistration_status_idx" ON "EventRegistration"("status")`,
+  `CREATE TABLE IF NOT EXISTS "SponsorInquiry" (
+    "id" TEXT PRIMARY KEY, "organization" TEXT NOT NULL, "contactName" TEXT NOT NULL,
+    "email" TEXT NOT NULL, "phone" TEXT NOT NULL DEFAULT '', "supportType" TEXT NOT NULL,
+    "message" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'New',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "SponsorInquiry_status_idx" ON "SponsorInquiry"("status")`,
+  `CREATE INDEX IF NOT EXISTS "SponsorInquiry_createdAt_idx" ON "SponsorInquiry"("createdAt")`,
+  `CREATE TABLE IF NOT EXISTS "GalleryItem" (
+    "id" TEXT PRIMARY KEY, "title" TEXT NOT NULL, "description" TEXT NOT NULL DEFAULT '',
+    "mediaUrl" TEXT NOT NULL, "mediaType" TEXT NOT NULL DEFAULT 'image', "category" TEXT NOT NULL DEFAULT 'General',
+    "eventDate" TEXT NOT NULL DEFAULT '', "published" BOOLEAN NOT NULL DEFAULT false, "order" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS "GalleryItem_published_idx" ON "GalleryItem"("published")`,
+  `CREATE INDEX IF NOT EXISTS "GalleryItem_category_idx" ON "GalleryItem"("category")`,
 ];
 
 async function runAutoMigration(): Promise<void> {
