@@ -1122,9 +1122,10 @@ export async function sendVerifiedDonationReceipt(donation: {
     const mailSetup = await getTransporter();
     if (!mailSetup) return;
 
-    const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
+    const htmlEntities: Record<string, string> = {
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-    }[char] || char));
+    };
+    const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
     const name = escapeHtml(donation.name);
     const email = escapeHtml(donation.email);
     const purpose = escapeHtml(donation.supportType);
