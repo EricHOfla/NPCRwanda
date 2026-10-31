@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
-const AMOUNTS = [5000, 10000, 25000, 50000, 100000];
 const PURPOSES = [
   { value: 'General Support', label: 'Where it is needed most', description: 'Support NPC Rwanda programmes and priorities.' },
   { value: 'Athlete Development', label: 'Athlete development', description: 'Coaching, training and athlete welfare.' },
@@ -15,7 +14,6 @@ const PURPOSES = [
 const money = (value: number) => new Intl.NumberFormat('en-RW', { maximumFractionDigits: 0 }).format(value);
 
 export default function DonatePage() {
-  const [amount, setAmount] = useState(10000);
   const [customAmount, setCustomAmount] = useState('');
   const [purpose, setPurpose] = useState('General Support');
   const [paymentMethod, setPaymentMethod] = useState<'mobile_money_rwanda' | 'card'>('mobile_money_rwanda');
@@ -26,14 +24,14 @@ export default function DonatePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const selectedAmount = customAmount.trim() ? Number(customAmount) : amount;
+  const selectedAmount = Number(customAmount);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
 
     if (!Number.isSafeInteger(selectedAmount) || selectedAmount < 1000) {
-      setError('Please choose or enter an amount of at least RWF 1,000.');
+      setError('Please enter an amount of at least RWF 1,000.');
       return;
     }
     if (!/^\+?[0-9\s()-]{9,20}$/.test(phone.trim())) {
@@ -116,7 +114,7 @@ export default function DonatePage() {
                   <div>
                     <span className="donation-step">YOUR CONTRIBUTION</span>
                     <h2>Make a donation</h2>
-                    <p>Choose an amount and complete your secure payment.</p>
+                    <p>Enter the amount you would like to contribute and complete your secure payment.</p>
                   </div>
                   <span className="donation-currency">RWF</span>
                 </div>
@@ -125,18 +123,11 @@ export default function DonatePage() {
 
                 <form onSubmit={handleSubmit}>
                   <fieldset className="mb-4">
-                    <legend className="donation-label">1. Choose your amount</legend>
-                    <div className="donation-amount-grid">
-                      {AMOUNTS.map((value) => (
-                        <button key={value} type="button" className={`donation-amount-option ${!customAmount && amount === value ? 'selected' : ''}`} aria-pressed={!customAmount && amount === value} onClick={() => { setAmount(value); setCustomAmount(''); }}>
-                          <span>RWF</span>{money(value)}
-                        </button>
-                      ))}
-                    </div>
-                    <label htmlFor="customAmount" className="form-label small fw-semibold mt-3">Or enter a different amount</label>
+                    <legend className="donation-label">1. Enter your donation amount</legend>
+                    <label htmlFor="customAmount" className="form-label small fw-semibold">How much would you like to contribute?</label>
                     <div className="input-group donation-custom-amount">
                       <span className="input-group-text">RWF</span>
-                      <input id="customAmount" type="number" min="1000" step="1" inputMode="numeric" className="form-control" placeholder="Enter amount" value={customAmount} onChange={(event) => setCustomAmount(event.target.value)} />
+                      <input id="customAmount" type="number" min="1000" step="1" inputMode="numeric" className="form-control" placeholder="Enter any amount" value={customAmount} onChange={(event) => setCustomAmount(event.target.value)} />
                     </div>
                     <small className="text-muted">Minimum donation: RWF 1,000.</small>
                   </fieldset>
@@ -256,11 +247,7 @@ export default function DonatePage() {
         .donation-card-heading p,.donation-side-card>p{color:#69788c;margin:0}
         .donation-currency{background:#edf4fb;color:#0c5794;font-size:.8rem;font-weight:800;padding:8px 12px;border-radius:9px}
         .donation-label{font-size:1rem;font-weight:800;margin-bottom:14px;color:#17243a}
-        .donation-amount-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-        .donation-amount-option{border:1.5px solid #dce4ed;background:#fff;border-radius:12px;padding:14px 8px;font-weight:800;color:#17243a;transition:.18s}
-        .donation-amount-option span{display:block;font-size:.65rem;letter-spacing:.08em;color:#8290a1;margin-bottom:4px}
-        .donation-amount-option:hover,.donation-amount-option.selected{border-color:#0b63a5;background:#edf6ff;color:#07528c}
-        .donation-custom-amount .input-group-text{background:#f3f6fa;border-color:#dce4ed;font-weight:700}
+                .donation-custom-amount .input-group-text{background:#f3f6fa;border-color:#dce4ed;font-weight:700}
         .donation-custom-amount .form-control{border-color:#dce4ed;min-height:48px}
         .donation-purpose-list{display:grid;gap:9px}
         .donation-purpose-option{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1.5px solid #e0e6ee;border-radius:12px;cursor:pointer;transition:.18s}
@@ -303,8 +290,8 @@ export default function DonatePage() {
         .donation-help-card p{font-size:.87rem;color:#69788c;line-height:1.6}
         .donation-contact-link{font-weight:800;color:#075a96;text-decoration:none}
         .donation-payment-note{text-align:left;padding:0 8px}
-        @media(max-width:575px){.donation-hero{padding:30px 0 48px}.donation-main-section{padding:30px 0 48px}.donation-amount-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.donation-impact-card{padding:22px}.donation-form-card{border-radius:15px}.donation-card-heading h2{font-size:1.5rem}}
-        @media(prefers-reduced-motion:reduce){.donation-amount-option,.donation-purpose-option{transition:none}}
+        @media(max-width:575px){.donation-hero{padding:30px 0 48px}.donation-main-section{padding:30px 0 48px}.donation-impact-card{padding:22px}.donation-form-card{border-radius:15px}.donation-card-heading h2{font-size:1.5rem}}
+        @media(prefers-reduced-motion:reduce){.donation-purpose-option{transition:none}}
       `}</style>
     </main>
   );
