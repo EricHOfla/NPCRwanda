@@ -9,7 +9,8 @@ const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(254),
   phone: z.string().trim().min(9).max(20),
-  amount: z.number().int().min(1000).max(100000000),
+  amount: z.number().int().min(1).max(100000000),
+  currency: z.enum(['RWF', 'USD']).default('RWF'),
   supportType: z.string().trim().min(2).max(80),
   frequency: z.enum(['One-time', 'Monthly pledge']),
   anonymous: z.boolean().default(false),
@@ -29,6 +30,12 @@ export async function POST(request: Request) {
     }
 
     const input = parsed.data;
+    if (input.paymentMethod === 'mobile_money_rwanda' && input.currency !== 'RWF') {
+      return NextResponse.json({ error: 'Rwanda mobile money payments must be made in RWF. Select RWF or choose card to donate in USD.' }, { status: 400 });
+    }
+    if (input.amount < (input.currency === 'USD' ? 1 : 1000)) {
+      return NextResponse.json({ error: input.currency === 'USD' ? 'Minimum donation is USD 1.' : 'Minimum donation is RWF 1,000.' }, { status: 400 });
+    }
     const txRef = `NPC-DON-${randomUUID()}`;
     const origin = new URL(request.url).origin;
     const callbackUrl = new URL('/donate/confirm', origin).toString();
@@ -40,7 +47,7 @@ export async function POST(request: Request) {
         email: input.email,
         phone: input.phone,
         amount: input.amount,
-        currency: 'RWF',
+        currency: input.currency,
         supportType: input.supportType,
         frequency: input.frequency,
         anonymous: input.anonymous,
@@ -53,7 +60,7 @@ export async function POST(request: Request) {
       ? {
           phone_number: input.phone,
           amount: input.amount,
-          currency: 'RWF',
+          currency: input.currency,
           email: input.email,
           tx_ref: txRef,
           order_id: donation.id,
@@ -64,7 +71,7 @@ export async function POST(request: Request) {
       : {
           tx_ref: txRef,
           amount: input.amount,
-          currency: 'RWF',
+          currency: input.currency,
           redirect_url: callbackUrl,
           payment_options: 'card',
           customer: { email: input.email, name: input.name, phonenumber: input.phone },
