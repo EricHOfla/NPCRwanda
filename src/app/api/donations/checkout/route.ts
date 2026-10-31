@@ -30,11 +30,23 @@ export async function POST(request: Request) {
     }
 
     const input = parsed.data;
-    if (input.paymentMethod === 'mobile_money_rwanda' && input.currency !== 'RWF') {
-      return NextResponse.json({ error: 'Rwanda mobile money payments must be made in RWF. Select RWF or choose card to donate in USD.' }, { status: 400 });
-    }
     if (input.amount < (input.currency === 'USD' ? 1 : 1000)) {
       return NextResponse.json({ error: input.currency === 'USD' ? 'Minimum donation is USD 1.' : 'Minimum donation is RWF 1,000.' }, { status: 400 });
+    }
+    let exchangeRate: number | null = null;
+    let exchangeRateDate: string | null = null;
+    let chargedAmount = input.amount;
+    const chargedCurrency = input.paymentMethod === 'mobile_money_rwanda' ? 'RWF' : input.currency;
+    if (input.paymentMethod === 'mobile_money_rwanda' && input.currency === 'USD') {
+      exchangeRate = Number(process.env.USD_RWF_MOBILE_MONEY_RATE);
+      exchangeRateDate = process.env.USD_RWF_MOBILE_MONEY_RATE_DATE || null;
+      if (!Number.isFinite(exchangeRate) || exchangeRate <= 1 || exchangeRate >= 100000 || !exchangeRateDate || !/^\\d{4}-\\d{2}-\\d{2}$/.test(exchangeRateDate)) {
+        return NextResponse.json({ error: 'USD to RWF mobile-money conversion is not configured yet. Please choose RWF or pay by card.' }, { status: 503 });
+      }
+      chargedAmount = Math.ceil(input.amount * exchangeRate);
+    }
+    if (input.paymentMethod === 'mobile_money_rwanda' && chargedAmount < 1000) {
+      return NextResponse.json({ error: 'The converted mobile-money donation must be at least RWF 1,000.' }, { status: 400 });
     }
     const txRef = `NPC-DON-${randomUUID()}`;
     const origin = new URL(request.url).origin;
@@ -46,8 +58,12 @@ export async function POST(request: Request) {
         name: input.name,
         email: input.email,
         phone: input.phone,
-        amount: input.amount,
-        currency: input.currency,
+        amount: chargedAmount,
+        currency: chargedCurrency,
+        donorAmount: input.amount,
+        donorCurrency: input.currency,
+        exchangeRate,
+        exchangeRateDate,
         supportType: input.supportType,
         frequency: input.frequency,
         anonymous: input.anonymous,
@@ -59,8 +75,8 @@ export async function POST(request: Request) {
     const payload = input.paymentMethod === 'mobile_money_rwanda'
       ? {
           phone_number: input.phone,
-          amount: input.amount,
-          currency: input.currency,
+          amount: chargedAmount,
+          currency: 'RWF',
           email: input.email,
           tx_ref: txRef,
           order_id: donation.id,
@@ -126,8 +142,14 @@ export async function POST(request: Request) {
       txRef,
       status: 'PENDING',
       checkoutUrl,
+      donorAmount: input.amount,
+      donorCurrency: input.currency,
+      chargedAmount,
+      chargedCurrency,
+      exchangeRate,
+      exchangeRateDate,
       message: input.paymentMethod === 'mobile_money_rwanda'
-        ? 'Approve the payment request on your phone. Do not close this page until you have completed the prompt.'
+        ? `Approve the RWF ${new Intl.NumberFormat('en-RW').format(chargedAmount)} payment request on your phone.`
         : 'Continue to the secure card payment page.',
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
