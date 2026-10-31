@@ -8,13 +8,13 @@ type Payment = {
   currency: string; supportType: string; paymentMethod: string; status: string;
   anonymous: boolean; createdAt: string; providerRef?: string | null;
 };
-type Summary = { successfulAmount: number; successfulCount: number; pendingCount: number; failedCount: number };
+type Summary = { successfulRwfAmount: number; successfulUsdAmount: number; successfulCount: number; pendingCount: number; failedCount: number };
 
 const money = (value: number) => new Intl.NumberFormat('en-RW').format(value);
 
 export default function DonationPaymentsAdminPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [summary, setSummary] = useState<Summary>({ successfulAmount: 0, successfulCount: 0, pendingCount: 0, failedCount: 0 });
+  const [summary, setSummary] = useState<Summary>({ successfulRwfAmount: 0, successfulUsdAmount: 0, successfulCount: 0, pendingCount: 0, failedCount: 0 });
   const [filter, setFilter] = useState('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,7 +26,7 @@ export default function DonationPaymentsAdminPage() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Unable to load donation payments.');
       setPayments(payload.payments || []);
-      setSummary(payload.summary || { successfulAmount: 0, successfulCount: 0, pendingCount: 0, failedCount: 0 });
+      setSummary(payload.summary || { successfulRwfAmount: 0, successfulUsdAmount: 0, successfulCount: 0, pendingCount: 0, failedCount: 0 });
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to load donation payments.'); }
     finally { setLoading(false); }
   }, []);
@@ -54,7 +54,7 @@ export default function DonationPaymentsAdminPage() {
     {error && <div className="alert alert-danger" role="alert">{error}</div>}
     <div className="row g-3 mb-4">
       <div className="col-6 col-xl-3"><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted">Verified donations</div><div className="h3 fw-bold mb-0">{summary.successfulCount}</div></div></div></div>
-      <div className="col-6 col-xl-3"><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted">Total received (RWF)</div><div className="h3 fw-bold mb-0">{money(summary.successfulAmount)}</div></div></div></div>
+      <div className="col-6 col-xl-3"><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted">Total received</div><div className="h5 fw-bold mb-1">RWF {money(summary.successfulRwfAmount)}</div><div className="h6 fw-bold mb-0">USD {money(summary.successfulUsdAmount)}</div></div></div></div>
       <div className="col-6 col-xl-3"><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted">Pending</div><div className="h3 fw-bold mb-0">{summary.pendingCount}</div></div></div></div>
       <div className="col-6 col-xl-3"><div className="card border-0 shadow-sm h-100"><div className="card-body"><div className="small text-muted">Failed</div><div className="h3 fw-bold mb-0">{summary.failedCount}</div></div></div></div>
     </div>
