@@ -208,7 +208,7 @@ export default function DonatePage() {
                     <legend className="donation-label">4. Select payment method</legend>
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className={`donation-payment-option ${paymentMethod === 'mobile_money_rwanda' ? 'selected' : ''} ${currency === 'USD' ? 'disabled' : ''}`}>
+                        <label className={`donation-payment-option ${paymentMethod === 'mobile_money_rwanda' ? 'selected' : ''}`}>
                           <input type="radio" name="paymentMethod" value="mobile_money_rwanda" checked={paymentMethod === 'mobile_money_rwanda'} onChange={() => setPaymentMethod('mobile_money_rwanda')} />
                           <span className="payment-method-icon"><i className="fas fa-mobile-alt" aria-hidden="true" /></span>
                           <span><strong>Mobile Money</strong><small>MTN MoMo & Airtel Money · RWF charge</small></span>
