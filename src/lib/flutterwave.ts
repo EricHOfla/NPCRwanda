@@ -1,5 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
+import { sendVerifiedDonationReceipt } from '@/lib/mailer';
 
 const FLUTTERWAVE_API = 'https://api.flutterwave.com/v3';
 
@@ -51,8 +52,8 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
     amount >= donation.amount;
 
   if (isSuccessful) {
-    return prisma.donationPayment.update({
-      where: { id: donation.id },
+    const transition = await prisma.donationPayment.updateMany({
+      where: { id: donation.id, status: { not: 'SUCCESSFUL' } },
       data: {
         status: 'SUCCESSFUL',
         providerId: BigInt(transaction.id || transactionId),
@@ -61,6 +62,21 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
         verifiedAt: new Date(),
       },
     });
+
+    if (transition.count > 0) {
+      await sendVerifiedDonationReceipt({
+        name: donation.name,
+        email: donation.email,
+        amount: donation.amount,
+        currency: donation.currency,
+        supportType: donation.supportType,
+        txRef: donation.txRef,
+      });
+    }
+
+    const updated = await prisma.donationPayment.findUnique({ where: { id: donation.id } });
+    if (!updated) throw new Error('Donation payment record could not be reloaded.');
+    return updated;
   }
 
   if (providerStatus === 'failed' || providerStatus === 'cancelled') {
