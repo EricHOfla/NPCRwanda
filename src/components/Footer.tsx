@@ -107,6 +107,7 @@ export const Footer: React.FC = () => {
               <li className="mb-2"><Link className="footer-link" href="/leaders">Leadership</Link></li>
               <li className="mb-2"><Link className="footer-link" href="/sports">Sports</Link></li>
               <li className="mb-2"><Link className="footer-link" href="/athletes">Athletes</Link></li>
+              <li className="mb-2"><Link className="footer-link" href="/sports-development">Training &amp; Opportunities</Link></li>
             </ul>
           </div>
 
