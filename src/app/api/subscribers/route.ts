@@ -6,8 +6,11 @@ import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 export const dynamic = 'force-dynamic';
 
+let tableEnsured = false;
+
 // Auto-creates the Subscriber table if it doesn't exist yet (production safety)
 async function ensureSubscriberTable() {
+  if (tableEnsured) return;
   try {
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "Subscriber" (
@@ -24,8 +27,12 @@ async function ensureSubscriberTable() {
     await prisma.$executeRaw`
       CREATE UNIQUE INDEX IF NOT EXISTS "Subscriber_email_key" ON "Subscriber"("email")
     `;
+    await prisma.$executeRaw`
+      CREATE INDEX IF NOT EXISTS "Subscriber_createdAt_idx" ON "Subscriber"("createdAt" DESC)
+    `;
+    tableEnsured = true;
   } catch {
-    // Table may already exist — safe to ignore
+    tableEnsured = true;
   }
 }
 
@@ -38,11 +45,67 @@ export async function GET(request: NextRequest) {
 
     await ensureSubscriberTable();
 
+    const { searchParams } = new URL(request.url);
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    const search = (searchParams.get('search') || '').trim();
+    const status = searchParams.get('status') || 'all';
+
+    const whereClause: any = {};
+    if (search) {
+      whereClause.email = { contains: search, mode: 'insensitive' };
+    }
+    if (status === 'active') {
+      whereClause.active = true;
+    } else if (status === 'inactive') {
+      whereClause.active = false;
+    }
+
+    const isPaginated = pageParam !== null || limitParam !== null;
+    const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(limitParam || '20', 10) || 20));
+
+    if (isPaginated) {
+      const [items, total, totalAll, activeTotal] = await Promise.all([
+        prisma.subscriber.findMany({
+          where: whereClause,
+          take: limit,
+          skip: (page - 1) * limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.subscriber.count({ where: whereClause }),
+        prisma.subscriber.count({}),
+        prisma.subscriber.count({ where: { active: true } }),
+      ]);
+
+      return NextResponse.json({
+        data: items,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.max(1, Math.ceil(total / limit)),
+        },
+        counts: {
+          total: totalAll,
+          active: activeTotal,
+          inactive: totalAll - activeTotal,
+        },
+      }, {
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' },
+      });
+    }
+
+    // Fallback for unpaginated callers (capped at 100 for safety)
     const subscribers = await prisma.subscriber.findMany({
+      where: whereClause,
+      take: 100,
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(subscribers);
+    return NextResponse.json(subscribers, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' },
+    });
   } catch (err: unknown) {
     console.error('Error fetching subscribers:', err);
     return NextResponse.json({ error: 'Failed to fetch subscribers' }, { status: 500 });

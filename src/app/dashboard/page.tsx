@@ -730,13 +730,44 @@ export default function DashboardPage() {
   const [jobAppSearch, setJobAppSearch] = useState('');
   const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
 
+  const [inboxFeedback, setInboxFeedback] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
+
   // Track pending deletion per submission so the correct row/button shows progress.
   const [deletingSubmissionIds, setDeletingSubmissionIds] = useState<string[]>([]);
-  const runSubmissionDelete = async (id: string, remove: (id: string) => Promise<boolean>) => {
+  const runSubmissionDelete = async (
+    id: string,
+    remove: (id: string) => Promise<boolean | void>,
+    label = 'Record'
+  ): Promise<boolean> => {
     if (deletingSubmissionIds.includes(id)) return false;
     setDeletingSubmissionIds(prev => [...prev, id]);
+    setInboxFeedback(null);
     try {
-      return await remove(id);
+      const res = await remove(id);
+      const ok = res !== false;
+      if (ok) {
+        setInboxFeedback({
+          type: 'success',
+          text: `${label} deleted successfully from database!`,
+        });
+        setTimeout(() => {
+          setInboxFeedback(prev => (prev?.text.includes(label) ? null : prev));
+        }, 6000);
+        return true;
+      } else {
+        setInboxFeedback({
+          type: 'danger',
+          text: `Failed to delete ${label.toLowerCase()} from database. Please check your connection.`,
+        });
+        return false;
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Server error';
+      setInboxFeedback({
+        type: 'danger',
+        text: `Error deleting ${label.toLowerCase()}: ${errMsg}`,
+      });
+      return false;
     } finally {
       setDeletingSubmissionIds(prev => prev.filter(itemId => itemId !== id));
     }
@@ -1764,6 +1795,58 @@ export default function DashboardPage() {
 
   return (
     <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
+      {/* ── Visual In-App Toast Alert (Database Feedback) ── */}
+      {inboxFeedback && (
+        <div
+          role="alert"
+          style={{
+            position: 'fixed',
+            top: '24px',
+            right: '24px',
+            zIndex: 999999,
+            minWidth: '320px',
+            maxWidth: '500px',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.2)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            background: inboxFeedback.type === 'success' ? '#065F46' : '#991B1B',
+            border: inboxFeedback.type === 'success' ? '1px solid #10B981' : '1px solid #EF4444',
+            color: '#FFFFFF',
+            fontWeight: 600,
+            fontSize: '0.92rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '14px',
+            animation: 'fadeIn 0.2s ease-in-out',
+          }}
+        >
+          <div className="d-flex align-items-center gap-2">
+            <i
+              className={`fas ${inboxFeedback.type === 'success' ? 'fa-circle-check text-warning' : 'fa-triangle-exclamation text-warning'} fa-lg`}
+            />
+            <span style={{ lineHeight: 1.4 }}>{inboxFeedback.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setInboxFeedback(null)}
+            aria-label="Close notification"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#FFFFFF',
+              opacity: 0.85,
+              cursor: 'pointer',
+              padding: '4px',
+              fontSize: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <i className="fas fa-xmark" />
+          </button>
+        </div>
+      )}
       
       {/* ── Mobile Sidebar Backdrop ── */}
       {sidebarOpen && (
@@ -5245,7 +5328,7 @@ export default function DashboardPage() {
                       {!activeVolunteer.read && (
                         <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                       )}
-                      <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
+                      <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication, 'Volunteer application')) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
                     </div>
                   </div>
                 )}
@@ -5288,7 +5371,7 @@ export default function DashboardPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
+                                  <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                                 </div>
                               </td>
                             </tr>
@@ -5382,6 +5465,18 @@ export default function DashboardPage() {
                 )}
               </div>
 
+              {inboxFeedback && (
+                <div
+                  className={`alert ${inboxFeedback.type === 'success' ? 'alert-success' : 'alert-danger'} d-flex align-items-center justify-content-between mb-4 shadow-sm`}
+                  role="alert"
+                >
+                  <div className="d-flex align-items-center gap-2">
+                    <i className={`fas ${inboxFeedback.type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'}`} />
+                    <strong>{inboxFeedback.text}</strong>
+                  </div>
+                  <button type="button" className="btn-close" onClick={() => setInboxFeedback(null)} aria-label="Close" />
+                </div>
+              )}
               {/* Message Details Modals */}
               {activeJobApplication && (
                 <div className="custom-card p-4 mb-4" style={{ background: '#F8FAFC', border: '1px solid #CBD5E1' }}>
@@ -5460,15 +5555,17 @@ export default function DashboardPage() {
                       </button>
                     )}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         if (confirm(`Are you sure you want to delete the application from ${activeJobApplication.fullName}?`)) {
-                          deleteJobApplication(activeJobApplication.id);
-                          setActiveJobApplication(null);
+                          if (await runSubmissionDelete(activeJobApplication.id, deleteJobApplication, 'Job application')) {
+                            setActiveJobApplication(null);
+                          }
                         }
                       }}
+                      disabled={deletingSubmissionIds.includes(activeJobApplication.id)}
                       className="btn btn-danger btn-sm"
                     >
-                      <i className="fas fa-trash me-1" /> Delete Application
+                      <i className="fas fa-trash me-1" /> {deletingSubmissionIds.includes(activeJobApplication.id) ? 'Deleting…' : 'Delete Application'}
                     </button>
                   </div>
                 </div>
@@ -5485,7 +5582,7 @@ export default function DashboardPage() {
                     {!activeMessage.read && (
                       <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (confirm(`Delete contact message from ${activeMessage.name}?`)) { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage)) setActiveMessage(null); } }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete Message'}</button>
+                    <button onClick={async () => { if (confirm(`Delete contact message from ${activeMessage.name}?`)) { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage, 'Contact message')) setActiveMessage(null); } }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete Message'}</button>
                   </div>
                 </div>
               )}
@@ -5503,7 +5600,7 @@ export default function DashboardPage() {
                     {!activeVolunteer.read && (
                       <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
+                    <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication, 'Volunteer application')) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
                   </div>
                 </div>
               )}
@@ -5521,7 +5618,7 @@ export default function DashboardPage() {
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry)) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
+                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry, 'Donation inquiry')) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
                   </div>
                 </div>
               )}
@@ -5552,7 +5649,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage, 'Contact message'); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5588,7 +5685,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5624,7 +5721,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5755,11 +5852,12 @@ export default function DashboardPage() {
                                   Review
                                 </button>
                                 <button
-                                  onClick={() => {
+                                  onClick={async () => {
                                     if (confirm(`Delete application from ${a.fullName}?`)) {
-                                      deleteJobApplication(a.id);
+                                      await runSubmissionDelete(a.id, deleteJobApplication, 'Job application');
                                     }
                                   }}
+                                  disabled={deletingSubmissionIds.includes(a.id)}
                                   className="btn btn-sm btn-outline-danger py-0"
                                 >
                                   Delete
