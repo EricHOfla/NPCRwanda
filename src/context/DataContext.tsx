@@ -1449,12 +1449,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await fetch(`/api/job-applications/${id}`, {
         method: 'DELETE',
+        cache: 'no-store',
       });
+      const result = await res.json().catch(() => ({}));
       if (res.ok) {
         setJobApplications(prev => prev.filter(a => a.id !== id));
+        alert(result.message || 'Job application deleted successfully from database!');
+      } else {
+        alert(result.error || 'Failed to delete job application from database.');
       }
     } catch (err) {
       console.error('Error deleting job application:', err);
+      alert('Network error: Failed to delete job application from database.');
     }
   };
 

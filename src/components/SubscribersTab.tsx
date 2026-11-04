@@ -113,7 +113,7 @@ export default function SubscribersTab() {
   useEffect(() => { fetchSubscribers(); }, [fetchSubscribers]);
 
   const handleDelete = async (id: string, email: string) => {
-    if (!confirm(`Remove subscriber "${email}"?`)) return;
+    if (!confirm(`Delete subscriber "${email}" from database?`)) return;
     setPendingSubscriberId(id);
     setActionError('');
     setActionMsg('');
@@ -122,9 +122,13 @@ export default function SubscribersTab() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `Could not remove ${email} (HTTP ${res.status}).`);
       setSubscribers(prev => prev.filter(s => s.id !== id));
-      setActionMsg(`Removed ${email}`);
+      const successMsg = data.message || `Subscriber "${email}" deleted successfully from database!`;
+      setActionMsg(successMsg);
+      alert(successMsg);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Could not remove subscriber. Check your connection and try again.');
+      const errMsg = err instanceof Error ? err.message : 'Could not remove subscriber. Check your connection and try again.';
+      setActionError(errMsg);
+      alert(`Failed to delete subscriber from database: ${errMsg}`);
     } finally {
       setPendingSubscriberId(null);
     }

@@ -68,13 +68,17 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    await prisma.jobApplication.delete({
+    const deleted = await prisma.jobApplication.deleteMany({
       where: { id },
     });
 
-    return NextResponse.json({ success: true, message: 'Application deleted successfully' });
+    return NextResponse.json({
+      success: true,
+      count: deleted.count,
+      message: 'Job application deleted successfully from database',
+    });
   } catch (error: any) {
     console.error('Error deleting job application:', error);
-    return NextResponse.json({ error: 'Failed to delete application' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete job application from database' }, { status: 500 });
   }
 }

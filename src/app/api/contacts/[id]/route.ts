@@ -65,22 +65,24 @@ export async function PUT(
   }
 }
 
-// DELETE: Remove a contact message
+// DELETE: Remove a contact message from database
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    // Make DELETE idempotent: retries after a client timeout should not turn an
-    // already-completed deletion into a misleading failure.
-    await prisma.contactMessage.deleteMany({ where: { id } });
+    const deleted = await prisma.contactMessage.deleteMany({ where: { id } });
 
-    return NextResponse.json({ message: 'Message deleted successfully' }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
+    return NextResponse.json({
+      success: true,
+      count: deleted.count,
+      message: 'Contact message deleted successfully from database',
+    }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
     console.error('Delete message error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete message' },
+      { error: 'Failed to delete message from database' },
       { status: 500 }
     );
   }

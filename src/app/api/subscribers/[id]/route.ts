@@ -15,14 +15,18 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     const { id } = await context.params;
     // Idempotent deletion so retrying does not throw Prisma P2025 error
-    await prisma.subscriber.deleteMany({
+    const deleted = await prisma.subscriber.deleteMany({
       where: { id },
     });
 
-    return NextResponse.json({ success: true, message: 'Subscriber removed' }, { headers: NO_STORE });
+    return NextResponse.json({
+      success: true,
+      count: deleted.count,
+      message: 'Subscriber deleted successfully from database',
+    }, { headers: NO_STORE });
   } catch (err: any) {
     console.error('Delete subscriber error:', err);
-    return NextResponse.json({ error: 'Failed to delete subscriber' }, { status: 500, headers: NO_STORE });
+    return NextResponse.json({ error: 'Failed to delete subscriber from database' }, { status: 500, headers: NO_STORE });
   }
 }
 
