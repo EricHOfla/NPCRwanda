@@ -30,12 +30,13 @@ export async function PUT(
     const result = updateSchema.safeParse(body);
     if (!result.success) return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
 
-    const updated = await prisma.donationInquiry.update({
+    const updated = await prisma.donationInquiry.updateMany({
       where: { id },
       data: { read: result.data.read },
     });
-    return NextResponse.json(updated);
+    return NextResponse.json({ success: true, count: updated.count });
   } catch (error) {
+    console.error('Update donation inquiry error:', error);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
@@ -53,6 +54,7 @@ export async function DELETE(
       message: 'Donation inquiry deleted successfully from database',
     }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
+    console.error('Delete donation inquiry error:', error);
     return NextResponse.json({ error: 'Failed to delete donation inquiry from database' }, { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   }
 }

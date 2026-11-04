@@ -30,12 +30,13 @@ export async function PUT(
     const result = updateSchema.safeParse(body);
     if (!result.success) return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
 
-    const updated = await prisma.volunteerApplication.update({
+    const updated = await prisma.volunteerApplication.updateMany({
       where: { id },
       data: { read: result.data.read },
     });
-    return NextResponse.json(updated);
+    return NextResponse.json({ success: true, count: updated.count });
   } catch (error) {
+    console.error('Update volunteer application error:', error);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
@@ -53,6 +54,7 @@ export async function DELETE(
       message: 'Volunteer application deleted successfully from database',
     }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (error) {
+    console.error('Delete volunteer application error:', error);
     return NextResponse.json({ error: 'Failed to delete volunteer application from database' }, { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   }
 }

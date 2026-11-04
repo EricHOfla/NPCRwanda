@@ -48,14 +48,14 @@ export async function PUT(
       );
     }
 
-    const updatedMessage = await prisma.contactMessage.update({
+    const updated = await prisma.contactMessage.updateMany({
       where: { id },
       data: {
         read: result.data.read,
       },
     });
 
-    return NextResponse.json(updatedMessage);
+    return NextResponse.json({ success: true, count: updated.count });
   } catch (error) {
     console.error('Update contact message error:', error);
     return NextResponse.json(

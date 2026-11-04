@@ -1289,15 +1289,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read }),
       });
-      if (!res.ok) {
-        const result = await res.json().catch(() => ({}));
-        alert(result.error || 'Could not update the message status. Please try again.');
-        return;
+      if (res.ok) {
+        setMessages(prev => prev.map(m => (m.id === id ? { ...m, read } : m)));
       }
-      setMessages(prev => prev.map(m => (m.id === id ? { ...m, read } : m)));
     } catch (error) {
-      console.error('Update contact message status failed:', error);
-      alert('Could not update the message status. Please check your connection and try again.');
+      console.warn('Update contact message read status failed:', error);
     }
   };
 
@@ -1314,15 +1310,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       setMessages(prev => prev.filter(m => m.id !== id));
+      alert(result.message || 'Contact message deleted successfully from database!');
       return true;
     } catch (error) {
       console.error('Delete contact message request failed:', error);
-      // A timed-out request may still have completed on the server. Refresh before asking
-      // the admin to retry so the UI reflects the database rather than stale local state.
       await fetchProtectedData();
-      alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
-        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
+      alert('Network error: Could not confirm deletion from database.');
       return false;
     }
   };
@@ -1335,15 +1328,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read }),
       });
-      if (!res.ok) {
-        const result = await res.json().catch(() => ({}));
-        alert(result.error || 'Could not update the volunteer application status. Please try again.');
-        return;
+      if (res.ok) {
+        setVolunteers(prev => prev.map(v => (v.id === id ? { ...v, read } : v)));
       }
-      setVolunteers(prev => prev.map(v => (v.id === id ? { ...v, read } : v)));
     } catch (error) {
-      console.error('Update volunteer application status failed:', error);
-      alert('Could not update the volunteer application status. Please check your connection and try again.');
+      console.warn('Update volunteer application read status failed:', error);
     }
   };
 
@@ -1360,13 +1349,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       setVolunteers(prev => prev.filter(v => v.id !== id));
+      alert(result.message || 'Volunteer application deleted successfully from database!');
       return true;
     } catch (error) {
       console.error('Delete volunteer application request failed:', error);
       await fetchProtectedData();
-      alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
-        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
+      alert('Network error: Could not confirm deletion from database.');
       return false;
     }
   };
@@ -1379,15 +1367,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read }),
       });
-      if (!res.ok) {
-        const result = await res.json().catch(() => ({}));
-        alert(result.error || 'Could not update the donation inquiry status. Please try again.');
-        return;
+      if (res.ok) {
+        setDonations(prev => prev.map(d => (d.id === id ? { ...d, read } : d)));
       }
-      setDonations(prev => prev.map(d => (d.id === id ? { ...d, read } : d)));
     } catch (error) {
-      console.error('Update donation inquiry status failed:', error);
-      alert('Could not update the donation inquiry status. Please check your connection and try again.');
+      console.warn('Update donation inquiry read status failed:', error);
     }
   };
 
@@ -1404,13 +1388,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       setDonations(prev => prev.filter(d => d.id !== id));
+      alert(result.message || 'Donation inquiry deleted successfully from database!');
       return true;
     } catch (error) {
       console.error('Delete donation inquiry request failed:', error);
       await fetchProtectedData();
-      alert(error instanceof DOMException && error.name === 'TimeoutError'
-        ? 'The deletion request timed out. The list has been refreshed to check whether it completed.'
-        : 'Could not confirm deletion. The list has been refreshed; please check the record before retrying.');
+      alert('Network error: Could not confirm deletion from database.');
       return false;
     }
   };
