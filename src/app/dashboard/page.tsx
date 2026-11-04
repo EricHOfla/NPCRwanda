@@ -1792,6 +1792,8 @@ export default function DashboardPage() {
             // Section: Management (Admin and above only)
             ...(isAdmin ? [
               { type: 'header', label: 'MANAGEMENT' } as const,
+              { id: 'community-sports', type: 'link', href: '/dashboard/community', label: 'Sports & Community', icon: 'fa-people-group' } as const,
+              { id: 'donations-payments', type: 'link', href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' } as const,
               { id: 'members', type: 'tab', tabId: 'members', label: 'Members Directory', icon: 'fa-users-cog' } as const,
               { id: 'users', type: 'tab', tabId: 'users', label: 'User Management', icon: 'fa-user-shield' } as const,
               { id: 'contacts', type: 'tab', tabId: 'contacts', label: 'Inbox Messages', icon: 'fa-envelope' } as const,
@@ -1823,7 +1825,9 @@ export default function DashboardPage() {
               );
             }
 
-            const isActive = item.type === 'tab'
+            const isActive = item.type === 'link'
+              ? false
+              : item.type === 'tab'
               ? adminTab === item.tabId
               : (adminTab === 'pages' && (activeEditPage || 'home') === item.pageId);
 
@@ -1831,6 +1835,10 @@ export default function DashboardPage() {
               <button
                 key={item.id}
                 onClick={() => {
+                  if (item.type === 'link' && item.href) {
+                    router.push(item.href);
+                    return;
+                  }
                   setAdminTab(item.tabId as AdminTab);
                   if (item.type === 'page') {
                     setActiveEditPage(item.pageId || 'home');
