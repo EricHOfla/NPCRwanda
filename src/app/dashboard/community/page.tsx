@@ -14,6 +14,8 @@ export default function CommunityManagementPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState<'programmes' | 'results' | 'gallery' | 'enquiries'>('programmes');
+  const [tablePages, setTablePages] = useState<Record<string, number>>({});
+  const pageSize = 10;
 
   // Form states
   const [programme, setProgramme] = useState({ title: '', sport: '', description: '', location: '', schedule: '', startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false });
@@ -67,93 +69,132 @@ export default function CommunityManagementPage() {
     finally { setBusy(''); }
   }
 
-  const renderTable = (title: string, type: keyof Data, columns: { label: string; key: string }[], statusOptions?: string[]) => (
+  const renderTable = (title: string, type: keyof Data, columns: { label: string; key: string }[], statusOptions?: string[]) => {
+    const list = data[type] || [];
+    const currentPage = tablePages[type] || 1;
+    const total = list.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const paginated = list.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    return (
     <div style={{ background: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', overflow: 'hidden', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }} key={type}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid #F1F5F9' }} className="d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center gap-2">
           <h2 style={{ fontSize: '0.96rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>{title}</h2>
           <span className="badge rounded-pill bg-light text-secondary border px-2 py-1" style={{ fontSize: '0.72rem' }}>
-            {data[type].length} records
+            {total} records
           </span>
         </div>
       </div>
-      {data[type].length === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-5 text-muted" style={{ fontSize: '0.86rem' }}>
           <i className="far fa-folder-open fa-2x mb-2 d-block text-secondary opacity-50" />
           No entries recorded yet.
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.86rem' }}>
-            <thead style={{ background: '#F8FAFC', color: '#475569', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              <tr>
-                {columns.map(c => <th key={c.key} style={{ padding: '12px 18px' }}>{c.label}</th>)}
-                <th>Status / Visibility</th>
-                <th className="text-end" style={{ paddingRight: '18px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data[type].map(item => (
-                <tr key={item.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                  {columns.map(c => (
-                    <td key={c.key} style={{ minWidth: 140, padding: '12px 18px' }}>
-                      <span className="text-dark fw-medium">{String(item[c.key] ?? '—').slice(0, 120)}</span>
-                    </td>
-                  ))}
-                  <td style={{ minWidth: 150 }}>
-                    {type === 'programmes' ? (
-                      <select 
-                        className="form-select form-select-sm" 
-                        value={item.status} 
-                        disabled={busy === item.id} 
-                        onChange={e => void update(type, item, { status: e.target.value })}
-                        style={{ fontSize: '0.78rem', borderRadius: '6px' }}
-                      >
-                        <option>Draft</option>
-                        <option>Published</option>
-                        <option>Archived</option>
-                      </select>
-                    ) : ['results', 'gallery'].includes(type) ? (
-                      <button 
-                        className={`btn btn-sm ${item.published ? 'btn-success-subtle text-success border border-success-subtle' : 'btn-light border text-muted'}`} 
-                        disabled={busy === item.id} 
-                        onClick={() => void update(type, item, { published: !item.published })}
-                        style={{ fontSize: '0.74rem', fontWeight: 600, borderRadius: '20px', padding: '3px 12px' }}
-                      >
-                        <i className={`fas ${item.published ? 'fa-check' : 'fa-eye-slash'} me-1`} />
-                        {item.published ? 'Published' : 'Hidden'}
-                      </button>
-                    ) : (
-                      <select 
-                        className="form-select form-select-sm" 
-                        value={item.status} 
-                        disabled={busy === item.id} 
-                        onChange={e => void update(type, item, { status: e.target.value })}
-                        style={{ fontSize: '0.78rem', borderRadius: '6px' }}
-                      >
-                        {(statusOptions || ['New', 'Contacted', 'Closed']).map(s => <option key={s}>{s}</option>)}
-                      </select>
-                    )}
-                  </td>
-                  <td className="text-end" style={{ paddingRight: '18px' }}>
-                    <button 
-                      className="btn btn-sm btn-outline-danger" 
-                      disabled={busy === item.id} 
-                      onClick={() => void remove(type, item)} 
-                      aria-label="Delete record"
-                      style={{ fontSize: '0.74rem', borderRadius: '6px', padding: '3px 10px' }}
-                    >
-                      <i className="fas fa-trash me-1" /> Delete
-                    </button>
-                  </td>
+        <>
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.86rem' }}>
+              <thead style={{ background: '#F8FAFC', color: '#475569', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <tr>
+                  {columns.map(c => <th key={c.key} style={{ padding: '12px 18px' }}>{c.label}</th>)}
+                  <th>Status / Visibility</th>
+                  <th className="text-end" style={{ paddingRight: '18px' }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {paginated.map(item => (
+                  <tr key={item.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    {columns.map(c => (
+                      <td key={c.key} style={{ minWidth: 140, padding: '12px 18px' }}>
+                        <span className="text-dark fw-medium">{String(item[c.key] ?? '—').slice(0, 120)}</span>
+                      </td>
+                    ))}
+                    <td style={{ minWidth: 150 }}>
+                      {type === 'programmes' ? (
+                        <select 
+                          className="form-select form-select-sm" 
+                          value={item.status} 
+                          disabled={busy === item.id} 
+                          onChange={e => void update(type, item, { status: e.target.value })}
+                          style={{ fontSize: '0.78rem', borderRadius: '6px' }}
+                        >
+                          <option>Draft</option>
+                          <option>Published</option>
+                          <option>Archived</option>
+                        </select>
+                      ) : ['results', 'gallery'].includes(type) ? (
+                        <button 
+                          className={`btn btn-sm ${item.published ? 'btn-success-subtle text-success border border-success-subtle' : 'btn-light border text-muted'}`} 
+                          disabled={busy === item.id} 
+                          onClick={() => void update(type, item, { published: !item.published })}
+                          style={{ fontSize: '0.74rem', fontWeight: 600, borderRadius: '20px', padding: '3px 12px' }}
+                        >
+                          <i className={`fas ${item.published ? 'fa-check' : 'fa-eye-slash'} me-1`} />
+                          {item.published ? 'Published' : 'Hidden'}
+                        </button>
+                      ) : (
+                        <select 
+                          className="form-select form-select-sm" 
+                          value={item.status} 
+                          disabled={busy === item.id} 
+                          onChange={e => void update(type, item, { status: e.target.value })}
+                          style={{ fontSize: '0.78rem', borderRadius: '6px' }}
+                        >
+                          {(statusOptions || ['New', 'Contacted', 'Closed']).map(s => <option key={s}>{s}</option>)}
+                        </select>
+                      )}
+                    </td>
+                    <td className="text-end" style={{ paddingRight: '18px' }}>
+                      <button 
+                        className="btn btn-sm btn-outline-danger p-1 px-2" 
+                        disabled={busy === item.id} 
+                        onClick={() => void remove(type, item)} 
+                        title="Delete record"
+                        aria-label="Delete record"
+                      >
+                        <i className="fas fa-trash" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 px-3 py-2 border-top bg-light">
+              <span className="small text-muted" style={{ fontSize: '0.78rem' }}>
+                Showing <strong>{(currentPage - 1) * pageSize + 1}</strong> to <strong>{Math.min(currentPage * pageSize, total)}</strong> of <strong>{total}</strong>
+              </span>
+              <nav>
+                <ul className="pagination pagination-sm mb-0 gap-1">
+                  <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={() => setTablePages(prev => ({ ...prev, [type]: Math.max(1, currentPage - 1) }))} disabled={currentPage <= 1}>
+                      <i className="fas fa-chevron-left" />
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <li key={p} className={`page-item ${p === currentPage ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setTablePages(prev => ({ ...prev, [type]: p }))}>
+                        {p}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                    <button className="page-link" onClick={() => setTablePages(prev => ({ ...prev, [type]: Math.min(totalPages, currentPage + 1) }))} disabled={currentPage >= totalPages}>
+                      <i className="fas fa-chevron-right" />
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          )}
+        </>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <div style={{ background: '#F8FAFC', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

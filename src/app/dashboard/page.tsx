@@ -924,17 +924,26 @@ export default function DashboardPage() {
   }, []);
   const [pageSizes] = useState({ 
     athletes: 10, 
-    news: 8, 
+    news: 10, 
     events: 10, 
-    careers: 12, 
-    contacts: 15,
-    sports: 12,
+    careers: 10, 
+    contacts: 10,
+    sports: 10,
     leaders: 10,
-    partners: 12,
-    media: 20,
-    donations: 15,
-    volunteers: 15,
-    applications: 15
+    partners: 10,
+    media: 10,
+    donations: 10,
+    volunteers: 10,
+    applications: 10,
+    announcements: 10,
+    socialLinks: 10,
+    govDocs: 10,
+    govPolicies: 10,
+    associations: 10,
+    clubs: 10,
+    federations: 10,
+    dpsco: 10,
+    users: 10
   });
   const [currentPage, setCurrentPage] = useState({ 
     athletes: 1, 
@@ -948,7 +957,16 @@ export default function DashboardPage() {
     media: 1,
     donations: 1,
     volunteers: 1,
-    applications: 1
+    applications: 1,
+    announcements: 1,
+    socialLinks: 1,
+    govDocs: 1,
+    govPolicies: 1,
+    associations: 1,
+    clubs: 1,
+    federations: 1,
+    dpsco: 1,
+    users: 1
   });
 
   // System Settings state
@@ -3991,8 +4009,8 @@ export default function DashboardPage() {
                                   <td className="small text-muted">{l.committee}</td>
                                   <td>
                                     <div className="d-flex gap-2">
-                                      <button onClick={() => handleEditLeaderClick(l)} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => { if (confirm(`Delete leader ${l.name}?`)) deleteLeader(l.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => handleEditLeaderClick(l)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit leader"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete leader ${l.name}?`)) deleteLeader(l.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete leader"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4114,8 +4132,8 @@ export default function DashboardPage() {
                                         setAthleteForm({ name: a.name, sport: a.sport, status: a.status, country: a.country, avatar: a.avatar, desc: a.desc, achievements: a.achievements || '' });
                                         setEditingAthleteId(a.id);
                                         setAthleteFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => { if (confirm(`Delete athlete ${a.name}?`)) deleteAthlete(a.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit athlete"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete athlete ${a.name}?`)) deleteAthlete(a.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete athlete"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4218,8 +4236,8 @@ export default function DashboardPage() {
                                         setSportForm({ slug: s.slug, title: s.title, img: s.img, desc: s.desc });
                                         setEditingSportId(s.id);
                                         setSportFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => { if (confirm(`Delete sport ${s.title}?`)) deleteSport(s.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit sport"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete sport ${s.title}?`)) deleteSport(s.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete sport"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4351,8 +4369,8 @@ export default function DashboardPage() {
                                         setNewsForm({ title: n.title, date: n.date, category: n.category, status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
                                         setEditingNewsId(n.id);
                                         setNewsFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => { if (confirm(`Delete article "${n.title}"?`)) deleteNews(n.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit article"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete article "${n.title}"?`)) deleteNews(n.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete article"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4462,33 +4480,50 @@ export default function DashboardPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {news.filter(n => isAnnouncementCategory(n.category)).map(n => (
-                                <tr key={n.id}>
-                                  <td className="fw-semibold small">{n.title}</td>
-                                  <td>
-                                    <span className="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle text-uppercase" style={{ fontSize: '0.68rem', letterSpacing: '0.4px' }}>
-                                      {n.category || 'Announcement'}
-                                    </span>
-                                  </td>
-                                  <td className="small text-muted">{n.date}</td>
-                                  <td>
-                                    <span className={`badge ${n.status === 'Published' ? 'bg-success' : 'bg-warning'}`}>{n.status}</span>
-                                  </td>
-                                  <td>
-                                    <div className="d-flex gap-2">
-                                      <button onClick={() => {
-                                        setNewsForm({ title: n.title, date: n.date, category: n.category || 'Announcement', status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
-                                        setEditingNewsId(n.id);
-                                        setNewsFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteNews(n.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
+                              {(() => {
+                                const list = news.filter(n => isAnnouncementCategory(n.category));
+                                if (list.length === 0) {
+                                  return (
+                                    <tr>
+                                      <td colSpan={5} className="text-center text-muted py-4">No announcements published yet.</td>
+                                    </tr>
+                                  );
+                                }
+                                return paginate(list, currentPage.announcements, pageSizes.announcements).map(n => (
+                                  <tr key={n.id}>
+                                    <td className="fw-semibold small">{n.title}</td>
+                                    <td>
+                                      <span className="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle text-uppercase" style={{ fontSize: '0.68rem', letterSpacing: '0.4px' }}>
+                                        {n.category || 'Announcement'}
+                                      </span>
+                                    </td>
+                                    <td className="small text-muted">{n.date}</td>
+                                    <td>
+                                      <span className={`badge ${n.status === 'Published' ? 'bg-success' : 'bg-warning'}`}>{n.status}</span>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex gap-2">
+                                        <button onClick={() => {
+                                          setNewsForm({ title: n.title, date: n.date, category: n.category || 'Announcement', status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
+                                          setEditingNewsId(n.id);
+                                          setNewsFormOpen(true);
+                                        }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit announcement"><i className="fas fa-pen" /></button>
+                                        <button onClick={() => deleteNews(n.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete announcement"><i className="fas fa-trash" /></button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ));
+                              })()}
                             </tbody>
                           </table>
                         </div>
+                        {news.filter(n => isAnnouncementCategory(n.category)).length > 0 && (
+                          <PaginationComponent 
+                            currentPage={currentPage.announcements} 
+                            totalPages={totalPages(news.filter(n => isAnnouncementCategory(n.category)).length, pageSizes.announcements)}
+                            onPageChange={(page) => setCurrentPage({ ...currentPage, announcements: page })}
+                          />
+                        )}
                       </div>
                     </div>
                   )}
@@ -4621,8 +4656,8 @@ export default function DashboardPage() {
                                         setEventForm({ title: e.title, description: e.description, date: e.date, endDate: e.endDate, location: e.location, category: e.category, status: e.status, img: e.img, featured: e.featured, resultsSummary: e.resultsSummary || '', results: e.results || '' });
                                         setEditingEventId(e.id);
                                         setEventFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => { if (confirm(`Delete event "${e.title}"?`)) deleteEvent(e.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit event"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete event "${e.title}"?`)) deleteEvent(e.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete event"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4776,12 +4811,12 @@ export default function DashboardPage() {
                                     </td>
                                     <td>
                                       <div className="d-flex align-items-center gap-2">
-                                        <button type="button" onClick={() => handleEditCareerClick(c)} className="btn btn-sm btn-outline-primary py-1" title="Edit vacancy">
-                                          <i className="fas fa-edit me-1" />Edit
+                                        <button type="button" onClick={() => handleEditCareerClick(c)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit vacancy">
+                                          <i className="fas fa-pen" />
                                         </button>
                                         {c.status === 'Open' && (
-                                          <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-1" title="Close vacancy">
-                                            Close
+                                          <button onClick={() => closeCareer(c.id)} className="btn btn-sm btn-outline-secondary py-0 px-2" title="Close vacancy">
+                                            <i className="fas fa-ban" />
                                           </button>
                                         )}
                                         <button
@@ -4790,11 +4825,10 @@ export default function DashboardPage() {
                                               deleteCareer(c.id);
                                             }
                                           }}
-                                          className="btn btn-sm btn-outline-danger py-1"
+                                          className="btn btn-sm btn-outline-danger py-0 px-2"
                                           title="Delete position"
                                         >
-                                          <i className="fas fa-trash-alt me-1" />
-                                          Delete
+                                          <i className="fas fa-trash" />
                                         </button>
                                       </div>
                                     </td>
@@ -4916,7 +4950,7 @@ export default function DashboardPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {socialLinks.map(s => (
+                              {paginate(socialLinks, currentPage.socialLinks, pageSizes.socialLinks).map(s => (
                                 <tr key={s.id}>
                                   <td className="small fw-semibold">{s.platform}</td>
                                   <td className="small text-muted">{s.url}</td>
@@ -4927,15 +4961,25 @@ export default function DashboardPage() {
                                   </td>
                                   <td>
                                     <div className="d-flex gap-2">
-                                      <button onClick={() => handleEditSocialClick(s)} className="btn btn-sm btn-outline-primary py-0">Edit</button>
-                                      <button onClick={() => deleteSocialLink(s.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                      <button onClick={() => handleEditSocialClick(s)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit social link"><i className="fas fa-pen" /></button>
+                                      <button onClick={() => deleteSocialLink(s.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete social link"><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
+                          {socialLinks.length === 0 && (
+                            <div className="text-center py-4 text-muted small">No social links configured.</div>
+                          )}
                         </div>
+                        {socialLinks.length > 0 && (
+                          <PaginationComponent 
+                            currentPage={currentPage.socialLinks} 
+                            totalPages={totalPages(socialLinks.length, pageSizes.socialLinks)}
+                            onPageChange={(page) => setCurrentPage({ ...currentPage, socialLinks: page })}
+                          />
+                        )}
                       </div>
                     </div>
                   )}
@@ -5025,7 +5069,7 @@ export default function DashboardPage() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {govDocs.map(d => (
+                                    {paginate(govDocs, currentPage.govDocs, pageSizes.govDocs).map(d => (
                                       <tr key={d.id}>
                                         <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '160px' }} title={d.title}>{d.title}</td>
                                         <td>
@@ -5057,16 +5101,27 @@ export default function DashboardPage() {
                                                 setEditingGovId(d.id);
                                                 setGovFormOpen(true);
                                               }} 
-                                              className="btn btn-xs btn-outline-primary py-0"
-                                            >Edit</button>
-                                            <button onClick={() => deleteGovItem('doc', d.id)} className="btn btn-xs btn-outline-danger py-0">Delete</button>
+                                              className="btn btn-xs btn-outline-primary py-0 px-2"
+                                              title="Edit document"
+                                            ><i className="fas fa-pen" /></button>
+                                            <button onClick={() => deleteGovItem('doc', d.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete document"><i className="fas fa-trash" /></button>
                                           </div>
                                         </td>
                                       </tr>
                                     ))}
                                   </tbody>
                                 </table>
+                                {govDocs.length === 0 && (
+                                  <div className="text-center py-3 text-muted small">No documents uploaded.</div>
+                                )}
                               </div>
+                              {govDocs.length > 0 && (
+                                <PaginationComponent 
+                                  currentPage={currentPage.govDocs} 
+                                  totalPages={totalPages(govDocs.length, pageSizes.govDocs)}
+                                  onPageChange={(page) => setCurrentPage({ ...currentPage, govDocs: page })}
+                                />
+                              )}
                             </div>
                           </div>
 
@@ -5084,7 +5139,7 @@ export default function DashboardPage() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {govPolicies.map(p => (
+                                    {paginate(govPolicies, currentPage.govPolicies, pageSizes.govPolicies).map(p => (
                                       <tr key={p.id}>
                                         <td className="small fw-semibold text-truncate text-dark" style={{ maxWidth: '160px' }} title={p.title}>{p.title}</td>
                                         <td>
@@ -5116,16 +5171,27 @@ export default function DashboardPage() {
                                                 setEditingGovId(p.id);
                                                 setGovFormOpen(true);
                                               }} 
-                                              className="btn btn-xs btn-outline-primary py-0"
-                                            >Edit</button>
-                                            <button onClick={() => deleteGovItem('policy', p.id)} className="btn btn-xs btn-outline-danger py-0">Delete</button>
+                                              className="btn btn-xs btn-outline-primary py-0 px-2"
+                                              title="Edit policy"
+                                            ><i className="fas fa-pen" /></button>
+                                            <button onClick={() => deleteGovItem('policy', p.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete policy"><i className="fas fa-trash" /></button>
                                           </div>
                                         </td>
                                       </tr>
                                     ))}
                                   </tbody>
                                 </table>
+                                {govPolicies.length === 0 && (
+                                  <div className="text-center py-3 text-muted small">No policies uploaded.</div>
+                                )}
                               </div>
+                              {govPolicies.length > 0 && (
+                                <PaginationComponent 
+                                  currentPage={currentPage.govPolicies} 
+                                  totalPages={totalPages(govPolicies.length, pageSizes.govPolicies)}
+                                  onPageChange={(page) => setCurrentPage({ ...currentPage, govPolicies: page })}
+                                />
+                              )}
                             </div>
                           </div>
                         </div>
@@ -5239,9 +5305,10 @@ export default function DashboardPage() {
                                         setEditingPartnerId(p.id);
                                         setPartnerFormOpen(true);
                                       }} 
-                                      className="btn btn-sm btn-outline-primary py-0"
-                                    >Edit</button>
-                                    <button onClick={() => deletePartner(p.id)} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                      className="btn btn-sm btn-outline-primary py-0 px-2"
+                                      title="Edit partner"
+                                    ><i className="fas fa-pen" /></button>
+                                    <button onClick={() => deletePartner(p.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete partner"><i className="fas fa-trash" /></button>
                                   </div>
                                 </td>
                               </tr>
@@ -5638,7 +5705,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {contacts.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No messages have been received yet.</td></tr> : contacts.map(c => (
+                        {contacts.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No messages have been received yet.</td></tr> : paginate(contacts, currentPage.contacts, pageSizes.contacts).map(c => (
                           <tr key={c.id}>
                             <td className="fw-semibold small">{c.name}</td>
                             <td className="small">{c.subject}</td>
@@ -5648,8 +5715,8 @@ export default function DashboardPage() {
                             </td>
                             <td>
                               <div className="d-flex gap-2">
-                                <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage, 'Contact message'); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View message"><i className="fas fa-eye" /></button>
+                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage, 'Contact message'); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete message"><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5657,6 +5724,13 @@ export default function DashboardPage() {
                       </tbody>
                     </table>
                   </div>
+                  {contacts.length > 0 && (
+                    <PaginationComponent 
+                      currentPage={currentPage.contacts} 
+                      totalPages={totalPages(contacts.length, pageSizes.contacts)}
+                      onPageChange={(page) => setCurrentPage({ ...currentPage, contacts: page })}
+                    />
+                  )}
                 </div>
               )}
 
@@ -5674,7 +5748,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {volunteers.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No volunteer applications have been received yet.</td></tr> : volunteers.map(v => (
+                        {volunteers.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No volunteer applications have been received yet.</td></tr> : paginate(volunteers, currentPage.volunteers, pageSizes.volunteers).map(v => (
                           <tr key={v.id}>
                             <td className="fw-semibold small">{v.name}</td>
                             <td className="small">{v.interest}</td>
@@ -5684,8 +5758,8 @@ export default function DashboardPage() {
                             </td>
                             <td>
                               <div className="d-flex gap-2">
-                                <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View volunteer application"><i className="fas fa-eye" /></button>
+                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete application"><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5693,6 +5767,13 @@ export default function DashboardPage() {
                       </tbody>
                     </table>
                   </div>
+                  {volunteers.length > 0 && (
+                    <PaginationComponent 
+                      currentPage={currentPage.volunteers} 
+                      totalPages={totalPages(volunteers.length, pageSizes.volunteers)}
+                      onPageChange={(page) => setCurrentPage({ ...currentPage, volunteers: page })}
+                    />
+                  )}
                 </div>
               )}
 
@@ -5710,7 +5791,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {donations.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No donation inquiries have been received yet.</td></tr> : donations.map(d => (
+                        {donations.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No donation inquiries have been received yet.</td></tr> : paginate(donations, currentPage.donations, pageSizes.donations).map(d => (
                           <tr key={d.id}>
                             <td className="fw-semibold small">{d.name}</td>
                             <td className="small">{d.category}</td>
@@ -5720,8 +5801,8 @@ export default function DashboardPage() {
                             </td>
                             <td>
                               <div className="d-flex gap-2">
-                                <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View donation inquiry"><i className="fas fa-eye" /></button>
+                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete inquiry"><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5729,6 +5810,13 @@ export default function DashboardPage() {
                       </tbody>
                     </table>
                   </div>
+                  {donations.length > 0 && (
+                    <PaginationComponent 
+                      currentPage={currentPage.donations} 
+                      totalPages={totalPages(donations.length, pageSizes.donations)}
+                      onPageChange={(page) => setCurrentPage({ ...currentPage, donations: page })}
+                    />
+                  )}
                 </div>
               )}
 
@@ -5847,9 +5935,10 @@ export default function DashboardPage() {
                                     setActiveJobApplication(a);
                                     if (!a.read) markJobApplicationRead(a.id, true);
                                   }}
-                                  className="btn btn-sm btn-outline-primary py-0"
+                                  className="btn btn-sm btn-outline-primary py-0 px-2"
+                                  title="Review candidate"
                                 >
-                                  Review
+                                  <i className="fas fa-eye" />
                                 </button>
                                 <button
                                   onClick={async () => {
@@ -5858,9 +5947,10 @@ export default function DashboardPage() {
                                     }
                                   }}
                                   disabled={deletingSubmissionIds.includes(a.id)}
-                                  className="btn btn-sm btn-outline-danger py-0"
+                                  className="btn btn-sm btn-outline-danger py-0 px-2"
+                                  title="Delete application"
                                 >
-                                  Delete
+                                  <i className="fas fa-trash" />
                                 </button>
                               </div>
                             </td>
@@ -5948,18 +6038,25 @@ export default function DashboardPage() {
                   </form>
                 )}
                 <div className="table-responsive bg-white rounded shadow-sm border"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Icon</th><th>Name</th><th>Acronym</th><th>Actions</th></tr></thead><tbody>
-                  {npcAssociations.map(p => (
+                  {paginate(npcAssociations, currentPage.associations, pageSizes.associations).map(p => (
                     <tr key={p.id}>
                       <td><i className={`fas ${p.icon} text-primary`}></i></td>
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.acronym}</td>
                       <td>
-                        <button onClick={() => { setAssocForm(p); setEditingAssocId(p.id); setAssocFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 me-2">Edit</button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcAssociation(p.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                        <button onClick={() => { setAssocForm(p); setEditingAssocId(p.id); setAssocFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit association"><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcAssociation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete association"><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
                 </tbody></table></div>
+                {npcAssociations.length > 0 && (
+                  <PaginationComponent 
+                    currentPage={currentPage.associations} 
+                    totalPages={totalPages(npcAssociations.length, pageSizes.associations)}
+                    onPageChange={(page) => setCurrentPage({ ...currentPage, associations: page })}
+                  />
+                )}
               </div>
 
               {/* Member Clubs & Teams */}
@@ -5978,17 +6075,24 @@ export default function DashboardPage() {
                   </form>
                 )}
                 <div className="table-responsive bg-white rounded shadow-sm border"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Name</th><th>Location / Province</th><th>Actions</th></tr></thead><tbody>
-                  {npcClubs.map(p => (
+                  {paginate(npcClubs, currentPage.clubs, pageSizes.clubs).map(p => (
                     <tr key={p.id}>
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.location}</td>
                       <td>
-                        <button onClick={() => { setClubForm(p); setEditingClubId(p.id); setClubFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 me-2">Edit</button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcClub(p.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                        <button onClick={() => { setClubForm(p); setEditingClubId(p.id); setClubFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit club"><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcClub(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete club"><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
                 </tbody></table></div>
+                {npcClubs.length > 0 && (
+                  <PaginationComponent 
+                    currentPage={currentPage.clubs} 
+                    totalPages={totalPages(npcClubs.length, pageSizes.clubs)}
+                    onPageChange={(page) => setCurrentPage({ ...currentPage, clubs: page })}
+                  />
+                )}
               </div>
 
               {/* Federations */}
@@ -6020,18 +6124,25 @@ export default function DashboardPage() {
                   </form>
                 )}
                 <div className="table-responsive bg-white rounded shadow-sm border"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Logo</th><th>Name</th><th>Role</th><th>Actions</th></tr></thead><tbody>
-                  {npcFederations.map(p => (
+                  {paginate(npcFederations, currentPage.federations, pageSizes.federations).map(p => (
                     <tr key={p.id}>
                       <td><img src={p.logo} alt={p.name} style={{width:'40px'}} /></td>
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.role}</td>
                       <td>
-                        <button onClick={() => { setFedForm({name:p.name, logo:p.logo, website:p.website||'', role:p.role, desc:p.desc, order:p.order, active:p.active}); setEditingFedId(p.id); setFedFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 me-2">Edit</button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcFederation(p.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                        <button onClick={() => { setFedForm({name:p.name, logo:p.logo, website:p.website||'', role:p.role, desc:p.desc, order:p.order, active:p.active}); setEditingFedId(p.id); setFedFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit federation"><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcFederation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete federation"><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
                 </tbody></table></div>
+                {npcFederations.length > 0 && (
+                  <PaginationComponent 
+                    currentPage={currentPage.federations} 
+                    totalPages={totalPages(npcFederations.length, pageSizes.federations)}
+                    onPageChange={(page) => setCurrentPage({ ...currentPage, federations: page })}
+                  />
+                )}
               </div>
 
               {/* DPSCO Contacts */}
@@ -6057,7 +6168,7 @@ export default function DashboardPage() {
                   </form>
                 )}
                 <div className="table-responsive bg-white rounded shadow-sm border"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Province</th><th>District</th><th>Coordinator</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead><tbody>
-                  {dpscoContacts.map(p => (
+                  {paginate(dpscoContacts, currentPage.dpsco, pageSizes.dpsco).map(p => (
                     <tr key={p.id}>
                       <td><span className="badge bg-secondary-soft text-secondary">{p.province}</span></td>
                       <td className="fw-bold">{p.district}</td>
@@ -6065,12 +6176,19 @@ export default function DashboardPage() {
                       <td>{p.phone}</td>
                       <td>{p.email}</td>
                       <td>
-                        <button onClick={() => { setDpscoForm(p); setEditingDpscoId(p.id); setDpscoFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 me-2">Edit</button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteDpscoContact(p.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                        <button onClick={() => { setDpscoForm(p); setEditingDpscoId(p.id); setDpscoFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit DPSCO contact"><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteDpscoContact(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete contact"><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
                 </tbody></table></div>
+                {dpscoContacts.length > 0 && (
+                  <PaginationComponent 
+                    currentPage={currentPage.dpsco} 
+                    totalPages={totalPages(dpscoContacts.length, pageSizes.dpsco)}
+                    onPageChange={(page) => setCurrentPage({ ...currentPage, dpsco: page })}
+                  />
+                )}
               </div>
 
             </div>
@@ -6349,7 +6467,7 @@ export default function DashboardPage() {
                           );
                         }
 
-                        return filtered.map((u: any, idx: number) => {
+                        return paginate(filtered, currentPage.users, pageSizes.users).map((u: any, idx: number) => {
                           const isSelf = currentUser.email === u.email || currentUser.id === u.id;
                           const initials = (u.name || 'NP')
                             .split(/\s+/)
@@ -6423,7 +6541,7 @@ export default function DashboardPage() {
                                     className="btn btn-outline-primary btn-sm px-2.5"
                                     title="Edit user details & password"
                                   >
-                                    <i className="fas fa-pen-to-square me-1" /> Edit
+                                    <i className="fas fa-pen-to-square" />
                                   </button>
                                   <button
                                     type="button"
@@ -6448,6 +6566,22 @@ export default function DashboardPage() {
                   <span className="small text-muted">
                     Total Registered Users: <strong>{systemUsers.length}</strong>
                   </span>
+                  {(() => {
+                    const filtered = systemUsers.filter((u: any) => {
+                      const query = userSearch.toLowerCase().trim();
+                      const matchesQuery = !query || u.name?.toLowerCase().includes(query) || u.email?.toLowerCase().includes(query);
+                      const matchesRole = userRoleFilter === 'ALL' || u.role === userRoleFilter;
+                      return matchesQuery && matchesRole;
+                    });
+                    if (filtered.length <= pageSizes.users) return null;
+                    return (
+                      <PaginationComponent 
+                        currentPage={currentPage.users} 
+                        totalPages={totalPages(filtered.length, pageSizes.users)}
+                        onPageChange={(page) => setCurrentPage({ ...currentPage, users: page })}
+                      />
+                    );
+                  })()}
                   <button
                     type="button"
                     onClick={fetchSystemUsers}

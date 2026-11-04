@@ -19,6 +19,8 @@ export default function DonationPaymentsAdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const load = useCallback(async () => {
     setLoading(true); setError('');
@@ -45,6 +47,15 @@ export default function DonationPaymentsAdminPage() {
       return matchesFilter && matchesSearch;
     });
   }, [payments, filter, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
+  const paginatedList = useMemo(() => {
+    return visible.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  }, [visible, currentPage, pageSize]);
 
   function exportCsv() {
     const columns = ['Date', 'Reference', 'Donor', 'Email', 'Phone', 'Donation amount', 'Donation currency', 'Charged amount', 'Charged currency', 'Exchange rate', 'Purpose', 'Payment method', 'Status'];
@@ -243,7 +254,8 @@ export default function DonationPaymentsAdminPage() {
               <p className="small mb-0 text-muted">Try adjusting your status filter or search keyword.</p>
             </div>
           ) : (
-            <div className="table-responsive">
+            <>
+              <div className="table-responsive">
               <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.86rem' }}>
                 <thead style={{ background: '#F8FAFC', color: '#475569', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   <tr>
@@ -256,7 +268,7 @@ export default function DonationPaymentsAdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visible.map((item) => {
+                  {paginatedList.map((item) => {
                     const isSuccess = item.status === 'SUCCESSFUL';
                     const isPending = item.status === 'PENDING';
                     return (
@@ -331,6 +343,37 @@ export default function DonationPaymentsAdminPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3 border-top bg-white">
+                <span className="small text-muted" style={{ fontSize: '0.82rem' }}>
+                  Showing <strong>{(currentPage - 1) * pageSize + 1}</strong> to <strong>{Math.min(currentPage * pageSize, visible.length)}</strong> of <strong>{visible.length}</strong> transactions
+                </span>
+                <nav>
+                  <ul className="pagination pagination-sm mb-0 gap-1">
+                    <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage <= 1}>
+                        <i className="fas fa-chevron-left" />
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <li key={p} className={`page-item ${p === currentPage ? 'active' : ''}`}>
+                        <button className="page-link" onClick={() => setCurrentPage(p)}>
+                          {p}
+                        </button>
+                      </li>
+                    ))}
+                    <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage >= totalPages}>
+                        <i className="fas fa-chevron-right" />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+          </>
           )}
 
           {/* Table Footer */}

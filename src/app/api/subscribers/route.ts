@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     const isPaginated = pageParam !== null || limitParam !== null;
     const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(limitParam || '20', 10) || 20));
+    const limit = Math.max(1, Math.min(100, parseInt(limitParam || '10', 10) || 10));
 
     if (isPaginated) {
       const [items, total, totalAll, activeTotal] = await Promise.all([

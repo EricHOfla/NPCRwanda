@@ -32,7 +32,7 @@ export default function SubscribersTab() {
 
   // Server-side pagination state
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [counts, setCounts] = useState<SubscriberCounts>({ total: 0, active: 0, inactive: 0 });
@@ -930,20 +930,20 @@ export default function SubscribersTab() {
                             onClick={() => handleToggle(sub.id, sub.active)}
                             disabled={pendingSubscriberId !== null}
                             title={sub.active ? 'Deactivate' : 'Activate'}
-                            style={{ background: sub.active ? '#FFF3E0' : '#E8F5E9', border: 'none', borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', color: sub.active ? '#E65100' : '#2E7D32', fontSize: '0.82rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                            aria-label={sub.active ? 'Deactivate' : 'Activate'}
+                            style={{ background: sub.active ? '#FFF3E0' : '#E8F5E9', border: 'none', borderRadius: '6px', padding: '6px 10px', cursor: 'pointer', color: sub.active ? '#E65100' : '#2E7D32', fontSize: '0.85rem' }}
                           >
                             <i className={`fas ${sub.active ? 'fa-ban' : 'fa-check'}`} />
-                            <span>{sub.active ? 'Deactivate' : 'Activate'}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDelete(sub.id, sub.email)}
                             disabled={pendingSubscriberId !== null}
-                            title="Remove subscriber"
-                            style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', color: '#C62828', fontSize: '0.82rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                            title="Delete"
+                            aria-label="Delete"
+                            style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '6px 10px', cursor: 'pointer', color: '#C62828', fontSize: '0.85rem' }}
                           >
                             <i className={`fas ${pendingSubscriberId === sub.id ? 'fa-spinner fa-spin' : 'fa-trash'}`} />
-                            <span>{pendingSubscriberId === sub.id ? 'Deleting…' : 'Delete'}</span>
                           </button>
                         </div>
                       </td>
