@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendContactNotification } from '@/lib/mailer';
+import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
 
@@ -13,6 +14,8 @@ const contactSchema = z.object({
   message: z.string().min(1, 'Message is required'),
   date: z.string().optional(),
   website_url: z.string().optional(), // Honeypot field for bot trap
+  hp_field: z.string().optional(),    // Secondary honeypot trap
+  _ts: z.union([z.number(), z.string()]).optional(), // Timestamp when form was loaded
 });
 
 // GET: Fetch list of inbox messages
@@ -54,8 +57,26 @@ export async function POST(request: Request) {
       );
     }
 
-    // Bot trap: If hidden honeypot field is filled, silently ignore
-    if (result.data.website_url && result.data.website_url.trim() !== '') {
+    // IP rate limiting check
+    const clientIp = getClientIp(request);
+    if (isRateLimited(clientIp, 6, 10)) {
+      console.warn(`[AntiSpam] Rate limited contact submission from IP: ${clientIp}`);
+      return NextResponse.json({ success: true, message: 'Message sent successfully.' }, { status: 200 });
+    }
+
+    // Bot & Spam validation
+    const spamCheck = validateAntiSpam({
+      website_url: result.data.website_url,
+      hp_field: result.data.hp_field,
+      _ts: result.data._ts,
+      email: result.data.email,
+      name: result.data.name,
+      message: result.data.message,
+    });
+
+    if (spamCheck.isSpam) {
+      console.warn(`[AntiSpam] Dropped fake/bot contact message (${spamCheck.reason}) from IP: ${clientIp}`);
+      // Return 200 success silently to trick the spam bot
       return NextResponse.json({ success: true, message: 'Message sent successfully.' }, { status: 200 });
     }
 
@@ -66,10 +87,10 @@ export async function POST(request: Request) {
 
     const newMessage = await prisma.contactMessage.create({
       data: {
-        name: result.data.name,
-        email: result.data.email,
-        subject: result.data.subject,
-        message: result.data.message,
+        name: result.data.name.trim(),
+        email: result.data.email.trim().toLowerCase(),
+        subject: result.data.subject.trim(),
+        message: result.data.message.trim(),
         date: result.data.date || formattedDate,
         read: false,
       },

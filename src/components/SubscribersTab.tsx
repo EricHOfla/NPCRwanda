@@ -17,6 +17,7 @@ export default function SubscribersTab() {
   const [actionMsg, setActionMsg] = useState('');
   const [actionError, setActionError] = useState('');
   const [pendingSubscriberId, setPendingSubscriberId] = useState<string | null>(null);
+  const [cleaningSpam, setCleaningSpam] = useState(false);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
 
@@ -61,6 +62,35 @@ export default function SubscribersTab() {
       });
     } finally {
       setBroadcasting(false);
+    }
+  };
+
+
+  const handleCleanSpam = async () => {
+    const wipeAll = confirm(
+      'Spam Cleanup Options:\n\n' +
+      'Click OK to remove detected bot/test/disposable emails.\n' +
+      'Click Cancel to keep all records.'
+    );
+    if (!wipeAll) return;
+
+    try {
+      setCleaningSpam(true);
+      setActionError('');
+      setActionMsg('');
+      const res = await fetch('/api/admin/clean-spam', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target: 'subscribers', mode: 'spam' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to clean spam subscribers');
+      await fetchSubscribers();
+      setActionMsg(`Cleanup completed: ${data.cleaned?.subscribers ?? 0} spam subscriber(s) removed.`);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Error cleaning subscribers');
+    } finally {
+      setCleaningSpam(false);
     }
   };
 

@@ -16,6 +16,9 @@ export default function VolunteerPage() {
   const [details, setDetails] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [hpField, setHpField] = useState('');
+  const [mountTime] = useState(() => Date.now());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +32,9 @@ export default function VolunteerPage() {
         interest,
         skills,
         details,
+        website_url: websiteUrl,
+        hp_field: hpField,
+        _ts: mountTime,
       });
       setName('');
       setEmail('');
@@ -229,6 +235,25 @@ export default function VolunteerPage() {
                           value={details}
                           onChange={(e) => setDetails(e.target.value)}
                           required
+                        />
+                      </div>
+                      {/* Anti-spam honeypot traps for web bots */}
+                      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: '1px', width: '1px', overflow: 'hidden' }} aria-hidden="true">
+                        <input
+                          type="text"
+                          name="website_url"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={websiteUrl}
+                          onChange={(e) => setWebsiteUrl(e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          name="hp_field"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={hpField}
+                          onChange={(e) => setHpField(e.target.value)}
                         />
                       </div>
                       <div className="col-12 mt-4">

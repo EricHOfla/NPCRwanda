@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
 import { sendWelcomeEmail } from '@/lib/mailer';
+import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,9 +52,25 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    // Honeypot spam trap
-    if (body.website_url && String(body.website_url).trim() !== '') {
-      return NextResponse.json({ message: 'Subscribed successfully!' }, { status: 200 });
+
+    // IP rate limiting check
+    const clientIp = getClientIp(request);
+    if (isRateLimited(clientIp, 6, 10)) {
+      console.warn(`[AntiSpam] Rate limited subscription from IP: ${clientIp}`);
+      return NextResponse.json({ success: true, message: 'Subscribed successfully!' }, { status: 200 });
+    }
+
+    // Bot & Spam validation
+    const spamCheck = validateAntiSpam({
+      website_url: body.website_url,
+      hp_field: body.hp_field,
+      _ts: body._ts,
+      email: body.email,
+    });
+
+    if (spamCheck.isSpam) {
+      console.warn(`[AntiSpam] Dropped fake/bot subscriber (${spamCheck.reason}) from IP: ${clientIp}`);
+      return NextResponse.json({ success: true, message: 'Subscribed successfully!' }, { status: 200 });
     }
 
     const email = (body.email || '').trim().toLowerCase();

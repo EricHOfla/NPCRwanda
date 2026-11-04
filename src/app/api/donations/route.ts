@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendDonationNotification } from '@/lib/mailer';
+import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
 
@@ -12,6 +13,8 @@ const donationSchema = z.object({
   supportType: z.string().min(1, 'Support type is required'),
   details: z.string().min(1, 'Details are required'),
   website_url: z.string().optional(), // Honeypot
+  hp_field: z.string().optional(),    // Secondary honeypot
+  _ts: z.union([z.number(), z.string()]).optional(),
 });
 
 export async function GET(request: Request) {
@@ -34,18 +37,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
-    // Honeypot spam trap
-    if (result.data.website_url && result.data.website_url.trim() !== '') {
+    // IP rate limiting check
+    const clientIp = getClientIp(request);
+    if (isRateLimited(clientIp, 6, 10)) {
+      console.warn(`[AntiSpam] Rate limited donation inquiry from IP: ${clientIp}`);
+      return NextResponse.json({ success: true, message: 'Inquiry submitted.' }, { status: 200 });
+    }
+
+    // Bot & Spam validation
+    const spamCheck = validateAntiSpam({
+      website_url: result.data.website_url,
+      hp_field: result.data.hp_field,
+      _ts: result.data._ts,
+      email: result.data.email,
+      name: result.data.name,
+      message: `${result.data.category} ${result.data.supportType} ${result.data.details}`,
+    });
+
+    if (spamCheck.isSpam) {
+      console.warn(`[AntiSpam] Dropped fake/bot donation inquiry (${spamCheck.reason}) from IP: ${clientIp}`);
       return NextResponse.json({ success: true, message: 'Inquiry submitted.' }, { status: 200 });
     }
 
     const newInquiry = await prisma.donationInquiry.create({
       data: {
-        name: result.data.name,
-        email: result.data.email,
-        category: result.data.category,
-        supportType: result.data.supportType,
-        details: result.data.details,
+        name: result.data.name.trim(),
+        email: result.data.email.trim().toLowerCase(),
+        category: result.data.category.trim(),
+        supportType: result.data.supportType.trim(),
+        details: result.data.details.trim(),
         read: false,
       },
     });

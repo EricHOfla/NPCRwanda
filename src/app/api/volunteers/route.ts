@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendVolunteerNotification } from '@/lib/mailer';
+import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
 
@@ -12,6 +13,8 @@ const volunteerSchema = z.object({
   skills: z.string().min(1, 'Skills description is required'),
   details: z.string().min(1, 'Details are required'),
   website_url: z.string().optional(), // Honeypot field
+  hp_field: z.string().optional(),    // Secondary honeypot
+  _ts: z.union([z.number(), z.string()]).optional(),
 });
 
 export async function GET(request: Request) {
@@ -34,18 +37,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
-    // Honeypot spam trap
-    if (result.data.website_url && result.data.website_url.trim() !== '') {
+    // IP rate limiting check
+    const clientIp = getClientIp(request);
+    if (isRateLimited(clientIp, 6, 10)) {
+      console.warn(`[AntiSpam] Rate limited volunteer submission from IP: ${clientIp}`);
+      return NextResponse.json({ success: true, message: 'Application submitted.' }, { status: 200 });
+    }
+
+    // Bot & Spam validation
+    const spamCheck = validateAntiSpam({
+      website_url: result.data.website_url,
+      hp_field: result.data.hp_field,
+      _ts: result.data._ts,
+      email: result.data.email,
+      name: result.data.name,
+      message: `${result.data.skills} ${result.data.details}`,
+    });
+
+    if (spamCheck.isSpam) {
+      console.warn(`[AntiSpam] Dropped fake/bot volunteer application (${spamCheck.reason}) from IP: ${clientIp}`);
       return NextResponse.json({ success: true, message: 'Application submitted.' }, { status: 200 });
     }
 
     const newApp = await prisma.volunteerApplication.create({
       data: {
-        name: result.data.name,
-        email: result.data.email,
-        interest: result.data.interest,
-        skills: result.data.skills,
-        details: result.data.details,
+        name: result.data.name.trim(),
+        email: result.data.email.trim().toLowerCase(),
+        interest: result.data.interest.trim(),
+        skills: result.data.skills.trim(),
+        details: result.data.details.trim(),
         read: false,
       },
     });

@@ -16,6 +16,9 @@ export default function NewsletterBox({
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ text: string; success: boolean } | null>(null);
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [hpField, setHpField] = useState('');
+  const [mountTime] = useState(() => Date.now());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +33,9 @@ export default function NewsletterBox({
         body: JSON.stringify({ 
           email,
           categories: category ? [category] : ['news', 'announcements', 'events', 'careers'],
+          website_url: websiteUrl,
+          hp_field: hpField,
+          _ts: mountTime,
         }),
       });
 
@@ -65,7 +71,26 @@ export default function NewsletterBox({
           </div>
         </div>
         <div className="col-lg-5">
-          <form onSubmit={handleSubmit} className="d-flex flex-column flex-sm-row gap-2">
+          <form onSubmit={handleSubmit} className="d-flex flex-column flex-sm-row gap-2 position-relative">
+            {/* Anti-spam honeypot */}
+            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: '1px', width: '1px', overflow: 'hidden' }} aria-hidden="true">
+              <input
+                type="text"
+                name="website_url"
+                tabIndex={-1}
+                autoComplete="off"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+              />
+              <input
+                type="text"
+                name="hp_field"
+                tabIndex={-1}
+                autoComplete="off"
+                value={hpField}
+                onChange={(e) => setHpField(e.target.value)}
+              />
+            </div>
             <input
               type="email"
               className="form-control"

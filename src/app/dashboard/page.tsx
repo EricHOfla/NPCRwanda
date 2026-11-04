@@ -742,6 +742,47 @@ export default function DashboardPage() {
     }
   };
 
+  const [cleaningSpam, setCleaningSpam] = useState(false);
+  const handleCleanSpam = async (target: 'messages' | 'volunteers' | 'donations' | 'applications') => {
+    const targetMap: Record<string, string> = {
+      messages: 'contacts',
+      volunteers: 'volunteers',
+      donations: 'donations',
+      applications: 'applications',
+    };
+    const apiTarget = targetMap[target];
+    if (!apiTarget || apiTarget === 'applications') {
+      alert('Spam cleanup is available for Messages, Volunteers, and Donations.');
+      return;
+    }
+
+    const choice = prompt(
+      `Spam Cleanup for ${target.toUpperCase()}:\n\n` +
+      `Type 'spam' to delete obvious bot and test submissions (e.g. example.com, test.com).\n` +
+      `Type 'all' to delete all submissions in this tab.\n\n` +
+      `Enter 'spam' or 'all':`,
+      'spam'
+    );
+    if (!choice || (choice.trim() !== 'spam' && choice.trim() !== 'all')) return;
+
+    try {
+      setCleaningSpam(true);
+      const res = await fetch('/api/admin/clean-spam', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target: apiTarget, mode: choice.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to clean records');
+      await fetchProtectedData();
+      alert(`Cleanup complete: Removed ${data.cleaned?.[apiTarget] ?? 0} record(s).`);
+    } catch (err: any) {
+      alert(err.message || 'Error executing cleanup');
+    } finally {
+      setCleaningSpam(false);
+    }
+  };
+
   // Track whether tab/page state has been restored on client mount
   const isTabInitializedRef = useRef(false);
 
@@ -5304,27 +5345,41 @@ export default function DashboardPage() {
               </div>
             ) : (
             <div>
-              <div className="mb-4 d-flex gap-2 border-bottom pb-2 flex-wrap">
-                {[
-                  { id: 'messages', label: `Messages Inbox (${contacts.filter(c => !c.read).length})` },
-                  { id: 'applications', label: `Job Applications (${jobApplications.filter(a => !a.read).length})` },
-                  { id: 'volunteers', label: `Volunteers (${volunteers.filter(v => !v.read).length})` },
-                  { id: 'donations', label: `Donation Inquiries (${donations.filter(d => !d.read).length})` },
-                ].map(sub => (
+              <div className="mb-4 d-flex justify-content-between align-items-center border-bottom pb-2 flex-wrap gap-2">
+                <div className="d-flex gap-2 flex-wrap">
+                  {[
+                    { id: 'messages', label: `Messages Inbox (${contacts.filter(c => !c.read).length})` },
+                    { id: 'applications', label: `Job Applications (${jobApplications.filter(a => !a.read).length})` },
+                    { id: 'volunteers', label: `Volunteers (${volunteers.filter(v => !v.read).length})` },
+                    { id: 'donations', label: `Donation Inquiries (${donations.filter(d => !d.read).length})` },
+                  ].map(sub => (
+                    <button
+                      key={sub.id}
+                      onClick={() => setInboxSubTab(sub.id as any)}
+                      className="btn btn-sm"
+                      style={{
+                        fontWeight: 600,
+                        background: inboxSubTab === sub.id ? 'var(--primary-blue)' : 'transparent',
+                        color: inboxSubTab === sub.id ? '#fff' : 'var(--text-dark)',
+                        borderRadius: '8px',
+                        border: 'none',
+                        padding: '8px 16px',
+                      }}
+                    >{sub.label}</button>
+                  ))}
+                </div>
+                {inboxSubTab !== 'applications' && (
                   <button
-                    key={sub.id}
-                    onClick={() => setInboxSubTab(sub.id as any)}
-                    className="btn btn-sm"
-                    style={{
-                      fontWeight: 600,
-                      background: inboxSubTab === sub.id ? 'var(--primary-blue)' : 'transparent',
-                      color: inboxSubTab === sub.id ? '#fff' : 'var(--text-dark)',
-                      borderRadius: '8px',
-                      border: 'none',
-                      padding: '8px 16px',
-                    }}
-                  >{sub.label}</button>
-                ))}
+                    onClick={() => handleCleanSpam(inboxSubTab)}
+                    disabled={cleaningSpam}
+                    className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2"
+                    style={{ borderRadius: '8px', fontWeight: 600 }}
+                    title={`Clean spam submissions from ${inboxSubTab}`}
+                  >
+                    <i className={`fas ${cleaningSpam ? 'fa-spinner fa-spin' : 'fa-broom'}`} />
+                    <span>{cleaningSpam ? 'Cleaning...' : `Clean ${inboxSubTab === 'messages' ? 'Spam Messages' : inboxSubTab === 'volunteers' ? 'Spam Volunteers' : 'Spam Inquiries'}`}</span>
+                  </button>
+                )}
               </div>
 
               {/* Message Details Modals */}

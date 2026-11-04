@@ -280,12 +280,12 @@ interface DataContextType {
   messages: ContactMessage[];
   volunteers: VolunteerApplication[];
   donations: DonationInquiry[];
-  submitContactMessage: (msg: Omit<ContactMessage, 'id' | 'date' | 'read'>) => Promise<{ success: boolean; error?: string }>;
-  submitVolunteerApplication: (app: Omit<VolunteerApplication, 'id' | 'read'>) => Promise<{ success: boolean; error?: string }>;
-  submitDonationInquiry: (inquiry: Omit<DonationInquiry, 'id' | 'read'>) => Promise<{ success: boolean; error?: string }>;
-  addContactMessage: (name: string, email: string, subject: string, message: string) => Promise<void>;
-  addVolunteerApplication: (app: Omit<VolunteerApplication, 'id' | 'read'>) => Promise<void>;
-  addDonationInquiry: (inquiry: Omit<DonationInquiry, 'id' | 'read'>) => Promise<void>;
+  submitContactMessage: (msg: Omit<ContactMessage, 'id' | 'date' | 'read'> & { website_url?: string; hp_field?: string; _ts?: number }) => Promise<{ success: boolean; error?: string }>;
+  submitVolunteerApplication: (app: Omit<VolunteerApplication, 'id' | 'read'> & { website_url?: string; hp_field?: string; _ts?: number }) => Promise<{ success: boolean; error?: string }>;
+  submitDonationInquiry: (inquiry: Omit<DonationInquiry, 'id' | 'read'> & { website_url?: string; hp_field?: string; _ts?: number }) => Promise<{ success: boolean; error?: string }>;
+  addContactMessage: (name: string, email: string, subject: string, message: string, antiSpam?: { website_url?: string; hp_field?: string; _ts?: number }) => Promise<void>;
+  addVolunteerApplication: (app: Omit<VolunteerApplication, 'id' | 'read'> & { website_url?: string; hp_field?: string; _ts?: number }) => Promise<void>;
+  addDonationInquiry: (inquiry: Omit<DonationInquiry, 'id' | 'read'> & { website_url?: string; hp_field?: string; _ts?: number }) => Promise<void>;
   markMessageRead: (id: string, read: boolean) => Promise<void>;
   deleteMessage: (id: string) => Promise<boolean>;
   markVolunteerRead: (id: string, read: boolean) => Promise<void>;
@@ -1665,8 +1665,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addContactMessage = async (name: string, email: string, subject: string, message: string) => {
-    const res = await submitContactMessage({ name, email, subject, message });
+  const addContactMessage = async (name: string, email: string, subject: string, message: string, antiSpam?: { website_url?: string; hp_field?: string; _ts?: number }) => {
+    const res = await submitContactMessage({ name, email, subject, message, ...antiSpam });
     if (!res.success) throw new Error(res.error || 'Failed to submit contact message');
   };
 

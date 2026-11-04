@@ -14,6 +14,9 @@ export const Footer: React.FC = () => {
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeMsg, setSubscribeMsg] = useState<{ text: string; success: boolean } | null>(null);
   const [logoError, setLogoError] = useState(false);
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [hpField, setHpField] = useState('');
+  const [mountTime] = useState(() => Date.now());
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +27,7 @@ export const Footer: React.FC = () => {
       const res = await fetch('/api/subscribers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: subscribeEmail }),
+        body: JSON.stringify({ email: subscribeEmail, website_url: websiteUrl, hp_field: hpField, _ts: mountTime }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -182,7 +185,26 @@ export const Footer: React.FC = () => {
               </p>
             </div>
             <div className="col-lg-6">
-              <form onSubmit={handleSubscribe} className="d-flex flex-column flex-sm-row gap-2">
+              <form onSubmit={handleSubscribe} className="d-flex flex-column flex-sm-row gap-2 position-relative">
+                {/* Anti-spam honeypot */}
+                <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: '1px', width: '1px', overflow: 'hidden' }} aria-hidden="true">
+                  <input
+                    type="text"
+                    name="website_url"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={websiteUrl}
+                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    name="hp_field"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={hpField}
+                    onChange={(e) => setHpField(e.target.value)}
+                  />
+                </div>
                 <input
                   type="email"
                   className="form-control form-control-sm"
