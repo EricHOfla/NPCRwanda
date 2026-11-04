@@ -253,30 +253,31 @@ export default function SubscribersTab() {
 
   return (
     <div className="subscribers-page-container">
-      {/* Responsive Stylesheet */}
+      {/* Responsive & Big Screen Stylesheet */}
       <style>{`
         .subscribers-page-container {
-          max-width: 1040px;
-          margin: 0 auto;
           width: 100%;
-          padding: 0 4px;
+          max-width: 100%;
+          margin: 0;
+          padding: 0;
         }
 
         .subscribers-card {
+          width: 100%;
           background: #FFFFFF;
           border-radius: 16px;
           border: 1px solid #E2E8F0;
           padding: 24px 28px;
           box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
 
         .subscribers-header-row {
           display: flex;
           align-items: center;
           gap: 16px;
-          margin-bottom: 20px;
-          padding-bottom: 16px;
+          margin-bottom: 22px;
+          padding-bottom: 18px;
           border-bottom: 1px solid #F1F5F9;
         }
 
@@ -298,33 +299,40 @@ export default function SubscribersTab() {
         .subscribers-stats-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
+          gap: 18px;
         }
 
         .subscribers-stat-item {
-          border-radius: 12px;
-          padding: 16px 20px;
+          border-radius: 14px;
+          padding: 18px 24px;
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 16px;
         }
 
         .subscribers-filter-row {
           display: flex;
-          gap: 12px;
-          margin-bottom: 20px;
+          gap: 14px;
+          margin-bottom: 22px;
           flex-wrap: wrap;
           align-items: center;
         }
 
         .subscribers-filter-search {
-          flex: 1 1 260px;
+          flex: 1 1 320px;
+          max-width: 480px;
           position: relative;
+        }
+
+        .subscribers-filter-secondary {
+          display: flex;
+          gap: 10px;
+          align-items: center;
         }
 
         .subscribers-filter-select {
           width: auto;
-          min-width: 150px;
+          min-width: 160px;
           height: 42px;
           font-size: 0.88rem;
         }
@@ -332,7 +340,7 @@ export default function SubscribersTab() {
         .subscribers-filter-refresh {
           height: 42px;
           border-radius: 8px;
-          padding: 0 16px;
+          padding: 0 18px;
           color: #475569;
           font-weight: 600;
           font-size: 0.85rem;
@@ -343,11 +351,77 @@ export default function SubscribersTab() {
           background: #F8FAFC;
         }
 
-        /* Desktop Table View (>= 768px) */
+        /* ── Desktop & Big Screen Table ── */
         .subscribers-desktop-table {
           display: block;
+          width: 100%;
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
+        }
+
+        .subscribers-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          font-size: 0.9rem;
+        }
+
+        .subscribers-table th {
+          background: #F8FAFC;
+          color: #475569;
+          font-weight: 700;
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          padding: 14px 18px;
+          border-bottom: 2px solid #E2E8F0;
+          white-space: nowrap;
+        }
+
+        .subscribers-table td {
+          padding: 16px 18px;
+          border-bottom: 1px solid #F1F5F9;
+          vertical-align: middle;
+          background-color: #FFFFFF;
+          transition: background-color 0.15s ease;
+        }
+
+        .subscribers-table tbody tr:hover td {
+          background-color: #F8FAFC;
+        }
+
+        /* Column distribution to fit wide screens gracefully */
+        .subscribers-col-email {
+          width: 32%;
+          min-width: 250px;
+        }
+
+        .subscribers-col-status {
+          width: 14%;
+          min-width: 120px;
+        }
+
+        .subscribers-col-categories {
+          width: 24%;
+          min-width: 180px;
+        }
+
+        .subscribers-col-date {
+          width: 14%;
+          min-width: 130px;
+        }
+
+        .subscribers-col-actions {
+          width: 16%;
+          min-width: 180px;
+          text-align: right;
+        }
+
+        .subscribers-actions-wrap {
+          display: flex;
+          gap: 8px;
+          justify-content: flex-end;
+          align-items: center;
         }
 
         /* Mobile Card View (< 768px) */
@@ -362,13 +436,13 @@ export default function SubscribersTab() {
           align-items: center;
           flex-wrap: wrap;
           gap: 16px;
-          padding-top: 20px;
-          margin-top: 16px;
+          padding-top: 22px;
+          margin-top: 20px;
           border-top: 1px solid #F1F5F9;
         }
 
         .subscribers-pagination-range {
-          font-size: 0.85rem;
+          font-size: 0.88rem;
           color: #64748B;
           font-weight: 500;
         }
@@ -387,7 +461,44 @@ export default function SubscribersTab() {
           gap: 8px;
         }
 
-        /* ── Mobile & Tablet Media Queries ── */
+        /* ── Big Screen Enhancements (>= 1400px) ── */
+        @media (min-width: 1400px) {
+          .subscribers-card {
+            padding: 28px 36px;
+          }
+
+          .subscribers-stats-grid {
+            gap: 22px;
+          }
+
+          .subscribers-stat-item {
+            padding: 22px 28px;
+          }
+
+          .subscribers-stat-number {
+            font-size: 1.85rem !important;
+          }
+
+          .subscribers-stat-label {
+            font-size: 0.84rem !important;
+          }
+
+          .subscribers-table th {
+            padding: 16px 22px;
+            font-size: 0.82rem;
+          }
+
+          .subscribers-table td {
+            padding: 18px 22px;
+            font-size: 0.92rem;
+          }
+
+          .subscribers-filter-search {
+            max-width: 520px;
+          }
+        }
+
+        /* ── Mobile & Tablet Media Queries (< 768px) ── */
         @media (max-width: 768px) {
           .subscribers-card {
             padding: 16px 14px;
@@ -453,6 +564,7 @@ export default function SubscribersTab() {
 
           .subscribers-filter-search {
             width: 100%;
+            max-width: none;
             flex: none;
           }
 
@@ -543,8 +655,8 @@ export default function SubscribersTab() {
           </div>
           <div className="subscribers-header-content">
             <div>
-              <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.2rem', color: '#0f172a' }}>Newsletter Subscribers</h3>
-              <p style={{ margin: '3px 0 0', fontSize: '0.84rem', color: '#64748B' }}>Manage subscriber list, inspect engagement, and broadcast official newsletters.</p>
+              <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.25rem', color: '#0f172a' }}>Newsletter Subscribers</h3>
+              <p style={{ margin: '3px 0 0', fontSize: '0.86rem', color: '#64748B' }}>Manage subscriber list, inspect engagement, and broadcast official newsletters.</p>
             </div>
             <div className="subscribers-header-actions">
               <button
@@ -657,12 +769,12 @@ export default function SubscribersTab() {
             { label: 'Inactive / Unsubscribed', value: counts.inactive, color: '#C62828', bg: '#FFEBEE', icon: 'fa-circle-xmark' },
           ].map(stat => (
             <div key={stat.label} className="subscribers-stat-item" style={{ background: stat.bg, border: `1px solid ${stat.color}15` }}>
-              <i className={`fas ${stat.icon}`} style={{ color: stat.color, fontSize: '1.45rem', flexShrink: 0 }} />
+              <i className={`fas ${stat.icon}`} style={{ color: stat.color, fontSize: '1.5rem', flexShrink: 0 }} />
               <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                <div className="subscribers-stat-number" style={{ fontSize: '1.5rem', fontWeight: 800, color: stat.color, lineHeight: 1.1 }}>
+                <div className="subscribers-stat-number" style={{ fontSize: '1.6rem', fontWeight: 800, color: stat.color, lineHeight: 1.1 }}>
                   {stat.value.toLocaleString()}
                 </div>
-                <div className="subscribers-stat-label" style={{ fontSize: '0.76rem', color: stat.color, fontWeight: 600, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div className="subscribers-stat-label" style={{ fontSize: '0.78rem', color: stat.color, fontWeight: 600, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {stat.label}
                 </div>
               </div>
@@ -694,21 +806,21 @@ export default function SubscribersTab() {
         {/* Search & Filter bar */}
         <div className="subscribers-filter-row">
           <div className="subscribers-filter-search">
-            <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', fontSize: '0.85rem' }} />
+            <i className="fas fa-search" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', fontSize: '0.85rem' }} />
             <input
               type="text"
               className="form-control"
               placeholder="Search by subscriber email…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ paddingLeft: '36px', fontSize: '0.88rem', height: '42px', borderRadius: '8px' }}
+              style={{ paddingLeft: '38px', fontSize: '0.88rem', height: '42px', borderRadius: '8px' }}
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
                 aria-label="Clear search"
-                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '0.88rem' }}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '0.88rem' }}
               >
                 <i className="fas fa-times-circle" />
               </button>
@@ -763,29 +875,31 @@ export default function SubscribersTab() {
           </div>
         ) : (
           <>
-            {/* ── 1. Desktop & Tablet Table View (>= 768px) ── */}
+            {/* ── 1. Desktop & Big Screen Table View (>= 768px) ── */}
             <div className="subscribers-desktop-table" style={{ opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+              <table className="subscribers-table">
                 <thead>
-                  <tr style={{ borderBottom: '2px solid #F1F5F9' }}>
-                    {['Email', 'Status', 'Categories', 'Joined Date', 'Actions'].map(h => (
-                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontWeight: 700, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
-                    ))}
+                  <tr>
+                    <th className="subscribers-col-email">Email</th>
+                    <th className="subscribers-col-status">Status</th>
+                    <th className="subscribers-col-categories">Categories</th>
+                    <th className="subscribers-col-date">Joined Date</th>
+                    <th className="subscribers-col-actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {subscribers.map((sub, idx) => (
-                    <tr key={sub.id} style={{ borderBottom: '1px solid #F8FAFC', background: idx % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                      <td style={{ padding: '14px 14px', color: '#1E293B', fontWeight: 600 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <i className="fas fa-envelope" style={{ color: '#0072C6', fontSize: '0.85rem' }} />
+                  {subscribers.map(sub => (
+                    <tr key={sub.id}>
+                      <td className="subscribers-col-email" style={{ color: '#1E293B', fontWeight: 600 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <i className="fas fa-envelope" style={{ color: '#0072C6', fontSize: '0.9rem', flexShrink: 0 }} />
                           <span style={{ wordBreak: 'break-all' }}>{sub.email}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '14px 14px' }}>
+                      <td className="subscribers-col-status">
                         <span style={{
                           display: 'inline-flex', alignItems: 'center', gap: '5px',
-                          padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                          padding: '4px 11px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
                           background: sub.active ? '#E8F5E9' : '#FFEBEE',
                           color: sub.active ? '#2E7D32' : '#C62828'
                         }}>
@@ -793,43 +907,43 @@ export default function SubscribersTab() {
                           {sub.active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td style={{ padding: '14px 14px' }}>
-                        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      <td className="subscribers-col-categories">
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                           {sub.categories && sub.categories.length > 0 ? (
                             sub.categories.map(cat => (
-                              <span key={cat} style={{ padding: '2px 8px', borderRadius: '12px', background: '#E3F2FD', color: '#0072C6', fontSize: '0.72rem', fontWeight: 600 }}>
+                              <span key={cat} style={{ padding: '3px 10px', borderRadius: '12px', background: '#E3F2FD', color: '#0072C6', fontSize: '0.74rem', fontWeight: 600 }}>
                                 {CATEGORY_LABELS[cat] || cat}
                               </span>
                             ))
                           ) : (
-                            <span style={{ color: '#94A3B8', fontSize: '0.75rem' }}>All categories</span>
+                            <span style={{ color: '#94A3B8', fontSize: '0.76rem' }}>All categories</span>
                           )}
                         </div>
                       </td>
-                      <td style={{ padding: '14px 14px', color: '#64748B', whiteSpace: 'nowrap', fontSize: '0.82rem' }}>
+                      <td className="subscribers-col-date" style={{ color: '#64748B', whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
                         {new Date(sub.createdAt).toLocaleDateString('en-RW', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td style={{ padding: '14px 14px' }}>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                      <td className="subscribers-col-actions">
+                        <div className="subscribers-actions-wrap">
                           <button
                             type="button"
                             onClick={() => handleToggle(sub.id, sub.active)}
                             disabled={pendingSubscriberId !== null}
                             title={sub.active ? 'Deactivate' : 'Activate'}
-                            style={{ background: sub.active ? '#FFF3E0' : '#E8F5E9', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', color: sub.active ? '#E65100' : '#2E7D32', fontSize: '0.8rem', fontWeight: 600 }}
+                            style={{ background: sub.active ? '#FFF3E0' : '#E8F5E9', border: 'none', borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', color: sub.active ? '#E65100' : '#2E7D32', fontSize: '0.82rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                           >
-                            <i className={`fas ${sub.active ? 'fa-ban' : 'fa-check'} me-1`} />
-                            {sub.active ? 'Deactivate' : 'Activate'}
+                            <i className={`fas ${sub.active ? 'fa-ban' : 'fa-check'}`} />
+                            <span>{sub.active ? 'Deactivate' : 'Activate'}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDelete(sub.id, sub.email)}
                             disabled={pendingSubscriberId !== null}
                             title="Remove subscriber"
-                            style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', color: '#C62828', fontSize: '0.8rem', fontWeight: 600 }}
+                            style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', color: '#C62828', fontSize: '0.82rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                           >
-                            <i className={`fas ${pendingSubscriberId === sub.id ? 'fa-spinner fa-spin' : 'fa-trash'} me-1`} />
-                            {pendingSubscriberId === sub.id ? 'Deleting…' : 'Delete'}
+                            <i className={`fas ${pendingSubscriberId === sub.id ? 'fa-spinner fa-spin' : 'fa-trash'}`} />
+                            <span>{pendingSubscriberId === sub.id ? 'Deleting…' : 'Delete'}</span>
                           </button>
                         </div>
                       </td>
@@ -938,16 +1052,16 @@ export default function SubscribersTab() {
 
             {/* Pagination Toolbar */}
             <div className="subscribers-pagination-bar">
-              {/* Range info & Limit Selector for Mobile */}
+              {/* Range info & Limit Selector */}
               <div className="subscribers-pagination-mobile-top">
                 <div className="subscribers-pagination-range">
                   Showing <span style={{ fontWeight: 700, color: '#0F172A' }}>{startIndex.toLocaleString()}</span> to{' '}
                   <span style={{ fontWeight: 700, color: '#0F172A' }}>{endIndex.toLocaleString()}</span> of{' '}
-                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{totalCount.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{totalCount.toLocaleString()}</span> subscribers
                 </div>
 
                 <div className="subscribers-pagination-size">
-                  <label htmlFor="subscribersPerPage" style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 500, margin: 0 }}>
+                  <label htmlFor="subscribersPerPage" style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 500, margin: 0 }}>
                     Per page:
                   </label>
                   <select
@@ -958,7 +1072,7 @@ export default function SubscribersTab() {
                       setLimit(Number(e.target.value));
                       setPage(1);
                     }}
-                    style={{ width: '70px', fontSize: '0.82rem', fontWeight: 600, padding: '3px 8px' }}
+                    style={{ width: '75px', fontSize: '0.82rem', fontWeight: 600, padding: '4px 8px' }}
                   >
                     <option value={10}>10</option>
                     <option value={20}>20</option>
@@ -975,7 +1089,7 @@ export default function SubscribersTab() {
                   onClick={() => setPage(1)}
                   disabled={page <= 1 || loading}
                   className="btn btn-sm btn-light"
-                  style={{ border: '1px solid #E2E8F0', padding: '5px 10px', fontSize: '0.82rem', fontWeight: 600 }}
+                  style={{ border: '1px solid #E2E8F0', padding: '5px 12px', fontSize: '0.82rem', fontWeight: 600 }}
                   title="First Page"
                 >
                   <i className="fas fa-angles-left" />
@@ -985,7 +1099,7 @@ export default function SubscribersTab() {
                   onClick={() => setPage(prev => Math.max(1, prev - 1))}
                   disabled={page <= 1 || loading}
                   className="btn btn-sm btn-light"
-                  style={{ border: '1px solid #E2E8F0', padding: '5px 12px', fontSize: '0.82rem', fontWeight: 600 }}
+                  style={{ border: '1px solid #E2E8F0', padding: '5px 14px', fontSize: '0.82rem', fontWeight: 600 }}
                 >
                   <i className="fas fa-chevron-left me-1" /> Prev
                 </button>
@@ -1002,7 +1116,7 @@ export default function SubscribersTab() {
                       color: p === page ? '#FFFFFF' : '#334155',
                       border: p === page ? '1px solid #0072C6' : '1px solid #E2E8F0',
                       fontWeight: p === page ? 700 : 500,
-                      minWidth: '34px',
+                      minWidth: '36px',
                       fontSize: '0.82rem',
                       padding: '5px 10px'
                     }}
@@ -1016,7 +1130,7 @@ export default function SubscribersTab() {
                   onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={page >= totalPages || loading}
                   className="btn btn-sm btn-light"
-                  style={{ border: '1px solid #E2E8F0', padding: '5px 12px', fontSize: '0.82rem', fontWeight: 600 }}
+                  style={{ border: '1px solid #E2E8F0', padding: '5px 14px', fontSize: '0.82rem', fontWeight: 600 }}
                 >
                   Next <i className="fas fa-chevron-right ms-1" />
                 </button>
@@ -1025,7 +1139,7 @@ export default function SubscribersTab() {
                   onClick={() => setPage(totalPages)}
                   disabled={page >= totalPages || loading}
                   className="btn btn-sm btn-light"
-                  style={{ border: '1px solid #E2E8F0', padding: '5px 10px', fontSize: '0.82rem', fontWeight: 600 }}
+                  style={{ border: '1px solid #E2E8F0', padding: '5px 12px', fontSize: '0.82rem', fontWeight: 600 }}
                   title="Last Page"
                 >
                   <i className="fas fa-angles-right" />
