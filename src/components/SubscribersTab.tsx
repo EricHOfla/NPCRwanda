@@ -400,7 +400,7 @@ export default function SubscribersTab() {
                           title="Remove subscriber"
                           style={{ background: '#FFEBEE', border: 'none', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', color: '#C62828', fontSize: '0.8rem', fontWeight: 600 }}
                         >
-                          <i className="fas fa-trash-can me-1" />Remove
+                          <i className={`fas ${pendingSubscriberId === sub.id ? 'fa-spinner fa-spin' : 'fa-trash'} me-1`} />{pendingSubscriberId === sub.id ? 'Deleting…' : 'Delete'}
                         </button>
                       </div>
                     </td>

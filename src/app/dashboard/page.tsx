@@ -3909,7 +3909,7 @@ export default function DashboardPage() {
                                   <td>
                                     <div className="d-flex gap-2">
                                       <button onClick={() => handleEditLeaderClick(l)} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteLeader(l.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => { if (confirm(`Delete leader ${l.name}?`)) deleteLeader(l.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4032,7 +4032,7 @@ export default function DashboardPage() {
                                         setEditingAthleteId(a.id);
                                         setAthleteFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteAthlete(a.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => { if (confirm(`Delete athlete ${a.name}?`)) deleteAthlete(a.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4136,7 +4136,7 @@ export default function DashboardPage() {
                                         setEditingSportId(s.id);
                                         setSportFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteSport(s.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => { if (confirm(`Delete sport ${s.title}?`)) deleteSport(s.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4269,7 +4269,7 @@ export default function DashboardPage() {
                                         setEditingNewsId(n.id);
                                         setNewsFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteNews(n.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => { if (confirm(`Delete article "${n.title}"?`)) deleteNews(n.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4539,7 +4539,7 @@ export default function DashboardPage() {
                                         setEditingEventId(e.id);
                                         setEventFormOpen(true);
                                       }} className="btn btn-sm btn-outline-primary py-1">Edit</button>
-                                      <button onClick={() => deleteEvent(e.id)} className="btn btn-sm btn-outline-danger py-1">Delete</button>
+                                      <button onClick={() => { if (confirm(`Delete event "${e.title}"?`)) deleteEvent(e.id); }} className="btn btn-sm btn-outline-danger py-1">Delete</button>
                                     </div>
                                   </td>
                                 </tr>
@@ -5245,7 +5245,7 @@ export default function DashboardPage() {
                       {!activeVolunteer.read && (
                         <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                       )}
-                      <button onClick={async () => { if (await deleteVolunteerApplication(activeVolunteer.id)) setActiveVolunteer(null); }} className="btn btn-danger btn-sm">Delete Application</button>
+                      <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
                     </div>
                   </div>
                 )}
@@ -5288,7 +5288,7 @@ export default function DashboardPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={async () => { await runSubmissionDelete(v.id, deleteVolunteerApplication); }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
+                                  <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                                 </div>
                               </td>
                             </tr>
@@ -5485,7 +5485,7 @@ export default function DashboardPage() {
                     {!activeMessage.read && (
                       <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage)) setActiveMessage(null); }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete'}</button>
+                    <button onClick={async () => { if (confirm(`Delete contact message from ${activeMessage.name}?`)) { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage)) setActiveMessage(null); } }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete Message'}</button>
                   </div>
                 </div>
               )}
@@ -5503,7 +5503,7 @@ export default function DashboardPage() {
                     {!activeVolunteer.read && (
                       <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete'}</button>
+                    <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication)) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
                   </div>
                 </div>
               )}
@@ -5521,7 +5521,7 @@ export default function DashboardPage() {
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry)) setActiveDonation(null); }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete'}</button>
+                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry)) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
                   </div>
                 </div>
               )}
@@ -5552,7 +5552,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await runSubmissionDelete(c.id, deleteContactMessage); }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(c.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5588,7 +5588,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await deleteVolunteerApplication(v.id); }} className="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>
@@ -5624,7 +5624,7 @@ export default function DashboardPage() {
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0">Open</button>
-                                <button onClick={async () => { await runSubmissionDelete(d.id, deleteDonationInquiry); }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
+                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(d.id) ? 'Deleting…' : 'Delete'}</button>
                               </div>
                             </td>
                           </tr>

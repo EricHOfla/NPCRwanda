@@ -4,22 +4,25 @@ import { getSessionUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+const NO_STORE = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSessionUser(request);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: NO_STORE });
     }
 
     const { id } = await context.params;
-    await prisma.subscriber.delete({
+    // Idempotent deletion so retrying does not throw Prisma P2025 error
+    await prisma.subscriber.deleteMany({
       where: { id },
     });
 
-    return NextResponse.json({ success: true, message: 'Subscriber removed' });
+    return NextResponse.json({ success: true, message: 'Subscriber removed' }, { headers: NO_STORE });
   } catch (err: any) {
     console.error('Delete subscriber error:', err);
-    return NextResponse.json({ error: 'Failed to delete subscriber' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete subscriber' }, { status: 500, headers: NO_STORE });
   }
 }
 
@@ -27,7 +30,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
   try {
     const session = await getSessionUser(request);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: NO_STORE });
     }
 
     const { id } = await context.params;
@@ -41,9 +44,9 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       },
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(updated, { headers: NO_STORE });
   } catch (err: any) {
     console.error('Update subscriber error:', err);
-    return NextResponse.json({ error: 'Failed to update subscriber' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update subscriber' }, { status: 500, headers: NO_STORE });
   }
 }
