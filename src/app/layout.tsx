@@ -69,18 +69,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon_io/favicon.ico', sizes: 'any' },
-      { url: '/favicon_io/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon_io/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon_io/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/favicon_io/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/assets/img/logo.png', sizes: 'any', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
-    shortcut: '/favicon_io/favicon.ico',
+    shortcut: '/assets/img/logo.png',
     apple: [
-      { url: '/favicon_io/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/assets/img/logo.png', sizes: '180x180', type: 'image/png' },
     ],
   },
-  manifest: '/favicon_io/site.webmanifest',
 };
 
 export default function RootLayout({
@@ -107,16 +103,10 @@ export default function RootLayout({
             --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           }
         `}} />
-        {/* Favicons, Mobile Icons & Touch Icon */}
-        <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png" />
-        <link rel="manifest" href="/favicon_io/site.webmanifest" />
-        <meta name="theme-color" content="#0033A0" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="NPC Rwanda" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/logo.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/logo.png" />
+        <link rel="shortcut icon" href="/assets/img/logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/logo.png" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
           rel="stylesheet"
