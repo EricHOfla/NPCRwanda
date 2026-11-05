@@ -3,13 +3,9 @@ import type { Metadata } from 'next';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const resolvedParams =
-    params && typeof (params as Promise<{ slug: string }>).then === 'function'
-      ? await (params as Promise<{ slug: string }>)
-      : (params as { slug: string });
-
+  const resolvedParams = await params;
   const slug = resolvedParams?.slug ?? '';
   const title = slug
     .split('-')

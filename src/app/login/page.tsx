@@ -187,7 +187,7 @@ export default function LoginPage() {
         .login-branding-panel {
           flex: 1.1;
           background: linear-gradient(150deg, rgba(6, 26, 61, 0.94) 0%, rgba(0, 51, 160, 0.88) 100%),
-                      url('/assets/img/curated/about-hero.jpg') center/cover no-repeat;
+                      url('/assets/img/logo.png') center/cover no-repeat;
           padding: 48px 40px;
           color: #ffffff;
           display: flex;
@@ -598,7 +598,7 @@ export default function LoginPage() {
                   <input
                     type="email"
                     id="loginEmail"
-                    placeholder="admin@npcrwanda.org"
+                    placeholder="Enter your account email"
                     className="login-input-field"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

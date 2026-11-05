@@ -6,10 +6,8 @@ import { useData } from '@/context/DataContext';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import CareerApplicationForm from '@/components/CareerApplicationForm';
 
-export default function CareerDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-  const unwrappedParams = params && typeof (params as Promise<{ slug: string }>).then === 'function' 
-    ? React.use(params as Promise<{ slug: string }>) 
-    : (params as { slug: string });
+export default function CareerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const unwrappedParams = React.use(params);
   const slug = unwrappedParams?.slug;
   const { careers, loading } = useData();
 
