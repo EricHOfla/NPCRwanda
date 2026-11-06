@@ -1564,23 +1564,6 @@ export default function DashboardPage() {
       return timeB - timeA;
     });
 
-  const STATS = [
-    { label: 'Total Athletes', value: String(athletes.length), icon: 'fa-person-running', color: '#0072C6', action: () => { setAdminTab('pages'); setActiveEditPage('athletes'); } },
-    { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50', action: () => { setAdminTab('pages'); setActiveEditPage('news'); } },
-    { 
-      label: 'Upcoming Events', 
-      value: String(upcomingEventsList.length), 
-      icon: 'fa-calendar-alt', 
-      color: '#673AB7', 
-      action: () => { setAdminTab('pages'); setActiveEditPage('events'); } 
-    },
-    { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935', action: () => { setAdminTab('pages'); setActiveEditPage('careers'); } },
-    ...(!isEditor ? [
-      { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000', action: () => setAdminTab('contacts') },
-      { label: 'Partners Logos', value: String(partners.length), icon: 'fa-handshake', color: '#00838F', action: () => { setAdminTab('pages'); setActiveEditPage('partners'); } },
-    ] : []),
-  ];
-
   // Forms Submissions
   const handleAthleteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2700,64 +2683,6 @@ export default function DashboardPage() {
                   </a>
                 </div>
               </div>
-
-              {/* Website content overview: public-facing content managed in the CMS */}
-              <section aria-labelledby="website-overview-heading" style={{ marginBottom: '28px' }}>
-                <div style={{ marginBottom: '14px' }}>
-                  <h2 id="website-overview-heading" style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Website Overview</h2>
-                  <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>Public website content and inbox figures. Select a card to manage its records.</p>
-                </div>
-                {/* Stats Strip */}
-                <div className="row g-4 mb-4">
-                {STATS.map(stat => (
-                  <div key={stat.label} className="col-sm-6 col-md-4 col-lg-2">
-                    <div 
-                      className="dashboard-stat-card"
-                      style={{ 
-                        background: '#ffffff', 
-                        borderRadius: '12px', 
-                        border: '1px solid #E2E8F0', 
-                        padding: '20px', 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '8px',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                        transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
-                        cursor: 'pointer'
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Open ${stat.label.toLowerCase()} management`}
-                      onClick={stat.action}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          stat.action();
-                        }
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.05)';
-                        e.currentTarget.style.borderColor = '#cbd5e1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
-                        e.currentTarget.style.borderColor = '#E2E8F0';
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</span>
-                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${stat.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <i className={`fas ${stat.icon}`} style={{ color: stat.color, fontSize: '0.85rem' }} />
-                        </div>
-                      </div>
-                      <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', lineHeight: '1.2' }}>{stat.value}</span>
-                    </div>
-                  </div>
-                ))}
-                </div>
-              </section>
 
               {!isEditor && <DashboardAnalytics />}
 
