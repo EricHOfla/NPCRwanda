@@ -55,6 +55,10 @@ export default function DashboardAnalytics() {
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
 
   return <div className="live-analytics-wrap">
+    <div style={{ margin: '0 0 14px' }}>
+      <h2 style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Organization Overview</h2>
+      <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>Operational figures for athletes, donations, active partners and requests needing attention.</p>
+    </div>
     <div className="live-analytics-toolbar">
       <div><span className="live-analytics-live-dot" /> <strong>Live database analytics</strong><small>Auto-refreshes every 30 seconds</small></div>
       <div className="live-analytics-controls">
