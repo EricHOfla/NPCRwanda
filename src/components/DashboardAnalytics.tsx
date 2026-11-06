@@ -22,12 +22,6 @@ function Panel({ title, icon, children, action }: { title: string; icon: string;
   </section>;
 }
 
-function Metric({ label, value, detail }: { label: string; value: number; detail?: string }) {
-  return <div className="live-analytics-metric">
-    <span>{label}</span><strong>{number(value)}</strong>{detail && <small>{detail}</small>}
-  </div>;
-}
-
 export default function DashboardAnalytics() {
   const [days, setDays] = useState(30);
   const [data, setData] = useState<Analytics | null>(null);
@@ -62,7 +56,7 @@ export default function DashboardAnalytics() {
 
   return <div className="live-analytics-wrap">
     <div className="live-analytics-toolbar">
-      <div><span className="live-analytics-live-dot" /> <strong>Overview analytics</strong><small>Database data · refreshes every 30 seconds</small></div>
+      <div><span className="live-analytics-live-dot" /> <strong>Live database analytics</strong><small>Auto-refreshes every 30 seconds</small></div>
       <div className="live-analytics-controls">
         <select aria-label="Analytics date range" value={days} onChange={(event) => setDays(Number(event.target.value))}>
           <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option><option value={365}>Last 12 months</option>
@@ -73,86 +67,45 @@ export default function DashboardAnalytics() {
     </div>
 
     {error && <div className="live-analytics-error" role="alert">{error} <button type="button" onClick={() => refresh()}>Try again</button></div>}
-    {loading && !data ? <div className="live-analytics-loading"><i className="fas fa-spinner fa-spin" /> Loading dashboard data…</div> : data && <>
-      <section className="live-analytics-section">
-        <div className="live-analytics-section-heading"><div><h3>Needs attention</h3><p>Open requests that still require an administrator response</p></div><strong className="live-analytics-total">{number(data.engagement.pendingWork)} open</strong></div>
-        <div className="live-analytics-attention-grid">
-          <Metric label="Unread contact messages" value={data.engagement.unreadMessages} detail={`of ${number(data.engagement.totalMessages)} total messages`} />
-          <Metric label="Pending job applications" value={data.engagement.pendingJobs} />
-          <Metric label="Athlete enquiries" value={data.engagement.athleteEnquiries} />
-          <Metric label="Event registrations" value={data.engagement.eventRegistrations} />
-          <Metric label="Sponsor enquiries" value={data.engagement.sponsorInquiries} />
-        </div>
-        <p className="live-analytics-note">The open total is the sum of these five categories. Volunteer applications are shown separately because the current data does not provide a verified pending-review status count.</p>
-      </section>
+    {loading && !data ? <div className="live-analytics-loading"><i className="fas fa-spinner fa-spin" /> Loading real database analytics…</div> : data && <>
+      <div className="live-analytics-kpis">
+        <div className="live-analytics-kpi blue"><span>Total Athletes</span><strong>{number(data.members.athletes)}</strong><small>{number(data.members.activeAthletes)} active</small><i className="fas fa-wheelchair" /></div>
+        <div className="live-analytics-kpi green"><span>Verified Donations</span><strong>{money(data.donations.lifetime.RWF, 'RWF')}</strong><small>{money(data.donations.lifetime.USD, 'USD')} · {number(data.donations.lifetime.count)} payments</small><i className="fas fa-hand-holding-heart" /></div>
+        <div className="live-analytics-kpi amber"><span>Active Partners</span><strong>{number(data.members.partners)}</strong><small>Currently active</small><i className="fas fa-handshake" /></div>
+        <div className="live-analytics-kpi violet"><span>Pending Work</span><strong>{number(data.engagement.pendingWork)}</strong><small>Requests needing attention</small><i className="fas fa-inbox" /></div>
+      </div>
 
-      <section className="live-analytics-section">
-        <div className="live-analytics-section-heading"><div><h3>Organization at a glance</h3><p>Current records and published website content</p></div></div>
-        <div className="live-analytics-overview-grid">
-          <Panel title="Athletes & partners" icon="fa-people-group">
-            <div className="live-analytics-metric-grid">
-              <Metric label="Total athletes" value={data.members.athletes} detail={`${number(data.members.activeAthletes)} active`} />
-              <Metric label="Active partners" value={data.members.partners} />
-            </div>
-          </Panel>
-          <Panel title="Website content" icon="fa-newspaper">
-            <div className="live-analytics-metric-grid">
-              <Metric label="Published news" value={data.content.publishedNews} />
-              <Metric label="News drafts" value={data.content.draftNews} />
-              <Metric label="Upcoming / ongoing events" value={data.content.upcomingEvents} />
-              <Metric label="All events" value={data.content.totalEvents} />
-            </div>
-          </Panel>
-          <Panel title="Community" icon="fa-users">
-            <div className="live-analytics-metric-grid">
-              <Metric label="Volunteer applications" value={data.engagement.volunteers} detail="All statuses" />
-              <Metric label="Active subscribers" value={data.engagement.activeSubscribers} />
-              <Metric label="All contact messages" value={data.engagement.totalMessages} />
-            </div>
-          </Panel>
-        </div>
-      </section>
+      <div className="live-analytics-grid">
+        <Panel title={`Donation activity · ${days} days`} icon="fa-chart-column">
+          <div className="live-analytics-donation-summary">
+            <div><small>Successful in selected period</small><strong>{money(data.donations.rangeRwf, 'RWF')}</strong><span>{money(data.donations.rangeUsd, 'USD')} USD · {number(data.donations.rangeCount)} transactions</span></div>
+            <div><small>Payment status</small><strong>{number(data.donations.pendingPayments)} pending</strong><span>{number(data.donations.failedPayments)} failed · excluded from totals</span></div>
+          </div>
+          <div className="live-analytics-bars" role="img" aria-label="Daily verified RWF donation totals">
+            {data.donations.daily.filter((_, i) => days <= 30 || i % Math.ceil(days / 30) === 0).map((item) => <div className="live-analytics-bar-col" key={item.date} title={`${item.date}: ${money(item.rwf, 'RWF')}`}>
+              <div className="live-analytics-bar-track"><span style={{ height: `${Math.max(item.rwf ? 3 : 0, item.rwf / maxDonation * 100)}%` }} /></div>
+              <small>{new Date(item.date + 'T00:00:00').toLocaleDateString('en', { day: 'numeric', month: 'short' })}</small>
+            </div>)}
+          </div>
+          <p className="live-analytics-note">Only payments marked SUCCESSFUL are included. RWF and USD are kept separate.</p>
+        </Panel>
 
-      <section className="live-analytics-section">
-        <div className="live-analytics-section-heading"><div><h3>Donations & payments</h3><p>Successful donations are separated by currency; pending and failed payments are not included in successful totals</p></div></div>
-        <div className="live-analytics-overview-grid">
-          <Panel title={`Successful donations · last ${days} days`} icon="fa-hand-holding-heart">
-            <div className="live-analytics-metric-grid">
-              <Metric label="RWF received" value={data.donations.rangeRwf} detail="Successful payments only" />
-              <Metric label="USD received" value={data.donations.rangeUsd} detail="Successful payments only" />
-              <Metric label="Successful transactions" value={data.donations.rangeCount} />
-            </div>
-            <div className="live-analytics-bars" role="img" aria-label="Daily successful RWF donation totals">
-              {data.donations.daily.filter((_, i) => days <= 30 || i % Math.ceil(days / 30) === 0).map((item) => <div className="live-analytics-bar-col" key={item.date} title={`${item.date}: ${money(item.rwf, 'RWF')}`}>
-                <div className="live-analytics-bar-track"><span style={{ height: `${Math.max(item.rwf ? 3 : 0, item.rwf / maxDonation * 100)}%` }} /></div>
-                <small>{new Date(item.date + 'T00:00:00').toLocaleDateString('en', { day: 'numeric', month: 'short' })}</small>
-              </div>)}
-            </div>
-            <p className="live-analytics-note">Chart shows RWF only. USD totals are displayed separately and are never converted or combined.</p>
-          </Panel>
-          <Panel title="Payment follow-up" icon="fa-receipt">
-            <div className="live-analytics-metric-grid">
-              <Metric label="Pending payments" value={data.donations.pendingPayments} />
-              <Metric label="Failed payments" value={data.donations.failedPayments} />
-              <Metric label="Lifetime successful RWF" value={data.donations.lifetime.RWF} />
-              <Metric label="Lifetime successful USD" value={data.donations.lifetime.USD} />
-              <Metric label="Lifetime successful transactions" value={data.donations.lifetime.count} />
-            </div>
-          </Panel>
-        </div>
-      </section>
-
-      <section className="live-analytics-section">
-        <div className="live-analytics-section-heading"><div><h3>Athletes by sport</h3><p>All sports represented in the athlete records</p></div></div>
-        <Panel title="Athlete distribution" icon="fa-medal">
-          {sportTotal ? <div className="live-analytics-sports">{data.sports.map((item) => <div key={item.sport}>
+        <Panel title="Athletes by sport" icon="fa-medal">
+          {sportTotal ? <div className="live-analytics-sports">{data.sports.slice(0, 7).map((item) => <div key={item.sport}>
             <div><span>{item.sport}</span><strong>{number(item.athletes)}</strong></div>
             <div className="live-analytics-progress"><span style={{ width: `${Math.round(item.athletes / sportTotal * 100)}%` }} /></div>
           </div>)}</div> : <p className="live-analytics-empty">No athlete records have been added yet.</p>}
         </Panel>
-      </section>
 
-      <div className="live-analytics-footnote"><i className="fas fa-circle-info" /> Visitor and page-view analytics are not shown because no verified traffic-tracking source is connected. Figures above come from the application database.</div>
+        <Panel title="Website content" icon="fa-newspaper">
+          <div className="live-analytics-stat-list"><div><span>Published news</span><strong>{number(data.content.publishedNews)}</strong></div><div><span>Draft news</span><strong>{number(data.content.draftNews)}</strong></div><div><span>Upcoming / ongoing events</span><strong>{number(data.content.upcomingEvents)}</strong></div><div><span>All events</span><strong>{number(data.content.totalEvents)}</strong></div></div>
+        </Panel>
+
+        <Panel title="Community engagement" icon="fa-users">
+          <div className="live-analytics-stat-list"><div><span>Unread messages</span><strong>{number(data.engagement.unreadMessages)}</strong></div><div><span>Volunteer applications</span><strong>{number(data.engagement.volunteers)}</strong></div><div><span>Pending job applications</span><strong>{number(data.engagement.pendingJobs)}</strong></div><div><span>Athlete enquiries</span><strong>{number(data.engagement.athleteEnquiries)}</strong></div><div><span>Event registrations</span><strong>{number(data.engagement.eventRegistrations)}</strong></div><div><span>Sponsor enquiries</span><strong>{number(data.engagement.sponsorInquiries)}</strong></div><div><span>Active subscribers</span><strong>{number(data.engagement.activeSubscribers)}</strong></div></div>
+        </Panel>
+      </div>
+      <div className="live-analytics-footnote"><i className="fas fa-circle-info" /> Website visitor/page-view analytics are not included yet because the current project has no verified traffic-tracking source connected. No visitor figures are estimated or fabricated.</div>
     </>}
   </div>;
 }
