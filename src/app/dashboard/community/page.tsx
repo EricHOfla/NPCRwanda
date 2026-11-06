@@ -1,5 +1,6 @@
 'use client';
 
+import AppSidebar from '@/components/dashboard/AppSidebar';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -399,155 +400,13 @@ function CommunityManagementContent() {
 
   return (
     <div className="dashboard-layout" style={{ display: 'flex', minHeight: '100vh', background: '#F8FAFC' }}>
-      {/* ── Mobile Sidebar Backdrop ── */}
-      {sidebarOpen && (
-        <div 
-          className="dashboard-sidebar-backdrop d-lg-none" 
-          onClick={() => setSidebarOpen(false)} 
-        />
-      )}
-
       {/* ── System Sidebar (Unified with main dashboard) ── */}
-      <aside 
-        className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open-mobile' : ''}`}
-        style={{
-          width: sidebarOpen ? '260px' : '72px',
-          background: '#0F172A',
-          color: '#fff',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-          flexShrink: 0,
-          zIndex: 1060,
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-        }}
-      >
-        {/* Logo block */}
-        <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-            <img src="/assets/img/logo.png" style={{ height: '32px', width: 'auto', flexShrink: 0 }} alt="NPC Logo" />
-            {sidebarOpen && <span style={{ fontWeight: 800, fontSize: '0.92rem', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>NPC DASHBOARD</span>}
-          </div>
-          <button 
-            type="button"
-            onClick={() => setSidebarOpen(false)}
-            className="d-lg-none btn btn-sm text-white-50 p-1"
-            style={{ background: 'none', border: 'none', fontSize: '1.2rem', lineHeight: 1 }}
-            title="Close menu"
-          >
-            <i className="fas fa-times" />
-          </button>
-        </div>
-
-        {/* Links Navigation */}
-        <nav className="dashboard-sidebar-nav" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', padding: '12px 0', overflowY: 'auto' }}>
-          {[
-            { id: 'overview', type: 'link', href: '/dashboard', label: 'Overview', icon: 'fa-chart-pie' },
-
-            { type: 'header', label: 'WEBSITE PAGES' },
-            { id: 'page-athletes', type: 'link', href: '/dashboard?tab=pages&page=athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
-            { id: 'page-sports', type: 'link', href: '/dashboard?tab=pages&page=sports', label: 'Sports Programs', icon: 'fa-volleyball' },
-            { id: 'page-news', type: 'link', href: '/dashboard?tab=pages&page=news', label: 'News Room', icon: 'fa-newspaper' },
-            { id: 'page-announcements', type: 'link', href: '/dashboard?tab=pages&page=announcements', label: 'Announcements', icon: 'fa-bullhorn' },
-            { id: 'page-events', type: 'link', href: '/dashboard?tab=pages&page=events', label: 'Events Calendar', icon: 'fa-calendar-days' },
-            { id: 'page-careers', type: 'link', href: '/dashboard?tab=pages&page=careers', label: 'Careers & Vacancies', icon: 'fa-briefcase' },
-            { id: 'page-partners', type: 'link', href: '/dashboard?tab=pages&page=partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
-            { id: 'page-governance', type: 'link', href: '/dashboard?tab=pages&page=governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
-
-            { type: 'header', label: 'MANAGEMENT' },
-            { id: 'community-sports', type: 'active', label: 'Sports & Community', icon: 'fa-people-group' },
-            { id: 'donations-payments', type: 'link', href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' },
-            { id: 'members', type: 'link', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' },
-            { id: 'contacts', type: 'link', href: '/dashboard?tab=contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
-          ].map((item: any, idx: number) => {
-            if (item.type === 'header') {
-              if (!sidebarOpen) return <div key={`sep-${idx}`} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 12px' }} />;
-              return (
-                <div
-                  key={`header-${idx}`}
-                  style={{
-                    padding: '14px 24px 6px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    letterSpacing: '1px',
-                    color: 'rgba(255, 255, 255, 0.45)',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {item.label}
-                </div>
-              );
-            }
-
-            const isActive = item.type === 'active';
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  if (item.href) {
-                    router.push(item.href);
-                  }
-                  if (typeof window !== 'undefined' && window.innerWidth < 992) {
-                    setSidebarOpen(false);
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  width: '100%',
-                  padding: sidebarOpen ? '10px 24px' : '12px 0',
-                  justifyContent: sidebarOpen ? 'flex-start' : 'center',
-                  background: isActive ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-                  border: 'none',
-                  color: isActive ? '#FFF' : 'rgba(255,255,255,0.7)',
-                  cursor: 'pointer',
-                  fontSize: '0.86rem',
-                  fontWeight: isActive ? 600 : 400,
-                  borderLeft: isActive ? '4px solid #FFA000' : '4px solid transparent',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left',
-                }}
-              >
-                <i className={`fas ${item.icon}`} style={{ fontSize: '0.95rem', width: '20px', textAlign: 'center', color: isActive ? '#FFA000' : 'inherit' }} />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Profile & Logout Block */}
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,.1)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {sidebarOpen && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 8px' }}>
-              <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#0b63b6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.82rem', flexShrink: 0 }}>
-                {userProfile.name.charAt(0).toUpperCase()}
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-                  {userProfile.name}
-                </span>
-                <span style={{ fontSize: '0.68rem', color: '#FFA000', textTransform: 'uppercase', fontWeight: 700 }}>
-                  {userProfile.role}
-                </span>
-              </div>
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
-            style={{ fontSize: '0.78rem', padding: '6px 12px', borderRadius: '8px' }}
-          >
-            <i className="fas fa-sign-out-alt" />
-            {sidebarOpen && <span>Sign Out</span>}
-          </button>
-        </div>
-      </aside>
+      <AppSidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        activeId="community-sports"
+        profile={userProfile}
+      />
 
       {/* ── Main Dashboard Workspace ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
