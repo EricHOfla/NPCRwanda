@@ -2701,7 +2701,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <DashboardAnalytics />
+              {!isEditor && <DashboardAnalytics />}
 
               {/* Stats Strip */}
               <div className="row g-4 mb-4">
