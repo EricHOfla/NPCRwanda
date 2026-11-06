@@ -22,7 +22,7 @@ function Panel({ title, icon, children, action }: { title: string; icon: string;
   </section>;
 }
 
-export default function DashboardAnalytics() {
+export default function DashboardAnalytics({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const [days, setDays] = useState(30);
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,9 +54,9 @@ export default function DashboardAnalytics() {
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
 
-  return <div className="live-analytics-wrap">
+  return <div className="live-analytics-wrap" id="organization-overview">
     <div style={{ margin: '0 0 14px' }}>
-      <h2 style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Organization Overview</h2>
+      <a href="#organization-overview" style={{ color: '#0F172A', fontSize: '1.15rem', fontWeight: 800, textDecoration: 'none' }} aria-label="Jump to Organization Overview">Organization Overview <i className="fas fa-link" style={{ fontSize: '0.75rem', marginLeft: 6, color: '#64748B' }} /></a>
       <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>Operational figures for athletes, donations, active partners and requests needing attention.</p>
     </div>
     <div className="live-analytics-toolbar">
@@ -73,14 +73,14 @@ export default function DashboardAnalytics() {
     {error && <div className="live-analytics-error" role="alert">{error} <button type="button" onClick={() => refresh()}>Try again</button></div>}
     {loading && !data ? <div className="live-analytics-loading"><i className="fas fa-spinner fa-spin" /> Loading real database analytics…</div> : data && <>
       <div className="live-analytics-kpis">
-        <div className="live-analytics-kpi blue"><span>Total Athletes</span><strong>{number(data.members.athletes)}</strong><small>{number(data.members.activeAthletes)} active</small><i className="fas fa-wheelchair" /></div>
-        <div className="live-analytics-kpi green"><span>Verified Donations</span><strong>{money(data.donations.lifetime.RWF, 'RWF')}</strong><small>{money(data.donations.lifetime.USD, 'USD')} · {number(data.donations.lifetime.count)} payments</small><i className="fas fa-hand-holding-heart" /></div>
-        <div className="live-analytics-kpi amber"><span>Active Partners</span><strong>{number(data.members.partners)}</strong><small>Currently active</small><i className="fas fa-handshake" /></div>
-        <div className="live-analytics-kpi violet"><span>Pending Work</span><strong>{number(data.engagement.pendingWork)}</strong><small>Requests needing attention</small><i className="fas fa-inbox" /></div>
+        <button type="button" onClick={() => onNavigate("athletes")} className="live-analytics-kpi blue" aria-label="Open athlete management" style={{ textAlign: "left", width: "100%", border: 0, cursor: "pointer" }}><span>Total Athletes</span><strong>{number(data.members.athletes)}</strong><small>{number(data.members.activeAthletes)} active</small><i className="fas fa-wheelchair" /></button>
+        <button type="button" onClick={() => onNavigate("pages")} className="live-analytics-kpi green" aria-label="Open donation management" style={{ textAlign: "left", width: "100%", border: 0, cursor: "pointer" }}><span>Verified Donations</span><strong>{money(data.donations.lifetime.RWF, 'RWF')}</strong><small>{money(data.donations.lifetime.USD, 'USD')} · {number(data.donations.lifetime.count)} payments</small><i className="fas fa-hand-holding-heart" /></button>
+        <button type="button" onClick={() => onNavigate("partners")} className="live-analytics-kpi amber" aria-label="Open partner management" style={{ textAlign: "left", width: "100%", border: 0, cursor: "pointer" }}><span>Active Partners</span><strong>{number(data.members.partners)}</strong><small>Currently active</small><i className="fas fa-handshake" /></button>
+        <button type="button" onClick={() => onNavigate("contacts")} className="live-analytics-kpi violet" aria-label="Open pending requests" style={{ textAlign: "left", width: "100%", border: 0, cursor: "pointer" }}><span>Pending Work</span><strong>{number(data.engagement.pendingWork)}</strong><small>Requests needing attention</small><i className="fas fa-inbox" /></button>
       </div>
 
       <div className="live-analytics-grid">
-        <Panel title={`Donation activity · ${days} days`} icon="fa-chart-column">
+        <Panel title={`Donation activity · ${days} days`} icon="fa-chart-column" action={<button type="button" className="btn btn-sm btn-link" onClick={() => onNavigate("pages")}>Open donations <i className="fas fa-arrow-right" /></button>}>
           <div className="live-analytics-donation-summary">
             <div><small>Successful in selected period</small><strong>{money(data.donations.rangeRwf, 'RWF')}</strong><span>{money(data.donations.rangeUsd, 'USD')} USD · {number(data.donations.rangeCount)} transactions</span></div>
             <div><small>Payment status</small><strong>{number(data.donations.pendingPayments)} pending</strong><span>{number(data.donations.failedPayments)} failed · excluded from totals</span></div>
@@ -94,19 +94,19 @@ export default function DashboardAnalytics() {
           <p className="live-analytics-note">Only payments marked SUCCESSFUL are included. RWF and USD are kept separate.</p>
         </Panel>
 
-        <Panel title="Athletes by sport" icon="fa-medal">
+        <Panel title="Athletes by sport" icon="fa-medal" action={<button type="button" className="btn btn-sm btn-link" onClick={() => onNavigate("athletes")}>View athletes <i className="fas fa-arrow-right" /></button>}>
           {sportTotal ? <div className="live-analytics-sports">{data.sports.slice(0, 7).map((item) => <div key={item.sport}>
             <div><span>{item.sport}</span><strong>{number(item.athletes)}</strong></div>
             <div className="live-analytics-progress"><span style={{ width: `${Math.round(item.athletes / sportTotal * 100)}%` }} /></div>
           </div>)}</div> : <p className="live-analytics-empty">No athlete records have been added yet.</p>}
         </Panel>
 
-        <Panel title="Website content" icon="fa-newspaper">
-          <div className="live-analytics-stat-list"><div><span>Published news</span><strong>{number(data.content.publishedNews)}</strong></div><div><span>Draft news</span><strong>{number(data.content.draftNews)}</strong></div><div><span>Upcoming / ongoing events</span><strong>{number(data.content.upcomingEvents)}</strong></div><div><span>All events</span><strong>{number(data.content.totalEvents)}</strong></div></div>
+        <Panel title="Website content" icon="fa-newspaper" action={<button type="button" className="btn btn-sm btn-link" onClick={() => onNavigate("news")}>Manage content <i className="fas fa-arrow-right" /></button>}>
+          <div className="live-analytics-stat-list"><button type="button" onClick={() => onNavigate("news")}><span>Published news</span><strong>{number(data.content.publishedNews)}</strong></button><button type="button" onClick={() => onNavigate("news")}><span>Draft news</span><strong>{number(data.content.draftNews)}</strong></button><button type="button" onClick={() => onNavigate("events")}><span>Upcoming / ongoing events</span><strong>{number(data.content.upcomingEvents)}</strong></button><button type="button" onClick={() => onNavigate("events")}><span>All events</span><strong>{number(data.content.totalEvents)}</strong></button></div>
         </Panel>
 
-        <Panel title="Community engagement" icon="fa-users">
-          <div className="live-analytics-stat-list"><div><span>Unread messages</span><strong>{number(data.engagement.unreadMessages)}</strong></div><div><span>Volunteer applications</span><strong>{number(data.engagement.volunteers)}</strong></div><div><span>Pending job applications</span><strong>{number(data.engagement.pendingJobs)}</strong></div><div><span>Athlete enquiries</span><strong>{number(data.engagement.athleteEnquiries)}</strong></div><div><span>Event registrations</span><strong>{number(data.engagement.eventRegistrations)}</strong></div><div><span>Sponsor enquiries</span><strong>{number(data.engagement.sponsorInquiries)}</strong></div><div><span>Active subscribers</span><strong>{number(data.engagement.activeSubscribers)}</strong></div></div>
+        <Panel title="Community engagement" icon="fa-users" action={<button type="button" className="btn btn-sm btn-link" onClick={() => onNavigate("contacts")}>Open inbox <i className="fas fa-arrow-right" /></button>}>
+          <div className="live-analytics-stat-list"><button type="button" onClick={() => onNavigate("contacts")}><span>Unread messages</span><strong>{number(data.engagement.unreadMessages)}</strong></button><button type="button" onClick={() => onNavigate("volunteers")}><span>Volunteer applications</span><strong>{number(data.engagement.volunteers)}</strong></button><button type="button" onClick={() => onNavigate("careers")}><span>Pending job applications</span><strong>{number(data.engagement.pendingJobs)}</strong></button><button type="button" onClick={() => onNavigate("athletes")}><span>Athlete enquiries</span><strong>{number(data.engagement.athleteEnquiries)}</strong></button><button type="button" onClick={() => onNavigate("events")}><span>Event registrations</span><strong>{number(data.engagement.eventRegistrations)}</strong></button><button type="button" onClick={() => onNavigate("partners")}><span>Sponsor enquiries</span><strong>{number(data.engagement.sponsorInquiries)}</strong></button><button type="button" onClick={() => onNavigate("subscribers")}><span>Active subscribers</span><strong>{number(data.engagement.activeSubscribers)}</strong></button></div>
         </Panel>
       </div>
       <div className="live-analytics-footnote"><i className="fas fa-circle-info" /> Website visitor/page-view analytics are not included yet because the current project has no verified traffic-tracking source connected. No visitor figures are estimated or fabricated.</div>
