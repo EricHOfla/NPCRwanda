@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const requestedDays = Number(request.nextUrl.searchParams.get('days') || 30);
   const days = [7, 30, 90, 365].includes(requestedDays) ? requestedDays : 30;
   const now = new Date();
-  const from = new Date(now);
+  const from = new Date(now.getTime());
   from.setDate(from.getDate() - (days - 1));
   from.setHours(0, 0, 0, 0);
 
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     const buckets = Array.from({ length: days }, (_, index) => {
-      const date = new Date(from);
+      const date = new Date(from.getTime());
       date.setDate(from.getDate() + index);
       return { date: date.toISOString().slice(0, 10), rwf: 0, usd: 0, count: 0 };
     });
