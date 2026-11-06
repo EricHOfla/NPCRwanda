@@ -2701,10 +2701,14 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {!isEditor && <DashboardAnalytics />}
-
-              {/* Stats Strip */}
-              <div className="row g-4 mb-4">
+              {/* Website content overview: public-facing content managed in the CMS */}
+              <section aria-labelledby="website-overview-heading" style={{ marginBottom: '28px' }}>
+                <div style={{ marginBottom: '14px' }}>
+                  <h2 id="website-overview-heading" style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Website Overview</h2>
+                  <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>Public website content and inbox figures. Select a card to manage its records.</p>
+                </div>
+                {/* Stats Strip */}
+                <div className="row g-4 mb-4">
                 {STATS.map(stat => (
                   <div key={stat.label} className="col-sm-6 col-md-4 col-lg-2">
                     <div 
@@ -2752,7 +2756,10 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+              </section>
+
+              {!isEditor && <DashboardAnalytics />}
 
               {/* Two-Column Grid */}
               <div className="row g-4">
