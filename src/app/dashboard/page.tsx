@@ -8,6 +8,7 @@ import { useTranslation } from '@/context/LanguageContext';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
 import {
   useData,
+  PUBLIC_BUNDLE_QUERY_KEY,
   Athlete,
   NewsArticle,
   Career,
@@ -25,6 +26,38 @@ import {
 import { isAnnouncementCategory } from '@/lib/newsUtils';
 import SubscribersTab from '@/components/SubscribersTab';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+
+
+// Real-time Event Timing & Upcoming Status Checker
+const getEventTiming = (ev: { date?: string; endDate?: string; status?: string }) => {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const start = (ev.date || '').trim();
+  const end = (ev.endDate || '').trim();
+
+  if (ev.status === 'Cancelled') {
+    return { isUpcoming: false, isOngoing: false, isPast: false, isCancelled: true, statusText: 'Cancelled', badgeClass: 'bg-danger' };
+  }
+  if (ev.status === 'Completed' && start && start < todayStr && (!end || end < todayStr)) {
+    return { isUpcoming: false, isOngoing: false, isPast: true, isCancelled: false, statusText: 'Completed', badgeClass: 'bg-secondary' };
+  }
+  // Ongoing: started on or before today and ends on or after today, OR single-day today, OR explicit Ongoing status
+  if ((start && end && start <= todayStr && end >= todayStr) || (start && start === todayStr) || ev.status === 'Ongoing') {
+    return { isUpcoming: true, isOngoing: true, isPast: false, isCancelled: false, statusText: 'Ongoing Today', badgeClass: 'bg-success' };
+  }
+  // Upcoming: start date is strictly in the future
+  if (start && start > todayStr) {
+    const d = new Date(start);
+    const today = new Date(todayStr);
+    const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const urgency = diffDays === 1 ? 'Tomorrow' : (diffDays > 0 ? `In ${diffDays} days` : 'Upcoming');
+    return { isUpcoming: true, isOngoing: false, isPast: false, isCancelled: false, statusText: urgency, badgeClass: 'bg-primary' };
+  }
+  // Fallback if status is marked Upcoming with no past date
+  if (ev.status === 'Upcoming' && (!start || start >= todayStr)) {
+    return { isUpcoming: true, isOngoing: false, isPast: false, isCancelled: false, statusText: 'Upcoming', badgeClass: 'bg-primary' };
+  }
+  return { isUpcoming: false, isOngoing: false, isPast: true, isCancelled: false, statusText: 'Past Event', badgeClass: 'bg-secondary' };
+};
 
 // Professional Pagination Component
 const PaginationComponent: React.FC<{
@@ -561,6 +594,11 @@ export default function DashboardPage() {
   const [activeEditPage, setActiveEditPage] = useState<string | null>('home');
   const [previewModeEnabled, setPreviewModeEnabled] = useState(false);
   const [contentSearch, setContentSearch] = useState('');
+
+  // Real-time synchronization & overview events tab
+  const [lastSyncTime, setLastSyncTime] = useState<string>('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [overviewEventsTab, setOverviewEventsTab] = useState<'upcoming' | 'past'>('upcoming');
 
 
   // Form states
@@ -1255,6 +1293,48 @@ export default function DashboardPage() {
     });
   }, [verifySession, fetchSystemUsers]);
 
+  // Real-time synchronization handler
+  const refreshRealTimeData = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY }),
+        fetchProtectedData(),
+        fetchGovData(),
+      ]);
+      setLastSyncTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    } catch (err) {
+      console.error('Error refreshing real-time data:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [queryClient, fetchProtectedData, fetchGovData]);
+
+  // Real-time auto-polling: refresh data every 30 seconds and on window focus
+  useEffect(() => {
+    if (!authVerified) return;
+    setLastSyncTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
+      fetchProtectedData();
+      setLastSyncTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 30000);
+
+    const handleFocus = () => {
+      queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
+      fetchProtectedData();
+      setLastSyncTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [authVerified, queryClient, fetchProtectedData]);
+
   // Inactivity timeout (60 minutes) & periodic session check
   useEffect(() => {
     if (!authVerified) return;
@@ -1466,10 +1546,33 @@ export default function DashboardPage() {
     }
   };
 
+  // Separate upcoming vs past events chronologically
+  const upcomingEventsList = events
+    .filter(ev => getEventTiming(ev).isUpcoming)
+    .sort((a, b) => {
+      const timeA = a.date ? new Date(a.date).getTime() : Infinity;
+      const timeB = b.date ? new Date(b.date).getTime() : Infinity;
+      return timeA - timeB;
+    });
+
+  const pastEventsList = events
+    .filter(ev => !getEventTiming(ev).isUpcoming)
+    .sort((a, b) => {
+      const timeA = a.date ? new Date(a.date).getTime() : 0;
+      const timeB = b.date ? new Date(b.date).getTime() : 0;
+      return timeB - timeA;
+    });
+
   const STATS = [
     { label: 'Total Athletes', value: String(athletes.length), icon: 'fa-person-running', color: '#0072C6', action: () => { setAdminTab('pages'); setActiveEditPage('athletes'); } },
     { label: 'News Articles', value: String(news.filter(n => !isAnnouncementCategory(n.category)).length), icon: 'fa-newspaper', color: '#4CAF50', action: () => { setAdminTab('pages'); setActiveEditPage('news'); } },
-    { label: 'Events Count', value: String(events.length), icon: 'fa-calendar-alt', color: '#673AB7', action: () => { setAdminTab('pages'); setActiveEditPage('events'); } },
+    { 
+      label: 'Upcoming Events', 
+      value: String(upcomingEventsList.length), 
+      icon: 'fa-calendar-alt', 
+      color: '#673AB7', 
+      action: () => { setAdminTab('pages'); setActiveEditPage('events'); } 
+    },
     { label: 'Open Positions', value: String(careers.filter(c => c.status === 'Open').length), icon: 'fa-briefcase', color: '#E53935', action: () => { setAdminTab('pages'); setActiveEditPage('careers'); } },
     ...(!isEditor ? [
       { label: 'Messages Inbox', value: String(contacts.filter(c => !c.read).length), icon: 'fa-envelope', color: '#FFA000', action: () => setAdminTab('contacts') },
@@ -2534,9 +2637,24 @@ export default function DashboardPage() {
                   <i className="fas fa-chart-pie" />
                 </div>
                 
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-                  Welcome back, {profile.name || 'Admin'}!
-                </h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+                    Welcome back, {profile.name || 'Admin'}!
+                  </h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.75rem', fontWeight: 600 }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', display: 'inline-block', boxShadow: '0 0 6px #4ADE80' }} />
+                    <span>Real-time Live Sync {lastSyncTime ? `(${lastSyncTime})` : ''}</span>
+                    <button 
+                      onClick={refreshRealTimeData}
+                      disabled={isRefreshing}
+                      className="btn btn-link btn-sm p-0 text-white"
+                      title="Sync live data now"
+                      style={{ textDecoration: 'none', marginLeft: '4px', opacity: isRefreshing ? 0.5 : 1 }}
+                    >
+                      <i className={`fas fa-sync-alt ${isRefreshing ? 'fa-spin' : ''}`} style={{ fontSize: '0.75rem' }} />
+                    </button>
+                  </div>
+                </div>
                 <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.85)', margin: '0 0 20px 0', maxWidth: '600px', lineHeight: '1.5' }}>
                   Manage the official National Paralympic Committee (NPC) Rwanda portal. Today is {currentDateString || 'Loading date...'}.
                 </p>
@@ -2777,10 +2895,15 @@ export default function DashboardPage() {
                 {/* Right Column: Upcoming Events & System */}
                 <div className="col-lg-5">
                   <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '24px', height: '100%', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                       <div>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Upcoming Events Schedule</h3>
-                        <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Training and national sports events</p>
+                        <div className="d-flex align-items-center gap-2">
+                          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Events Schedule</h3>
+                          <span className={`badge ${upcomingEventsList.length > 0 ? 'bg-primary' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
+                            {upcomingEventsList.length} Upcoming
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Real-time verification of upcoming vs completed events</p>
                       </div>
                       <button 
                         onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); }}
@@ -2791,38 +2914,127 @@ export default function DashboardPage() {
                       </button>
                     </div>
 
+                    {/* Filter tabs: Upcoming vs Past Events */}
+                    <div className="d-flex gap-2 mb-3 border-bottom pb-2">
+                      <button
+                        onClick={() => setOverviewEventsTab('upcoming')}
+                        className={`btn btn-sm ${overviewEventsTab === 'upcoming' ? 'btn-primary' : 'btn-light border'} py-1 px-3`}
+                        style={{ fontSize: '0.78rem', fontWeight: 600, borderRadius: '6px' }}
+                      >
+                        <i className="fas fa-calendar-check me-1" /> Upcoming ({upcomingEventsList.length})
+                      </button>
+                      <button
+                        onClick={() => setOverviewEventsTab('past')}
+                        className={`btn btn-sm ${overviewEventsTab === 'past' ? 'btn-primary' : 'btn-light border'} py-1 px-3`}
+                        style={{ fontSize: '0.78rem', fontWeight: 600, borderRadius: '6px' }}
+                      >
+                        <i className="fas fa-history me-1" /> Past ({pastEventsList.length})
+                      </button>
+                    </div>
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
                       {(() => {
-                        const upcoming = events.slice(0, 3);
-                        if (upcoming.length === 0) {
+                        const targetList = overviewEventsTab === 'upcoming' ? upcomingEventsList : pastEventsList;
+                        const displayEvents = targetList.slice(0, 4);
+
+                        if (displayEvents.length === 0) {
                           return (
-                            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                              <i className="far fa-calendar-times" style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#CBD5E1' }} />
-                              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>No upcoming events scheduled</span>
-                              <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>Add new events in the Events tab.</p>
+                            <div style={{ textAlign: 'center', padding: '36px 20px', color: '#94A3B8', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                              <i className={`far ${overviewEventsTab === 'upcoming' ? 'fa-calendar-plus text-primary' : 'fa-calendar-times'} mb-2`} style={{ fontSize: '2.5rem', opacity: 0.7 }} />
+                              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1E293B' }}>
+                                {overviewEventsTab === 'upcoming' ? 'No Upcoming Events Right Now' : 'No Past Events Found'}
+                              </span>
+                              <p style={{ fontSize: '0.78rem', margin: '4px 0 16px 0', maxWidth: '300px' }}>
+                                {overviewEventsTab === 'upcoming'
+                                  ? (pastEventsList.length > 0 
+                                      ? `All ${pastEventsList.length} recorded events have passed. Schedule a new event to appear here.`
+                                      : 'Add your first upcoming event to display it here in real-time.')
+                                  : 'No previous events recorded yet.'}
+                              </p>
+                              {overviewEventsTab === 'upcoming' && (
+                                <button
+                                  onClick={() => {
+                                    setAdminTab('pages');
+                                    setActiveEditPage('events');
+                                    setEventFormOpen(true);
+                                  }}
+                                  className="btn btn-sm btn-primary"
+                                  style={{ borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600 }}
+                                >
+                                  <i className="fas fa-plus me-1" /> Schedule New Event
+                                </button>
+                              )}
                             </div>
                           );
                         }
 
-                        return upcoming.map((ev, index) => {
+                        return displayEvents.map((ev, index) => {
                           const evDate = new Date(ev.date);
-                          const day = evDate.getDate() || '??';
-                          const monthStr = evDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() || 'M';
+                          const isValidDate = !isNaN(evDate.getTime());
+                          const day = isValidDate ? evDate.getDate() : '??';
+                          const monthStr = isValidDate ? evDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : 'DATE';
+                          const timing = getEventTiming(ev);
                           
                           return (
-                            <div key={ev.id} style={{ display: 'flex', gap: '14px', alignItems: 'center', borderBottom: index < upcoming.length - 1 ? '1px dashed #E2E8F0' : 'none', paddingBottom: index < upcoming.length - 1 ? '12px' : 0 }}>
-                              <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: '#F1F5F9', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <span style={{ fontSize: '0.62rem', fontWeight: 800, color: '#0b63b6', lineHeight: 1 }}>{monthStr}</span>
-                                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>{day}</span>
+                            <div 
+                              key={ev.id} 
+                              onClick={() => {
+                                setAdminTab('pages');
+                                setActiveEditPage('events');
+                                setEditingEventId(ev.id);
+                                setEventForm({
+                                  title: ev.title,
+                                  description: ev.description,
+                                  date: ev.date,
+                                  endDate: ev.endDate,
+                                  location: ev.location,
+                                  category: ev.category,
+                                  status: ev.status,
+                                  img: ev.img,
+                                  featured: ev.featured,
+                                  resultsSummary: ev.resultsSummary || '',
+                                  results: ev.results || ''
+                                });
+                                setEventFormOpen(true);
+                              }}
+                              style={{ 
+                                display: 'flex', 
+                                gap: '14px', 
+                                alignItems: 'center', 
+                                borderBottom: index < displayEvents.length - 1 ? '1px dashed #E2E8F0' : 'none', 
+                                paddingBottom: index < displayEvents.length - 1 ? '12px' : 0,
+                                cursor: 'pointer',
+                                transition: 'transform 0.15s ease'
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateX(4px)'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+                            >
+                              <div style={{ width: '50px', height: '50px', borderRadius: '10px', background: timing.isOngoing ? '#DCFCE7' : '#F1F5F9', border: `1px solid ${timing.isOngoing ? '#86EFAC' : '#E2E8F0'}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <span style={{ fontSize: '0.62rem', fontWeight: 800, color: timing.isOngoing ? '#166534' : '#0b63b6', lineHeight: 1 }}>{monthStr}</span>
+                                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: timing.isOngoing ? '#166534' : '#0F172A', lineHeight: 1.1 }}>{day}</span>
                               </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <span style={{ fontSize: '0.68rem', fontWeight: 700, color: ev.category === 'International' ? '#CF2F3B' : '#0b63b6', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
-                                  {ev.category} {ev.featured && '• Featured'}
-                                </span>
-                                <h4 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A', margin: '0 0 2px 0', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{ev.title}</h4>
-                                <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <i className="fas fa-map-marker-alt" style={{ fontSize: '0.7rem' }} /> {ev.location}
-                                </span>
+                                <div className="d-flex align-items-center gap-2 mb-1">
+                                  <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.62rem', fontWeight: 700 }}>
+                                    {timing.statusText}
+                                  </span>
+                                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: ev.category === 'International' ? '#CF2F3B' : '#0b63b6', textTransform: 'uppercase' }}>
+                                    {ev.category} {ev.featured && '• Featured'}
+                                  </span>
+                                </div>
+                                <h4 style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0F172A', margin: '0 0 2px 0', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                  {ev.title}
+                                </h4>
+                                <div className="d-flex align-items-center gap-3" style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <i className="fas fa-map-marker-alt text-danger" style={{ fontSize: '0.68rem' }} /> {ev.location}
+                                  </span>
+                                  {ev.endDate && ev.endDate !== ev.date && (
+                                    <span className="text-muted">
+                                      <i className="far fa-calendar-range me-1" /> Until {ev.endDate}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           );
@@ -4619,9 +4831,10 @@ uploadMediaFile={uploadMediaFile}
                               <tr>
                                 <th>Cover</th>
                                 <th>Title</th>
+                                <th>Date Schedule</th>
                                 <th>Location</th>
                                 <th>Category</th>
-                                <th>Status</th>
+                                <th>Timing Status</th>
                                 <th>Actions</th>
                               </tr>
                             </thead>
@@ -4632,10 +4845,16 @@ uploadMediaFile={uploadMediaFile}
                                     <img src={e.img.startsWith('http') || e.img.startsWith('/') ? e.img : `/assets/img/${e.img}`} style={{ height: '30px', objectFit: 'contain' }} alt="" />
                                   </td>
                                   <td className="fw-semibold small">{e.title}</td>
+                                  <td className="small text-nowrap">
+                                    <div className="fw-semibold">{e.date || 'TBD'}</div>
+                                    {e.endDate && e.endDate !== e.date && <div className="text-muted" style={{ fontSize: '0.7rem' }}>to {e.endDate}</div>}
+                                  </td>
                                   <td className="small text-muted">{e.location}</td>
                                   <td className="small"><span className="badge bg-light text-dark border">{e.category}</span></td>
                                   <td>
-                                    <span className={`badge ${e.status === 'Completed' ? 'bg-secondary' : 'bg-success'}`}>{e.status}</span>
+                                    <span className={`badge ${getEventTiming(e).badgeClass}`} style={{ fontSize: '0.72rem' }}>
+                                      {getEventTiming(e).statusText}
+                                    </span>
                                   </td>
                                   <td>
                                     <div className="d-flex gap-2">
