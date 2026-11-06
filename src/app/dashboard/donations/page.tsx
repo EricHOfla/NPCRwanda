@@ -3,7 +3,7 @@
 import AppSidebar from '@/components/dashboard/AppSidebar';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 type Payment = {
   id: string;
@@ -52,7 +52,6 @@ type Summary = {
 const money = (value: number) => new Intl.NumberFormat('en-RW').format(value);
 
 function DonationManagementContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Navigation & view states

@@ -875,7 +875,7 @@ export default function DashboardPage() {
     const targetPage = urlPage !== null && urlPage !== undefined ? urlPage : storedPage;
     const targetSubTab = urlSubTab || storedSubTab;
 
-    const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners'];
+    const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners', 'npc-background', 'contact'];
 
     if (PAGE_IDS.includes(targetTab)) {
       setAdminTab('pages');
@@ -947,7 +947,7 @@ export default function DashboardPage() {
       const urlPage = params.get('page');
       const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
 
-      const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners'];
+      const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners', 'npc-background', 'contact'];
       if (PAGE_IDS.includes(urlTab)) {
         setAdminTab('pages');
         setActiveEditPage(urlTab);

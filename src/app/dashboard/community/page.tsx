@@ -3,7 +3,7 @@
 import AppSidebar from '@/components/dashboard/AppSidebar';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 type Row = Record<string, any> & { id: string };
 type Data = { 
@@ -25,7 +25,6 @@ const empty: Data = {
 };
 
 function CommunityManagementContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Sidebar state
@@ -193,15 +192,6 @@ function CommunityManagementContent() {
       setBusy(''); 
     }
   }
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
-    } catch {
-      router.push('/login');
-    }
-  };
 
   // Render Table Helper
   const renderTable = (
