@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -23,7 +23,7 @@ const empty: Data = {
   sponsorEnquiries: [] 
 };
 
-export default function CommunityManagementPage() {
+function CommunityManagementContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -1167,5 +1167,20 @@ export default function CommunityManagementPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CommunityManagementPage() {
+  return (
+    <Suspense fallback={
+      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+        <div className="text-center">
+          <i className="fas fa-circle-notch fa-spin fa-2x text-primary mb-3" />
+          <p className="small text-muted fw-semibold">Loading Community Desk...</p>
+        </div>
+      </div>
+    }>
+      <CommunityManagementContent />
+    </Suspense>
   );
 }
