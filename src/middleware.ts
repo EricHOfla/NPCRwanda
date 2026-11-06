@@ -115,9 +115,62 @@ export async function middleware(request: NextRequest) {
 
       try {
         const { payload } = await jwtVerify(sessionCookie, key);
+        const userRole = (payload.role as string || '').toUpperCase();
+
+        // RBAC Enforcement Layer
+        // 1. System Settings & Database Backups: Strictly Super Administrator only
+        if (pathname.startsWith('/api/system-settings') || pathname.startsWith('/api/backup/export')) {
+          if (userRole !== 'SUPER_ADMIN') {
+            return NextResponse.json(
+              {
+                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
+                code: 'FORBIDDEN',
+              },
+              { status: 403 }
+            );
+          }
+        }
+
+        // 2. User Account Management: Administrator or Super Administrator only
+        if (pathname.startsWith('/api/users')) {
+          if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+            return NextResponse.json(
+              {
+                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
+                code: 'FORBIDDEN',
+              },
+              { status: 403 }
+            );
+          }
+        }
+
+        // 3. Donation Payments & Records: Administrator or Super Administrator only
+        if (pathname.startsWith('/api/donations/payments')) {
+          if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+            return NextResponse.json(
+              {
+                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
+                code: 'FORBIDDEN',
+              },
+              { status: 403 }
+            );
+          }
+        }
+
+        // 4. Admin Community & Spam cleaning: Administrator or Super Administrator only
+        if (pathname.startsWith('/api/admin/clean-spam') || pathname.startsWith('/api/admin/community')) {
+          if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+            return NextResponse.json(
+              {
+                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
+                code: 'FORBIDDEN',
+              },
+              { status: 403 }
+            );
+          }
+        }
 
         if (method === 'DELETE') {
-          const userRole = payload.role as string;
           if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
             return NextResponse.json(
               { error: 'Forbidden. Insufficient privileges.' },

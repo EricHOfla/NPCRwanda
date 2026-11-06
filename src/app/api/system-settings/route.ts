@@ -1,10 +1,15 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac';
 
-// GET: Fetch all system settings as a key-value object
+// GET: Fetch all system settings as a key-value object (Super Admin / system-settings.view only)
 export async function GET(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'system-settings.view');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const settings = await prisma.systemSetting.findMany();
 
     // Transform array to key-value record
@@ -44,15 +49,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT: Save/update system settings
+// PUT: Save/update system settings (Super Admin / system-settings.update only)
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (session.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Only Super Administrators can modify system configuration.' }, { status: 403 });
+    const auth = await authorizeRequest(request, 'system-settings.update');
+    if (!auth.authorized) {
+      return auth.response;
     }
 
     const body = await request.json();

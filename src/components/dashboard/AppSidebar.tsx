@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { hasPermission } from '@/lib/rbac';
 
 export interface SidebarNavItem {
   id: string;
@@ -88,7 +89,21 @@ export default function AppSidebar({
     ? 'Super Administrator'
     : isAdmin
     ? 'Administrator'
+    : role === 'MANAGER'
+    ? 'Manager'
+    : role === 'STAFF'
+    ? 'Staff Member'
     : 'Content Editor';
+
+  // Granular Permission Gates for Navigation
+  const canAccessSettings = hasPermission(role, 'system-settings.view');
+  const canAccessUsers = hasPermission(role, 'users.view');
+  const canAccessDonations = hasPermission(role, 'donations.view');
+  const canAccessCommunity = hasPermission(role, 'community.view');
+  const canAccessMembers = hasPermission(role, 'members.view');
+  const canAccessInbox = hasPermission(role, 'inbox.view');
+  const canAccessSubscribers = hasPermission(role, 'subscribers.view');
+  const canAccessContent = hasPermission(role, 'content.view');
 
   const handleLogout = async () => {
     if (onLogout) {
@@ -103,7 +118,7 @@ export default function AppSidebar({
           localStorage.removeItem('admin_active_page');
           localStorage.removeItem('admin_inbox_subtab');
         } catch {}
-        router.push('https://admin.npcrwanda.org/login');
+        router.push('/login');
         router.refresh();
       }
     } catch (err) {
@@ -114,45 +129,49 @@ export default function AppSidebar({
   const navItems: SidebarItem[] = [
     { id: 'overview', type: 'tab', tabId: 'overview', href: '/dashboard', label: 'Overview', icon: 'fa-chart-pie' },
 
-    // Section: Website Pages
-    { type: 'header', label: 'WEBSITE PAGES' },
-    ...(!isEditor
+    // Section: Website Pages (CMS)
+    ...(canAccessContent
       ? [
-          { id: 'page-home', type: 'page' as const, tabId: 'pages', pageId: 'home', href: '/dashboard?tab=pages&page=home', label: 'Home Page', icon: 'fa-house' },
-          { id: 'page-about', type: 'page' as const, tabId: 'pages', pageId: 'about', href: '/dashboard?tab=pages&page=about', label: 'About Us', icon: 'fa-circle-info' },
-          { id: 'page-background', type: 'page' as const, tabId: 'pages', pageId: 'npc-background', href: '/dashboard?tab=pages&page=npc-background', label: 'NPC Background', icon: 'fa-book-open' },
-          { id: 'page-leadership', type: 'page' as const, tabId: 'pages', pageId: 'leadership', href: '/dashboard?tab=pages&page=leadership', label: 'Leadership', icon: 'fa-users' },
-        ]
-      : []),
-    { id: 'page-athletes', type: 'page', tabId: 'pages', pageId: 'athletes', href: '/dashboard?tab=pages&page=athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
-    { id: 'page-sports', type: 'page', tabId: 'pages', pageId: 'sports', href: '/dashboard?tab=pages&page=sports', label: 'Sports Programs', icon: 'fa-volleyball' },
-    { id: 'page-news', type: 'page', tabId: 'pages', pageId: 'news', href: '/dashboard?tab=pages&page=news', label: 'News Room', icon: 'fa-newspaper' },
-    { id: 'page-announcements', type: 'page', tabId: 'pages', pageId: 'announcements', href: '/dashboard?tab=pages&page=announcements', label: 'Announcements', icon: 'fa-bullhorn' },
-    { id: 'page-events', type: 'page', tabId: 'pages', pageId: 'events', href: '/dashboard?tab=pages&page=events', label: 'Events Calendar', icon: 'fa-calendar-days' },
-    { id: 'page-careers', type: 'page', tabId: 'pages', pageId: 'careers', href: '/dashboard?tab=pages&page=careers', label: 'Careers & Vacancies', icon: 'fa-briefcase' },
-    ...(!isEditor
-      ? [
-          { id: 'page-governance', type: 'page' as const, tabId: 'pages', pageId: 'governance', href: '/dashboard?tab=pages&page=governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
-          { id: 'page-partners', type: 'page' as const, tabId: 'pages', pageId: 'partners', href: '/dashboard?tab=pages&page=partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
-          { id: 'page-contact', type: 'page' as const, tabId: 'pages', pageId: 'contact', href: '/dashboard?tab=pages&page=contact', label: 'Contact & Footer', icon: 'fa-address-card' },
+          { type: 'header' as const, label: 'WEBSITE PAGES' },
+          ...(!isEditor
+            ? [
+                { id: 'page-home', type: 'page' as const, tabId: 'pages', pageId: 'home', href: '/dashboard?tab=pages&page=home', label: 'Home Page', icon: 'fa-house' },
+                { id: 'page-about', type: 'page' as const, tabId: 'pages', pageId: 'about', href: '/dashboard?tab=pages&page=about', label: 'About Us', icon: 'fa-circle-info' },
+                { id: 'page-background', type: 'page' as const, tabId: 'pages', pageId: 'npc-background', href: '/dashboard?tab=pages&page=npc-background', label: 'NPC Background', icon: 'fa-book-open' },
+                { id: 'page-leadership', type: 'page' as const, tabId: 'pages', pageId: 'leadership', href: '/dashboard?tab=pages&page=leadership', label: 'Leadership', icon: 'fa-users' },
+              ]
+            : []),
+          { id: 'page-athletes', type: 'page' as const, tabId: 'pages', pageId: 'athletes', href: '/dashboard?tab=pages&page=athletes', label: 'Athletes Directory', icon: 'fa-person-running' },
+          { id: 'page-sports', type: 'page' as const, tabId: 'pages', pageId: 'sports', href: '/dashboard?tab=pages&page=sports', label: 'Sports Programs', icon: 'fa-volleyball' },
+          { id: 'page-news', type: 'page' as const, tabId: 'pages', pageId: 'news', href: '/dashboard?tab=pages&page=news', label: 'News Room', icon: 'fa-newspaper' },
+          { id: 'page-announcements', type: 'page' as const, tabId: 'pages', pageId: 'announcements', href: '/dashboard?tab=pages&page=announcements', label: 'Announcements', icon: 'fa-bullhorn' },
+          { id: 'page-events', type: 'page' as const, tabId: 'pages', pageId: 'events', href: '/dashboard?tab=pages&page=events', label: 'Events Calendar', icon: 'fa-calendar-days' },
+          { id: 'page-careers', type: 'page' as const, tabId: 'pages', pageId: 'careers', href: '/dashboard?tab=pages&page=careers', label: 'Careers & Vacancies', icon: 'fa-briefcase' },
+          ...(!isEditor
+            ? [
+                { id: 'page-governance', type: 'page' as const, tabId: 'pages', pageId: 'governance', href: '/dashboard?tab=pages&page=governance', label: 'Governance & Policies', icon: 'fa-scale-balanced' },
+                { id: 'page-partners', type: 'page' as const, tabId: 'pages', pageId: 'partners', href: '/dashboard?tab=pages&page=partners', label: 'Partners & Sponsors', icon: 'fa-handshake' },
+                { id: 'page-contact', type: 'page' as const, tabId: 'pages', pageId: 'contact', href: '/dashboard?tab=pages&page=contact', label: 'Contact & Footer', icon: 'fa-address-card' },
+              ]
+            : []),
         ]
       : []),
 
-    // Section: Management (Admin and above only)
-    ...(isAdmin
+    // Section: Management (Controlled via granular permissions)
+    ...((canAccessCommunity || canAccessDonations || canAccessMembers || canAccessUsers || canAccessInbox || canAccessSubscribers)
       ? [
           { type: 'header' as const, label: 'MANAGEMENT' },
-          { id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports & Community', icon: 'fa-people-group' },
-          { id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' },
-          { id: 'members', type: 'tab' as const, tabId: 'members', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' },
-          { id: 'users', type: 'tab' as const, tabId: 'users', href: '/dashboard?tab=users', label: 'User Management', icon: 'fa-user-shield' },
-          { id: 'contacts', type: 'tab' as const, tabId: 'contacts', href: '/dashboard?tab=contacts', label: 'Inbox Messages', icon: 'fa-envelope' },
-          { id: 'subscribers', type: 'tab' as const, tabId: 'subscribers', href: '/dashboard?tab=subscribers', label: 'Subscribers', icon: 'fa-bell' },
+          ...(canAccessCommunity ? [{ id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports & Community', icon: 'fa-people-group' }] : []),
+          ...(canAccessDonations ? [{ id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' }] : []),
+          ...(canAccessMembers ? [{ id: 'members', type: 'tab' as const, tabId: 'members', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' }] : []),
+          ...(canAccessUsers ? [{ id: 'users', type: 'tab' as const, tabId: 'users', href: '/dashboard?tab=users', label: 'User Management', icon: 'fa-user-shield' }] : []),
+          ...(canAccessInbox ? [{ id: 'contacts', type: 'tab' as const, tabId: 'contacts', href: '/dashboard?tab=contacts', label: 'Inbox Messages', icon: 'fa-envelope' }] : []),
+          ...(canAccessSubscribers ? [{ id: 'subscribers', type: 'tab' as const, tabId: 'subscribers', href: '/dashboard?tab=subscribers', label: 'Subscribers', icon: 'fa-bell' }] : []),
         ]
       : []),
 
-    // Section: Configuration (Super Admin only)
-    ...(isSuperAdmin
+    // Section: Configuration (Only users with system-settings.view — strictly Super Admin)
+    ...(canAccessSettings
       ? [
           { type: 'header' as const, label: 'CONFIGURATION' },
           { id: 'settings', type: 'tab' as const, tabId: 'settings', href: '/dashboard?tab=settings', label: 'System Settings', icon: 'fa-sliders' },

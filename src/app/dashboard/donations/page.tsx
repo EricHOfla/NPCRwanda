@@ -1,6 +1,8 @@
 'use client';
 
 import AppSidebar from '@/components/dashboard/AppSidebar';
+import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import { hasPermission } from '@/lib/rbac';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -113,8 +115,14 @@ function DonationManagementContent() {
       .catch(() => {});
   }, []);
 
+  const isAuthorized = hasPermission(userProfile.role, 'donations.view');
+
   // Fetch payment records
   const loadPayments = useCallback(async () => {
+    if (!hasPermission(userProfile.role, 'donations.view')) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -140,6 +148,10 @@ function DonationManagementContent() {
 
   // Fetch inquiries records
   const loadInquiries = useCallback(async () => {
+    if (!hasPermission(userProfile.role, 'donations.view')) {
+      setInquiryLoading(false);
+      return;
+    }
     setInquiryLoading(true);
     try {
       const response = await fetch('/api/donations', { cache: 'no-store' });
@@ -155,9 +167,11 @@ function DonationManagementContent() {
 
   // Initial load
   useEffect(() => {
-    void loadPayments();
-    void loadInquiries();
-  }, [loadPayments, loadInquiries]);
+    if (hasPermission(userProfile.role, 'donations.view')) {
+      void loadPayments();
+      void loadInquiries();
+    }
+  }, [loadPayments, loadInquiries, userProfile.role]);
 
   // Sync tab with URL
   useEffect(() => {
@@ -462,6 +476,10 @@ function DonationManagementContent() {
 
         {/* Content Body */}
         <main className="container-fluid py-4 px-3 px-lg-4" style={{ maxWidth: 1600 }}>
+          {!isAuthorized ? (
+            <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
+          ) : (
+            <>
           {/* Notification Alerts */}
           {error && (
             <div className="alert alert-danger alert-dismissible border-0 shadow-sm d-flex align-items-center gap-2 mb-4" style={{ borderRadius: '10px' }}>
@@ -1236,6 +1254,8 @@ function DonationManagementContent() {
                 </span>
               </div>
             </section>
+          )}
+            </>
           )}
         </main>
       </div>

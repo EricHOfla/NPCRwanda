@@ -1,16 +1,22 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { authorizeRequest } from '@/lib/rbac';
 
 const updateSchema = z.object({
   read: z.boolean(),
 });
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await authorizeRequest(request, 'donations.view');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const { id } = await params;
     const item = await prisma.donationInquiry.findUnique({ where: { id } });
     if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -21,10 +27,15 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await authorizeRequest(request, 'donations.manage');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const { id } = await params;
     const body = await request.json();
     const result = updateSchema.safeParse(body);
@@ -42,19 +53,20 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await authorizeRequest(request, 'donations.manage');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const { id } = await params;
     const deleted = await prisma.donationInquiry.deleteMany({ where: { id } });
-    return NextResponse.json({
-      success: true,
-      count: deleted.count,
-      message: 'Donation inquiry deleted successfully from database',
-    }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
+    return NextResponse.json({ success: true, count: deleted.count });
   } catch (error) {
     console.error('Delete donation inquiry error:', error);
-    return NextResponse.json({ error: 'Failed to delete donation inquiry from database' }, { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

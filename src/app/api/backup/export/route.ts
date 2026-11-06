@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac';
 
 function toSqlValue(val: any): string {
   if (val === null || val === undefined) {
@@ -53,17 +53,11 @@ function generateTableInserts(tableName: string, rows: Record<string, any>[]): s
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await authorizeRequest(request, 'system-settings.export-backup');
+    if (!auth.authorized) {
+      return auth.response;
     }
-
-    if (session.role !== 'SUPER_ADMIN') {
-      return NextResponse.json(
-        { error: 'Forbidden: Super Administrator privileges required to export system backups.' },
-        { status: 403 }
-      );
-    }
+    const session = auth.user;
 
     // Fetch all collections in parallel
     const [

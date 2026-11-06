@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +25,9 @@ const KNOWN_SPAM_DOMAINS = [
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await authorizeRequest(request, 'inbox.clean-spam');
+    if (!auth.authorized) {
+      return auth.response;
     }
 
     const body = await request.json();

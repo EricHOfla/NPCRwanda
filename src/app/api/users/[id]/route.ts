@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac';
 import { Role } from '@prisma/client';
 
 // PUT: Update user profile, role, or password
@@ -10,14 +10,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await authorizeRequest(request, 'users.update');
+    if (!auth.authorized) {
+      return auth.response;
     }
-
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Administrator access required.' }, { status: 403 });
-    }
+    const session = auth.user;
 
     const { id } = await params;
     const body = await request.json();
@@ -99,14 +96,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await authorizeRequest(request, 'users.delete');
+    if (!auth.authorized) {
+      return auth.response;
     }
-
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Administrator access required.' }, { status: 403 });
-    }
+    const session = auth.user;
 
     const { id } = await params;
     const targetUser = await prisma.user.findUnique({ where: { id } });

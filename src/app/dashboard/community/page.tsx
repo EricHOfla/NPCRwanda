@@ -1,6 +1,8 @@
 'use client';
 
 import AppSidebar from '@/components/dashboard/AppSidebar';
+import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import { hasPermission } from '@/lib/rbac';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -89,7 +91,13 @@ function CommunityManagementContent() {
   }, []);
 
   // Fetch community data
+  const isAuthorized = hasPermission(userProfile.role, 'community.view');
+
   const load = useCallback(async () => {
+    if (!hasPermission(userProfile.role, 'community.view')) {
+      setLoading(false);
+      return;
+    }
     setLoading(true); 
     setError('');
     try {
@@ -104,7 +112,7 @@ function CommunityManagementContent() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { if (hasPermission(userProfile.role, 'community.view')) { void load(); } }, [load, userProfile.role]);
 
   // Sync tab from URL if present
   useEffect(() => {
@@ -445,6 +453,10 @@ function CommunityManagementContent() {
 
         {/* Workspace Body */}
         <main className="py-4 px-3 px-lg-4" style={{ flex: 1, maxWidth: 1600, width: '100%', margin: '0 auto' }}>
+          {!isAuthorized ? (
+            <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
+          ) : (
+            <>
           {/* Notification Alerts */}
           {error && (
             <div className="alert alert-danger border-0 shadow-sm d-flex align-items-center justify-content-between mb-4" style={{ borderRadius: '10px' }}>
@@ -780,6 +792,8 @@ function CommunityManagementContent() {
                 </>
               )}
             </>
+          )}
+        </>
           )}
         </main>
       </div>

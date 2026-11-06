@@ -1,15 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { authorizeRequest } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
 const types = ['programmes', 'results', 'gallery', 'athleteEnquiries', 'eventRegistrations', 'sponsorEnquiries'] as const;
 type ItemType = typeof types[number];
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'community.view');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     await ensureAutoMigrated();
     const [programmes, results, gallery, athleteEnquiries, eventRegistrations, sponsorEnquiries] = await Promise.all([
       prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } }),
@@ -33,8 +39,13 @@ const updateSchema = z.object({
   published: z.boolean().optional(),
 });
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     await ensureAutoMigrated();
     const parsed = updateSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid update request' }, { status: 400 });
@@ -69,8 +80,13 @@ export async function PATCH(request: Request) {
 }
 
 const deleteSchema = z.object({ type: z.enum(types), id: z.string().min(1) });
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'community.delete');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     await ensureAutoMigrated();
     const parsed = deleteSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid delete request' }, { status: 400 });

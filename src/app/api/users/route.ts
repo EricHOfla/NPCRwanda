@@ -1,19 +1,15 @@
 import { NextResponse, NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac';
 import { Role } from '@prisma/client';
 
 // GET: Retrieve all registered system users
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Administrator access required.' }, { status: 403 });
+    const auth = await authorizeRequest(request, 'users.view');
+    if (!auth.authorized) {
+      return auth.response;
     }
 
     const users = await prisma.user.findMany({
@@ -38,14 +34,11 @@ export async function GET(request: NextRequest) {
 // POST: Register a new system user
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await authorizeRequest(request, 'users.create');
+    if (!auth.authorized) {
+      return auth.response;
     }
-
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Administrator access required.' }, { status: 403 });
-    }
+    const session = auth.user;
 
     const body = await request.json();
     const { name, email, password, role } = body;

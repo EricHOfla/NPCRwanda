@@ -4,6 +4,8 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppSidebar, { SidebarNavItem } from '@/components/dashboard/AppSidebar';
+import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import { hasPermission } from '@/lib/rbac';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/context/LanguageContext';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
@@ -1049,6 +1051,13 @@ export default function DashboardPage() {
   const isSuperAdmin = userRole === 'SUPER_ADMIN';
   const isAdmin = userRole === 'ADMIN' || isSuperAdmin;
   const isEditor = userRole === 'EDITOR';
+
+  // Granular Permission Gates
+  const canAccessSettings = hasPermission(userRole, 'system-settings.view');
+  const canAccessUsers = hasPermission(userRole, 'users.view');
+  const canAccessMembers = hasPermission(userRole, 'members.view');
+  const canAccessDonations = hasPermission(userRole, 'donations.view');
+  const canAccessCommunity = hasPermission(userRole, 'community.view');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
     if (isSuperAdmin) return false;
@@ -6199,19 +6208,8 @@ uploadMediaFile={uploadMediaFile}
              ────────────────────────────── */}
           
           {adminTab === 'members' && (
-            !isAdmin ? (
-              <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>Members Directory requires Administrator or higher privileges.</p>
-                  </div>
-                  <div className="card-body text-center py-3">
-                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
-                  </div>
-                </div>
-              </div>
+            !canAccessMembers ? (
+              <AccessRestricted onReturn={() => setAdminTab('overview')} />
             ) : (
             <div className="animation-fade-in">
               <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
@@ -6400,19 +6398,8 @@ uploadMediaFile={uploadMediaFile}
              TAB: USERS MANAGEMENT
              ────────────────────────────── */}
           {adminTab === 'users' && (
-            !isAdmin ? (
-              <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className="fas fa-lock" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Restricted Access Area</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>User Management requires Administrator or higher privileges.</p>
-                  </div>
-                  <div className="card-body text-center py-3">
-                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
-                  </div>
-                </div>
-              </div>
+            !canAccessUsers ? (
+              <AccessRestricted onReturn={() => setAdminTab('overview')} />
             ) : (
             <div className="animation-fade-in">
               {/* Header */}
@@ -6797,19 +6784,8 @@ uploadMediaFile={uploadMediaFile}
           )}
 
           {adminTab === 'settings' && (
-            !isSuperAdmin ? (
-              <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className="fas fa-shield-halved" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Super Admin Only</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>System Settings are restricted to Super Administrators only.</p>
-                  </div>
-                  <div className="card-body text-center py-3">
-                    <button className="btn btn-primary btn-sm" onClick={() => setAdminTab('overview')}><i className="fas fa-arrow-left me-2" />Back to Overview</button>
-                  </div>
-                </div>
-              </div>
+            !canAccessSettings ? (
+              <AccessRestricted onReturn={() => setAdminTab('overview')} />
             ) : (
             <div style={{ maxWidth: '800px' }}>
               <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>

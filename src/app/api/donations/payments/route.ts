@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authorizeRequest } from '@/lib/rbac';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'donations.view');
+    if (!auth.authorized) {
+      return auth.response;
+    }
+
     const [payments, successfulTotals, successfulCount, pendingCount, failedCount] = await Promise.all([
       prisma.donationPayment.findMany({ orderBy: { createdAt: 'desc' }, take: 250 }),
       prisma.donationPayment.groupBy({ by: ['currency'], where: { status: 'SUCCESSFUL' }, _sum: { amount: true } }),
