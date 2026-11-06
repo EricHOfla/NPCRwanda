@@ -2,6 +2,17 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+export type AnalyticsNavigateAction = {
+  tab?: string;
+  page?: string;
+  subtab?: string;
+  url?: string;
+};
+
+interface DashboardAnalyticsProps {
+  onNavigate?: (action: AnalyticsNavigateAction) => void;
+}
+
 type Analytics = {
   generatedAt: string;
   range: { days: number };
@@ -37,13 +48,27 @@ function Panel({ title, icon, children, action }: { title: string; icon: string;
   );
 }
 
-export default function DashboardAnalytics() {
+export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsProps) {
   const [days, setDays] = useState(30);
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showPendingBreakdown, setShowPendingBreakdown] = useState(true);
+
+  const handleNav = (action: AnalyticsNavigateAction) => {
+    if (onNavigate) {
+      onNavigate(action);
+    } else if (action.url) {
+      window.location.href = action.url;
+    } else {
+      const params = new URLSearchParams();
+      if (action.tab) params.set('tab', action.tab);
+      if (action.page) params.set('page', action.page);
+      if (action.subtab) params.set('subtab', action.subtab);
+      window.location.href = `/dashboard?${params.toString()}`;
+    }
+  };
 
   const refresh = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -75,7 +100,7 @@ export default function DashboardAnalytics() {
       <div style={{ margin: '0 0 14px' }}>
         <h2 style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Organization Overview</h2>
         <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>
-          Operational figures for athletes, donations, active partners, and live requests needing attention.
+          Operational figures for athletes, donations, active partners, and requests needing attention. Select any card or row to navigate to its management page.
         </p>
       </div>
 
@@ -112,34 +137,73 @@ export default function DashboardAnalytics() {
         </div>
       ) : data && (
         <>
-          {/* Top 4 Key Performance Indicators */}
+          {/* Top 4 Key Performance Indicators (all clickable to respective pages) */}
           <div className="live-analytics-kpis">
-            <div className="live-analytics-kpi blue">
-              <span>Total Athletes</span>
+            {/* 1. Total Athletes -> Navigates to Athletes Page */}
+            <div 
+              className="live-analytics-kpi blue"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleNav({ tab: 'pages', page: 'athletes' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'pages', page: 'athletes' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              title="Open Athletes Directory"
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Total Athletes</span>
+                <span style={{ fontSize: '0.65rem', color: '#2563EB', fontWeight: 700 }}>Manage →</span>
+              </div>
               <strong>{number(data.members.athletes)}</strong>
               <small>{number(data.members.activeAthletes)} active</small>
               <i className="fas fa-wheelchair" />
             </div>
 
-            <div className="live-analytics-kpi green">
-              <span>Verified Donations</span>
+            {/* 2. Verified Donations -> Navigates to Donations Inbox */}
+            <div 
+              className="live-analytics-kpi green"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleNav({ tab: 'contacts', subtab: 'donations' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'contacts', subtab: 'donations' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              title="Open Verified Donations Inbox"
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Verified Donations</span>
+                <span style={{ fontSize: '0.65rem', color: '#059669', fontWeight: 700 }}>View Records →</span>
+              </div>
               <strong>{money(data.donations.lifetime.RWF, 'RWF')}</strong>
               <small>{money(data.donations.lifetime.USD, 'USD')} · {number(data.donations.lifetime.count)} payments</small>
               <i className="fas fa-hand-holding-heart" />
             </div>
 
-            <div className="live-analytics-kpi amber">
-              <span>Active Partners</span>
+            {/* 3. Active Partners -> Navigates to Partners Editor */}
+            <div 
+              className="live-analytics-kpi amber"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleNav({ tab: 'pages', page: 'partners' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'pages', page: 'partners' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              title="Open Partners & Sponsors Management"
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Active Partners</span>
+                <span style={{ fontSize: '0.65rem', color: '#D97706', fontWeight: 700 }}>Manage →</span>
+              </div>
               <strong>{number(data.members.partners)}</strong>
               <small>Currently active</small>
               <i className="fas fa-handshake" />
             </div>
 
-            {/* Pending Work KPI with explicit breakdown trigger */}
+            {/* 4. Pending Work -> Toggles breakdown and highlights requests */}
             <div 
               className="live-analytics-kpi violet"
-              style={{ cursor: 'pointer', transition: 'all 0.2s ease', borderColor: showPendingBreakdown ? '#7C3AED' : '#E2E8F0' }}
+              role="button"
+              tabIndex={0}
               onClick={() => setShowPendingBreakdown(!showPendingBreakdown)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowPendingBreakdown(!showPendingBreakdown); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease', borderColor: showPendingBreakdown ? '#7C3AED' : '#E2E8F0' }}
               title="Click to toggle detailed pending work specification"
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -178,7 +242,7 @@ export default function DashboardAnalytics() {
             </div>
           </div>
 
-          {/* Explicit Specification Panel for the 21 Pending Work Requests */}
+          {/* Explicit Specification Panel for the 21 Pending Work Requests (each tile navigates directly) */}
           {showPendingBreakdown && (
             <div 
               style={{
@@ -218,34 +282,45 @@ export default function DashboardAnalytics() {
                       </span>
                     </div>
                     <p style={{ margin: '2px 0 0', fontSize: '0.76rem', color: '#6B21A8' }}>
-                      Exact category breakdown of public submissions awaiting administrative review, response, or follow-up
+                      Click any card below to navigate directly to its review queue
                     </p>
                   </div>
                 </div>
 
                 <div className="d-flex gap-2">
-                  <a 
-                    href="/dashboard#inbox" 
+                  <button 
+                    type="button"
+                    onClick={() => handleNav({ tab: 'contacts', subtab: 'messages' })}
                     className="btn btn-xs"
-                    style={{ background: '#FFFFFF', border: '1px solid #DDD6FE', color: '#6D28D9', fontWeight: 600, borderRadius: '6px', fontSize: '0.72rem', padding: '5px 12px', textDecoration: 'none' }}
+                    style={{ background: '#FFFFFF', border: '1px solid #DDD6FE', color: '#6D28D9', fontWeight: 600, borderRadius: '6px', fontSize: '0.72rem', padding: '5px 12px' }}
                   >
                     <i className="fas fa-inbox me-1" /> Open Messages & Jobs
-                  </a>
-                  <a 
-                    href="/dashboard/community" 
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => handleNav({ url: '/dashboard/community' })}
                     className="btn btn-xs"
-                    style={{ background: '#7C3AED', color: '#FFFFFF', fontWeight: 600, borderRadius: '6px', fontSize: '0.72rem', padding: '5px 12px', textDecoration: 'none' }}
+                    style={{ background: '#7C3AED', color: '#FFFFFF', fontWeight: 600, borderRadius: '6px', fontSize: '0.72rem', padding: '5px 12px' }}
                   >
                     <i className="fas fa-users-gear me-1" /> Community Enquiries
-                  </a>
+                  </button>
                 </div>
               </div>
 
               {/* 5 Distinct Categories making up the Pending Work */}
               <div className="row g-2">
-                {/* 1. Unread Messages */}
+                {/* 1. Unread Messages -> Navigates to Messages Inbox */}
                 <div className="col-sm-6 col-md-4 col-lg">
-                  <div style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ tab: 'contacts', subtab: 'messages' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'contacts', subtab: 'messages' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0369A1'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Review Unread Contact Messages"
+                  >
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0369A1', textTransform: 'uppercase' }}>Contact Messages</span>
@@ -255,15 +330,25 @@ export default function DashboardAnalytics() {
                         {number(data.engagement.unreadMessages)}
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '6px' }}>
-                      Unread contact inquiries
+                    <div style={{ fontSize: '0.7rem', color: '#0369A1', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Messages</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
                 </div>
 
-                {/* 2. Job Candidates */}
+                {/* 2. Job Candidates -> Navigates to Job Applications */}
                 <div className="col-sm-6 col-md-4 col-lg">
-                  <div style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ tab: 'contacts', subtab: 'applications' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'contacts', subtab: 'applications' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#7C3AED'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Review Job Candidates"
+                  >
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase' }}>Job Applications</span>
@@ -273,15 +358,25 @@ export default function DashboardAnalytics() {
                         {number(data.engagement.pendingJobs)}
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '6px' }}>
-                      Candidates awaiting review
+                    <div style={{ fontSize: '0.7rem', color: '#7C3AED', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Candidates</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Athlete Enquiries */}
+                {/* 3. Athlete Enquiries -> Navigates to Community Athlete Enquiries */}
                 <div className="col-sm-6 col-md-4 col-lg">
-                  <div style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0D9488'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Open Athlete Intake Enquiries"
+                  >
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0D9488', textTransform: 'uppercase' }}>Athlete Intake</span>
@@ -291,15 +386,25 @@ export default function DashboardAnalytics() {
                         {number(data.engagement.athleteEnquiries)}
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '6px' }}>
-                      Prospective athlete intake
+                    <div style={{ fontSize: '0.7rem', color: '#0D9488', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Intake</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
                 </div>
 
-                {/* 4. Event Registrations */}
+                {/* 4. Event Registrations -> Navigates to Community Event Signups */}
                 <div className="col-sm-6 col-md-4 col-lg">
-                  <div style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#16A34A'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Open Event Attendee Registrations"
+                  >
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16A34A', textTransform: 'uppercase' }}>Event Signups</span>
@@ -309,15 +414,25 @@ export default function DashboardAnalytics() {
                         {number(data.engagement.eventRegistrations)}
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '6px' }}>
-                      Pending event registrations
+                    <div style={{ fontSize: '0.7rem', color: '#16A34A', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Signups</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
                 </div>
 
-                {/* 5. Sponsor Enquiries */}
+                {/* 5. Sponsor Enquiries -> Navigates to Community Sponsor Inquiries */}
                 <div className="col-sm-6 col-md-4 col-lg">
-                  <div style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Open Sponsorship & Partner Leads"
+                  >
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>Sponsor Leads</span>
@@ -327,8 +442,9 @@ export default function DashboardAnalytics() {
                         {number(data.engagement.sponsorInquiries)}
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '6px' }}>
-                      Partnership & sponsor leads
+                    <div style={{ fontSize: '0.7rem', color: '#D97706', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Leads</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
                 </div>
@@ -336,10 +452,31 @@ export default function DashboardAnalytics() {
             </div>
           )}
 
-          {/* Analytics Details Grid */}
+          {/* Analytics Details Grid with Links to All Pages */}
           <div className="live-analytics-grid">
-            <Panel title={`Donation activity · ${days} days`} icon="fa-chart-column">
-              <div className="live-analytics-donation-summary">
+            {/* Panel 1: Donation Activity */}
+            <Panel 
+              title={`Donation activity · ${days} days`} 
+              icon="fa-chart-column"
+              action={
+                <button
+                  type="button"
+                  onClick={() => handleNav({ tab: 'contacts', subtab: 'donations' })}
+                  className="btn btn-xs btn-outline-primary"
+                  style={{ fontSize: '0.72rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px' }}
+                >
+                  Manage Donations <i className="fas fa-arrow-right ms-1" />
+                </button>
+              }
+            >
+              <div 
+                className="live-analytics-donation-summary"
+                role="button"
+                tabIndex={0}
+                onClick={() => handleNav({ tab: 'contacts', subtab: 'donations' })}
+                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                title="Open Donation Management"
+              >
                 <div>
                   <small>Successful in selected period</small>
                   <strong>{money(data.donations.rangeRwf, 'RWF')}</strong>
@@ -364,14 +501,40 @@ export default function DashboardAnalytics() {
               <p className="live-analytics-note">Only payments marked SUCCESSFUL are included. RWF and USD are kept separate.</p>
             </Panel>
 
-            <Panel title="Athletes by sport" icon="fa-medal">
+            {/* Panel 2: Athletes by Sport */}
+            <Panel 
+              title="Athletes by sport" 
+              icon="fa-medal"
+              action={
+                <button
+                  type="button"
+                  onClick={() => handleNav({ tab: 'pages', page: 'sports' })}
+                  className="btn btn-xs btn-outline-primary"
+                  style={{ fontSize: '0.72rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px' }}
+                >
+                  Manage Sports <i className="fas fa-arrow-right ms-1" />
+                </button>
+              }
+            >
               {sportTotal ? (
                 <div className="live-analytics-sports">
                   {data.sports.slice(0, 7).map((item) => (
-                    <div key={item.sport}>
-                      <div>
+                    <div 
+                      key={item.sport}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleNav({ tab: 'pages', page: 'athletes' })}
+                      style={{ cursor: 'pointer', padding: '4px 6px', borderRadius: '6px', transition: 'background 0.15s' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      title={`Filter ${item.sport} athletes in directory`}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{item.sport}</span>
-                        <strong>{number(item.athletes)}</strong>
+                        <strong style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {number(item.athletes)}
+                          <i className="fas fa-angle-right text-muted" style={{ fontSize: '0.7rem' }} />
+                        </strong>
                       </div>
                       <div className="live-analytics-progress">
                         <span style={{ width: `${Math.round((item.athletes / sportTotal) * 100)}%` }} />
@@ -384,24 +547,160 @@ export default function DashboardAnalytics() {
               )}
             </Panel>
 
-            <Panel title="Website content" icon="fa-newspaper">
+            {/* Panel 3: Website Content */}
+            <Panel 
+              title="Website content" 
+              icon="fa-newspaper"
+              action={
+                <button
+                  type="button"
+                  onClick={() => handleNav({ tab: 'pages', page: 'news' })}
+                  className="btn btn-xs btn-outline-primary"
+                  style={{ fontSize: '0.72rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px' }}
+                >
+                  Manage Content <i className="fas fa-arrow-right ms-1" />
+                </button>
+              }
+            >
               <div className="live-analytics-stat-list">
-                <div><span>Published news</span><strong>{number(data.content.publishedNews)}</strong></div>
-                <div><span>Draft news</span><strong>{number(data.content.draftNews)}</strong></div>
-                <div><span>Upcoming / ongoing events</span><strong>{number(data.content.upcomingEvents)}</strong></div>
-                <div><span>All events</span><strong>{number(data.content.totalEvents)}</strong></div>
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'pages', page: 'news' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Published News Articles"
+                >
+                  <span><i className="fas fa-newspaper text-success me-2" />Published news</span>
+                  <strong>{number(data.content.publishedNews)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'pages', page: 'news' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Draft Articles"
+                >
+                  <span><i className="fas fa-file-pen text-warning me-2" />Draft news</span>
+                  <strong>{number(data.content.draftNews)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'pages', page: 'events' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Upcoming Events Calendar"
+                >
+                  <span><i className="fas fa-calendar-alt text-primary me-2" />Upcoming / ongoing events</span>
+                  <strong>{number(data.content.upcomingEvents)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'pages', page: 'events' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open All Events"
+                >
+                  <span><i className="fas fa-calendar-check text-secondary me-2" />All recorded events</span>
+                  <strong>{number(data.content.totalEvents)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
               </div>
             </Panel>
 
-            <Panel title="Community engagement" icon="fa-users">
+            {/* Panel 4: Community Engagement */}
+            <Panel 
+              title="Community engagement" 
+              icon="fa-users"
+              action={
+                <button
+                  type="button"
+                  onClick={() => handleNav({ url: '/dashboard/community' })}
+                  className="btn btn-xs btn-outline-primary"
+                  style={{ fontSize: '0.72rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px' }}
+                >
+                  Community Center <i className="fas fa-arrow-right ms-1" />
+                </button>
+              }
+            >
               <div className="live-analytics-stat-list">
-                <div><span>Unread messages</span><strong>{number(data.engagement.unreadMessages)}</strong></div>
-                <div><span>Volunteer applications</span><strong>{number(data.engagement.volunteers)}</strong></div>
-                <div><span>Pending job applications</span><strong>{number(data.engagement.pendingJobs)}</strong></div>
-                <div><span>Athlete enquiries</span><strong>{number(data.engagement.athleteEnquiries)}</strong></div>
-                <div><span>Event registrations</span><strong>{number(data.engagement.eventRegistrations)}</strong></div>
-                <div><span>Sponsor enquiries</span><strong>{number(data.engagement.sponsorInquiries)}</strong></div>
-                <div><span>Active subscribers</span><strong>{number(data.engagement.activeSubscribers)}</strong></div>
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'contacts', subtab: 'messages' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Unread Messages"
+                >
+                  <span><i className="fas fa-envelope text-primary me-2" />Unread messages</span>
+                  <strong>{number(data.engagement.unreadMessages)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'contacts', subtab: 'volunteers' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Volunteer Applications"
+                >
+                  <span><i className="fas fa-hands-helping text-success me-2" />Volunteer applications</span>
+                  <strong>{number(data.engagement.volunteers)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'contacts', subtab: 'applications' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Job Candidates"
+                >
+                  <span><i className="fas fa-briefcase text-purple me-2" style={{ color: '#7C3AED' }} />Pending job applications</span>
+                  <strong>{number(data.engagement.pendingJobs)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Athlete Intake"
+                >
+                  <span><i className="fas fa-person-running text-teal me-2" style={{ color: '#0D9488' }} />Athlete enquiries</span>
+                  <strong>{number(data.engagement.athleteEnquiries)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Event Registrations"
+                >
+                  <span><i className="fas fa-calendar-check text-success me-2" />Event registrations</span>
+                  <strong>{number(data.engagement.eventRegistrations)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Sponsor Leads"
+                >
+                  <span><i className="fas fa-handshake text-warning me-2" />Sponsor enquiries</span>
+                  <strong>{number(data.engagement.sponsorInquiries)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
+
+                <div 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleNav({ tab: 'contacts' })}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+                  title="Open Newsletter Subscribers"
+                >
+                  <span><i className="fas fa-bell text-secondary me-2" />Active subscribers</span>
+                  <strong>{number(data.engagement.activeSubscribers)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
+                </div>
               </div>
             </Panel>
           </div>

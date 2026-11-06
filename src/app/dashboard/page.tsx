@@ -2792,7 +2792,34 @@ export default function DashboardPage() {
               {/* Role-Aware Middle Section */}
               {!isEditor ? (
                 /* Super Admin / Admin: Live database analytics */
-                <DashboardAnalytics />
+                <DashboardAnalytics 
+                  onNavigate={(action) => {
+                    if (action.url) {
+                      router.push(action.url);
+                      return;
+                    }
+                    if (action.tab === 'community') {
+                      router.push('/dashboard/community');
+                      return;
+                    }
+                    if (action.tab === 'pages') {
+                      setAdminTab('pages');
+                      if (action.page) setActiveEditPage(action.page);
+                      return;
+                    }
+                    if (action.tab === 'contacts') {
+                      setAdminTab('contacts');
+                      if (action.subtab && ['messages', 'volunteers', 'donations', 'applications'].includes(action.subtab)) {
+                        setInboxSubTab(action.subtab as any);
+                      }
+                      return;
+                    }
+                    if (action.tab) {
+                      setAdminTab(action.tab as any);
+                      if (action.page) setActiveEditPage(action.page);
+                    }
+                  }}
+                />
               ) : (
                 /* Editor: Editorial Content Workspace */
                 <div style={{ marginBottom: '24px' }}>
