@@ -2603,88 +2603,283 @@ export default function DashboardPage() {
 
           {adminTab === 'overview' && (
             <div>
-              {/* Welcome Panel */}
+              {/* Welcome Banner */}
               <div 
                 className="dashboard-welcome-banner"
                 style={{ 
-                  background: 'linear-gradient(135deg, #0b63b6 0%, #0a3f7a 100%)',
+                  background: 'linear-gradient(135deg, #074783 0%, #0b63b6 50%, #083866 100%)',
                   borderRadius: '16px',
-                  padding: '24px 32px',
+                  padding: '24px 28px',
                   color: '#ffffff',
-                  marginBottom: '24px',
-                  boxShadow: '0 4px 20px rgba(11, 99, 182, 0.15)',
+                  marginBottom: '20px',
+                  boxShadow: '0 8px 24px rgba(11, 99, 182, 0.16)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                <div style={{ position: 'absolute', right: '-20px', bottom: '-40px', opacity: 0.15, fontSize: '10rem', color: '#fff', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', right: '-15px', bottom: '-35px', opacity: 0.12, fontSize: '9rem', color: '#fff', pointerEvents: 'none' }}>
                   <i className="fas fa-chart-pie" />
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-                    Welcome back, {profile.name || 'Admin'}!
-                  </h2>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.75rem', fontWeight: 600 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
+                  <div>
+                    <div className="d-flex align-items-center gap-2 mb-1">
+                      <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.35)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {isEditor ? 'Editor Portal' : 'Admin Operations'}
+                      </span>
+                    </div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>
+                      Welcome back, {profile.name || 'Admin'}!
+                    </h2>
+                    <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
+                      National Paralympic Committee (NPC) Rwanda Management Portal · Today is {currentDateString || 'Loading date...'}.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.12)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid rgba(255, 255, 255, 0.18)' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', display: 'inline-block', boxShadow: '0 0 6px #4ADE80' }} />
-                    <span>Real-time Live Sync {lastSyncTime ? `(${lastSyncTime})` : ''}</span>
+                    <span>Live Sync {lastSyncTime ? `(${lastSyncTime})` : ''}</span>
                     <button 
                       onClick={refreshRealTimeData}
                       disabled={isRefreshing}
                       className="btn btn-link btn-sm p-0 text-white"
                       title="Sync live data now"
-                      style={{ textDecoration: 'none', marginLeft: '4px', opacity: isRefreshing ? 0.5 : 1 }}
+                      style={{ textDecoration: 'none', marginLeft: '6px', opacity: isRefreshing ? 0.5 : 1 }}
                     >
                       <i className={`fas fa-sync-alt ${isRefreshing ? 'fa-spin' : ''}`} style={{ fontSize: '0.75rem' }} />
                     </button>
                   </div>
                 </div>
-                <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.85)', margin: '0 0 20px 0', maxWidth: '600px', lineHeight: '1.5' }}>
-                  Manage the official National Paralympic Committee (NPC) Rwanda portal. Today is {currentDateString || 'Loading date...'}.
-                </p>
                 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', position: 'relative', zIndex: 2 }}>
-                  <button 
-                    onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); setNewsFormOpen(true); }}
-                    className="btn btn-sm"
-                    style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <i className="fas fa-plus" /> Write News Article
-                  </button>
-                  <button 
-                    onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }}
-                    className="btn btn-sm"
-                    style={{ background: 'rgba(255, 255, 255, 0.18)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <i className="fas fa-user-plus" /> Add Athlete
-                  </button>
-                  <button 
-                    onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); setEventFormOpen(true); }}
-                    className="btn btn-sm"
-                    style={{ background: 'rgba(255, 255, 255, 0.18)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <i className="fas fa-calendar-plus" /> Schedule Event
-                  </button>
-                   <button 
-                    onClick={() => { setAdminTab('pages'); setActiveEditPage('announcements'); }}
-                    className="btn btn-sm"
-                    style={{ background: 'rgba(255, 255, 255, 0.18)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <i className="fas fa-bullhorn" /> Announcements
-                  </button>
+                <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.15)', margin: '18px 0 16px' }} />
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', position: 'relative', zIndex: 2 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    <button 
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); setNewsFormOpen(true); }}
+                      className="btn btn-sm"
+                      style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
+                    >
+                      <i className="fas fa-plus" /> Write News Article
+                    </button>
+                    <button 
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }}
+                      className="btn btn-sm"
+                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <i className="fas fa-user-plus" /> Add Athlete
+                    </button>
+                    <button 
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); setEventFormOpen(true); }}
+                      className="btn btn-sm"
+                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <i className="fas fa-calendar-plus" /> Schedule Event
+                    </button>
+                    <button 
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('announcements'); }}
+                      className="btn btn-sm"
+                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <i className="fas fa-bullhorn" /> Announcements
+                    </button>
+                  </div>
+
                   <a 
                     href="https://npcrwanda.org/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-sm btn-link"
-                    style={{ color: '#FFD700', fontWeight: 600, textDecoration: 'none', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}
+                    className="btn btn-sm"
+                    style={{ background: 'rgba(255, 255, 255, 0.12)', color: '#FFD700', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.35)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
                   >
-                    View Website <i className="fas fa-external-link-alt" />
+                    View Website <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.75rem' }} />
                   </a>
                 </div>
               </div>
 
-              {!isEditor && <DashboardAnalytics />}
+              {/* Priority Action Required Queue (Admins only) */}
+              {!isEditor && (() => {
+                const unreadMessages = contacts.filter(c => !c.read).length;
+                const unreadVolunteers = volunteers.filter(v => !v.read).length;
+                const unreadDonations = donations.filter(d => !d.read).length;
+                const unreadJobApps = jobApplications.filter(a => !a.read).length;
+                const totalPending = unreadMessages + unreadVolunteers + unreadDonations + unreadJobApps;
+
+                if (totalPending === 0) return null;
+
+                return (
+                  <div 
+                    className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"
+                    style={{
+                      background: 'linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%)',
+                      border: '1px solid #FCD34D',
+                      borderRadius: '12px',
+                      padding: '12px 18px',
+                      boxShadow: '0 2px 8px rgba(245, 158, 11, 0.08)'
+                    }}
+                  >
+                    <div className="d-flex align-items-center gap-3">
+                      <span 
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: '#F59E0B',
+                          color: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                      >
+                        <i className="fas fa-bell" style={{ fontSize: '0.85rem' }} />
+                      </span>
+                      <div>
+                        <strong style={{ fontSize: '0.88rem', fontWeight: 800, color: '#78350F' }}>
+                          Action Required: {totalPending} item{totalPending > 1 ? 's' : ''} awaiting review
+                        </strong>
+                        <span className="d-block" style={{ fontSize: '0.76rem', color: '#B45309' }}>
+                          Unread submissions requiring staff follow-up or administrative action
+                        </span>
+                      </div>
+                    </div>
+                    <div className="d-flex flex-wrap gap-2">
+                      {unreadMessages > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => { setAdminTab('contacts'); setInboxSubTab('messages'); }}
+                          className="btn btn-xs"
+                          style={{ background: '#FFFFFF', border: '1px solid #FCD34D', color: '#92400E', fontWeight: 700, borderRadius: '8px', fontSize: '0.75rem', padding: '5px 12px' }}
+                        >
+                          <i className="fas fa-envelope text-primary me-1" /> {unreadMessages} Message{unreadMessages > 1 ? 's' : ''}
+                        </button>
+                      )}
+                      {unreadVolunteers > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => { setAdminTab('contacts'); setInboxSubTab('volunteers'); }}
+                          className="btn btn-xs"
+                          style={{ background: '#FFFFFF', border: '1px solid #FCD34D', color: '#92400E', fontWeight: 700, borderRadius: '8px', fontSize: '0.75rem', padding: '5px 12px' }}
+                        >
+                          <i className="fas fa-hands-helping text-success me-1" /> {unreadVolunteers} Volunteer{unreadVolunteers > 1 ? 's' : ''}
+                        </button>
+                      )}
+                      {unreadDonations > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => { setAdminTab('contacts'); setInboxSubTab('donations'); }}
+                          className="btn btn-xs"
+                          style={{ background: '#FFFFFF', border: '1px solid #FCD34D', color: '#92400E', fontWeight: 700, borderRadius: '8px', fontSize: '0.75rem', padding: '5px 12px' }}
+                        >
+                          <i className="fas fa-hand-holding-usd text-warning me-1" /> {unreadDonations} Donation{unreadDonations > 1 ? 's' : ''}
+                        </button>
+                      )}
+                      {unreadJobApps > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => { setAdminTab('contacts'); setInboxSubTab('applications'); }}
+                          className="btn btn-xs"
+                          style={{ background: '#FFFFFF', border: '1px solid #FCD34D', color: '#92400E', fontWeight: 700, borderRadius: '8px', fontSize: '0.75rem', padding: '5px 12px' }}
+                        >
+                          <i className="fas fa-briefcase me-1" style={{ color: '#7C3AED' }} /> {unreadJobApps} Application{unreadJobApps > 1 ? 's' : ''}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Role-Aware Middle Section */}
+              {!isEditor ? (
+                /* Super Admin / Admin: Live database analytics */
+                <DashboardAnalytics />
+              ) : (
+                /* Editor: Editorial Content Workspace */
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '14px' }}>
+                    <h3 style={{ margin: 0, color: '#0F172A', fontSize: '1.1rem', fontWeight: 800 }}>Editorial Content Workspace</h3>
+                    <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.82rem' }}>Quick overview of live content and directories you can edit</p>
+                  </div>
+                  <div className="row g-3">
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>News Room</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-newspaper" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {news.filter(n => !isAnnouncementCategory(n.category)).length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Published articles</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('announcements'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Announcements</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FEF3C7', color: '#92400E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-bullhorn" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {news.filter(n => isAnnouncementCategory(n.category)).length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Active public notices</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Athletes Directory</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-person-running" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {athletes.length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Registered profiles</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Upcoming Events</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EDE9FE', color: '#6D28D9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-calendar-alt" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {upcomingEventsList.length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Scheduled competitions</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Two-Column Grid */}
               <div className="row g-4">
@@ -2750,12 +2945,26 @@ export default function DashboardPage() {
                         </div>
                       </>
                     ) : (
-                      /* ── ADMIN / SUPER ADMIN: Inbox Panel ── */
+                      /* ── ADMIN / SUPER ADMIN: Inbox Panel with Messages, Volunteers, Donations & Job Applications ── */
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                           <div>
-                            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Inbox Activity</h3>
-                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Unread messages and inquiries requiring attention</p>
+                            <div className="d-flex align-items-center gap-2">
+                              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Inbox Activity</h3>
+                              {(() => {
+                                const unreadTotal = contacts.filter(c => !c.read).length + volunteers.filter(v => !v.read).length + donations.filter(d => !d.read).length + jobApplications.filter(a => !a.read).length;
+                                return unreadTotal > 0 ? (
+                                  <span className="badge bg-danger rounded-pill" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
+                                    {unreadTotal} Unread
+                                  </span>
+                                ) : (
+                                  <span className="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
+                                    All Clear
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Messages, volunteer registrations, donations & job applications</p>
                           </div>
                           <button
                             onClick={() => setAdminTab('contacts')}
@@ -2767,7 +2976,7 @@ export default function DashboardPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           {(() => {
-                            const items: { type: 'message' | 'volunteer' | 'donation'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
+                            const items: { type: 'message' | 'volunteer' | 'donation' | 'application'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
                             contacts.filter(c => !c.read).slice(0, 3).forEach(c => {
                               items.push({ type: 'message', raw: c, date: c.date, sender: c.name, title: `Message: ${c.subject}`, subtitle: c.message });
                             });
@@ -2777,13 +2986,23 @@ export default function DashboardPage() {
                             donations.filter(d => !d.read).slice(0, 3).forEach(d => {
                               items.push({ type: 'donation', raw: d, date: 'New Donation', sender: d.name, title: `Donation: ${d.supportType}`, subtitle: `Category: ${d.category}` });
                             });
-                            const displayItems = items.slice(0, 4);
+                            jobApplications.filter(a => !a.read).slice(0, 3).forEach(a => {
+                              items.push({
+                                type: 'application',
+                                raw: a,
+                                date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'New Candidate',
+                                sender: a.fullName,
+                                title: `Job Application: ${a.careerTitle || 'General Vacancy'}`,
+                                subtitle: `${a.email}${a.phone ? ` · ${a.phone}` : ''}`
+                              });
+                            });
+                            const displayItems = items.slice(0, 5);
                             if (displayItems.length === 0) {
                               return (
                                 <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8' }}>
                                   <i className="far fa-folder-open" style={{ fontSize: '2.5rem', marginBottom: '12px', display: 'block', color: '#CBD5E1' }} />
                                   <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Your inbox is completely clear!</span>
-                                  <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>No unread messages or applications found.</p>
+                                  <p style={{ fontSize: '0.75rem', margin: '4px 0 0 0' }}>No unread messages, registrations, or job applications found.</p>
                                 </div>
                               );
                             }
@@ -2793,6 +3012,7 @@ export default function DashboardPage() {
                               let icon = 'fa-envelope';
                               if (item.type === 'volunteer') { badgeBg = '#D1FAE5'; badgeColor = '#065F46'; icon = 'fa-hands-helping'; }
                               else if (item.type === 'donation') { badgeBg = '#FEF3C7'; badgeColor = '#92400E'; icon = 'fa-hand-holding-usd'; }
+                              else if (item.type === 'application') { badgeBg = '#EDE9FE'; badgeColor = '#6D28D9'; icon = 'fa-briefcase'; }
                               return (
                                 <div
                                   key={index}
@@ -2801,6 +3021,7 @@ export default function DashboardPage() {
                                     if (item.type === 'message') { setInboxSubTab('messages'); setActiveMessage(item.raw); markContactAsRead(item.raw.id); }
                                     else if (item.type === 'volunteer') { setInboxSubTab('volunteers'); setActiveVolunteer(item.raw); markVolunteerAsRead(item.raw.id); }
                                     else if (item.type === 'donation') { setInboxSubTab('donations'); setActiveDonation(item.raw); markDonationAsRead(item.raw.id); }
+                                    else if (item.type === 'application') { setInboxSubTab('applications'); setActiveJobApplication(item.raw); markJobApplicationRead(item.raw.id, true); }
                                   }}
                                   style={{ display: 'flex', gap: '16px', padding: '14px', border: '1px solid #E8ECF0', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s ease', background: '#FFFFFF' }}
                                   onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.03)'; e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
@@ -2827,7 +3048,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Right Column: Upcoming Events & System */}
+                {/* Right Column: Events Schedule & System */}
                 <div className="col-lg-5">
                   <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '24px', height: '100%', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
