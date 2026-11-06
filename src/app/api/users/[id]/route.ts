@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
-import { authorizeRequest } from '@/lib/rbac';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { Role } from '@prisma/client';
 
 // PUT: Update user profile, role, or password

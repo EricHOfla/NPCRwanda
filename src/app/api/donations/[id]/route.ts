@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { authorizeRequest } from '@/lib/rbac';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 const updateSchema = z.object({
   read: z.boolean(),

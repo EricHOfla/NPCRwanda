@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { authorizeRequest } from '@/lib/rbac';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 // GET: Fetch all system settings as a key-value object (Super Admin / system-settings.view only)
 export async function GET(request: NextRequest) {

@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { authorizeRequest } from '@/lib/rbac';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 function toSqlValue(val: any): string {
   if (val === null || val === undefined) {

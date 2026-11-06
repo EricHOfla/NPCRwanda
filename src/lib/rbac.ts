@@ -2,13 +2,9 @@
  * Role-Based Access Control (RBAC) System
  * NPC Rwanda Management Platform
  *
- * Implements granular, permission-based authorization across frontend and backend.
- * Isomorphic: permission checks run cleanly in Client Components, Server Components,
- * Middleware, and Route Handlers.
+ * Client-safe & Isomorphic: contains pure role matrices and permission-checking
+ * utilities. Safe to import anywhere (Client Components, Server Components, Middleware).
  */
-
-import type { NextRequest, NextResponse } from 'next/server';
-import type { JWTPayload } from '@/lib/auth';
 
 // Standard system roles supported by the platform
 export type AppRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'EDITOR' | 'STAFF' | string;
@@ -264,69 +260,4 @@ export function logAuthorizationFailure(details: {
   console.warn(
     `[SECURITY AUDIT] ${timestamp} | Auth Failure | reason=${details.reason} | path=${details.path || 'unknown'} | method=${details.method || 'GET'} | user=${details.userEmail || 'anonymous'} | role=${details.userRole || 'none'} | required=${details.requiredPermission || 'none'}`
   );
-}
-
-export type AuthorizationResult =
-  | { authorized: true; user: JWTPayload }
-  | { authorized: false; response: NextResponse; user: JWTPayload | null };
-
-/**
- * Server-side route handler authorization guard.
- *
- * Checks for a valid session and verifies the required granular permission.
- * Returns 401 if unauthenticated and 403 if authenticated but unauthorized.
- */
-export async function authorizeRequest(
-  request: NextRequest,
-  requiredPermission: Permission
-): Promise<AuthorizationResult> {
-  const { getSessionUser } = await import('@/lib/auth');
-  const { NextResponse } = await import('next/server');
-
-  const user = await getSessionUser(request);
-
-  if (!user) {
-    logAuthorizationFailure({
-      reason: 'UNAUTHENTICATED',
-      path: request.nextUrl.pathname,
-      method: request.method,
-      requiredPermission,
-    });
-    return {
-      authorized: false,
-      user: null,
-      response: NextResponse.json(
-        {
-          error: 'Authentication required. Please sign in to continue.',
-          code: 'UNAUTHENTICATED',
-        },
-        { status: 401 }
-      ),
-    };
-  }
-
-  if (!hasPermission(user.role, requiredPermission)) {
-    logAuthorizationFailure({
-      reason: 'FORBIDDEN',
-      userId: user.userId,
-      userEmail: user.email,
-      userRole: user.role,
-      path: request.nextUrl.pathname,
-      method: request.method,
-      requiredPermission,
-    });
-    return {
-      authorized: false,
-      user,
-      response: NextResponse.json(
-        {
-          error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
-          code: 'FORBIDDEN',
-        },
-        { status: 403 }
-      ),
-    };
-  }
-
-  return { authorized: true, user };
 }
