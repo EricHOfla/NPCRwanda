@@ -2701,8 +2701,12 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Website content cards remain available without a separate section heading. */}
-              <section aria-label="Website content and CMS statistics" style={{ marginBottom: '28px' }}>
+              {/* Website content overview: public-facing content managed in the CMS */}
+              <section aria-labelledby="website-overview-heading" style={{ marginBottom: '28px' }}>
+                <div style={{ marginBottom: '14px' }}>
+                  <h2 id="website-overview-heading" style={{ margin: 0, color: '#0F172A', fontSize: '1.15rem', fontWeight: 800 }}>Website Overview</h2>
+                  <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.84rem' }}>Public website content and inbox figures. Select a card to manage its records.</p>
+                </div>
                 {/* Stats Strip */}
                 <div className="row g-4 mb-4">
                 {STATS.map(stat => (
@@ -2755,7 +2759,7 @@ export default function DashboardPage() {
                 </div>
               </section>
 
-              {!isEditor && <DashboardAnalytics onNavigate={(tab) => setAdminTab(tab as AdminTab)} />}
+              {!isEditor && <DashboardAnalytics />}
 
               {/* Two-Column Grid */}
               <div className="row g-4">
