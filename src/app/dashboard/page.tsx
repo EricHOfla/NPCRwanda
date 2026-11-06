@@ -1256,7 +1256,7 @@ export default function DashboardPage() {
 
   // Session security & idle management
   const lastActivityRef = useRef<number>(Date.now());
-  const [authVerified, setAuthVerified] = useState(false);
+  const [authVerified, setAuthVerified] = useState(true);
 
   const verifySession = useCallback(async (): Promise<boolean> => {
     try {
@@ -1889,15 +1889,6 @@ export default function DashboardPage() {
   };
 
   const totalPages = (total: number, size: number) => Math.ceil(total / size) || 1;
-
-  if (!authVerified) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
-        <i className="fas fa-spinner fa-spin text-primary fa-3x mb-3" />
-        <p className="text-muted small fw-semibold">Verifying secure administrator session...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
