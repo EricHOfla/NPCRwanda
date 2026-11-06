@@ -5565,3 +5565,25 @@ body.accessibility-center-text {
         margin-left: 2.5rem !important;
     }
 }
+
+
+/* Live NPC Rwanda dashboard analytics */
+.live-analytics-wrap{margin:0 0 26px;color:#0f172a}
+.live-analytics-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:13px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:12px}
+.live-analytics-toolbar>div:first-child{display:flex;align-items:center;gap:9px;font-size:.88rem}.live-analytics-toolbar small{color:#64748b;font-size:.74rem}
+.live-analytics-live-dot{width:9px;height:9px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px #dcfce7}
+.live-analytics-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.live-analytics-controls select,.live-analytics-controls button{border:1px solid #dbe3ed;border-radius:8px;padding:7px 10px;background:#fff;color:#334155;font-size:.78rem}.live-analytics-controls button{font-weight:700}.live-analytics-updated{font-size:.7rem;color:#64748b}
+.live-analytics-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.live-analytics-kpi{position:relative;overflow:hidden;background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:18px;min-width:0;box-shadow:0 2px 5px #0f172a08}
+.live-analytics-kpi span,.live-analytics-kpi small{display:block;color:#64748b;font-size:.75rem;font-weight:600}.live-analytics-kpi strong{display:block;font-size:1.5rem;line-height:1.5;font-weight:800;color:#0f172a;overflow-wrap:anywhere}.live-analytics-kpi small{font-weight:500;font-size:.7rem}.live-analytics-kpi>i{position:absolute;right:15px;top:17px;font-size:1.4rem;opacity:.22}
+.live-analytics-kpi.blue>i{color:#2563eb}.live-analytics-kpi.green>i{color:#059669}.live-analytics-kpi.amber>i{color:#d97706}.live-analytics-kpi.violet>i{color:#7c3aed}
+.live-analytics-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.live-analytics-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;min-width:0;box-shadow:0 2px 5px #0f172a08}
+.live-analytics-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.live-analytics-panel-head h3{display:flex;align-items:center;gap:9px;margin:0;font-size:.95rem;font-weight:800}.live-analytics-panel-head h3 i{color:#1769c2}
+.live-analytics-donation-summary{display:flex;gap:18px;flex-wrap:wrap}.live-analytics-donation-summary>div{display:flex;flex-direction:column;gap:4px}.live-analytics-donation-summary small,.live-analytics-donation-summary span{font-size:.7rem;color:#64748b}.live-analytics-donation-summary strong{font-size:1.05rem}
+.live-analytics-bars{height:150px;display:flex;align-items:stretch;gap:5px;margin-top:18px;border-bottom:1px solid #e2e8f0;padding:0 2px}.live-analytics-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}.live-analytics-bar-track{height:120px;width:100%;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(to top,#f8fafc,#fff);border-radius:5px 5px 0 0}.live-analytics-bar-track span{width:min(70%,22px);min-height:0;background:linear-gradient(180deg,#38bdf8,#1769c2);border-radius:5px 5px 0 0}.live-analytics-bar-col small{font-size:.58rem;color:#64748b;white-space:nowrap}
+.live-analytics-note,.live-analytics-footnote{font-size:.7rem;color:#64748b;margin:12px 0 0}.live-analytics-sports{display:flex;flex-direction:column;gap:12px}.live-analytics-sports>div>div:first-child,.live-analytics-stat-list>div{display:flex;justify-content:space-between;gap:12px;font-size:.78rem}.live-analytics-sports strong,.live-analytics-stat-list strong{font-weight:800}.live-analytics-progress{height:7px;background:#eef2f7;border-radius:10px;margin-top:6px;overflow:hidden}.live-analytics-progress span{display:block;height:100%;background:linear-gradient(90deg,#0b63b6,#38bdf8);border-radius:10px}
+.live-analytics-stat-list{display:flex;flex-direction:column;gap:11px}.live-analytics-stat-list>div{padding-bottom:8px;border-bottom:1px solid #f1f5f9}.live-analytics-stat-list>div:last-child{border:0;padding:0}
+.live-analytics-footnote{padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px}.live-analytics-footnote i{color:#1769c2;margin-right:6px}.live-analytics-error{padding:12px;background:#fff1f2;color:#9f1239;border-radius:8px;margin-bottom:12px}.live-analytics-error button{margin-left:8px}.live-analytics-loading,.live-analytics-empty{padding:24px;text-align:center;color:#64748b;font-size:.82rem}
+@media(max-width:900px){.live-analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.live-analytics-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.live-analytics-kpi{padding:13px}.live-analytics-kpi strong{font-size:1.2rem}.live-analytics-toolbar>div:first-child{flex-wrap:wrap}.live-analytics-updated{width:100%}.live-analytics-bars{gap:2px}.live-analytics-bar-col small{font-size:.5rem}}

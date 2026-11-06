@@ -25,6 +25,7 @@ import {
 } from '@/context/DataContext';
 import { isAnnouncementCategory } from '@/lib/newsUtils';
 import SubscribersTab from '@/components/SubscribersTab';
+import DashboardAnalytics from '@/components/DashboardAnalytics';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 
@@ -2699,6 +2700,8 @@ export default function DashboardPage() {
                   </a>
                 </div>
               </div>
+
+              {!isEditor && <DashboardAnalytics />}
 
               {/* Stats Strip */}
               <div className="row g-4 mb-4">
