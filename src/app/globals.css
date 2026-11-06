@@ -5590,7 +5590,7 @@ body.accessibility-center-text {
 
 
 /* Admin overview information hierarchy */
-.live-analytics-section{margin:0 0:22px}
+.live-analytics-section{margin:0 0 22px}
 .live-analytics-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:22px 0 12px}
 .live-analytics-section-heading h3{margin:0;color:#0f172a;font-size:1.05rem;font-weight:800}
 .live-analytics-section-heading p{margin:3px 0 0;color:#64748b;font-size:.76rem}
