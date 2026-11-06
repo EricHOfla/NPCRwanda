@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       date.setDate(from.getDate() + index);
       return { date: date.toISOString().slice(0, 10), rwf: 0, usd: 0, count: 0 };
     });
-    const bucketMap = new Map(buckets.map((bucket) => [bucket.date, bucket]));
+    const bucketMap = new Map(buckets.map((bucket) => [bucket.date, bucket] as const));
     for (const payment of successfulPayments) {
       const bucket = bucketMap.get(payment.createdAt.toISOString().slice(0, 10));
       if (!bucket) continue;
