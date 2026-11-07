@@ -20,8 +20,9 @@ const careerSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'Open';
-    if (status !== 'Open') {
+    const adminScope = searchParams.get('scope') === 'admin';
+    const status = searchParams.get('status') || (adminScope ? 'All' : 'Open');
+    if (adminScope || status !== 'Open') {
       const auth = await authorizeRequest(request, 'content.view');
       if (!auth.authorized) return auth.response;
     }
