@@ -46,6 +46,7 @@ function CommunityManagementContent() {
 
   // Modal states
   const [showProgrammeModal, setShowProgrammeModal] = useState(false);
+  const [editingProgrammeId, setEditingProgrammeId] = useState<string | null>(null);
   const [selectedAthleteEnquiry, setSelectedAthleteEnquiry] = useState<Row | null>(null);
 
   // Form states for Training Programme
@@ -53,6 +54,35 @@ function CommunityManagementContent() {
     title: '', sport: '', description: '', location: '', schedule: '', 
     startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false 
   });
+
+  const resetProgrammeForm = () => setProgramme({
+    title: '', sport: '', description: '', location: '', schedule: '',
+    startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false,
+  });
+
+  const openNewProgramme = () => {
+    setEditingProgrammeId(null);
+    resetProgrammeForm();
+    setShowProgrammeModal(true);
+  };
+
+  const openEditProgramme = (item: Row) => {
+    setEditingProgrammeId(item.id);
+    setProgramme({
+      title: item.title || '',
+      sport: item.sport || '',
+      description: item.description || '',
+      location: item.location || '',
+      schedule: item.schedule || '',
+      startDate: item.startDate || '',
+      endDate: item.endDate || '',
+      eligibility: item.eligibility || '',
+      contactEmail: item.contactEmail || '',
+      status: item.status || 'Draft',
+      featured: Boolean(item.featured),
+    });
+    setShowProgrammeModal(true);
+  };
 
   // Track whether we've already kicked off the initial data load
   const dataFetchedRef = useRef(false);
@@ -109,18 +139,16 @@ function CommunityManagementContent() {
     setSuccess('');
     try {
       const response = await fetch('/api/training-programs', { 
-        method: 'POST', 
+        method: editingProgrammeId ? 'PATCH' : 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(programme) 
+        body: JSON.stringify(editingProgrammeId ? { ...programme, id: editingProgrammeId } : programme) 
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Save failed');
-      setProgramme({ 
-        title: '', sport: '', description: '', location: '', schedule: '', 
-        startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false 
-      }); 
+      resetProgrammeForm();
+      setEditingProgrammeId(null);
       setShowProgrammeModal(false);
-      setSuccess('Training programme created successfully. Set to Published to display on public site.'); 
+      setSuccess(editingProgrammeId ? 'Training programme updated successfully.' : 'Training programme created successfully.'); 
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Save failed'); 
@@ -255,7 +283,7 @@ function CommunityManagementContent() {
             {type === 'programmes' && (
               <button 
                 type="button" 
-                onClick={() => setShowProgrammeModal(true)} 
+                onClick={openNewProgramme} 
                 className="btn btn-sm btn-primary fw-semibold d-inline-flex align-items-center gap-1.5"
                 style={{ background: '#0B5F9F', borderColor: '#0B5F9F', fontSize: '0.8rem' }}
               >
@@ -330,6 +358,18 @@ function CommunityManagementContent() {
                         )}
                       </td>
                       <td className="text-end" style={{ paddingRight: '18px' }}>
+                        {type === 'programmes' && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-primary p-1 px-2 me-1"
+                            disabled={busy === item.id}
+                            onClick={() => openEditProgramme(item)}
+                            title="Edit programme"
+                            aria-label={`Edit ${item.title || 'training programme'}`}
+                          >
+                            <i className="fas fa-pen" />
+                          </button>
+                        )}
                         <button 
                           type="button"
                           className="btn btn-sm btn-outline-danger p-1 px-2" 
@@ -801,7 +841,7 @@ function CommunityManagementContent() {
                   </div>
                   <div>
                     <h5 className="modal-title fw-bold mb-0" style={{ fontSize: '1.2rem' }}>
-                      Create Training Programme
+                      {editingProgrammeId ? 'Edit Training Programme' : 'Create Training Programme'}
                     </h5>
                     <span className="small opacity-75" style={{ fontSize: '0.8rem' }}>
                       Publish official grassroots academies, youth training clinics &amp; training camps
@@ -811,7 +851,7 @@ function CommunityManagementContent() {
                 <button
                   type="button"
                   className="btn-close btn-close-white"
-                  onClick={() => setShowProgrammeModal(false)}
+                  onClick={() => { setShowProgrammeModal(false); setEditingProgrammeId(null); resetProgrammeForm(); }}
                   aria-label="Close"
                 />
               </div>
@@ -1009,7 +1049,7 @@ function CommunityManagementContent() {
                     ) : (
                       <>
                         <i className="fas fa-check" />
-                        <span>Create Training Programme</span>
+                        <span>{editingProgrammeId ? 'Save Changes' : 'Create Training Programme'}</span>
                       </>
                     )}
                   </button>
