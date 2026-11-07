@@ -1,6 +1,7 @@
 'use client';
 
 import AppSidebar from '@/components/dashboard/AppSidebar';
+import DashboardTopbar from '@/components/dashboard/DashboardTopbar';
 import AccessRestricted from '@/components/dashboard/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -406,81 +407,35 @@ function DonationManagementContent() {
 
       {/* ── Main Content Area ── */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-        {/* Top Navbar */}
-        <header
-          style={{
-            background: '#FFFFFF',
-            borderBottom: '1px solid #E2E8F0',
-            padding: '12px 24px',
-            flexShrink: 0,
-            zIndex: 1020,
-          }}
+        {/* Unified System Dashboard Topbar */}
+        <DashboardTopbar
+          title="Donations & Contributions"
+          breadcrumb="Dashboard"
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          userProfile={userProfile}
         >
-          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div className="d-flex align-items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="btn btn-sm btn-light border p-2"
-                style={{ borderRadius: '8px', color: '#334155' }}
-                aria-label="Toggle Navigation"
-              >
-                <i className="fas fa-bars" />
-              </button>
-
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb mb-0" style={{ fontSize: '0.82rem' }}>
-                  <li className="breadcrumb-item">
-                    <Link href="/dashboard" className="text-decoration-none text-muted">
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item active text-dark fw-semibold" aria-current="page">
-                    Donations & Contributions
-                  </li>
-                </ol>
-              </nav>
-            </div>
-
-            <div className="d-flex align-items-center gap-2">
-              <Link
-                href="/dashboard/community"
-                className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold"
-                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
-              >
-                <i className="fas fa-people-group text-primary" /> Sports & Community Desk
-              </Link>
-              <Link
-                href="/donate"
-                target="_blank"
-                className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 fw-semibold"
-                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
-              >
-                <i className="fas fa-heart text-danger" /> Public Donate Page
-              </Link>
-              <button
-                type="button"
-                className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary"
-                onClick={() => {
-                  void loadPayments();
-                  void loadInquiries();
-                }}
-                disabled={loading || inquiryLoading}
-                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
-              >
-                <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold"
-                onClick={exportCsv}
-                style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}
-              >
-                <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
-              </button>
-            </div>
-          </div>
-        </header>
+          <button
+            type="button"
+            className="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 fw-semibold text-secondary"
+            onClick={() => {
+              void loadPayments();
+              void loadInquiries();
+            }}
+            disabled={loading || inquiryLoading}
+            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
+          >
+            <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold"
+            onClick={exportCsv}
+            style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}
+          >
+            <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
+          </button>
+        </DashboardTopbar>
 
         {/* Content Body */}
         <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>

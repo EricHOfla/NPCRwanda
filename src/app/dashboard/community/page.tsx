@@ -1,6 +1,7 @@
 'use client';
 
 import AppSidebar from '@/components/dashboard/AppSidebar';
+import DashboardTopbar from '@/components/dashboard/DashboardTopbar';
 import AccessRestricted from '@/components/dashboard/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -223,7 +224,7 @@ function CommunityManagementContent() {
               <span className="badge bg-secondary rounded-pill" style={{ fontSize: '0.72rem' }}>{total}</span>
             </h3>
             <p className="small text-muted mb-0" style={{ fontSize: '0.78rem' }}>
-              Records synchronized with the public <Link href="/sports-development" target="_blank" className="text-primary fw-semibold">Sports Development</Link> portal.
+              Official records for Sports Development talent identification and training academies.
             </p>
           </div>
 
@@ -406,49 +407,24 @@ function CommunityManagementContent() {
       {/* ── Main Dashboard Workspace ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0 }}>
         {/* Top Header Bar */}
-        <header style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '14px 28px', flexShrink: 0, zIndex: 100 }}>
-          <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div className="d-flex align-items-center gap-3">
-              <button 
-                type="button"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="btn btn-sm btn-light border p-2"
-                style={{ width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                title="Toggle Sidebar"
-              >
-                <i className="fas fa-bars" style={{ fontSize: '0.9rem' }} />
-              </button>
-
-              <nav aria-label="breadcrumb" className="d-none d-sm-block">
-                <ol className="breadcrumb mb-0" style={{ fontSize: '0.8rem' }}>
-                  <li className="breadcrumb-item"><Link href="/dashboard" className="text-decoration-none text-muted">Dashboard</Link></li>
-                  <li className="breadcrumb-item active text-dark fw-semibold" aria-current="page">Sports Development</li>
-                </ol>
-              </nav>
-            </div>
-
-            <div className="d-flex align-items-center gap-2">
-              <Link 
-                href="/sports-development" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold"
-                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem' }}
-              >
-                <i className="fas fa-external-link-alt text-primary" /> Live Public Portal
-              </Link>
-              <button 
-                type="button"
-                className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary"
-                onClick={() => void load()} 
-                disabled={loading}
-                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem' }}
-              >
-                <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
-              </button>
-            </div>
-          </div>
-        </header>
+        {/* Unified System Dashboard Topbar */}
+        <DashboardTopbar
+          title="Sports Development"
+          breadcrumb="Dashboard"
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          userProfile={userProfile}
+        >
+          <button 
+            type="button"
+            className="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 fw-semibold text-secondary"
+            onClick={() => void load()} 
+            disabled={loading}
+            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
+          >
+            <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
+          </button>
+        </DashboardTopbar>
 
         {/* Workspace Body */}
         <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
@@ -495,31 +471,22 @@ function CommunityManagementContent() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
                   <div>
                     <span className="badge mb-2" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.35)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Public Portal Management
+                      Sports Development Management
                     </span>
                     <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
                       Sports Development Desk
                     </h1>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
-                      Directly connected to the public <Link href="/sports-development" target="_blank" className="text-warning text-decoration-underline fw-bold">/sports-development</Link> page. Review aspiring athlete talent submissions and publish official training programmes.
+                      Review aspiring athlete talent submissions, manage scouting profiles, and create official grassroots training programmes.
                     </p>
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    <Link
-                      href="/sports-development"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-sm"
-                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      <i className="fas fa-external-link-alt" /> View Public Page
-                    </Link>
                     <button 
                       type="button"
                       onClick={() => setShowProgrammeModal(true)}
                       className="btn btn-sm"
-                      style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
+                      style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
                     >
                       <i className="fas fa-plus" /> New Programme
                     </button>
@@ -729,14 +696,9 @@ function CommunityManagementContent() {
 
               {activeTab === 'programmes' && (
                 <>
-                  <div className="alert alert-info py-2.5 px-3 small d-flex align-items-center justify-content-between mb-3 border-0 shadow-sm" style={{ borderRadius: '10px', background: '#EFF6FF', color: '#1E40AF' }}>
-                    <div className="d-flex align-items-center gap-2">
-                      <i className="fas fa-info-circle text-primary" />
-                      <span>Programmes with <strong>Published</strong> status are immediately displayed on the public <Link href="/sports-development" target="_blank" className="fw-bold text-decoration-underline text-primary">Sports Development page</Link>.</span>
-                    </div>
-                    <Link href="/sports-development" target="_blank" className="btn btn-xs btn-outline-primary fw-bold" style={{ fontSize: '0.75rem' }}>
-                      Preview Live Page <i className="fas fa-arrow-up-right-from-square ms-1" />
-                    </Link>
+                  <div className="alert alert-info py-2.5 px-3 small d-flex align-items-center gap-2 mb-3 border-0 shadow-sm" style={{ borderRadius: '10px', background: '#EFF6FF', color: '#1E40AF' }}>
+                    <i className="fas fa-info-circle text-primary flex-shrink-0" />
+                    <span>Programmes with <strong>Published</strong> status are immediately displayed on the public Sports Development portal.</span>
                   </div>
                   {renderTable('Grassroots Training Programmes', 'programmes', [
                     { 
@@ -857,82 +819,238 @@ function CommunityManagementContent() {
         </div>
       )}
 
-      {/* ── Modal: Add Training Programme ── */}
+      {/* ── Modal: Redesigned Training Programme Form ── */}
       {showProgrammeModal && (
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
-              <div className="modal-header text-white" style={{ background: '#0B5F9F' }}>
-                <h5 className="modal-title fw-bold">
-                  <i className="fas fa-plus me-2" /> Add Training Programme (Sports Development)
-                </h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setShowProgrammeModal(false)} aria-label="Close" />
+              <div
+                className="modal-header text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #074783 0%, #0B5F9F 100%)',
+                  padding: '20px 24px',
+                }}
+              >
+                <div className="d-flex align-items-center gap-2.5">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.18)', fontSize: '1.15rem' }}
+                  >
+                    <i className="fas fa-dumbbell" />
+                  </div>
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0" style={{ fontSize: '1.2rem' }}>
+                      Create Training Programme
+                    </h5>
+                    <span className="small opacity-75" style={{ fontSize: '0.8rem' }}>
+                      Publish official grassroots academies, youth training clinics &amp; training camps
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setShowProgrammeModal(false)}
+                  aria-label="Close"
+                />
               </div>
+
               <form onSubmit={saveProgramme}>
-                <div className="modal-body p-4">
-                  <div className="alert alert-info py-2 px-3 small mb-3 border-0" style={{ background: '#EFF6FF', color: '#1E40AF' }}>
-                    <i className="fas fa-info-circle me-1" />
-                    Published programmes will automatically appear on the public <Link href="/sports-development" target="_blank" className="fw-bold text-decoration-underline text-primary">Sports Development page</Link>.
+                <div className="modal-body p-4" style={{ background: '#FFFFFF', maxHeight: '70vh', overflowY: 'auto' }}>
+                  {/* Section 1: Basic Information */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#EFF6FF', color: '#0B5F9F', fontSize: '0.7rem' }}>
+                      1. General Details
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Programme Title <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          required
+                          value={programme.title}
+                          onChange={e => setProgramme(s => ({ ...s, title: e.target.value }))}
+                          placeholder="e.g. Grassroots Sitting Volleyball Youth Academy"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Sport Discipline <span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className="form-select py-2.5 rounded-3"
+                          required
+                          value={programme.sport}
+                          onChange={e => setProgramme(s => ({ ...s, sport: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        >
+                          <option value="">Select sport discipline</option>
+                          <option value="Sitting Volleyball">Sitting Volleyball</option>
+                          <option value="Para-Athletics">Para-Athletics (Track &amp; Field)</option>
+                          <option value="Wheelchair Basketball">Wheelchair Basketball</option>
+                          <option value="Para-Powerlifting">Para-Powerlifting</option>
+                          <option value="Goalball">Goalball</option>
+                          <option value="Para-Swimming">Para-Swimming</option>
+                          <option value="Multi-Sport Grassroots Clinic">Multi-Sport Grassroots Clinic</option>
+                          <option value="Other Para-Sport">Other Para-Sport</option>
+                        </select>
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Location / Venue <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          required
+                          value={programme.location}
+                          onChange={e => setProgramme(s => ({ ...s, location: e.target.value }))}
+                          placeholder="e.g. Amahoro National Stadium Compound, Kigali"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="mb-3">
-                    <label className="form-label small fw-bold">Programme Title *</label>
-                    <input className="form-control" required value={programme.title} onChange={e => setProgramme(s => ({ ...s, title: e.target.value }))} placeholder="e.g. Grassroots Sitting Volleyball Youth Academy" />
-                  </div>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Sport Discipline *</label>
-                      <input className="form-control" required value={programme.sport} onChange={e => setProgramme(s => ({ ...s, sport: e.target.value }))} placeholder="Sitting Volleyball / Para Athletics" />
+                  {/* Section 2: Timing & Schedule */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#FEF3C7', color: '#92400E', fontSize: '0.7rem' }}>
+                      2. Dates &amp; Schedule
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Start Date</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="date"
+                          value={programme.startDate}
+                          onChange={e => setProgramme(s => ({ ...s, startDate: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">End Date</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="date"
+                          value={programme.endDate}
+                          onChange={e => setProgramme(s => ({ ...s, endDate: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">Training Frequency / Schedule</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          value={programme.schedule}
+                          onChange={e => setProgramme(s => ({ ...s, schedule: e.target.value }))}
+                          placeholder="e.g. Every Saturday & Sunday (09:00 - 12:30 CAT)"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
                     </div>
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Location / Venue *</label>
-                      <input className="form-control" required value={programme.location} onChange={e => setProgramme(s => ({ ...s, location: e.target.value }))} placeholder="Amahoro Stadium / Huye Gymnasium" />
+                  </div>
+
+                  {/* Section 3: Eligibility & Coordination */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#ECFDF5', color: '#065F46', fontSize: '0.7rem' }}>
+                      3. Requirements &amp; Contact
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Eligibility Criteria</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          value={programme.eligibility}
+                          onChange={e => setProgramme(s => ({ ...s, eligibility: e.target.value }))}
+                          placeholder="e.g. Open to youth aged 12-25 with physical impairments"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Coordinator Email</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="email"
+                          value={programme.contactEmail}
+                          onChange={e => setProgramme(s => ({ ...s, contactEmail: e.target.value }))}
+                          placeholder="development@npcrwanda.org"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">Programme Overview &amp; Description</label>
+                        <textarea
+                          className="form-control rounded-3"
+                          rows={3}
+                          value={programme.description}
+                          onChange={e => setProgramme(s => ({ ...s, description: e.target.value }))}
+                          placeholder="Describe the training syllabus, coaching team, facilities, equipment provided, and pathway opportunities..."
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem', resize: 'vertical' }}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Start Date</label>
-                      <input className="form-control" type="date" value={programme.startDate} onChange={e => setProgramme(s => ({ ...s, startDate: e.target.value }))} />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">End Date</label>
-                      <input className="form-control" type="date" value={programme.endDate} onChange={e => setProgramme(s => ({ ...s, endDate: e.target.value }))} />
-                    </div>
-                  </div>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Schedule / Frequency</label>
-                      <input className="form-control" value={programme.schedule} onChange={e => setProgramme(s => ({ ...s, schedule: e.target.value }))} placeholder="e.g. Saturdays & Sundays, 09:00 - 12:00" />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Coordinator Email</label>
-                      <input className="form-control" type="email" value={programme.contactEmail} onChange={e => setProgramme(s => ({ ...s, contactEmail: e.target.value }))} placeholder="coordinator@npcrwanda.org" />
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label small fw-bold">Eligibility Requirements</label>
-                    <input className="form-control" value={programme.eligibility} onChange={e => setProgramme(s => ({ ...s, eligibility: e.target.value }))} placeholder="e.g. Open to youth aged 12-25 with lower limb impairments" />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label small fw-bold">Programme Description</label>
-                    <textarea className="form-control" rows={3} value={programme.description} onChange={e => setProgramme(s => ({ ...s, description: e.target.value }))} placeholder="Detailed overview of drills, coaching staff, and progression pathways..." />
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between p-3 bg-light rounded border">
+
+                  {/* Section 4: Publishing Status */}
+                  <div
+                    className="p-3 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3"
+                    style={{ background: '#F8FAFC', border: '1.5px solid #E2E8F0' }}
+                  >
                     <div>
-                      <label className="form-label small fw-bold mb-0">Initial Publication Status</label>
-                      <div className="text-muted small" style={{ fontSize: '0.75rem' }}>Select &apos;Published&apos; to show immediately on the public website.</div>
+                      <div className="fw-bold small text-dark mb-0.5">Publication Status</div>
+                      <div className="small text-muted" style={{ fontSize: '0.78rem' }}>
+                        Set to <strong>Published</strong> to display on the public Sports Development portal.
+                      </div>
                     </div>
-                    <select className="form-select form-select-sm w-auto" value={programme.status} onChange={e => setProgramme(s => ({ ...s, status: e.target.value }))}>
-                      <option value="Draft">Draft (Hidden)</option>
+                    <select
+                      className="form-select form-select-sm fw-bold w-auto"
+                      value={programme.status}
+                      onChange={e => setProgramme(s => ({ ...s, status: e.target.value }))}
+                      style={{ border: '1.5px solid #CBD5E1', borderRadius: '8px', padding: '6px 14px' }}
+                    >
+                      <option value="Draft">Draft (Saved Privately)</option>
                       <option value="Published">Published (Public)</option>
-                      <option value="Archived">Archived</option>
+                      <option value="Archived">Archived (Closed)</option>
                     </select>
                   </div>
                 </div>
-                <div className="modal-footer bg-light">
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowProgrammeModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary btn-sm px-4 fw-semibold" style={{ background: '#0B5F9F', borderColor: '#0B5F9F' }} disabled={busy === 'programme'}>
-                    {busy === 'programme' ? <><i className="fas fa-spinner fa-spin me-1" /> Saving...</> : 'Create Programme'}
+
+                {/* Footer Controls */}
+                <div className="modal-footer bg-light px-4 py-3 d-flex justify-content-between">
+                  <button
+                    type="button"
+                    className="btn btn-light border px-4 py-2 fw-semibold rounded-3"
+                    onClick={() => setShowProgrammeModal(false)}
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary px-4 py-2 fw-bold rounded-3 d-inline-flex align-items-center gap-2"
+                    style={{ background: '#0B5F9F', borderColor: '#0B5F9F', fontSize: '0.85rem' }}
+                    disabled={busy === 'programme'}
+                  >
+                    {busy === 'programme' ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                        <span>Saving Programme...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-check" />
+                        <span>Create Training Programme</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
