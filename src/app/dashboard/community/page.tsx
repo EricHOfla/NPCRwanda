@@ -98,6 +98,7 @@ function CommunityManagementContent() {
 
   // Derived permission
   const isAuthorized = hasPermission(userProfile.role, 'community.view');
+  const canDeleteCommunityRecords = hasPermission(userProfile.role, 'community.delete');
 
   // Fetch sports development data
   const load = useCallback(async () => {
@@ -384,6 +385,7 @@ function CommunityManagementContent() {
                             <i className="fas fa-pen" />
                           </button>
                         )}
+                        {canDeleteCommunityRecords && (
                         <button 
                           type="button"
                           className="btn btn-sm btn-outline-danger p-1 px-2" 
@@ -394,6 +396,7 @@ function CommunityManagementContent() {
                         >
                           <i className="fas fa-trash" />
                         </button>
+                        )}
                       </td>
                     </tr>
                   ))}
