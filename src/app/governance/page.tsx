@@ -3,256 +3,216 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
-import { useData } from '@/context/DataContext';
 
-interface GovDoc {
-  id: string;
-  title: string;
-  desc: string;
-  fileUrl: string;
-  order: number;
-}
+const governancePrinciples = [
+  {
+    icon: 'fa-scale-balanced',
+    title: 'Accountability',
+    description: 'Leadership and management are responsible for decisions, resources, and the results delivered to athletes and members.',
+  },
+  {
+    icon: 'fa-eye',
+    title: 'Transparency',
+    description: 'We aim to make our governance approach, responsibilities, and institutional direction clear to our stakeholders.',
+  },
+  {
+    icon: 'fa-handshake-angle',
+    title: 'Integrity',
+    description: 'We promote ethical conduct, fairness, and respect throughout the Paralympic movement in Rwanda.',
+  },
+  {
+    icon: 'fa-people-group',
+    title: 'Representation',
+    description: 'Athletes, members, and disability groups should have a meaningful voice in the decisions that affect them.',
+  },
+];
 
-interface GovPolicy {
-  id: string;
-  title: string;
-  desc: string;
-  fileUrl: string;
-  order: number;
-}
+const governanceLevels = [
+  {
+    number: '01',
+    title: 'General Assembly',
+    description: 'The supreme member body that provides the institutional mandate and considers major decisions.',
+    icon: 'fa-users',
+    level: 'primary',
+  },
+  {
+    number: '02',
+    title: 'Board of Directors',
+    description: 'Provides strategic oversight, governance direction, and accountability for the committee.',
+    icon: 'fa-landmark',
+    level: 'primary',
+  },
+  {
+    number: '03',
+    title: 'Executive Secretariat',
+    description: 'Coordinates daily operations and implements approved plans, programmes, and decisions.',
+    icon: 'fa-building',
+    level: 'primary',
+  },
+];
 
-const getDocDetails = (url: string) => {
-  if (!url || url === '#') return { icon: 'fa-file-lines', label: 'Document' };
-  const clean = url.split('?')[0].toLowerCase();
-  if (clean.endsWith('.pdf')) return { icon: 'fa-file-pdf text-danger', label: 'PDF' };
-  if (clean.endsWith('.doc') || clean.endsWith('.docx')) return { icon: 'fa-file-word text-primary', label: 'DOC' };
-  if (clean.endsWith('.xls') || clean.endsWith('.xlsx') || clean.endsWith('.csv')) return { icon: 'fa-file-excel text-success', label: 'Excel' };
-  if (clean.endsWith('.ppt') || clean.endsWith('.pptx')) return { icon: 'fa-file-powerpoint text-warning', label: 'PPT' };
-  if (clean.endsWith('.png') || clean.endsWith('.jpg') || clean.endsWith('.jpeg')) return { icon: 'fa-file-image text-info', label: 'Image' };
-  return { icon: 'fa-file-lines text-primary', label: 'Document' };
-};
-
-const isDocAvailable = (url?: string): boolean => {
-  if (!url) return false;
-  const trimmed = url.trim();
-  return trimmed !== '' && trimmed !== '#';
-};
+const supportingStructures = [
+  {
+    title: 'Technical Commissions',
+    description: 'Support technical standards, sport development, athlete preparation, and specialist functions.',
+    icon: 'fa-medal',
+  },
+  {
+    title: 'District Committees',
+    description: 'Help extend participation, talent identification, and adapted sport activities across Rwanda.',
+    icon: 'fa-map-location-dot',
+  },
+];
 
 export default function GovernancePage() {
   const { t } = useTranslation();
-  const { governanceDocs: keyDocuments, governancePolicies: officialPolicies, loading } = useData();
 
   return (
-    <main id="main-content">
-      {/* Page Header */}
-      <header className="page-header">
+    <main id="main-content" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
+      <header
+        className="page-header"
+        style={{
+          background: 'linear-gradient(135deg, #082B55 0%, #0B477B 58%, #087B78 100%)',
+          color: '#fff',
+          padding: '64px 0 76px',
+          borderBottom: '4px solid #F2B632',
+        }}
+      >
         <div className="container">
-          <nav aria-label="breadcrumb" data-aos="fade-up">
-            <ol className="breadcrumb mb-2">
+          <nav aria-label="breadcrumb" className="mb-4">
+            <ol className="breadcrumb mb-0">
               <li className="breadcrumb-item">
-                <Link href="/">
-                  Home
-                </Link>
+                <Link href="/" className="text-white text-decoration-none">{t('nav.home') || 'Home'}</Link>
               </li>
-              <li className="breadcrumb-item active" aria-current="page">
-                {t('phrase.Governance')}
+              <li className="breadcrumb-item active text-white" aria-current="page">
+                {t('phrase.Governance') || 'Governance'}
               </li>
             </ol>
           </nav>
-          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">
-            {t('phrase.Governance & Transparency')}
-          </h1>
-          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
-            Our commitment to accountability, integrity, and ethical leadership in Paralympic sports.
-          </p>
+          <div className="row align-items-center g-4">
+            <div className="col-lg-8">
+              <span className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 mb-3" style={{ background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.25)', fontSize: '.78rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                <i className="fas fa-landmark" /> Governance &amp; institutional leadership
+              </span>
+              <h1 className="display-5 fw-bold mb-3 text-white">{t('phrase.Governance & Transparency') || 'Governance & Transparency'}</h1>
+              <p className="lead mb-0" style={{ maxWidth: '760px', color: 'rgba(255,255,255,.86)', lineHeight: 1.7 }}>
+                NPC Rwanda is committed to responsible leadership, clear accountability, and inclusive decision-making in the development of Paralympic sport.
+              </p>
+            </div>
+            <div className="col-lg-4">
+              <div className="rounded-4 p-4" style={{ background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.2)' }}>
+                <div className="d-flex align-items-center gap-3 mb-2">
+                  <i className="fas fa-shield-halved fa-2x text-warning" />
+                  <div className="fw-bold text-white">Good governance</div>
+                </div>
+                <p className="small mb-0" style={{ color: 'rgba(255,255,255,.82)' }}>
+                  Strong institutions help protect the interests of athletes, members, partners, and the wider community.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Main Governance Section */}
-      <section id="governance-info">
-        <div className="container">
-          <div className="row g-5">
-            <div className="col-lg-8">
-              <h2 className="mb-4" data-aos="fade-up">
-                {t('phrase.How We Are Managed')}
-              </h2>
-              <p className="mb-4 text-justify" data-aos="fade-up">
-                {t(
-                  'phrase.NPC Rwanda operates under governance standards aligned with the International Paralympic Committee. We are committed to transparency so athletes, partners, and the public can access our strategic direction, policies, and performance reporting.'
-                )}
-              </p>
+      <section className="container py-5" aria-labelledby="governance-approach">
+        <div className="row g-4 align-items-end mb-4">
+          <div className="col-lg-8">
+            <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>Our commitment</span>
+            <h2 id="governance-approach" className="fw-bold text-dark mt-2 mb-3">{t('phrase.How We Are Managed') || 'How We Are Managed'}</h2>
+            <p className="text-muted mb-0" style={{ maxWidth: '850px', lineHeight: 1.8 }}>
+              NPC Rwanda operates under governance standards aligned with the International Paralympic Committee. We work to ensure that our strategic direction, leadership responsibilities, and institutional decisions support fair and inclusive sport.
+            </p>
+          </div>
+          <div className="col-lg-4 text-lg-end">
+            <Link href="/resources" className="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
+              <i className="fas fa-folder-open me-2" />View official publications
+            </Link>
+          </div>
+        </div>
 
-              {/* Key Documents */}
-              <div className="mb-5" id="reports">
-                <h3 className="h4 mb-4" data-aos="fade-up">
-                  {t('phrase.Key Documents')}
-                </h3>
-
-                {loading ? (
-                  <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                ) : keyDocuments.length === 0 ? (
-                  <p className="text-muted">No documents available at this time.</p>
-                ) : (
-                  keyDocuments.map((doc, index) => {
-                    const docId = doc.title.toLowerCase().includes('constitution') ? 'constitution' :
-                                  doc.title.toLowerCase().includes('strategic') ? 'strategic-plan' :
-                                  doc.title.toLowerCase().includes('annual') ? 'annual-report-2023' :
-                                  doc.title.toLowerCase().includes('financial') ? 'financial-audit-2023' :
-                                  doc.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                    const hasDoc = isDocAvailable(doc.fileUrl);
-                    const docHref = hasDoc ? (doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/assets/img/curated/${doc.fileUrl}`) : '#';
-                    return (
-                      <div
-                        key={doc.id}
-                        id={docId}
-                        className="doc-item d-flex align-items-center p-3 mb-3 border rounded-3 bg-white shadow-soft"
-                        data-aos="fade-up"
-                        data-aos-delay={index * 100}
-                        style={{ transition: 'all 0.3s ease' }}
-                      >
-                        <div
-                          className="doc-icon d-flex align-items-center justify-content-center bg-light rounded-3 me-3"
-                          style={{ width: '50px', height: '50px', minWidth: '50px', color: 'var(--primary-blue)' }}
-                        >
-                          <i className={`fas ${getDocDetails(doc.fileUrl).icon} fa-lg`}></i>
-                        </div>
-                        <div className="flex-grow-1">
-                          <h4 className="h6 mb-1">{doc.title}</h4>
-                          <p className="small text-muted mb-0">{doc.desc}</p>
-                        </div>
-                        {hasDoc ? (
-                          <a
-                            href={docHref}
-                            download={`${doc.title}.pdf`}
-                            className="btn btn-sm btn-outline-primary ms-3"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ whiteSpace: 'nowrap' }}
-                          >
-                            <i className="fas fa-download me-1"></i>
-                            <span>{getDocDetails(doc.fileUrl).label}</span>
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-light border ms-3 text-muted"
-                            disabled
-                            style={{ whiteSpace: 'nowrap', opacity: 0.6 }}
-                          >
-                            <span>Available Soon</span>
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Official Policies */}
-              <div id="policies">
-                <h3 className="h4 mb-4" data-aos="fade-up">
-                  {t('phrase.Official Policies')}
-                </h3>
-                {loading ? (
-                  <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                ) : officialPolicies.length === 0 ? (
-                  <p className="text-muted">No policies available at this time.</p>
-                ) : (
-                  <div className="row g-3">
-                    {officialPolicies.map((policy, index) => {
-                      const policyId = policy.title.toLowerCase().includes('safeguarding') ? 'safeguarding-policy' :
-                                       policy.title.toLowerCase().includes('anti-doping') ? 'anti-doping-regulations' :
-                                       policy.title.toLowerCase().includes('selection') ? 'selection-criteria' :
-                                       policy.title.toLowerCase().includes('classification') ? 'classification-rules' :
-                                       policy.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                      const hasPolicy = isDocAvailable(policy.fileUrl);
-                      const policyHref = hasPolicy ? (policy.fileUrl.startsWith('http') || policy.fileUrl.startsWith('/') ? policy.fileUrl : `/assets/img/curated/${policy.fileUrl}`) : '#';
-                      return (
-                        <div
-                          key={policy.id}
-                          className="col-md-6"
-                          data-aos="zoom-in"
-                          data-aos-delay={index * 100}
-                        >
-                          <div className="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between" id={policyId}>
-                            <div>
-                              <div className="d-flex align-items-center justify-content-between mb-2">
-                                <h5 className="h6 mb-0 fw-bold">{policy.title}</h5>
-                                <i className={`fas ${getDocDetails(policy.fileUrl).icon}`} />
-                              </div>
-                              <p className="small text-muted mb-3">{policy.desc}</p>
-                            </div>
-                            {hasPolicy ? (
-                              <a
-                                href={policyHref}
-                                download={`${policy.title}.pdf`}
-                                className="small fw-bold text-primary d-inline-flex align-items-center gap-1"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <span>{t('phrase.Read Policy')}</span> 
-                                <i className="fas fa-download" style={{ fontSize: '0.72rem' }} />
-                              </a>
-                            ) : (
-                              <span className="small text-muted fst-italic">Document in archive</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+        <div className="row g-3 mb-5">
+          {governancePrinciples.map((principle) => (
+            <div className="col-sm-6 col-xl-3" key={principle.title}>
+              <article className="h-100 bg-white border rounded-4 p-4 shadow-sm">
+                <div className="d-inline-flex align-items-center justify-content-center rounded-3 mb-3" style={{ width: 48, height: 48, background: '#EAF2FB', color: '#0B5793' }}>
+                  <i className={`fas ${principle.icon} fa-lg`} aria-hidden="true" />
+                </div>
+                <h3 className="h5 fw-bold text-dark mb-2">{principle.title}</h3>
+                <p className="small text-muted mb-0" style={{ lineHeight: 1.7 }}>{principle.description}</p>
+              </article>
             </div>
+          ))}
+        </div>
 
-            {/* Sidebar */}
-            <div className="col-lg-4" data-aos="fade-left">
-              <div className="bg-white p-4 rounded-4 shadow-soft border mb-4" id="board">
-                <h4 className="h6 text-uppercase fw-bold mb-3">{t('phrase.Our Structure')}</h4>
-                <div className="text-center py-3">
-                  <div className="bg-primary text-white p-2 rounded small mb-2">
-                    {t('phrase.General Assembly')}
-                  </div>
-                  <i className="fas fa-arrow-down text-muted mb-2"></i>
-                  <div className="bg-primary text-white p-2 rounded small mb-2">
-                    {t('phrase.Board of Directors')}
-                  </div>
-                  <i className="fas fa-arrow-down text-muted mb-2"></i>
-                  <div className="bg-primary text-white p-2 rounded small mb-2">
-                    {t('phrase.Executive Secretariat')}
-                  </div>
-                  <i className="fas fa-arrow-down text-muted mb-2"></i>
-                  <div className="bg-light p-2 rounded small border mb-1 text-dark">
-                    {t('phrase.Technical Commissions')}
-                  </div>
-                  <div className="bg-light p-2 rounded small border mb-1 text-dark">
-                    {t('phrase.District Committees')}
-                  </div>
+        <div className="row g-4">
+          <div className="col-lg-8">
+            <section className="bg-white border rounded-4 p-4 p-md-5 shadow-sm h-100" aria-labelledby="governance-structure">
+              <div className="mb-4">
+                <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>Institutional framework</span>
+                <h2 id="governance-structure" className="h3 fw-bold text-dark mt-2 mb-2">{t('phrase.Our Structure') || 'Our Structure'}</h2>
+                <p className="text-muted mb-0">The committee works through member representation, strategic oversight, and operational coordination.</p>
+              </div>
+
+              <div className="d-flex flex-column align-items-center">
+                {governanceLevels.map((level, index) => (
+                  <React.Fragment key={level.number}>
+                    <article className="w-100 rounded-4 p-3 p-md-4 d-flex align-items-start gap-3" style={{ maxWidth: '620px', background: index === 0 ? '#0B477B' : index === 1 ? '#125F8B' : '#EAF2F8', color: index === 2 ? '#17324D' : '#fff', border: index === 2 ? '1px solid #D5E2ED' : '1px solid transparent' }}>
+                      <div className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 46, height: 46, background: index === 2 ? '#D7E8F5' : 'rgba(255,255,255,.16)' }}>
+                        <i className={`fas ${level.icon} `} aria-hidden="true" />
+                      </div>
+                      <div className="flex-grow-1">
+                        <div className="small fw-bold mb-1" style={{ opacity: .72 }}>LEVEL {level.number}</div>
+                        <h3 className="h5 fw-bold mb-1" style={{ color: 'inherit' }}>{t(`phrase.${level.title}`) || level.title}</h3>
+                        <p className="small mb-0" style={{ opacity: .82, lineHeight: 1.65 }}>{level.description}</p>
+                      </div>
+                    </article>
+                    {index < governanceLevels.length - 1 && (
+                      <div className="py-2 text-primary" aria-hidden="true"><i className="fas fa-arrow-down fa-lg" /></div>
+                    )}
+                  </React.Fragment>
+                ))}
+                <div className="py-2 text-primary" aria-hidden="true"><i className="fas fa-arrow-down fa-lg" /></div>
+                <div className="row g-3 w-100" style={{ maxWidth: '700px' }}>
+                  {supportingStructures.map((item) => (
+                    <div className="col-md-6" key={item.title}>
+                      <article className="h-100 rounded-4 p-3 border" style={{ background: '#F8FAFC', borderColor: '#D8E3ED' }}>
+                        <div className="d-flex align-items-center gap-2 mb-2 text-primary">
+                          <i className={`fas ${item.icon}`} aria-hidden="true" />
+                          <h3 className="h6 fw-bold mb-0 text-dark">{t(`phrase.${item.title}`) || item.title}</h3>
+                        </div>
+                        <p className="small text-muted mb-0" style={{ lineHeight: 1.65 }}>{item.description}</p>
+                      </article>
+                    </div>
+                  ))}
                 </div>
               </div>
+            </section>
+          </div>
 
-              <div className="bg-accent-green text-white p-4 rounded-4 shadow-soft">
-                <h4 className="h6 text-uppercase fw-bold mb-3 text-white">
-                  {t('phrase.Need Information?')}
-                </h4>
-                <p className="small mb-3">
-                  {t(
-                    'phrase.For specific governance questions or official record requests, contact our secretariat.'
-                  )}
+          <div className="col-lg-4">
+            <aside className="h-100 d-flex flex-column gap-3">
+              <div className="bg-white border rounded-4 p-4 shadow-sm">
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <i className="fas fa-people-arrows-left-right text-primary fa-lg" />
+                  <h2 className="h5 fw-bold mb-0">Inclusive leadership</h2>
+                </div>
+                <p className="small text-muted mb-0" style={{ lineHeight: 1.75 }}>
+                  Governance should reflect the diversity of the Paralympic movement and support meaningful participation by athletes and people with disabilities.
                 </p>
-                <Link href="/contact" className="btn btn-light btn-sm px-4 py-2 fw-bold w-auto d-inline-block">
-                  {t('phrase.Contact Secretariat')}
+              </div>
+              <div className="rounded-4 p-4 text-white flex-grow-1" style={{ background: 'linear-gradient(145deg, #087B78, #075B68)' }}>
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <i className="fas fa-comments fa-lg" />
+                  <h2 className="h5 fw-bold text-white mb-0">{t('phrase.Need Information?') || 'Need Information?'}</h2>
+                </div>
+                <p className="small mb-4" style={{ color: 'rgba(255,255,255,.86)', lineHeight: 1.75 }}>
+                  For governance questions, institutional enquiries, or requests for official records, please contact the NPC Rwanda secretariat.
+                </p>
+                <Link href="/contact" className="btn btn-light rounded-pill px-4 fw-bold">
+                  <i className="fas fa-envelope me-2" />{t('phrase.Contact Secretariat') || 'Contact Secretariat'}
                 </Link>
               </div>
-            </div>
+            </aside>
           </div>
         </div>
       </section>
