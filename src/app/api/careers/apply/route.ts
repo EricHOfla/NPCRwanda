@@ -134,8 +134,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Application submitted successfully.',
-      application,
-    });
+      applicationId: application.id,
+    }, { status: 201 });
   } catch (error: any) {
     console.error('Error submitting job application:', error);
     return NextResponse.json(
