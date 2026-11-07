@@ -1082,8 +1082,8 @@ export default function DashboardPage() {
     try {
       setGovLoading(true);
       const [docsRes, polsRes] = await Promise.all([
-        fetch('/api/governance-docs'),
-        fetch('/api/governance-policies')
+        fetch('/api/governance-docs?scope=admin'),
+        fetch('/api/governance-policies?scope=admin')
       ]);
       if (docsRes.ok) setGovDocs(await docsRes.json());
       if (polsRes.ok) setGovPolicies(await polsRes.json());
