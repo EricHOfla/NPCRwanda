@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
 import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +15,6 @@ export async function GET(request: NextRequest) {
       return auth.response;
     }
 
-    await ensureAutoMigrated();
     const [programmes, athleteEnquiries] = await Promise.all([
       prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.athleteEnquiry.findMany({ orderBy: { createdAt: 'desc' } }),
