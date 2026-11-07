@@ -234,18 +234,7 @@ export async function middleware(request: NextRequest) {
           }
         }
 
-        // 3. Donation Payments & Records: Administrator or Super Administrator only
-        if (pathname.startsWith('/api/donations/payments')) {
-          if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
-            return NextResponse.json(
-              {
-                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
-                code: 'FORBIDDEN',
-              },
-              { status: 403 }
-            );
-          }
-        }
+        // Donation payment access is governed by donations.view / donations.manage.
 
         // Community and inbox access is governed by the granular permission map above.
 
