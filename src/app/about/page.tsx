@@ -166,7 +166,7 @@ export default function AboutPage() {
               lineHeight: 1.15,
             }}
           >
-            Championing Inclusion Through Para-Sport Excellence
+            {getSiteText('about.pageTitle', 'Championing Inclusion Through Para-Sport Excellence')}
           </h1>
 
           <p
@@ -179,8 +179,7 @@ export default function AboutPage() {
               fontWeight: 500,
             }}
           >
-            Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda,
-            dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.
+            {getSiteText('about.pageIntro', 'Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda, dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.')}
           </p>
 
           {/* Quick Metrics Bar */}
