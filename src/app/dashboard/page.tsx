@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/context/LanguageContext';
