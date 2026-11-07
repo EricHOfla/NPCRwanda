@@ -24,8 +24,8 @@ This audit checks whether public-facing records have an administrative source of
 | Site editorial content | `/api/site-content`, public bundle | Website Pages editor (Home, About, NPC Background, Governance, Leadership) |
 | Training programmes | `/api/training-programs` | Community → Programmes |
 | Athlete scouting enquiries | `/api/athlete-enquiries` | Community → Athlete Enquiries |
-| Event registrations | `/api/event-registrations` | Community → Event Registrations |
-| Partnership enquiries | `/api/sponsor-enquiries` | Community → Partnership Enquiries |
+| Event registrations | `/api/event-registrations` | Not listed in Community admin; submissions remain outside the active Community management interface |
+| Partnership enquiries | `/api/sponsor-enquiries` | Not listed in Community admin; submissions remain outside the active Community management interface |
 | Volunteer, contact, job and donation enquiries | `/api/volunteers`, `/api/contacts`, `/api/job-applications`, `/api/donations` | Inbox / Applications |
 | Donation payments | `/api/donations/payments` and payment provider callbacks | Donations & Contributions |
 | Newsletter subscribers | `/api/subscribers` | Newsletter Subscribers |
