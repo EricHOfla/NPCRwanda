@@ -576,9 +576,6 @@ export default function DashboardPage() {
   const [selectedAvatar, setSelectedAvatar] = useState('avatar-1.svg');
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth >= 992) {
-      setSidebarOpen(true);
-    }
     setCurrentDateString(new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
     const savedAvatar = localStorage.getItem('admin_avatar') || 'avatar-1.svg';
     setSelectedAvatar(savedAvatar);
