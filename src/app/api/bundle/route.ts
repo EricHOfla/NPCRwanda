@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       : null;
     if (authorization && !authorization.authorized) return authorization.response;
     const isAdminRequest = Boolean(authorization?.authorized);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getRwandaDateString();
 
     const [
       athletes,
