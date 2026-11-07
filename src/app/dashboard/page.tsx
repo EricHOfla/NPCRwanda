@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
+import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/context/LanguageContext';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
@@ -503,6 +504,7 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const router = useRouter();
+  const sessionProfile = useDashboardAuth();
   const {
     athletes,
     news,
@@ -865,13 +867,11 @@ export default function DashboardPage() {
     const urlPage = params.get('page');
     const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
 
-    const storedTab = localStorage.getItem('admin_active_tab') as AdminTab | null;
-    const storedPage = localStorage.getItem('admin_active_page');
-    const storedSubTab = localStorage.getItem('admin_inbox_subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
-
-    const targetTab = urlTab || storedTab || 'overview';
-    const targetPage = urlPage !== null && urlPage !== undefined ? urlPage : storedPage;
-    const targetSubTab = urlSubTab || storedSubTab;
+    // The URL is the single source of truth. Old localStorage values must not
+    // reopen a previously edited page when the user refreshes Admin Overview.
+    const targetTab = urlTab || 'overview';
+    const targetPage = urlPage;
+    const targetSubTab = urlSubTab;
 
     const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners', 'npc-background', 'contact'];
 
@@ -1015,11 +1015,11 @@ export default function DashboardPage() {
   const [settingsMsg, setSettingsMsg] = useState('');
 
   // Admin Profile state
-  const [profile, setProfile] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [profile, setProfile] = useState({ name: sessionProfile.name, email: sessionProfile.email, password: '', confirmPassword: '' });
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState('');
   const [profileError, setProfileError] = useState('');
-  const [currentUser, setCurrentUser] = useState<{ id?: string; name?: string; email?: string; role?: string }>({});
+  const [currentUser, setCurrentUser] = useState<{ id?: string; name?: string; email?: string; role?: string }>({ name: sessionProfile.name, email: sessionProfile.email, role: sessionProfile.role });
 
   // System User Management States & CRUD
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
@@ -1056,6 +1056,9 @@ export default function DashboardPage() {
   const canAccessCommunity = hasPermission(userRole, 'community.view');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
+    // The server layout has already authenticated the user and applied the
+    // route-level permission check before this page is rendered.
+    if (!authVerified) return false;
     if (isSuperAdmin) return false;
     if (isEditor && !editorAllowedPages.includes(page || 'home')) return true;
     return false;
@@ -1287,13 +1290,11 @@ export default function DashboardPage() {
 
   // Initial mount data fetch with session verification guard
   useEffect(() => {
-    verifySession().then(isValid => {
-      if (isValid) {
-        // Run all three in parallel - no sequential waterfall
-        void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
-      }
-    });
-  }, [verifySession, fetchSystemUsers]);
+    // The server dashboard layout has already verified the signed session and
+    // supplied the user's role/profile. Load dashboard data without another
+    // profile request on every full page refresh.
+    void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
+  }, [fetchSystemUsers]);
 
   // Real-time synchronization handler
   const refreshRealTimeData = useCallback(async () => {
@@ -1517,8 +1518,11 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('admin_avatar', selectedAvatar);
+        const updatedUser = data.user || { name: profile.name, email: profile.email, role: currentUser.role };
+        setCurrentUser(updatedUser);
         setProfileMsg('Profile updated successfully!');
-        setProfile(prev => ({ ...prev, password: '', confirmPassword: '' }));
+        setProfile(prev => ({ ...prev, name: updatedUser.name || profile.name, email: updatedUser.email || profile.email, password: '', confirmPassword: '' }));
+        router.refresh();
       } else {
         setProfileError(data.error || 'Failed to update profile.');
       }
