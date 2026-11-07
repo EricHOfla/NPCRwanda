@@ -40,7 +40,6 @@ export async function PATCH(request: NextRequest) {
       return auth.response;
     }
 
-    await ensureAutoMigrated();
     const parsed = updateSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid update request' }, { status: 400 });
     const { type, id, status, published } = parsed.data;
