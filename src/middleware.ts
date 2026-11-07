@@ -160,7 +160,7 @@ export async function middleware(request: NextRequest) {
     const isPublicFormRoute =
       pathname.startsWith('/api/contacts') ||
       pathname.startsWith('/api/volunteers') ||
-      pathname.startsWith('/api/donations') ||
+      pathname === '/api/donations' ||
       pathname.startsWith('/api/athlete-enquiries') ||
       pathname.startsWith('/api/event-registrations') ||
       pathname.startsWith('/api/sponsor-enquiries') ||
