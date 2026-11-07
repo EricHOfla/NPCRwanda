@@ -21,8 +21,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
-    const status = searchParams.get('status') || 'Active';
-    if (status !== 'Active') {
+    const adminScope = searchParams.get('scope') === 'admin';
+    const status = searchParams.get('status') || (adminScope ? 'All' : 'Active');
+    if (adminScope || status !== 'Active') {
       const auth = await authorizeRequest(request, 'content.view');
       if (!auth.authorized) return auth.response;
     }
