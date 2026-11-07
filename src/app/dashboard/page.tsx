@@ -5923,7 +5923,7 @@ uploadMediaFile={uploadMediaFile}
              ────────────────────────────── */}
           {adminTab === 'users' && (
             !canAccessUsers ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div className="animation-fade-in">
               {/* Header */}
@@ -6309,7 +6309,7 @@ uploadMediaFile={uploadMediaFile}
 
           {adminTab === 'settings' && (
             !canAccessSettings ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div style={{ maxWidth: '800px' }}>
               <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
