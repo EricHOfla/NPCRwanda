@@ -839,12 +839,15 @@ export default function SubscribersTab() {
             </select>
 
             <button
-              onClick={fetchSubscribers}
+              type="button"
+              onClick={() => { void fetchSubscribers(); }}
               disabled={loading}
+              aria-label="Refresh subscriber list"
+              title={loading ? 'Refreshing subscribers…' : 'Refresh subscriber list'}
               className="btn btn-light subscribers-filter-refresh"
             >
               <i className={`fas fa-rotate-right ${loading ? 'fa-spin' : ''}`} />
-              <span className="d-none d-sm-inline">Refresh</span>
+              <span className="d-none d-sm-inline">{loading ? 'Refreshing…' : 'Refresh'}</span>
             </button>
           </div>
         </div>
