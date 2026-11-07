@@ -80,6 +80,15 @@ export default function DashboardLayoutClient({
   const queryString = searchParams.toString();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // Keep the full navigation visible on desktop, but start with the drawer
+  // closed on phones so it never covers the dashboard content on first load.
+  useEffect(() => {
+    const syncSidebarForViewport = () => setSidebarOpen(window.innerWidth >= 992);
+    syncSidebarForViewport();
+    window.addEventListener('resize', syncSidebarForViewport);
+    return () => window.removeEventListener('resize', syncSidebarForViewport);
+  }, []);
+
   // Profile and role are provided by the authenticated server layout from the
   // signed login session. No extra /api/auth/profile request is needed.
   const profile = initialProfile;
