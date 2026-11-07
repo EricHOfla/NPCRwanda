@@ -160,7 +160,7 @@ export default function LeadersPage() {
           <div className="row g-3 pt-2" data-aos="fade-up" data-aos-delay="120">
             <div className="col-6 col-md-3">
               <div className="p-3 rounded-3" style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' }}>
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>{leadership.length || 23}</div>
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>{leadership.length}</div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>Governing Leaders</div>
               </div>
             </div>
