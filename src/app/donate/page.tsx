@@ -50,7 +50,9 @@ const formatMoney = (value: number, currency: 'RWF' | 'USD') =>
   }).format(value);
 
 export default function DonatePage() {
-  const { athletes } = useData();
+  const { athletes, dpscoContacts, partners } = useData();
+  const districtCount = new Set(dpscoContacts.filter((contact) => contact.active).map((contact) => contact.district.trim().toLowerCase()).filter(Boolean)).size;
+  const partnerCount = partners.filter((partner) => partner.active).length;
 
   // Wizard steps: 1: Amount & Cause | 2: Donor Info | 3: Payment
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -269,12 +271,12 @@ export default function DonatePage() {
                     <span className="metric-label">Active Athletes</span>
                   </div>
                   <div className="metric-box">
-                    <span className="metric-value">30</span>
-                    <span className="metric-label">Districts Covered</span>
+                    <span className="metric-value">{districtCount}</span>
+                    <span className="metric-label">Districts with Active Contacts</span>
                   </div>
                   <div className="metric-box">
-                    <span className="metric-value">100%</span>
-                    <span className="metric-label">Direct Impact</span>
+                    <span className="metric-value">{partnerCount}</span>
+                    <span className="metric-label">Active Partners</span>
                   </div>
                 </div>
               </div>
