@@ -856,7 +856,7 @@ export default function DashboardPage() {
   };
 
   // Track whether tab/page state has been restored on client mount
-  const isTabInitializedRef = useRef(false);
+  const [isTabInitialized, setIsTabInitialized] = useState(false);
 
   // Restore active tab and page on client mount from URL or localStorage
   useEffect(() => {
@@ -889,13 +889,13 @@ export default function DashboardPage() {
       setInboxSubTab(targetSubTab);
     }
 
-    isTabInitializedRef.current = true;
+    setIsTabInitialized(true);
   }, []);
 
   // Sync active tab, page, and subtab to URL and localStorage when changed
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!isTabInitializedRef.current) return;
+    if (!isTabInitialized) return;
 
     try {
       localStorage.setItem('admin_active_tab', adminTab);
@@ -933,7 +933,7 @@ export default function DashboardPage() {
     } catch {
       // Ignore storage/url write errors
     }
-  }, [adminTab, activeEditPage, inboxSubTab]);
+  }, [adminTab, activeEditPage, inboxSubTab, isTabInitialized]);
 
   // Support browser Back and Forward navigation
   useEffect(() => {
