@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    if (status) {
+    if (status && status !== 'All') {
       whereClause.status = status;
     }
 
