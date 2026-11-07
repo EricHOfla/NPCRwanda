@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       : null;
     if (authorization && !authorization.authorized) return authorization.response;
     const isAdminRequest = Boolean(authorization?.authorized);
-
+    const today = new Date().toISOString().slice(0, 10);
 
     const [
       athletes,
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
       }),
       prisma.career.findMany({
-        where: isAdminRequest ? undefined : { status: 'Open' },
+        where: isAdminRequest ? undefined : { status: 'Open', OR: [{ deadline: null }, { deadline: { gte: today } }] },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
@@ -167,7 +167,6 @@ export async function GET(request: NextRequest) {
       governancePolicies,
       events: events.map((event) => {
         if (event.status === 'Cancelled' || !event.date) return event;
-        const today = new Date().toISOString().slice(0, 10);
         const start = event.date.trim();
         const end = event.endDate?.trim() || '';
         const status = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
