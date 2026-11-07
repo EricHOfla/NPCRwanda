@@ -40,14 +40,7 @@ export async function GET(request: NextRequest) {
       leadersRaw,
       governanceDocs,
       governancePolicies,
-      events: events.map((event) => {
-        if (event.status === 'Cancelled' || !event.date) return event;
-        const today = new Date().toISOString().slice(0, 10);
-        const start = event.date.trim();
-        const end = event.endDate?.trim() || '';
-        const status = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
-        return { ...event, status };
-      }),
+      events,
       partners,
       siteContentList,
       rawContactInfo,
@@ -172,7 +165,14 @@ export async function GET(request: NextRequest) {
       leaders,
       governanceDocs,
       governancePolicies,
-      events,
+      events: events.map((event) => {
+        if (event.status === 'Cancelled' || !event.date) return event;
+        const today = new Date().toISOString().slice(0, 10);
+        const start = event.date.trim();
+        const end = event.endDate?.trim() || '';
+        const status = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
+        return { ...event, status };
+      }),
       partners,
       siteContent: siteContentList,
       siteContentMap,
