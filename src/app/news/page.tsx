@@ -33,7 +33,7 @@ export default function NewsPage() {
   const [page, setPage] = useState(1);
 
   const published = useMemo(() => news.filter(item => item.status === 'Published' && !isAnnouncementCategory(item.category || '')), [news]);
-  const categories = useMemo(() => ['All', ...Array.from(new Set(published.map(item => item.category).filter(Boolean)))], [published]);
+  const categories = useMemo(() => ['All', ...Array.from(new Set(published.map(item => item.category).filter((value): value is string => Boolean(value))))], [published]);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return published.filter(item => {
