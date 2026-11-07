@@ -219,28 +219,30 @@ export default function DonatePage() {
           </nav>
           <div className="row align-items-center gy-4">
             <div className="col-lg-7">
-              <span className="donation-eyebrow">
-                <i className="fas fa-heart me-2" aria-hidden="true" />
-                POWER INCLUSIVE SPORT
-              </span>
-              <h1>Empower Rwanda&apos;s Para-Athletes</h1>
+              <div className="mb-3">
+                <span className="donation-eyebrow">
+                  <i className="fas fa-heart me-2" aria-hidden="true" />
+                  POWER INCLUSIVE SPORT
+                </span>
+              </div>
+              <h1 className="donation-title">Empower Rwanda&apos;s Para-Athletes</h1>
               <p className="donation-hero-copy">
                 Your support equips champions, builds grassroots academies, and proves that disability is never an
                 inability. 100% of public gifts go directly into sports programmes.
               </p>
-              <div className="d-flex flex-wrap gap-2 gap-sm-3 mt-3">
-                <span className="donation-trust-badge">
-                  <i className="fas fa-shield-alt me-2 text-warning" aria-hidden="true" />
-                  Bank-Grade Encryption
-                </span>
-                <span className="donation-trust-badge">
-                  <i className="fas fa-mobile-alt me-2 text-warning" aria-hidden="true" />
-                  MTN MoMo, Airtel & Cards
-                </span>
-                <span className="donation-trust-badge">
-                  <i className="fas fa-file-invoice me-2 text-warning" aria-hidden="true" />
-                  Instant Tax Receipt
-                </span>
+              <div className="donation-trust-grid mt-4">
+                <div className="donation-trust-badge">
+                  <i className="fas fa-shield-alt trust-icon-shield" aria-hidden="true" />
+                  <span>Bank-Grade Encryption</span>
+                </div>
+                <div className="donation-trust-badge">
+                  <i className="fas fa-mobile-alt trust-icon-momo" aria-hidden="true" />
+                  <span>MTN MoMo, Airtel & Cards</span>
+                </div>
+                <div className="donation-trust-badge">
+                  <i className="fas fa-file-invoice trust-icon-receipt" aria-hidden="true" />
+                  <span>Instant Tax Receipt</span>
+                </div>
               </div>
             </div>
             <div className="col-lg-5">
@@ -251,27 +253,25 @@ export default function DonatePage() {
                   </div>
                   <div>
                     <span className="impact-kicker">NPC RWANDA INITIATIVE</span>
-                    <h3 className="h5 text-white mb-0 fw-bold">From Grassroots to Paralympics</h3>
+                    <h3 className="impact-title mb-0">From Grassroots to Paralympics</h3>
                   </div>
                 </div>
-                <p className="small text-white-50 mb-3">
+                <p className="impact-description mb-4">
                   Rwanda&apos;s National Paralympic Committee develops high-performing athletes representing our nation
                   globally in Sitting Volleyball, Para-Athletics, Wheelchair Basketball, and Para-Powerlifting.
                 </p>
-                <div className="impact-metrics-row">
-                  <div>
-                    <strong>1,200+</strong>
-                    <small>Active Athletes</small>
+                <div className="impact-metrics-grid">
+                  <div className="metric-box">
+                    <span className="metric-value">1,200+</span>
+                    <span className="metric-label">Active Athletes</span>
                   </div>
-                  <div className="divider" />
-                  <div>
-                    <strong>30</strong>
-                    <small>Districts Covered</small>
+                  <div className="metric-box">
+                    <span className="metric-value">30</span>
+                    <span className="metric-label">Districts Covered</span>
                   </div>
-                  <div className="divider" />
-                  <div>
-                    <strong>100%</strong>
-                    <small>Direct Impact</small>
+                  <div className="metric-box">
+                    <span className="metric-value">100%</span>
+                    <span className="metric-label">Direct Impact</span>
                   </div>
                 </div>
               </div>
@@ -748,9 +748,9 @@ export default function DonatePage() {
         .donation-hero {
           position: relative;
           overflow: hidden;
-          padding: 40px 0 60px;
-          background: linear-gradient(130deg, #071e3d 0%, #0b4e87 55%, #087c82 100%);
-          color: #fff;
+          padding: 44px 0 68px;
+          background: linear-gradient(135deg, #06152B 0%, #0B2545 60%, #0F325E 100%);
+          color: #ffffff;
         }
         .donation-hero:after {
           content: '';
@@ -765,90 +765,142 @@ export default function DonatePage() {
         }
         .donation-hero .breadcrumb a,
         .donation-hero .breadcrumb-item {
-          color: rgba(255, 255, 255, 0.72);
-          font-size: 0.85rem;
+          color: #cbd5e1;
+          font-size: 0.88rem;
+          font-weight: 500;
+        }
+        .donation-hero .breadcrumb a:hover {
+          color: #ffffff;
+          text-decoration: underline;
         }
         .donation-hero .breadcrumb-item.active {
-          color: #fff;
+          color: #ffffff;
+          font-weight: 700;
         }
         .donation-eyebrow {
-          display: inline-block;
-          font-size: 0.75rem;
+          display: inline-flex;
+          align-items: center;
+          background: rgba(245, 158, 11, 0.2);
+          color: #fde047;
+          border: 1.5px solid rgba(245, 158, 11, 0.5);
+          font-size: 0.78rem;
           letter-spacing: 0.12em;
           font-weight: 800;
-          color: #f2c94c;
-          margin-bottom: 8px;
+          padding: 6px 14px;
+          border-radius: 20px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        .donation-hero h1 {
-          font-size: clamp(2.1rem, 4vw, 3.2rem);
+        .donation-title {
+          font-size: clamp(2.2rem, 4.2vw, 3.4rem);
           font-weight: 800;
           line-height: 1.15;
-          margin-bottom: 14px;
+          color: #ffffff;
+          margin-bottom: 16px;
+          letter-spacing: -0.02em;
         }
         .donation-hero-copy {
-          font-size: 1.05rem;
-          line-height: 1.6;
-          color: rgba(255, 255, 255, 0.85);
-          max-width: 600px;
+          font-size: 1.1rem;
+          line-height: 1.7;
+          color: #f1f5f9;
+          max-width: 620px;
+          font-weight: 400;
+        }
+        .donation-trust-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
         }
         .donation-trust-badge {
-          font-size: 0.8rem;
-          color: #fff;
-          background: rgba(255, 255, 255, 0.12);
-          padding: 7px 13px;
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          border-radius: 20px;
-          backdrop-filter: blur(4px);
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #ffffff;
+          background: #0d2d54;
+          border: 1.5px solid #2563eb;
+          padding: 8px 14px;
+          border-radius: 24px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .trust-icon-shield {
+          color: #38bdf8;
+          font-size: 1rem;
+        }
+        .trust-icon-momo {
+          color: #fbbf24;
+          font-size: 1rem;
+        }
+        .trust-icon-receipt {
+          color: #34d399;
+          font-size: 1rem;
         }
 
         /* Impact Card in Hero */
         .donation-impact-card {
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 18px;
-          padding: 24px;
-          backdrop-filter: blur(8px);
+          background: #071930;
+          border: 2px solid #1e3a8a;
+          border-radius: 20px;
+          padding: 28px;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
         }
         .impact-icon {
           width: 48px;
           height: 48px;
           border-radius: 12px;
-          background: #f2c94c;
-          color: #071e3d;
+          background: #f59e0b;
+          color: #06152b;
           display: grid;
           place-items: center;
-          font-size: 1.25rem;
+          font-size: 1.3rem;
           flex-shrink: 0;
         }
         .impact-kicker {
-          font-size: 0.65rem;
+          font-size: 0.72rem;
           font-weight: 800;
-          letter-spacing: 0.12em;
-          color: #f2c94c;
+          letter-spacing: 0.14em;
+          color: #fde047;
           display: block;
+          margin-bottom: 2px;
         }
-        .impact-metrics-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          background: rgba(0, 0, 0, 0.18);
-          padding: 12px;
-          border-radius: 12px;
+        .impact-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #ffffff;
+        }
+        .impact-description {
+          font-size: 0.94rem;
+          line-height: 1.65;
+          color: #e2e8f0;
+        }
+        .impact-metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          background: #0b2545;
+          border: 1px solid #1e40af;
+          border-radius: 14px;
+          padding: 14px 8px;
           text-align: center;
         }
-        .impact-metrics-row strong {
+        .metric-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .metric-value {
           display: block;
-          font-size: 1.15rem;
-          color: #fff;
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #38bdf8;
         }
-        .impact-metrics-row small {
-          font-size: 0.72rem;
-          color: rgba(255, 255, 255, 0.7);
-        }
-        .impact-metrics-row .divider {
-          width: 1px;
-          height: 24px;
-          background: rgba(255, 255, 255, 0.2);
+        .metric-label {
+          display: block;
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #f8fafc;
+          margin-top: 3px;
         }
 
         /* Main Section */
@@ -889,52 +941,52 @@ export default function DonatePage() {
           z-index: 2;
         }
         .step-num {
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           display: grid;
           place-items: center;
-          font-weight: 700;
-          font-size: 0.85rem;
-          background: #edf2f7;
-          color: #64748b;
+          font-weight: 800;
+          font-size: 0.9rem;
+          background: #e2e8f0;
+          color: #334155;
           transition: all 0.2s ease;
         }
         .step-btn.active .step-num {
           background: #0b5f9f;
-          color: #fff;
-          box-shadow: 0 0 0 4px rgba(11, 95, 159, 0.2);
+          color: #ffffff;
+          box-shadow: 0 0 0 4px rgba(11, 95, 159, 0.25);
         }
         .step-btn.completed .step-num {
-          background: #10b981;
-          color: #fff;
+          background: #059669;
+          color: #ffffff;
         }
         .step-title {
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #64748b;
+          font-size: 0.92rem;
+          font-weight: 700;
+          color: #334155;
         }
         .step-btn.active .step-title {
           color: #0b5f9f;
-          font-weight: 700;
+          font-weight: 800;
         }
         .step-connector {
           flex: 1;
           height: 3px;
-          background: #e2e8f0;
+          background: #cbd5e1;
           margin: 0 12px;
           border-radius: 2px;
           transition: background 0.3s ease;
         }
         .step-connector.completed {
-          background: #10b981;
+          background: #059669;
         }
 
         /* Pill selectors */
         .frequency-pills,
         .currency-selector {
           display: inline-flex;
-          background: #f1f5f9;
+          background: #e2e8f0;
           padding: 4px;
           border-radius: 12px;
         }
@@ -942,11 +994,11 @@ export default function DonatePage() {
         .currency-btn {
           border: none;
           background: none;
-          padding: 7px 16px;
+          padding: 8px 16px;
           border-radius: 9px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #64748b;
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #1e293b;
           cursor: pointer;
           transition: all 0.18s;
         }
@@ -954,21 +1006,21 @@ export default function DonatePage() {
         .currency-btn.active {
           background: #ffffff;
           color: #0b5f9f;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-          font-weight: 700;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+          font-weight: 800;
         }
 
         .section-subheading {
-          font-size: 0.92rem;
-          font-weight: 700;
-          color: #1e293b;
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #0f172a;
           display: block;
         }
 
         /* Direct Amount Input Card */
         .amount-input-card {
           background: #f8fafc;
-          border: 1.5px solid #e2e8f0;
+          border: 1.5px solid #cbd5e1;
           border-radius: 16px;
           padding: 20px;
           transition: border-color 0.2s ease;
@@ -976,11 +1028,11 @@ export default function DonatePage() {
         .amount-input-card:focus-within {
           border-color: #0b5f9f;
           background: #ffffff;
-          box-shadow: 0 4px 14px rgba(11, 95, 159, 0.06);
+          box-shadow: 0 4px 14px rgba(11, 95, 159, 0.1);
         }
         .amount-input-label {
-          font-size: 0.95rem;
-          font-weight: 700;
+          font-size: 0.98rem;
+          font-weight: 800;
           color: #0f172a;
           display: block;
           margin-bottom: 12px;
@@ -989,30 +1041,30 @@ export default function DonatePage() {
           display: flex;
           align-items: stretch;
           background: #ffffff;
-          border: 2px solid #cbd5e1;
+          border: 2px solid #94a3b8;
           border-radius: 12px;
           overflow: hidden;
           transition: border-color 0.2s;
         }
         .amount-input-wrapper:focus-within {
           border-color: #0b5f9f;
-          box-shadow: 0 0 0 3px rgba(11, 95, 159, 0.12);
+          box-shadow: 0 0 0 3px rgba(11, 95, 159, 0.18);
         }
         .currency-badge {
-          background: #edf2f7;
-          color: #1e293b;
+          background: #0b5f9f;
+          color: #ffffff;
           font-weight: 800;
-          font-size: 1.05rem;
-          padding: 0 16px;
+          font-size: 1.1rem;
+          padding: 0 18px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-right: 1.5px solid #cbd5e1;
+          border-right: 1.5px solid #0b5f9f;
         }
         .amount-large-input {
           border: none;
           outline: none;
-          font-size: 1.35rem;
+          font-size: 1.4rem;
           font-weight: 800;
           color: #0f172a;
           padding: 12px 16px;
@@ -1023,66 +1075,69 @@ export default function DonatePage() {
           box-shadow: none;
         }
         .amount-preview-pill {
-          background: #eff6ff;
-          color: #0b5f9f;
-          font-weight: 700;
-          font-size: 0.85rem;
-          padding: 4px 10px;
+          background: #dbeafe;
+          color: #1e40af;
+          font-weight: 800;
+          font-size: 0.88rem;
+          padding: 4px 12px;
           border-radius: 20px;
         }
 
         /* Purpose Grid */
         .purpose-grid {
           display: grid;
-          gap: 8px;
+          gap: 9px;
         }
         .purpose-card {
           width: 100%;
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 11px 14px;
-          border: 1.5px solid #e2e8f0;
+          padding: 12px 15px;
+          border: 1.5px solid #cbd5e1;
           border-radius: 12px;
-          background: #fff;
+          background: #ffffff;
           cursor: pointer;
           text-align: left;
           transition: all 0.16s;
         }
         .purpose-card:hover {
-          border-color: #cbd5e1;
+          border-color: #94a3b8;
           background: #f8fafc;
         }
         .purpose-card.selected {
           border-color: #0b5f9f;
           background: #eff6ff;
+          box-shadow: 0 0 0 1px #0b5f9f;
         }
         .purpose-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 9px;
-          background: #f1f5f9;
-          color: #0b5f9f;
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          background: #e0f2fe;
+          color: #0369a1;
           display: grid;
           place-items: center;
-          font-size: 1rem;
+          font-size: 1.05rem;
           flex-shrink: 0;
         }
         .purpose-card.selected .purpose-icon {
           background: #0b5f9f;
-          color: #fff;
+          color: #ffffff;
         }
         .purpose-info {
           flex: 1;
         }
         .purpose-info strong {
           display: block;
-          font-size: 0.9rem;
+          font-size: 0.94rem;
+          font-weight: 800;
           color: #0f172a;
         }
         .purpose-info small {
-          font-size: 0.77rem;
-          color: #64748b;
+          font-size: 0.82rem;
+          font-weight: 500;
+          color: #334155;
           display: block;
           line-height: 1.35;
         }
@@ -1199,7 +1254,8 @@ export default function DonatePage() {
           padding: 4px 0;
         }
         .summary-row .label {
-          color: #64748b;
+          color: #334155;
+          font-weight: 600;
         }
 
         .exchange-rate-banner {
@@ -1209,12 +1265,14 @@ export default function DonatePage() {
           padding: 10px 14px;
           font-size: 0.85rem;
           color: #1e40af;
+          font-weight: 600;
         }
 
         .security-notice {
-          font-size: 0.82rem;
-          color: #64748b;
+          font-size: 0.84rem;
+          color: #334155;
           line-height: 1.5;
+          font-weight: 500;
         }
 
         /* Buttons & Wizard Actions */
@@ -1283,9 +1341,9 @@ export default function DonatePage() {
           color: #0f172a;
         }
         .benefit-item small {
-          font-size: 0.8rem;
-          color: #64748b;
-          line-height: 1.4;
+          font-size: 0.82rem;
+          color: #334155;
+          line-height: 1.45;
           display: block;
         }
 
