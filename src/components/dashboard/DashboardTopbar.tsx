@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { hasPermission } from '@/lib/rbac';
 
 export interface DashboardUserProfile {
   name: string;
@@ -45,6 +46,9 @@ export default function DashboardTopbar({
   const profileRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLDivElement>(null);
 
+  const canViewInbox = hasPermission(profile.role, 'inbox.view');
+  const canViewSystemSettings = hasPermission(profile.role, 'system-settings.view');
+
   // Sync initialProfile if updated from parent
   useEffect(() => {
     if (initialProfile) {
@@ -71,8 +75,13 @@ export default function DashboardTopbar({
     }
   }, [profile.email]);
 
-  // Fetch unread notifications for bell
+  // Fetch unread notifications only for users allowed to open the inbox.
   useEffect(() => {
+    if (!canViewInbox) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
     let active = true;
     Promise.all([
       fetch('/api/contacts?read=false').then((r) => (r.ok ? r.json() : [])).catch(() => []),
@@ -118,7 +127,7 @@ export default function DashboardTopbar({
     return () => {
       active = false;
     };
-  }, []);
+  }, [canViewInbox]);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -204,7 +213,7 @@ export default function DashboardTopbar({
         )}
 
         {/* Inbox bell count & dropdown (Exact matching overview topbar) */}
-        <div style={{ position: 'relative' }} ref={bellRef} data-bell-dropdown>
+        {canViewInbox && <div style={{ position: 'relative' }} ref={bellRef} data-bell-dropdown>
           <button
             type="button"
             onClick={() => setBellOpen((prev) => !prev)}
@@ -353,7 +362,7 @@ export default function DashboardTopbar({
               </div>
             </div>
           )}
-        </div>
+        </div>}
 
         <div style={{ borderLeft: '1px solid #E2E8F0', height: '32px' }} />
 
@@ -508,7 +517,7 @@ export default function DashboardTopbar({
                   Profile Settings
                 </Link>
 
-                {isSuperAdmin && (
+                {canViewSystemSettings && (
                   <Link
                     href="/dashboard?tab=settings"
                     onClick={() => setProfileDropdownOpen(false)}
