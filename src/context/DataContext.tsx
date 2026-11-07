@@ -427,11 +427,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: queryError,
     refetch,
   } = useQuery({
-    queryKey: PUBLIC_BUNDLE_QUERY_KEY,
+    // Keep public and authenticated admin payloads in separate cache entries.
+    queryKey: pathname.startsWith('/dashboard') ? [...PUBLIC_BUNDLE_QUERY_KEY, 'admin'] : PUBLIC_BUNDLE_QUERY_KEY,
     // The login screen has no public content to display; avoid a full database bundle request there.
     enabled: pathname !== '/login',
     queryFn: async () => {
-      const res = await fetch('/api/bundle', { cache: 'no-store' });
+      const bundleUrl = pathname.startsWith('/dashboard') ? '/api/bundle?scope=admin' : '/api/bundle';
+      const res = await fetch(bundleUrl, { cache: 'no-store' });
       if (!res.ok) {
         throw new Error(`Failed to fetch public bundle (status ${res.status})`);
       }
