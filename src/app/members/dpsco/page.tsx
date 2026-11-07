@@ -17,7 +17,7 @@ export default function DpscoContactsPage() {
 
   // Active verified contacts from the database
   const activeContacts = useMemo(() => {
-    return dpscoContacts.filter(c => c.active !== false);
+    return dpscoContacts.filter(c => c.active);
   }, [dpscoContacts]);
 
   // Extract unique provinces from DB preserving standard order
