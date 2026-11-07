@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
     const auth = await authorizeRequest(request, 'community.manage');
     if (!auth.authorized) return auth.response;
 
-    await ensureAutoMigrated();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid media details', details: parsed.error.flatten() }, { status: 400 });
     const data = await prisma.galleryItem.create({ data: parsed.data });
