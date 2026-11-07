@@ -495,7 +495,7 @@ export default function DashboardTopbar({
 
               <div style={{ padding: '4px 0' }}>
                 <Link
-                  href="/dashboard?tab=profile"
+                  href="/dashboard/profile"
                   onClick={() => setProfileDropdownOpen(false)}
                   style={{
                     width: '100%',
