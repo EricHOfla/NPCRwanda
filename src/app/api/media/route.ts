@@ -1,10 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { prisma } from '@/lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'content.view');
+    if (!auth.authorized) return auth.response;
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
 
@@ -29,8 +32,10 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'content.create');
+    if (!auth.authorized) return auth.response;
     const body = await request.json();
     const { filename, url, fileSize, mimeType } = body;
     if (!filename || !url) {
@@ -51,8 +56,10 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
+    const auth = await authorizeRequest(request, 'content.delete');
+    if (!auth.authorized) return auth.response;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
