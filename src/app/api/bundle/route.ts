@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,11 +27,11 @@ export async function GET(request: NextRequest) {
     // Admin data is requested explicitly and requires a valid session. Public requests
     // never receive drafts, inactive records, or private administrative data.
     const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
-    const session = adminScope ? await getSessionUser(request) : null;
-    if (adminScope && !session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const isAdminRequest = adminScope && Boolean(session);
+    const authorization = adminScope
+      ? await authorizeRequest(request, 'content.view')
+      : null;
+    if (authorization && !authorization.authorized) return authorization.response;
+    const isAdminRequest = Boolean(authorization?.authorized);
 
     // Fire-and-forget — keep event statuses accurate without blocking the response
     autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       dpscoContacts,
     ] = await Promise.all([
       prisma.athlete.findMany({
+        where: isAdminRequest ? undefined : { status: 'Active' },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
@@ -79,11 +80,11 @@ export async function GET(request: NextRequest) {
         prisma.leader.findMany({ orderBy: { name: 'asc' } })
       ),
       prisma.governanceDocument.findMany({
-        where: { published: true },
+        where: isAdminRequest ? undefined : { published: true },
         orderBy: { order: 'asc' },
       }),
       prisma.governancePolicy.findMany({
-        where: { published: true },
+        where: isAdminRequest ? undefined : { published: true },
         orderBy: { order: 'asc' },
       }),
       prisma.event.findMany({
@@ -147,20 +148,10 @@ export async function GET(request: NextRequest) {
       siteSubtitle: 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA',
       siteLogo: '/assets/img/logo.png',
     };
-    const missingEntries = Object.entries(seedDefaults).filter(([k]) => !settingsMap[k]);
-    if (missingEntries.length > 0) {
-      try {
-        await prisma.$transaction(
-          missingEntries.map(([key, value]) =>
-            prisma.systemSetting.upsert({ where: { key }, update: {}, create: { key, value } })
-          )
-        );
-        missingEntries.forEach(([k, v]) => { settingsMap[k] = v; });
-      } catch (seedErr) {
-        console.error('Failed to auto-seed system settings in bundle:', seedErr);
-        missingEntries.forEach(([k, v]) => { settingsMap[k] = v; });
-      }
-    }
+    // Defaults are response-only: reading the public bundle must never create records.
+    Object.entries(seedDefaults).forEach(([key, value]) => {
+      if (!settingsMap[key]) settingsMap[key] = value;
+    });
 
     const siteContentMap: Record<string, string> = {};
     siteContentList.forEach((c) => {
