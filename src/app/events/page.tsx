@@ -1,479 +1,310 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useTranslation } from '@/context/LanguageContext';
-import { useData } from '@/context/DataContext';
+import { useData, Event } from '@/context/DataContext';
 import Pagination from '@/components/Pagination';
-import { Event } from '@/context/DataContext';
 
-const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
-  Upcoming:  { bg: '#EFF6FF', text: '#1D4ED8', icon: 'fa-clock' },
-  Ongoing:   { bg: '#F0FDF4', text: '#15803D', icon: 'fa-circle-dot' },
-  Completed: { bg: '#F9FAFB', text: '#6B7280', icon: 'fa-circle-check' },
-  Cancelled: { bg: '#FFF1F2', text: '#BE123C', icon: 'fa-circle-xmark' },
+const STATUS_STYLES: Record<string, { background: string; color: string; icon: string }> = {
+  Upcoming: { background: '#E8F1FF', color: '#1456A0', icon: 'fa-clock' },
+  Ongoing: { background: '#E7F7EF', color: '#137547', icon: 'fa-circle-dot' },
+  Completed: { background: '#EEF1F5', color: '#536174', icon: 'fa-circle-check' },
+  Cancelled: { background: '#FCEBED', color: '#A92D3B', icon: 'fa-circle-xmark' },
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
-  National:      'fa-flag',
+  National: 'fa-flag',
   International: 'fa-globe',
-  Regional:      'fa-map-marker-alt',
-  Training:      'fa-dumbbell',
-  Conference:    'fa-chalkboard-teacher',
+  Regional: 'fa-location-dot',
+  Training: 'fa-dumbbell',
+  Conference: 'fa-people-group',
 };
 
-const CATEGORY_GRADIENTS: Record<string, string> = {
-  National:      'linear-gradient(135deg, #002B49 0%, #0072C6 100%)',
-  International: 'linear-gradient(135deg, #0F172A 0%, #1E40AF 100%)',
-  Regional:      'linear-gradient(135deg, #1E293B 0%, #0D9488 100%)',
-  Training:      'linear-gradient(135deg, #064E3B 0%, #10B981 100%)',
-  Conference:    'linear-gradient(135deg, #312E81 0%, #6366F1 100%)',
+const CATEGORY_BACKGROUNDS: Record<string, string> = {
+  National: 'linear-gradient(135deg,#092B52,#1267B1)',
+  International: 'linear-gradient(135deg,#102746,#315A91)',
+  Regional: 'linear-gradient(135deg,#123D4B,#168A83)',
+  Training: 'linear-gradient(135deg,#123E35,#26966C)',
+  Conference: 'linear-gradient(135deg,#292B5D,#5C63A8)',
 };
 
-const getEventImageUrl = (img?: string) => {
-  if (!img) return null;
-  const clean = img.trim();
-  if (!clean || clean === 'sports-hero.jpg' || clean === 'default' || clean === '#') return null;
-  if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/')) {
-    return clean;
-  }
-  return `/assets/img/curated/${clean}`;
-};
+function imageUrl(value?: string) {
+  const image = (value || '').trim();
+  if (!image || ['default', '#', 'sports-hero.jpg'].includes(image)) return '';
+  if (/^(https?:\/\/|\/)/i.test(image)) return image;
+  return `/assets/img/curated/${image}`;
+}
 
-function EventCardMedia({
-  ev,
-  height = '180px',
-  statusConfig,
-}: {
-  ev: Event;
-  height?: string;
-  statusConfig: { bg: string; text: string; icon: string };
-}) {
-  const [imgFailed, setImgFailed] = useState(false);
-  const rawUrl = getEventImageUrl(ev.img);
-  const hasRealImage = Boolean(rawUrl && !imgFailed);
+function formatDate(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? ''
+    : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 
-  const categoryIcon = CATEGORY_ICONS[ev.category] || 'fa-calendar-check';
-  const gradient = CATEGORY_GRADIENTS[ev.category] || 'linear-gradient(135deg, #002B49 0%, #0072C6 100%)';
-
-  const dateObj = ev.date ? new Date(ev.date) : null;
-  const validDate = dateObj && !isNaN(dateObj.getTime());
-  const monthName = validDate ? dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase() : '';
-  const dayNum = validDate ? dateObj.getDate() : '';
+function EventArtwork({ event, compact = false }: { event: Event; compact?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const src = imageUrl(event.img);
+  const date = event.date ? new Date(event.date) : null;
+  const validDate = date && !Number.isNaN(date.getTime());
+  const categoryIcon = CATEGORY_ICONS[event.category] || 'fa-calendar-days';
+  const background = CATEGORY_BACKGROUNDS[event.category] || 'linear-gradient(135deg,#092B52,#1267B1)';
 
   return (
-    <div className="position-relative overflow-hidden" style={{ height, background: gradient }}>
-      {hasRealImage ? (
-        <img
-          src={rawUrl!}
-          alt={ev.title}
-          className="w-100 h-100"
-          style={{ objectFit: 'cover' }}
-          onError={() => setImgFailed(true)}
-        />
+    <div className="position-relative overflow-hidden" style={{ height: compact ? 190 : 250, background }}>
+      {src && !failed ? (
+        <img src={src} alt={event.title} className="w-100 h-100" style={{ objectFit: 'cover' }} onError={() => setFailed(true)} />
       ) : (
-        <div className="w-100 h-100 d-flex align-items-center justify-content-between px-4 position-relative">
-          <i
-            className={`fas ${categoryIcon} position-absolute`}
-            style={{
-              fontSize: '5.5rem',
-              right: '15px',
-              bottom: '-8px',
-              color: 'rgba(255, 255, 255, 0.15)',
-              pointerEvents: 'none',
-            }}
-          />
+        <div className="w-100 h-100 d-flex align-items-center justify-content-between px-4">
           {validDate && (
-            <div
-              className="text-center rounded-3 px-3 py-2 shadow-sm"
-              style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                color: '#0F172A',
-                minWidth: '60px',
-                zIndex: 2,
-              }}
-            >
-              <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-blue)', letterSpacing: '1px' }}>
-                {monthName}
-              </div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 900, lineHeight: 1 }}>
-                {dayNum}
-              </div>
+            <div className="rounded-3 text-center px-3 py-2" style={{ background: '#fff', color: '#102746', minWidth: 68, zIndex: 1 }}>
+              <div className="small fw-bold text-primary text-uppercase">{date.toLocaleDateString('en-US', { month: 'short' })}</div>
+              <div className="fs-3 fw-bold lh-1">{date.getDate()}</div>
             </div>
           )}
+          <i className={`fas ${categoryIcon}`} aria-hidden="true" style={{ fontSize: '6rem', color: 'rgba(255,255,255,.16)', marginLeft: 'auto' }} />
         </div>
       )}
-
-      {/* Status Badge */}
-      <span
-        className="badge fw-bold px-2 py-1 position-absolute top-0 start-0 m-2"
-        style={{ background: statusConfig.bg, color: statusConfig.text, fontSize: '0.72rem', zIndex: 3 }}
-      >
-        <i className={`fas ${statusConfig.icon} me-1`}></i>{ev.status}
-      </span>
-
-      {/* Featured / Category Badge */}
-      <div className="position-absolute top-0 end-0 m-2 d-flex gap-1" style={{ zIndex: 3 }}>
-        {ev.featured && (
-          <span className="badge" style={{ background: '#F59E0B', color: '#fff', fontSize: '0.68rem' }}>
-            <i className="fas fa-star me-1"></i>Featured
-          </span>
-        )}
-        <span className="badge fw-bold" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '0.68rem' }}>
-          <i className={`fas ${categoryIcon} me-1`}></i>{ev.category}
+      <div className="position-absolute top-0 start-0 m-3 d-flex flex-wrap gap-2">
+        <span className="badge rounded-pill px-3 py-2" style={{ ...(STATUS_STYLES[event.status] || STATUS_STYLES.Upcoming), fontSize: '.72rem' }}>
+          <i className={`fas ${(STATUS_STYLES[event.status] || STATUS_STYLES.Upcoming).icon} me-1`} />{event.status}
         </span>
+        {event.featured && <span className="badge rounded-pill px-3 py-2" style={{ background: '#F4B942', color: '#24364B', fontSize: '.72rem' }}><i className="fas fa-star me-1" />Featured</span>}
       </div>
+      <span className="position-absolute bottom-0 end-0 m-3 badge rounded-pill px-3 py-2" style={{ background: 'rgba(7,25,48,.78)', color: '#fff' }}>
+        <i className={`fas ${categoryIcon} me-1`} />{event.category || 'Event'}
+      </span>
     </div>
   );
 }
 
 export default function EventsPage() {
-  const { t } = useTranslation();
   const { events, loading, error } = useData();
-  const [activeStatus, setActiveStatus] = useState('All');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [status, setStatus] = useState('All');
+  const [category, setCategory] = useState('All');
   const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
-  const [calendarMonth, setCalendarMonth] = useState(() => {
+  const [page, setPage] = useState(1);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [month, setMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
-  const ITEMS_PER_PAGE = 6;
+  const categories = useMemo(() => ['All', ...Array.from(new Set(events.map(item => item.category).filter(Boolean)))], [events]);
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return events.filter(item => {
+      const matchesStatus = status === 'All' || item.status === status;
+      const matchesCategory = category === 'All' || item.category === category;
+      const matchesSearch = !term || [item.title, item.description, item.location, item.category, item.status]
+        .some(value => String(value || '').toLowerCase().includes(term));
+      return matchesStatus && matchesCategory && matchesSearch;
+    });
+  }, [events, status, category, search]);
 
-  const statuses = ['All', 'Upcoming', 'Ongoing', 'Completed', 'Cancelled'];
-  const categories = ['All', ...Array.from(new Set(events.map(e => e.category).filter((category): category is string => Boolean(category))))];
-
-  const query = search.trim().toLowerCase();
-  const filtered = events.filter(ev => {
-    const statusMatch = activeStatus === 'All' || ev.status === activeStatus;
-    const catMatch = activeCategory === 'All' || ev.category === activeCategory;
-    const searchMatch = !query || [ev.title, ev.description, ev.location, ev.category, ev.status]
-      .some(value => String(value || '').toLowerCase().includes(query));
-    return statusMatch && catMatch && searchMatch;
-  });
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const visiblePage = Math.min(currentPage, Math.max(totalPages, 1));
-  const paginatedEvents = filtered.slice((visiblePage - 1) * ITEMS_PER_PAGE, visiblePage * ITEMS_PER_PAGE);
-  const calendarYear = calendarMonth.getFullYear();
-  const calendarMonthIndex = calendarMonth.getMonth();
-  const calendarDaysInMonth = new Date(calendarYear, calendarMonthIndex + 1, 0).getDate();
-  const calendarStartOffset = new Date(calendarYear, calendarMonthIndex, 1).getDay();
-  const calendarCells = Array.from(
-    { length: calendarStartOffset + calendarDaysInMonth },
-    (_, index) => index < calendarStartOffset ? null : index - calendarStartOffset + 1
-  );
-  const calendarMonthLabel = calendarMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-  const getCalendarEvents = (day: number) => filtered.filter(item => {
+  const pageSize = 6;
+  const pages = Math.ceil(filtered.length / pageSize);
+  const currentPage = Math.min(page, Math.max(pages, 1));
+  const pageItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const featured = events.filter(item => item.featured);
+  const upcoming = events.filter(item => item.status === 'Upcoming').length;
+  const ongoing = events.filter(item => item.status === 'Ongoing').length;
+  const year = month.getFullYear();
+  const monthIndex = month.getMonth();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const offset = new Date(year, monthIndex, 1).getDay();
+  const calendarCells = Array.from({ length: offset + daysInMonth }, (_, index) => index < offset ? null : index - offset + 1);
+  const monthLabel = month.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const eventsForDay = (day: number) => filtered.filter(item => {
     if (!item.date) return false;
     const date = new Date(item.date);
-    return !Number.isNaN(date.getTime()) &&
-      date.getFullYear() === calendarYear &&
-      date.getMonth() === calendarMonthIndex &&
-      date.getDate() === day;
+    return !Number.isNaN(date.getTime()) && date.getFullYear() === year && date.getMonth() === monthIndex && date.getDate() === day;
   });
-
-  const featured = events.filter(e => e.featured);
-  const upcoming = events.filter(e => e.status === 'Upcoming').length;
-  const ongoing  = events.filter(e => e.status === 'Ongoing').length;
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  };
+  const resetFilters = () => { setStatus('All'); setCategory('All'); setSearch(''); setPage(1); };
 
   return (
-    <main id="main-content">
-      {/* Hero */}
+    <main id="main-content" className="npc-events-page">
       <header className="page-header">
         <div className="container">
           <nav aria-label="breadcrumb" data-aos="fade-up">
-            <ol className="breadcrumb mb-2">
-              <li className="breadcrumb-item">
-                <Link href="/">
-                  Home
-                </Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link href="/news">
-                  {t('nav.news')}
-                </Link>
-              </li>
-              <li className="breadcrumb-item active" aria-current="page">Events</li>
+            <ol className="breadcrumb mb-3">
+              <li className="breadcrumb-item"><Link href="/">Home</Link></li>
+              <li className="breadcrumb-item active" aria-current="page">Events &amp; Competitions</li>
             </ol>
           </nav>
-          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">Events &amp; Competitions</h1>
-          <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
-            Stay up to date with NPC Rwanda national, regional, and international sports events, training camps, and conferences.
-          </p>
+          <div className="row align-items-end g-4">
+            <div className="col-lg-8">
+              <span className="d-inline-flex align-items-center gap-2 text-uppercase fw-bold mb-3" style={{ color: '#7BD6A7', letterSpacing: '1.8px', fontSize: '.76rem' }}>
+                <span style={{ width: 28, height: 2, background: '#7BD6A7' }} />On the calendar
+              </span>
+              <h1 className="page-title mb-3">Events &amp; Competitions</h1>
+              <p className="page-subtitle mb-0" style={{ maxWidth: 690 }}>
+                Follow the moments that bring Rwanda’s Paralympic community together — from grassroots activities and training camps to national and international competition.
+              </p>
+            </div>
+            <div className="col-lg-4 text-lg-end">
+              <Link href="/contact" className="btn btn-light rounded-pill px-4 py-3 fw-bold">
+                Partner with us <i className="fas fa-arrow-right ms-2" />
+              </Link>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Stats Bar */}
-      <div style={{ background: 'var(--primary-blue)', color: '#fff' }}>
-        <div className="container py-3">
-          <div className="row g-3 text-center">
+      <section className="py-4" style={{ background: '#0B2C50', color: '#fff' }}>
+        <div className="container">
+          <div className="row g-3">
             {[
-              { label: 'Total Events', value: events.length, icon: 'fa-calendar' },
+              { label: 'All events', value: events.length, icon: 'fa-calendar-days' },
               { label: 'Upcoming', value: upcoming, icon: 'fa-clock' },
-              { label: 'Ongoing', value: ongoing, icon: 'fa-circle-dot' },
+              { label: 'In progress', value: ongoing, icon: 'fa-circle-play' },
               { label: 'Featured', value: featured.length, icon: 'fa-star' },
-            ].map(stat => (
-              <div key={stat.label} className="col-6 col-md-3">
-                <div className="d-flex align-items-center justify-content-center gap-2">
-                  <i className={`fas ${stat.icon}`} style={{ fontSize: '1.2rem', opacity: 0.8 }}></i>
-                  <div className="text-start">
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1 }}>{stat.value}</div>
-                    <div style={{ fontSize: '0.72rem', opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</div>
-                  </div>
+            ].map(item => (
+              <div className="col-6 col-md-3" key={item.label}>
+                <div className="d-flex align-items-center gap-3 justify-content-center justify-content-md-start">
+                  <span className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 44, height: 44, background: 'rgba(255,255,255,.11)', color: '#9BE0B8' }}>
+                    <i className={`fas ${item.icon}`} />
+                  </span>
+                  <div><div className="fs-4 fw-bold lh-1">{item.value}</div><div className="small opacity-75 mt-1">{item.label}</div></div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <section>
+      <section className="py-5">
         <div className="container">
-
-          {/* Featured Events */}
           {featured.length > 0 && (
-            <div className="mb-5" data-aos="fade-up">
-              <div className="section-title text-start mb-4">
-                <span className="text-uppercase fw-bold text-accent-green mb-2 d-block" style={{ fontSize: '0.78rem', letterSpacing: '1px' }}>
-                  <i className="fas fa-star me-1"></i> Featured
-                </span>
-                <h2 className="h3">Highlight Events</h2>
+            <div className="mb-5">
+              <div className="d-flex align-items-end justify-content-between gap-3 mb-4">
+                <div><span className="text-uppercase fw-bold small" style={{ color: '#16845B', letterSpacing: '1.5px' }}>Don’t miss</span><h2 className="h3 fw-bold mt-1 mb-0">Featured events</h2></div>
+                <span className="small text-muted">{featured.length} highlighted</span>
               </div>
               <div className="row g-4">
-                {featured.slice(0, 2).map((ev, i) => {
-                  const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
-                  return (
-                    <div key={ev.id} className="col-lg-6" data-aos="fade-up" data-aos-delay={i * 100}>
-                      <div className="custom-card event-feature-card h-100 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
-                        <EventCardMedia ev={ev} height="220px" statusConfig={sc} />
-                        <div className="p-4">
-                          <h3 className="h5 mb-2">{ev.title}</h3>
-                          <p className="small text-muted mb-3">{ev.description}</p>
-                          <div className="d-flex flex-wrap gap-3 text-muted small">
-                            <span><i className="fas fa-calendar me-1 text-primary"></i>{formatDate(ev.date)}{ev.endDate && ev.endDate !== ev.date ? ` – ${formatDate(ev.endDate)}` : ''}</span>
-                            <span><i className="fas fa-map-marker-alt me-1 text-primary"></i>{ev.location}</span>
-                          </div>
-                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
-                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
-                          </Link>
+                {featured.slice(0, 2).map(event => (
+                  <div className="col-lg-6" key={event.id}>
+                    <article className="custom-card h-100 overflow-hidden border-0 shadow-sm">
+                      <EventArtwork event={event} />
+                      <div className="p-4 p-lg-4">
+                        <h3 className="h5 fw-bold mb-2">{event.title}</h3>
+                        <p className="text-muted mb-3" style={{ lineHeight: 1.7 }}>{event.description}</p>
+                        <div className="d-flex flex-wrap gap-3 small text-muted mb-3">
+                          <span><i className="fas fa-calendar me-2 text-primary" />{formatDate(event.date)}{event.endDate && event.endDate !== event.date ? ` – ${formatDate(event.endDate)}` : ''}</span>
+                          {event.location && <span><i className="fas fa-location-dot me-2 text-primary" />{event.location}</span>}
                         </div>
+                        <Link href={`/events/${encodeURIComponent(event.id)}`} className="fw-bold text-primary text-decoration-none">Explore event <i className="fas fa-arrow-right ms-1" /></Link>
                       </div>
-                    </div>
-                  );
-                })}
+                    </article>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {activeStatus === 'Completed' && (
-            <div className="rounded-4 p-4 mb-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} aria-live="polite">
-              <h2 className="h5 fw-bold mb-1"><i className="fas fa-trophy text-warning me-2" aria-hidden="true" />Past Events &amp; Competition Results</h2>
-              <p className="small text-muted mb-0">Browse completed events and review results or highlights entered by NPC Rwanda administrators.</p>
-            </div>
-          )}
-
-          {/* Filters */}
-          <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mb-4 p-3 p-md-4 rounded-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }} data-aos="fade-up">
-            <div className="event-search-field">
-              <label htmlFor="event-directory-search" className="small fw-bold text-muted mb-2 text-uppercase d-block" style={{ letterSpacing: '0.5px' }}>Search events</label>
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0" aria-hidden="true"><i className="fas fa-search text-muted" /></span>
-                <input
-                  id="event-directory-search"
-                  type="search"
-                  className="form-control border-start-0"
-                  placeholder="Search title, venue, or category"
-                  value={search}
-                  onChange={event => { setSearch(event.target.value); setCurrentPage(1); }}
-                  aria-describedby="event-filter-count"
-                />
-                {search && <button type="button" className="btn btn-outline-secondary" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Clear event search">Clear</button>}
+          <div className="rounded-4 p-3 p-lg-4 mb-4" style={{ background: '#F3F6FA', border: '1px solid #E4EAF1' }}>
+            <div className="row g-3 align-items-end">
+              <div className="col-lg-4">
+                <label htmlFor="event-search" className="form-label small fw-bold text-uppercase text-muted">Find an event</label>
+                <div className="input-group">
+                  <span className="input-group-text bg-white border-end-0"><i className="fas fa-search text-muted" /></span>
+                  <input id="event-search" type="search" className="form-control bg-white border-start-0" placeholder="Search title, venue or category" value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} />
+                  {search && <button className="btn btn-outline-secondary bg-white" type="button" onClick={() => { setSearch(''); setPage(1); }}>Clear</button>}
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="small fw-bold text-muted mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Status</p>
-              <div className="d-flex flex-wrap gap-2">
-                {statuses.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => {
-                      setActiveStatus(s);
-                      setCurrentPage(1);
-                    }}
-                    className="btn btn-sm"
-                    style={{
-                      borderRadius: '999px',
-                      fontWeight: 600,
-                      fontSize: '0.8rem',
-                      background: activeStatus === s ? 'var(--primary-blue)' : '#fff',
-                      color: activeStatus === s ? '#fff' : 'var(--text-dark)',
-                      border: activeStatus === s ? '1px solid var(--primary-blue)' : '1px solid #D1D5DB',
-                      transition: 'all 0.2s',
-                    }}
-                  >{s}</button>
-                ))}
+              <div className="col-lg-4">
+                <label className="form-label small fw-bold text-uppercase text-muted">Event status</label>
+                <div className="d-flex flex-wrap gap-2">
+                  {['All', 'Upcoming', 'Ongoing', 'Completed', 'Cancelled'].map(value => (
+                    <button type="button" key={value} onClick={() => { setStatus(value); setPage(1); }} className="btn btn-sm rounded-pill px-3" style={{ background: status === value ? '#0B4F91' : '#fff', color: status === value ? '#fff' : '#334155', border: '1px solid #D8E0E9', fontWeight: 600 }}>{value}</button>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="vr d-none d-md-block" style={{ opacity: 0.2 }}></div>
-            <div>
-              <p className="small fw-bold text-muted mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Category</p>
-              <div className="d-flex flex-wrap gap-2">
-                {categories.map(c => (
-                  <button
-                    key={c}
-                    onClick={() => {
-                      setActiveCategory(c);
-                      setCurrentPage(1);
-                    }}
-                    className="btn btn-sm"
-                    style={{
-                      borderRadius: '999px',
-                      fontWeight: 600,
-                      fontSize: '0.8rem',
-                      background: activeCategory === c ? '#16A34A' : '#fff',
-                      color: activeCategory === c ? '#fff' : 'var(--text-dark)',
-                      border: activeCategory === c ? '1px solid #16A34A' : '1px solid #D1D5DB',
-                      transition: 'all 0.2s',
-                    }}
-                  >{c}</button>
-                ))}
+              <div className="col-lg-4">
+                <label htmlFor="event-category" className="form-label small fw-bold text-uppercase text-muted">Category</label>
+                <select id="event-category" className="form-select bg-white" value={category} onChange={event => { setCategory(event.target.value); setPage(1); }}>
+                  {categories.map(value => <option key={value} value={value}>{value === 'All' ? 'All categories' : value}</option>)}
+                </select>
               </div>
-            </div>
-            <div className="d-flex flex-wrap align-items-center gap-2 ms-md-auto">
-              <span id="event-filter-count" className="small text-muted fw-semibold" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : filtered.length + ' event' + (filtered.length !== 1 ? 's' : '') + ' found'}</span>
-              {(search || activeStatus !== 'All' || activeCategory !== 'All') && (
-                <button type="button" className="btn btn-link btn-sm p-0" onClick={() => { setSearch(''); setActiveStatus('All'); setActiveCategory('All'); setCurrentPage(1); }}>Reset filters</button>
-              )}
-              <div className="btn-group btn-group-sm" role="group" aria-label="Event display mode">
-                <button type="button" className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
-                  <i className="fas fa-grip me-1" aria-hidden="true" />List
-                </button>
-                <button type="button" className={`btn ${viewMode === 'calendar' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={viewMode === 'calendar'} onClick={() => setViewMode('calendar')}>
-                  <i className="fas fa-calendar-days me-1" aria-hidden="true" />Calendar
-                </button>
+              <div className="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2 pt-1">
+                <span className="small text-muted" aria-live="polite">{loading && events.length === 0 ? 'Loading events…' : `Showing ${filtered.length} event${filtered.length === 1 ? '' : 's'}`}</span>
+                <div className="d-flex align-items-center gap-2">
+                  {(search || status !== 'All' || category !== 'All') && <button type="button" className="btn btn-link btn-sm text-decoration-none" onClick={resetFilters}>Reset filters</button>}
+                  <div className="btn-group btn-group-sm" role="group" aria-label="Event view">
+                    <button type="button" className={`btn ${view === 'list' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={view === 'list'} onClick={() => setView('list')}><i className="fas fa-grip me-1" />Cards</button>
+                    <button type="button" className={`btn ${view === 'calendar' ? 'btn-primary' : 'btn-outline-primary'}`} aria-pressed={view === 'calendar'} onClick={() => setView('calendar')}><i className="fas fa-calendar-days me-1" />Calendar</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Events Grid */}
           {loading && events.length === 0 ? (
-            <div className="text-center py-5" role="status" aria-live="polite">
-              <div className="spinner-border text-primary mb-3" aria-hidden="true" />
-              <h3 className="h6 text-muted">Loading events...</h3>
-            </div>
+            <div className="text-center py-5" role="status"><div className="spinner-border text-primary mb-3" /><p className="text-muted mb-0">Loading events…</p></div>
+          ) : error && events.length === 0 ? (
+            <div className="text-center rounded-4 py-5 px-3" style={{ background: '#F7F9FC' }}><i className="fas fa-calendar-xmark fs-1 text-muted mb-3" /><h2 className="h5">Events are temporarily unavailable</h2><p className="text-muted mb-0">Please try again shortly.</p></div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-5" data-aos="fade-up">
-              <i className="fas fa-calendar-times text-muted mb-3" aria-hidden="true" style={{ fontSize: '3rem' }}></i>
-              <h3 className="h5 text-muted">{error ? 'Events are temporarily unavailable' : events.length === 0 ? 'No events have been published yet' : 'No events found'}</h3>
-              <p className="small text-muted">{error ? 'Please try again in a moment.' : events.length === 0 ? 'Please check back later for upcoming competitions and results.' : 'Try changing the filters above.'}</p>
-            </div>
-          ) : viewMode === 'calendar' ? (
-            <section className="event-calendar" aria-label="Events calendar">
-              <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-                <h2 className="h4 fw-bold mb-0">{calendarMonthLabel}</h2>
+            <div className="text-center rounded-4 py-5 px-3" style={{ background: '#F7F9FC' }}><i className="fas fa-calendar-xmark fs-1 text-muted mb-3" /><h2 className="h5">{events.length === 0 ? 'No events published yet' : 'No matching events'}</h2><p className="text-muted mb-0">{events.length === 0 ? 'Please check back for upcoming activities and competitions.' : 'Try another search or adjust your filters.'}</p></div>
+          ) : view === 'calendar' ? (
+            <div className="rounded-4 p-3 p-lg-4" style={{ border: '1px solid #E3EAF2', background: '#fff' }}>
+              <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div><span className="small text-uppercase fw-bold" style={{ color: '#16845B', letterSpacing: '1px' }}>Monthly schedule</span><h2 className="h4 fw-bold mb-0">{monthLabel}</h2></div>
                 <div className="d-flex gap-2">
-                  <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setCalendarMonth(new Date(calendarYear, calendarMonthIndex - 1, 1))} aria-label="Previous month">
-                    <i className="fas fa-chevron-left" aria-hidden="true" /> <span className="d-none d-sm-inline">Previous</span>
-                  </button>
-                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => { const now = new Date(); setCalendarMonth(new Date(now.getFullYear(), now.getMonth(), 1)); }}>Today</button>
-                  <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setCalendarMonth(new Date(calendarYear, calendarMonthIndex + 1, 1))} aria-label="Next month">
-                    <span className="d-none d-sm-inline">Next</span> <i className="fas fa-chevron-right" aria-hidden="true" />
-                  </button>
+                  <button className="btn btn-outline-primary btn-sm" type="button" aria-label="Previous month" onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}><i className="fas fa-chevron-left" /></button>
+                  <button className="btn btn-outline-secondary btn-sm" type="button" onClick={() => { const now = new Date(); setMonth(new Date(now.getFullYear(), now.getMonth(), 1)); }}>Today</button>
+                  <button className="btn btn-outline-primary btn-sm" type="button" aria-label="Next month" onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}><i className="fas fa-chevron-right" /></button>
                 </div>
               </div>
-              <div className="event-calendar-grid" aria-label={calendarMonthLabel} tabIndex={0} role="group">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div className="event-calendar-weekday" key={day}>{day}</div>
-                ))}
+              <div className="row g-2 text-center mb-2">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div className="col" key={day}><span className="small fw-bold text-muted">{day}</span></div>)}</div>
+              <div className="row g-2">
                 {calendarCells.map((day, index) => {
-                  if (day === null) return <div className="event-calendar-day is-empty" aria-hidden="true" key={`empty-${index}`} />;
-                  const dayEvents = getCalendarEvents(day);
-                  return (
-                    <div className="event-calendar-day" key={day}>
-                      <span className="event-calendar-date">{day}</span>
-                      <div className="event-calendar-day-items">
-                        {dayEvents.slice(0, 2).map(item => (
-                          <Link key={item.id} href={`/events/${encodeURIComponent(item.id)}`} className="event-calendar-item" title={item.title}>
-                            {item.title}
-                          </Link>
-                        ))}
-                        {dayEvents.length > 2 && <span className="event-calendar-more">+{dayEvents.length - 2} more</span>}
+                  if (day === null) return <div className="col-12 col-md" key={`blank-${index}`} style={{ minWidth: '12%' }}><div className="rounded-3" style={{ minHeight: 104, background: '#F7F9FC' }} /></div>;
+                  const dayEvents = eventsForDay(day);
+                  return <div className="col-12 col-md" key={day} style={{ minWidth: '12%' }}>
+                    <div className="rounded-3 p-2 h-100" style={{ minHeight: 104, border: dayEvents.length ? '1px solid #B9D3ED' : '1px solid #E8EDF3', background: dayEvents.length ? '#F2F7FC' : '#fff' }}>
+                      <span className="small fw-bold text-muted">{day}</span>
+                      <div className="d-flex flex-column gap-1 mt-2">
+                        {dayEvents.slice(0, 2).map(item => <Link key={item.id} href={`/events/${encodeURIComponent(item.id)}`} className="small text-decoration-none fw-semibold rounded-2 px-2 py-1" style={{ background: '#DCEBFA', color: '#164B7D', overflowWrap: 'anywhere' }}>{item.title}</Link>)}
+                        {dayEvents.length > 2 && <span className="small text-muted">+{dayEvents.length - 2} more</span>}
                       </div>
                     </div>
-                  );
+                  </div>;
                 })}
               </div>
-              {!filtered.some(item => {
-                if (!item.date) return false;
-                const date = new Date(item.date);
-                return !Number.isNaN(date.getTime()) && date.getFullYear() === calendarYear && date.getMonth() === calendarMonthIndex;
-              }) && <p className="text-muted small mt-3 mb-0">No events in this month match the current filters. Try another month or reset your filters.</p>}
-            </section>
+              {!filtered.some(item => { const date = item.date ? new Date(item.date) : null; return date && !Number.isNaN(date.getTime()) && date.getFullYear() === year && date.getMonth() === monthIndex; }) && <p className="small text-muted mt-3 mb-0">No matching events in this month.</p>}
+            </div>
           ) : (
             <>
+              <div className="d-flex justify-content-between align-items-center gap-3 mb-3"><h2 className="h4 fw-bold mb-0">{status === 'Completed' ? 'Past events & results' : 'All events'}</h2><span className="small text-muted">Page {currentPage} of {Math.max(pages, 1)}</span></div>
               <div className="row g-4">
-              {paginatedEvents.map((ev, i) => {
-                const sc = STATUS_COLORS[ev.status] || STATUS_COLORS.Upcoming;
-                return (
-                  <div key={ev.id} className="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={`${(i % 3) * 100}`}>
-                    <div className="custom-card event-list-card h-100 d-flex flex-column overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
-                      <EventCardMedia ev={ev} height="170px" statusConfig={sc} />
-                      <div className="p-4 flex-grow-1 d-flex flex-column">
-                        <div className="d-flex align-items-center gap-2 mb-2">
-                          <span className="badge" style={{ background: '#EFF6FF', color: '#1D4ED8', fontSize: '0.68rem', fontWeight: 600 }}>
-                            <i className={`fas ${CATEGORY_ICONS[ev.category] || 'fa-tag'} me-1`}></i>{ev.category}
-                          </span>
-                        </div>
-                        <h4 className="h6 fw-bold mb-2">{ev.title}</h4>
-                        <p className="small text-muted mb-3 flex-grow-1" style={{ lineHeight: 1.6 }}>{ev.description}</p>
-                        <div className="border-top pt-3 mt-auto">
-                          <div className="small text-muted mb-1">
-                            <i className="fas fa-calendar me-2 text-primary"></i>
-                            <strong>{formatDate(ev.date)}</strong>
-                            {ev.endDate && ev.endDate !== ev.date && <span className="text-muted"> – {formatDate(ev.endDate)}</span>}
-                          </div>
-                          <div className="small text-muted">
-                            <i className="fas fa-map-marker-alt me-2 text-primary"></i>{ev.location}
-                          </div>
-                          <Link href={`/events/${encodeURIComponent(ev.id)}`} className="btn btn-outline-primary btn-sm rounded-pill px-3 mt-3">
-                            Event details <i className="fas fa-arrow-right ms-1" aria-hidden="true" />
-                          </Link>
-                          {ev.status === 'Completed' && (ev.resultsSummary?.trim() || ev.results?.trim()) && (
-                            <div className="mt-3 p-3 rounded-3" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-                              <h5 className="small fw-bold text-success mb-1"><i className="fas fa-trophy me-2" aria-hidden="true" />Competition Results</h5>
-                              {ev.resultsSummary?.trim() && <p className="fw-semibold text-dark mb-2">{ev.resultsSummary}</p>}
-                              {ev.results?.trim() && <p className="small text-muted mb-0" style={{ whiteSpace: 'pre-line', lineHeight: 1.6 }}>{ev.results}</p>}
-                            </div>
-                          )}
-                        </div>
+                {pageItems.map(event => (
+                  <div className="col-md-6 col-xl-4" key={event.id}>
+                    <article className="custom-card h-100 overflow-hidden border-0 shadow-sm d-flex flex-column">
+                      <EventArtwork event={event} compact />
+                      <div className="p-4 d-flex flex-column flex-grow-1">
+                        <div className="small text-muted mb-2"><i className="fas fa-calendar me-2 text-primary" />{formatDate(event.date)}{event.endDate && event.endDate !== event.date ? ` – ${formatDate(event.endDate)}` : ''}</div>
+                        <h3 className="h5 fw-bold mb-2">{event.title}</h3>
+                        <p className="small text-muted flex-grow-1" style={{ lineHeight: 1.7 }}>{event.description}</p>
+                        {event.location && <p className="small text-muted mb-3"><i className="fas fa-location-dot me-2 text-primary" />{event.location}</p>}
+                        {event.status === 'Completed' && (event.resultsSummary?.trim() || event.results?.trim()) && <div className="rounded-3 p-3 mb-3" style={{ background: '#EFF8F2', border: '1px solid #D4EBDD' }}><div className="small fw-bold text-success mb-1"><i className="fas fa-trophy me-2" />Competition results</div>{event.resultsSummary?.trim() && <p className="small fw-semibold mb-1">{event.resultsSummary}</p>}{event.results?.trim() && <p className="small text-muted mb-0" style={{ whiteSpace: 'pre-line' }}>{event.results}</p>}</div>}
+                        <Link href={`/events/${encodeURIComponent(event.id)}`} className="btn btn-outline-primary rounded-pill fw-semibold mt-auto">Event details <i className="fas fa-arrow-right ms-2" /></Link>
                       </div>
-                    </div>
+                    </article>
                   </div>
-                );
-              })}
+                ))}
               </div>
-              <Pagination currentPage={visiblePage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="Events pagination" />
+              <Pagination currentPage={currentPage} totalPages={pages} onPageChange={setPage} ariaLabel="Events pagination" />
             </>
           )}
+        </div>
+      </section>
 
-          {/* CTA */}
-          <div className="text-center py-5 mt-4" data-aos="fade-up">
-            <div className="d-inline-flex flex-column align-items-center gap-3 p-4 rounded-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-              <i className="fas fa-envelope-open-text text-success" style={{ fontSize: '2rem' }}></i>
-              <p className="mb-0 fw-semibold text-dark">Want to participate or partner with us for an event?</p>
-              <Link href="/contact" className="btn btn-success px-4 fw-semibold">
-                <i className="fas fa-paper-plane me-2"></i>Contact Us
-              </Link>
-            </div>
+      <section className="pb-5">
+        <div className="container">
+          <div className="rounded-4 p-4 p-lg-5 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4" style={{ background: 'linear-gradient(120deg,#0B2C50,#145A91)', color: '#fff' }}>
+            <div><span className="small text-uppercase fw-bold" style={{ color: '#9BE0B8', letterSpacing: '1.5px' }}>Be part of the movement</span><h2 className="h3 fw-bold mt-2 mb-2">Interested in an NPC Rwanda event?</h2><p className="mb-0 opacity-75">Connect with our team about participation, collaboration, or event partnerships.</p></div>
+            <Link href="/contact" className="btn btn-light rounded-pill px-4 py-3 fw-bold flex-shrink-0">Contact NPC Rwanda <i className="fas fa-arrow-right ms-2" /></Link>
           </div>
         </div>
       </section>
