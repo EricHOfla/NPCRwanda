@@ -91,7 +91,7 @@ export default function EventsPage() {
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
-  const categories = useMemo(() => ['All', ...Array.from(new Set(events.map(item => item.category).filter(Boolean)))], [events]);
+  const categories = useMemo(() => ['All', ...Array.from(new Set(events.map(item => item.category).filter((value): value is string => Boolean(value))))], [events]);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return events.filter(item => {
