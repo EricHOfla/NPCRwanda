@@ -16,11 +16,12 @@ This audit checks whether public-facing records have an administrative source of
 | Events and results | `/api/events`, competition results API | Website Pages → Events; Community for registrations |
 | Careers and vacancies | `/api/careers` | Website Pages → Careers |
 | Leadership | `/api/leaders` | Website Pages → Leadership |
-| Governance documents and policies | `/api/governance-docs`, `/api/governance-policies` | Website Pages → Governance |
+| Governance page copy and institutional structure | `/api/site-content`, public bundle | Website Pages → Governance editor |
+| Governance documents and policies | `/api/governance-docs`, `/api/governance-policies` | Website Pages → Governance editor; displayed publicly only on Resources |
 | Partners | `/api/partners` | Website Pages → Partners |
 | Associations, clubs, federations, DPSCO contacts | `/api/npc-associations`, `/api/npc-clubs`, `/api/npc-federations`, `/api/dpsco-contacts` | Members management |
 | Contact details and social links | `/api/contact-info`, `/api/social-links` | Contact / footer and page content management |
-| Site editorial content | `/api/site-content`, public bundle | Website Pages editor (Home, About, NPC Background, Leadership) |
+| Site editorial content | `/api/site-content`, public bundle | Website Pages editor (Home, About, NPC Background, Governance, Leadership) |
 | Training programmes | `/api/training-programs` | Community → Programmes |
 | Athlete scouting enquiries | `/api/athlete-enquiries` | Community → Athlete Enquiries |
 | Event registrations | `/api/event-registrations` | Community → Event Registrations |
@@ -39,6 +40,13 @@ The public bundle filters inactive or unpublished records for the public scope. 
 - Strategic objective descriptions and outcome text now read managed content instead of being fixed in the public page.
 - NPC Background page heading, introduction, foundation copy, strategic-objective headings, and pillar titles now read from editable SiteContent fields exposed in the Admin page editor.
 - Dashboard notification previews now use one permission-checked summary endpoint rather than downloading three full inbox lists. Donation previews are included only for roles with `donations.view`, and each notification links to its corresponding inbox tab.
+
+## Governance and Resources page separation
+
+- The Governance page is now an institutional overview: governance principles, a governance structure diagram, inclusive leadership, and a secretariat contact route.
+- Governance document and policy listings/downloads have been removed from `/governance` to avoid repeating the official publications catalogue.
+- `/resources` remains the single public catalogue for governance documents and policies.
+- The new Governance page copy is stored in SiteContent and editable in Website Pages → Governance. The document/policy records and their admin management remain intact.
 
 ## Editorial copy still requiring a product decision / follow-up
 
