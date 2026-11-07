@@ -3355,8 +3355,7 @@ export default function DashboardPage() {
                         </div>
                         <button 
                           type="button" 
-                          disabled={pageSaving}
-                          disabled={!canUpdateContent}
+                          disabled={pageSaving || !canUpdateContent}
                           onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramPostUrl'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
@@ -3571,8 +3570,7 @@ export default function DashboardPage() {
                           </div>
                           <button
                             type="button"
-                            disabled={pageSaving}
-                            disabled={!canUpdateContent}
+                            disabled={pageSaving || !canUpdateContent}
                           onClick={() => handleSectionSave(['leadership.mandatePeriod'])}
                             className="btn btn-primary btn-sm fw-bold px-3"
                           >
@@ -3969,7 +3967,6 @@ uploadMediaFile={uploadMediaFile}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>News Articles ({news.filter(n => !isAnnouncementCategory(n.category)).length})</h3>
                         <button
-                          hidden={!canCreateContent && !canUpdateContent}
                           hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingNewsId(null);
