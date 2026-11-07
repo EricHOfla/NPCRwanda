@@ -18,7 +18,11 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
     const event = await prisma.event.findUnique({ where: { id: parsed.data.eventId } });
-    if (!event || event.status === 'Cancelled' || event.status === 'Completed') {
+    const today = new Date().toISOString().slice(0, 10);
+    const start = event?.date?.trim() || '';
+    const end = event?.endDate?.trim() || '';
+    const isPast = Boolean(start && (end ? end < today : start < today));
+    if (!event || event.status === 'Cancelled' || event.status === 'Completed' || isPast) {
       return NextResponse.json({ error: 'This event is not accepting registrations.' }, { status: 400 });
     }
     const item = await prisma.eventRegistration.create({
