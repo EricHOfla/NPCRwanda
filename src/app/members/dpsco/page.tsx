@@ -30,6 +30,7 @@ export default function DpscoContactsPage() {
     return ordered.length > 0 ? ordered : DEFAULT_PROVINCES;
   }, [activeContacts]);
 
+  const districtCount = new Set(activeContacts.map(contact => contact.district.trim().toLowerCase()).filter(Boolean)).size;
   const [activeProvince, setActiveProvince] = useState('Kigali City');
 
   // Ensure active province is valid
@@ -61,7 +62,7 @@ export default function DpscoContactsPage() {
             DPSCO Contacts
           </h1>
           <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
-            District Paralympic Sport Committees across all 30 districts of Rwanda.
+            District Paralympic Sport Committees across Rwanda. {districtCount} districts currently have active contacts.
           </p>
         </div>
       </header>
