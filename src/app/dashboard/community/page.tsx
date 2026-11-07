@@ -1,6 +1,6 @@
 'use client';
 
-import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
