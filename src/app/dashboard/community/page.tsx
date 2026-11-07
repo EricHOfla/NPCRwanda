@@ -42,10 +42,10 @@ function CommunityManagementContent() {
   const [success, setSuccess] = useState('');
 
   // Tab & Sub-tab navigation
-  const initialTab = (searchParams.get('tab') as 'programmes' | 'results' | 'gallery' | 'enquiries') || 'programmes';
+  const initialTab = (searchParams.get('tab') as 'programmes' | 'athleteEnquiries' | 'results' | 'gallery' | 'enquiries') || 'programmes';
   const initialSub = (searchParams.get('sub') as 'athleteEnquiries' | 'eventRegistrations' | 'sponsorEnquiries') || 'athleteEnquiries';
 
-  const [activeTab, setActiveTab] = useState<'programmes' | 'results' | 'gallery' | 'enquiries'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'programmes' | 'athleteEnquiries' | 'results' | 'gallery' | 'enquiries'>(initialTab);
   const [activeEnquirySubTab, setActiveEnquirySubTab] = useState<'athleteEnquiries' | 'eventRegistrations' | 'sponsorEnquiries'>(initialSub);
 
   // Search & Filter state
@@ -60,6 +60,7 @@ function CommunityManagementContent() {
   const [showProgrammeModal, setShowProgrammeModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [selectedAthleteEnquiry, setSelectedAthleteEnquiry] = useState<Row | null>(null);
 
   // Form states
   const [programme, setProgramme] = useState({ 
@@ -125,8 +126,8 @@ function CommunityManagementContent() {
 
   // Sync tab from URL if present
   useEffect(() => {
-    const tab = searchParams.get('tab') as 'programmes' | 'results' | 'gallery' | 'enquiries';
-    if (tab && ['programmes', 'results', 'gallery', 'enquiries'].includes(tab)) {
+    const tab = searchParams.get('tab') as 'programmes' | 'athleteEnquiries' | 'results' | 'gallery' | 'enquiries';
+    if (tab && ['programmes', 'athleteEnquiries', 'results', 'gallery', 'enquiries'].includes(tab)) {
       setActiveTab(tab);
     }
     const sub = searchParams.get('sub') as 'athleteEnquiries' | 'eventRegistrations' | 'sponsorEnquiries';
@@ -436,12 +437,21 @@ function CommunityManagementContent() {
               <nav aria-label="breadcrumb" className="d-none d-sm-block">
                 <ol className="breadcrumb mb-0" style={{ fontSize: '0.8rem' }}>
                   <li className="breadcrumb-item"><Link href="/dashboard" className="text-decoration-none text-muted">Dashboard</Link></li>
-                  <li className="breadcrumb-item active text-dark fw-semibold" aria-current="page">Sports Development & Community</li>
+                  <li className="breadcrumb-item active text-dark fw-semibold" aria-current="page">Sports Development</li>
                 </ol>
               </nav>
             </div>
 
             <div className="d-flex align-items-center gap-2">
+              <Link 
+                href="/sports-development" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold"
+                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem' }}
+              >
+                <i className="fas fa-external-link-alt text-primary" /> Live Portal
+              </Link>
               <Link 
                 href="/dashboard/donations" 
                 className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 fw-semibold"
@@ -501,23 +511,33 @@ function CommunityManagementContent() {
             }}
           >
             <div style={{ position: 'absolute', right: '-10px', bottom: '-25px', opacity: 0.12, fontSize: '8.5rem', color: '#fff', pointerEvents: 'none' }}>
-              <i className="fas fa-volleyball" />
+              <i className="fas fa-chart-line" />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
               <div>
                 <span className="badge mb-2" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.35)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Sports Desk & Community Center
+                  Sports Development &amp; Talent Scouting
                 </span>
                 <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
-                  Sports Development & Community Desk
+                  Sports Development Management
                 </h1>
-                <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '640px', lineHeight: '1.45' }}>
-                  Manage grassroots training programmes, athlete competition results, intake registrations, and media photo gallery.
+                <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
+                  Publish and manage training programmes for the public <Link href="/sports-development" target="_blank" className="text-warning text-decoration-underline fw-bold">/sports-development</Link> page,
+                  review aspiring athlete registrations and talent scouting enquiries, and track competition results.
                 </p>
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <Link
+                  href="/sports-development"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm"
+                  style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <i className="fas fa-external-link-alt" /> View Live Page
+                </Link>
                 <button 
                   type="button"
                   onClick={() => setShowProgrammeModal(true)}
@@ -550,9 +570,9 @@ function CommunityManagementContent() {
           <div className="row g-3 mb-4">
             {[
               { id: 'programmes', label: 'Training Programmes', count: data.programmes.length, icon: 'fa-dumbbell', color: '#0072C6', bg: '#E0F2FE' },
+              { id: 'athleteEnquiries', label: 'Athlete Talent Scouting', count: data.athleteEnquiries.length, icon: 'fa-person-running', color: '#6366F1', bg: '#EDE9FE' },
               { id: 'results', label: 'Competition Results', count: data.results.length, icon: 'fa-trophy', color: '#F59E0B', bg: '#FEF3C7' },
               { id: 'gallery', label: 'Gallery Media', count: data.gallery.length, icon: 'fa-images', color: '#10B981', bg: '#D1FAE5' },
-              { id: 'athleteEnquiries', isEnquiry: true, subKey: 'athleteEnquiries', label: 'Athlete Intake', count: data.athleteEnquiries.length, icon: 'fa-person-running', color: '#6366F1', bg: '#EDE9FE' },
               { id: 'eventRegistrations', isEnquiry: true, subKey: 'eventRegistrations', label: 'Event Signups', count: data.eventRegistrations.length, icon: 'fa-calendar-check', color: '#EC4899', bg: '#FCE7F3' },
               { id: 'sponsorEnquiries', isEnquiry: true, subKey: 'sponsorEnquiries', label: 'Sponsor Leads', count: data.sponsorEnquiries.length, icon: 'fa-handshake', color: '#0284C7', bg: '#E0F2FE' },
             ].map(k => (
@@ -561,7 +581,9 @@ function CommunityManagementContent() {
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    if (k.isEnquiry) {
+                    if (k.id === 'athleteEnquiries') {
+                      setActiveTab('athleteEnquiries');
+                    } else if (k.isEnquiry) {
                       setActiveTab('enquiries');
                       setActiveEnquirySubTab(k.subKey as any);
                     } else {
@@ -600,13 +622,14 @@ function CommunityManagementContent() {
             <div className="nav nav-pills gap-2" role="tablist">
               {[
                 { id: 'programmes', label: 'Training Programmes', icon: 'fa-dumbbell', count: data.programmes.length },
+                { id: 'athleteEnquiries', label: 'Athlete Talent Scouting', icon: 'fa-person-running', count: data.athleteEnquiries.length },
                 { id: 'results', label: 'Competition Results', icon: 'fa-trophy', count: data.results.length },
                 { id: 'gallery', label: 'Gallery Media', icon: 'fa-images', count: data.gallery.length },
                 { 
                   id: 'enquiries', 
-                  label: 'Public Enquiries & Intake', 
+                  label: 'Event & Partner Inquiries', 
                   icon: 'fa-clipboard-list', 
-                  count: data.athleteEnquiries.length + data.eventRegistrations.length + data.sponsorEnquiries.length 
+                  count: data.eventRegistrations.length + data.sponsorEnquiries.length 
                 },
               ].map(tab => (
                 <button
@@ -658,12 +681,11 @@ function CommunityManagementContent() {
             )}
           </div>
 
-          {/* Sub-tab selection for Public Enquiries */}
+          {/* Sub-tab selection for Event & Partner Inquiries */}
           {activeTab === 'enquiries' && (
             <div className="d-flex flex-wrap gap-2 mb-3 p-2 bg-white rounded border">
               <span className="small fw-bold text-muted d-flex align-items-center px-2">Sub-queue:</span>
               {[
-                { key: 'athleteEnquiries', label: 'Athlete Intake Enquiries', icon: 'fa-person-running', count: data.athleteEnquiries.length },
                 { key: 'eventRegistrations', label: 'Public Event Registrations', icon: 'fa-calendar-check', count: data.eventRegistrations.length },
                 { key: 'sponsorEnquiries', label: 'Partnership Requests', icon: 'fa-handshake', count: data.sponsorEnquiries.length },
               ].map(sub => (
@@ -689,18 +711,96 @@ function CommunityManagementContent() {
           ) : (
             <>
               {/* Tab 1: Programmes */}
-              {activeTab === 'programmes' && renderTable('Grassroots Training Programmes', 'programmes', [
-                { label: 'Programme Title', key: 'title', format: (val, item) => (
-                  <div>
-                    <span className="text-dark fw-bold d-block">{val}</span>
-                    {item.featured && <span className="badge bg-warning text-dark" style={{ fontSize: '0.62rem' }}>Featured</span>}
+              {activeTab === 'programmes' && (
+                <>
+                  <div className="alert alert-info py-2.5 px-3 small d-flex align-items-center justify-content-between mb-3 border-0 shadow-sm" style={{ borderRadius: '10px', background: '#EFF6FF', color: '#1E40AF' }}>
+                    <div className="d-flex align-items-center gap-2">
+                      <i className="fas fa-info-circle text-primary" />
+                      <span>Programmes with <strong>Published</strong> status are immediately displayed on the public <Link href="/sports-development" target="_blank" className="fw-bold text-decoration-underline text-primary">Sports Development page</Link>.</span>
+                    </div>
+                    <Link href="/sports-development" target="_blank" className="btn btn-xs btn-outline-primary fw-bold" style={{ fontSize: '0.75rem' }}>
+                      Preview Live Page <i className="fas fa-arrow-up-right-from-square ms-1" />
+                    </Link>
                   </div>
-                )},
-                { label: 'Sport', key: 'sport' },
-                { label: 'Location', key: 'location' },
-                { label: 'Schedule', key: 'schedule' },
-                { label: 'Contact', key: 'contactEmail' },
-              ])}
+                  {renderTable('Grassroots Training Programmes', 'programmes', [
+                    { label: 'Programme Title', key: 'title', format: (val, item) => (
+                      <div>
+                        <span className="text-dark fw-bold d-block">{val}</span>
+                        {item.featured && <span className="badge bg-warning text-dark" style={{ fontSize: '0.62rem' }}>Featured</span>}
+                      </div>
+                    )},
+                    { label: 'Sport', key: 'sport' },
+                    { label: 'Location', key: 'location' },
+                    { label: 'Schedule', key: 'schedule' },
+                    { label: 'Contact', key: 'contactEmail' },
+                  ])}
+                </>
+              )}
+
+              {/* Tab 2: Athlete Talent Scouting */}
+              {activeTab === 'athleteEnquiries' && (
+                <>
+                  <div className="alert alert-primary py-2.5 px-3 small d-flex align-items-center justify-content-between mb-3 border-0 shadow-sm" style={{ borderRadius: '10px', background: '#EEF2FF', color: '#3730A3' }}>
+                    <div className="d-flex align-items-center gap-2">
+                      <i className="fas fa-person-running text-primary" />
+                      <span>Aspiring athlete profiles submitted through the talent scouting portal on <Link href="/sports-development#talent-registration" target="_blank" className="fw-bold text-decoration-underline text-primary">/sports-development</Link>.</span>
+                    </div>
+                  </div>
+                  {renderTable('Athlete Talent Scouting Profiles', 'athleteEnquiries', [
+                    { label: 'Athlete Full Name', key: 'fullName', format: (val, item) => (
+                      <div>
+                        <span className="text-dark fw-bold d-block">{val}</span>
+                        <span className="badge bg-light text-dark border mt-1" style={{ fontSize: '0.7rem' }}>
+                          {item.ageRange || 'General Category'}
+                        </span>
+                      </div>
+                    )},
+                    { label: 'Sport & District', key: 'sport', format: (val, item) => (
+                      <div>
+                        <span className="badge bg-primary-subtle text-primary fw-bold d-inline-block mb-1">
+                          {val}
+                        </span>
+                        <div className="small text-muted">
+                          <i className="fas fa-location-dot me-1 text-danger" />
+                          {item.district}
+                        </div>
+                      </div>
+                    )},
+                    { label: 'Contact Info', key: 'email', format: (val, item) => (
+                      <div className="small">
+                        <a href={`mailto:${val}`} className="d-block text-primary text-decoration-none fw-semibold">
+                          <i className="fas fa-envelope me-1" />{val}
+                        </a>
+                        {item.phone && (
+                          <a href={`tel:${item.phone}`} className="text-secondary text-decoration-none">
+                            <i className="fas fa-phone me-1" />{item.phone}
+                          </a>
+                        )}
+                      </div>
+                    )},
+                    { label: 'Profile & Background', key: 'message', format: (val, item) => (
+                      <div>
+                        <span className="small text-dark d-block text-truncate" style={{ maxWidth: '240px' }} title={val}>
+                          {val || '—'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedAthleteEnquiry(item)}
+                          className="btn btn-link btn-sm p-0 fw-bold"
+                          style={{ fontSize: '0.75rem', textDecoration: 'none' }}
+                        >
+                          View Full Details <i className="fas fa-expand ms-1" />
+                        </button>
+                      </div>
+                    )},
+                    { label: 'Received', key: 'createdAt', format: (val) => (
+                      <span className="small text-muted">
+                        {val ? new Date(val).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                      </span>
+                    )},
+                  ], ['New', 'Contacted', 'Accepted', 'Closed'])}
+                </>
+              )}
 
               {/* Tab 2: Results */}
               {activeTab === 'results' && renderTable('Competition & Paralympic Results', 'results', [
@@ -762,26 +862,9 @@ function CommunityManagementContent() {
                 )},
               ])}
 
-              {/* Tab 4: Public Enquiries */}
+              {/* Tab 5: Event & Partner Enquiries */}
               {activeTab === 'enquiries' && (
                 <>
-                  {activeEnquirySubTab === 'athleteEnquiries' && renderTable('Athlete Intake Enquiries', 'athleteEnquiries', [
-                    { label: 'Athlete Full Name', key: 'fullName', format: (val, item) => (
-                      <div>
-                        <span className="text-dark fw-bold d-block">{val}</span>
-                        <span className="small text-muted" style={{ fontSize: '0.7rem' }}>Age: {item.ageRange || 'Not provided'}</span>
-                      </div>
-                    )},
-                    { label: 'Email Address', key: 'email' },
-                    { label: 'Phone', key: 'phone' },
-                    { label: 'Sport & District', key: 'sport', format: (val, item) => (
-                      <span>{val} · {item.district}</span>
-                    )},
-                    { label: 'Message / Notes', key: 'message', format: (val) => (
-                      <span className="small text-muted" title={val}>{val ? val.slice(0, 80) + '...' : '—'}</span>
-                    )}
-                  ], ['New', 'Contacted', 'Accepted', 'Closed'])}
-
                   {activeEnquirySubTab === 'eventRegistrations' && renderTable('Public Event Registrations', 'eventRegistrations', [
                     { label: 'Target Event', key: 'eventTitle', format: (val) => (
                       <span className="text-dark fw-bold">{val}</span>
@@ -818,7 +901,7 @@ function CommunityManagementContent() {
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
               <div className="modal-header text-white" style={{ background: '#0b63b6' }}>
                 <h5 className="modal-title fw-bold">
-                  <i className="fas fa-plus me-2" /> Add Grassroots Training Programme
+                  <i className="fas fa-plus me-2" /> Add Training Programme (Sports Development)
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowProgrammeModal(false)} aria-label="Close" />
               </div>
@@ -833,6 +916,10 @@ function CommunityManagementContent() {
                 );
               }}>
                 <div className="modal-body p-4">
+                  <div className="alert alert-info py-2 px-3 small mb-3 border-0" style={{ background: '#EFF6FF', color: '#1E40AF' }}>
+                    <i className="fas fa-info-circle me-1" />
+                    Published programmes will automatically appear on the public <Link href="/sports-development" target="_blank" className="fw-bold text-decoration-underline text-primary">Sports Development page</Link>.
+                  </div>
                   <div className="mb-3">
                     <label className="form-label small fw-bold">Programme Title *</label>
                     <input className="form-control" required value={programme.title} onChange={e => setProgramme(s => ({ ...s, title: e.target.value }))} placeholder="e.g. Grassroots Sitting Volleyball Youth Academy" />
@@ -1038,6 +1125,101 @@ function CommunityManagementContent() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: View Athlete Talent Scouting Profile ── */}
+      {selectedAthleteEnquiry && (
+        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="modal-header text-white" style={{ background: '#074783' }}>
+                <div className="d-flex align-items-center gap-2">
+                  <i className="fas fa-id-card" style={{ fontSize: '1.2rem' }} />
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0">Athlete Talent Scouting Profile</h5>
+                    <span className="small opacity-75">Submitted via public Sports Development portal</span>
+                  </div>
+                </div>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedAthleteEnquiry(null)} aria-label="Close" />
+              </div>
+              <div className="modal-body p-4">
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Full Name</label>
+                    <div className="fs-5 fw-bold text-dark">{selectedAthleteEnquiry.fullName}</div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Age Category</label>
+                    <div className="fw-semibold text-dark">{selectedAthleteEnquiry.ageRange || 'Not specified'}</div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Sport of Interest</label>
+                    <span className="badge bg-primary px-2.5 py-1.5" style={{ fontSize: '0.85rem' }}>
+                      {selectedAthleteEnquiry.sport}
+                    </span>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">District</label>
+                    <div className="fw-semibold text-dark">
+                      <i className="fas fa-location-dot me-1 text-danger" />
+                      {selectedAthleteEnquiry.district}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Email Address</label>
+                    <a href={`mailto:${selectedAthleteEnquiry.email}`} className="text-primary fw-semibold text-decoration-none">
+                      <i className="fas fa-envelope me-1" />
+                      {selectedAthleteEnquiry.email}
+                    </a>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Phone / WhatsApp</label>
+                    {selectedAthleteEnquiry.phone ? (
+                      <a href={`tel:${selectedAthleteEnquiry.phone}`} className="text-dark fw-semibold text-decoration-none">
+                        <i className="fas fa-phone me-1 text-success" />
+                        {selectedAthleteEnquiry.phone}
+                      </a>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-muted small fw-bold text-uppercase d-block mb-2">Impairment Details &amp; Athletic Background</label>
+                  <div className="p-3 rounded-3" style={{ background: '#F8FAFC', border: '1.5px solid #E2E8F0', fontSize: '0.92rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {selectedAthleteEnquiry.message || 'No additional details provided.'}
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center justify-content-between pt-3 border-top">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="fw-bold small mb-0">Status:</label>
+                    <select
+                      className="form-select form-select-sm"
+                      value={selectedAthleteEnquiry.status}
+                      disabled={busy === selectedAthleteEnquiry.id}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        await update('athleteEnquiries', selectedAthleteEnquiry, { status: newStatus });
+                        setSelectedAthleteEnquiry((prev) => prev ? { ...prev, status: newStatus } : null);
+                      }}
+                      style={{ width: '140px', fontSize: '0.82rem' }}
+                    >
+                      <option>New</option>
+                      <option>Contacted</option>
+                      <option>Accepted</option>
+                      <option>Closed</option>
+                    </select>
+                  </div>
+                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedAthleteEnquiry(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

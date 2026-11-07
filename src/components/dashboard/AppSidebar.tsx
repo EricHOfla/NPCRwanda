@@ -162,7 +162,7 @@ export default function AppSidebar({
     ...((canAccessCommunity || canAccessDonations || canAccessMembers || canAccessUsers || canAccessInbox || canAccessSubscribers)
       ? [
           { type: 'header' as const, label: 'MANAGEMENT' },
-          ...(canAccessCommunity ? [{ id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports & Community', icon: 'fa-people-group' }] : []),
+          ...(canAccessCommunity ? [{ id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports Development', icon: 'fa-chart-line' }] : []),
           ...(canAccessDonations ? [{ id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' }] : []),
           ...(canAccessMembers ? [{ id: 'members', type: 'tab' as const, tabId: 'members', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' }] : []),
           ...(canAccessUsers ? [{ id: 'users', type: 'tab' as const, tabId: 'users', href: '/dashboard?tab=users', label: 'User Management', icon: 'fa-user-shield' }] : []),
