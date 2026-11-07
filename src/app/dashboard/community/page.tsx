@@ -306,7 +306,7 @@ function CommunityManagementContent() {
             {type === 'programmes' && (
               <button 
                 type="button" 
-                onClick={() => setShowProgrammeModal(true)} 
+                onClick={openNewProgramme} 
                 className="btn btn-sm btn-outline-primary mt-3 fw-semibold"
               >
                 <i className="fas fa-plus me-1" /> Create First Training Programme
@@ -486,7 +486,7 @@ function CommunityManagementContent() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     <button 
                       type="button"
-                      onClick={() => setShowProgrammeModal(true)}
+                      onClick={openNewProgramme}
                       className="btn btn-sm"
                       style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
                     >
@@ -606,7 +606,7 @@ function CommunityManagementContent() {
                 {activeTab === 'programmes' && (
                   <button 
                     type="button" 
-                    onClick={() => setShowProgrammeModal(true)} 
+                    onClick={openNewProgramme} 
                     className="btn btn-sm btn-success fw-semibold d-flex align-items-center gap-2"
                     style={{ borderRadius: '8px', padding: '8px 16px', background: '#059669', borderColor: '#059669' }}
                   >
@@ -1030,7 +1030,7 @@ function CommunityManagementContent() {
                   <button
                     type="button"
                     className="btn btn-light border px-4 py-2 fw-semibold rounded-3"
-                    onClick={() => setShowProgrammeModal(false)}
+                    onClick={() => { setShowProgrammeModal(false); setEditingProgrammeId(null); resetProgrammeForm(); }}
                     style={{ fontSize: '0.85rem' }}
                   >
                     Cancel
