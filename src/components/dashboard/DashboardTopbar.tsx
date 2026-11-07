@@ -75,54 +75,31 @@ export default function DashboardTopbar({
     }
   }, [profile.email]);
 
-  // Fetch unread notifications only for users allowed to open the inbox.
+  // One permission-checked aggregate request replaces three full-list API requests.
   useEffect(() => {
     if (!canViewInbox) {
       setNotifications([]);
       setUnreadCount(0);
       return;
     }
+
     let active = true;
-    Promise.all([
-      fetch('/api/contacts?read=false').then((r) => (r.ok ? r.json() : [])).catch(() => []),
-      fetch('/api/volunteers').then((r) => (r.ok ? r.json() : [])).catch(() => []),
-      fetch('/api/donations').then((r) => (r.ok ? r.json() : [])).catch(() => []),
-    ]).then(([msgs, vols, dons]) => {
-      if (!active) return;
-      const unreadMsgs = Array.isArray(msgs) ? msgs.filter((m: any) => !m.read) : [];
-      const unreadVols = Array.isArray(vols) ? vols.filter((v: any) => !v.read) : [];
-      const unreadDons = Array.isArray(dons) ? dons.filter((d: any) => !d.read) : [];
-
-      const items: NotificationItem[] = [
-        ...unreadMsgs.map((m: any) => ({
-          id: m.id,
-          type: 'Message',
-          sender: m.name,
-          snippet: `${m.subject || 'Inquiry'}: ${m.message || ''}`,
-          date: m.date || 'Recent',
-          color: '#0b63b6',
-        })),
-        ...unreadVols.map((v: any) => ({
-          id: v.id,
-          type: 'Volunteer Form',
-          sender: v.name,
-          snippet: `Interested in ${v.interest || 'Volunteering'}`,
-          date: 'New',
-          color: '#2e9e57',
-        })),
-        ...unreadDons.map((d: any) => ({
-          id: d.id,
-          type: 'Donation Inquiry',
-          sender: d.name,
-          snippet: `Type: ${d.supportType || 'Support'}`,
-          date: 'New',
-          color: '#FFD700',
-        })),
-      ];
-
-      setNotifications(items);
-      setUnreadCount(items.length);
-    }).catch(() => {});
+    fetch('/api/dashboard/notifications', { cache: 'no-store' })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || 'Unable to load notifications');
+        return payload;
+      })
+      .then((payload) => {
+        if (!active) return;
+        setNotifications(Array.isArray(payload.items) ? payload.items : []);
+        setUnreadCount(Number(payload.unreadCount) || 0);
+      })
+      .catch(() => {
+        if (!active) return;
+        setNotifications([]);
+        setUnreadCount(0);
+      });
 
     return () => {
       active = false;
