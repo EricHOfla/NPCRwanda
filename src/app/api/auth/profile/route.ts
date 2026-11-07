@@ -42,13 +42,13 @@ export async function PUT(request: NextRequest) {
     if (name.length < 2) {
       return NextResponse.json({ error: 'Name must be at least 2 characters' }, { status: 400 });
     }
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (!email.includes('@') || !email.split('@')[1]?.includes('.')) {
       return NextResponse.json({ error: 'Valid email is required' }, { status: 400 });
     }
     if (password && password.length < 6) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
     }
-    if (avatar !== undefined && avatar && !avatar.startsWith('/') && !/^https:\\/\\//i.test(avatar)) {
+    if (avatar !== undefined && avatar && !avatar.startsWith('/') && !avatar.startsWith('https://')) {
       return NextResponse.json({ error: 'Invalid profile photo URL' }, { status: 400 });
     }
 
