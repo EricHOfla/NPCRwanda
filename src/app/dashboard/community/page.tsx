@@ -694,6 +694,342 @@ function CommunityManagementContent() {
           )}
           </div>
         </main>
+
+      {/* ── Modal: View Athlete Talent Scouting Profile ── */}
+      {selectedAthleteEnquiry && (
+        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="modal-header text-white" style={{ background: '#0B5F9F' }}>
+                <div className="d-flex align-items-center gap-2">
+                  <i className="fas fa-id-card" style={{ fontSize: '1.2rem' }} />
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0">Athlete Talent Profile</h5>
+                    <span className="small opacity-75">Submitted via public Sports Development portal</span>
+                  </div>
+                </div>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedAthleteEnquiry(null)} aria-label="Close" />
+              </div>
+              <div className="modal-body p-4">
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Full Name</label>
+                    <div className="fs-5 fw-bold text-dark">{selectedAthleteEnquiry.fullName}</div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Age Category</label>
+                    <div className="fw-semibold text-dark">{selectedAthleteEnquiry.ageRange || 'Not specified'}</div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Sport of Interest</label>
+                    <span className="badge bg-primary px-2.5 py-1.5" style={{ fontSize: '0.85rem' }}>
+                      {selectedAthleteEnquiry.sport}
+                    </span>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">District</label>
+                    <div className="fw-semibold text-dark">
+                      <i className="fas fa-location-dot me-1 text-danger" />
+                      {selectedAthleteEnquiry.district}
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Email Address</label>
+                    <a href={`mailto:${selectedAthleteEnquiry.email}`} className="text-primary fw-semibold text-decoration-none">
+                      <i className="fas fa-envelope me-1" />
+                      {selectedAthleteEnquiry.email}
+                    </a>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Phone / WhatsApp</label>
+                    {selectedAthleteEnquiry.phone ? (
+                      <a href={`tel:${selectedAthleteEnquiry.phone}`} className="text-dark fw-semibold text-decoration-none">
+                        <i className="fas fa-phone me-1 text-success" />
+                        {selectedAthleteEnquiry.phone}
+                      </a>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-muted small fw-bold text-uppercase d-block mb-2">Impairment Details &amp; Athletic Background</label>
+                  <div className="p-3 rounded-3" style={{ background: '#F8FAFC', border: '1.5px solid #E2E8F0', fontSize: '0.92rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {selectedAthleteEnquiry.message || 'No additional details provided.'}
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center justify-content-between pt-3 border-top">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="fw-bold small mb-0">Status:</label>
+                    <select
+                      className="form-select form-select-sm"
+                      value={selectedAthleteEnquiry.status}
+                      disabled={busy === selectedAthleteEnquiry.id}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        await update('athleteEnquiries', selectedAthleteEnquiry, { status: newStatus });
+                        setSelectedAthleteEnquiry((prev) => prev ? { ...prev, status: newStatus } : null);
+                      }}
+                      style={{ width: '140px', fontSize: '0.82rem' }}
+                    >
+                      <option>New</option>
+                      <option>Contacted</option>
+                      <option>Accepted</option>
+                      <option>Closed</option>
+                    </select>
+                  </div>
+                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedAthleteEnquiry(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Redesigned Training Programme Form ── */}
+      {showProgrammeModal && (
+        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div
+                className="modal-header text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #074783 0%, #0B5F9F 100%)',
+                  padding: '20px 24px',
+                }}
+              >
+                <div className="d-flex align-items-center gap-2.5">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.18)', fontSize: '1.15rem' }}
+                  >
+                    <i className="fas fa-dumbbell" />
+                  </div>
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0" style={{ fontSize: '1.2rem' }}>
+                      Create Training Programme
+                    </h5>
+                    <span className="small opacity-75" style={{ fontSize: '0.8rem' }}>
+                      Publish official grassroots academies, youth training clinics &amp; training camps
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setShowProgrammeModal(false)}
+                  aria-label="Close"
+                />
+              </div>
+
+              <form onSubmit={saveProgramme}>
+                <div className="modal-body p-4" style={{ background: '#FFFFFF', maxHeight: '70vh', overflowY: 'auto' }}>
+                  {/* Section 1: Basic Information */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#EFF6FF', color: '#0B5F9F', fontSize: '0.7rem' }}>
+                      1. General Details
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Programme Title <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          required
+                          value={programme.title}
+                          onChange={e => setProgramme(s => ({ ...s, title: e.target.value }))}
+                          placeholder="e.g. Grassroots Sitting Volleyball Youth Academy"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Sport Discipline <span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className="form-select py-2.5 rounded-3"
+                          required
+                          value={programme.sport}
+                          onChange={e => setProgramme(s => ({ ...s, sport: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        >
+                          <option value="">Select sport discipline</option>
+                          <option value="Sitting Volleyball">Sitting Volleyball</option>
+                          <option value="Para-Athletics">Para-Athletics (Track &amp; Field)</option>
+                          <option value="Wheelchair Basketball">Wheelchair Basketball</option>
+                          <option value="Para-Powerlifting">Para-Powerlifting</option>
+                          <option value="Goalball">Goalball</option>
+                          <option value="Para-Swimming">Para-Swimming</option>
+                          <option value="Multi-Sport Grassroots Clinic">Multi-Sport Grassroots Clinic</option>
+                          <option value="Other Para-Sport">Other Para-Sport</option>
+                        </select>
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">
+                          Location / Venue <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          required
+                          value={programme.location}
+                          onChange={e => setProgramme(s => ({ ...s, location: e.target.value }))}
+                          placeholder="e.g. Amahoro National Stadium Compound, Kigali"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Timing & Schedule */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#FEF3C7', color: '#92400E', fontSize: '0.7rem' }}>
+                      2. Dates &amp; Schedule
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Start Date</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="date"
+                          value={programme.startDate}
+                          onChange={e => setProgramme(s => ({ ...s, startDate: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">End Date</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="date"
+                          value={programme.endDate}
+                          onChange={e => setProgramme(s => ({ ...s, endDate: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">Training Frequency / Schedule</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          value={programme.schedule}
+                          onChange={e => setProgramme(s => ({ ...s, schedule: e.target.value }))}
+                          placeholder="e.g. Every Saturday & Sunday (09:00 - 12:30 CAT)"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Eligibility & Coordination */}
+                  <div className="mb-4">
+                    <span className="badge px-2.5 py-1 text-uppercase fw-bold mb-2" style={{ background: '#ECFDF5', color: '#065F46', fontSize: '0.7rem' }}>
+                      3. Requirements &amp; Contact
+                    </span>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Eligibility Criteria</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          value={programme.eligibility}
+                          onChange={e => setProgramme(s => ({ ...s, eligibility: e.target.value }))}
+                          placeholder="e.g. Open to youth aged 12-25 with physical impairments"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label small fw-bold text-dark mb-1">Coordinator Email</label>
+                        <input
+                          className="form-control py-2.5 rounded-3"
+                          type="email"
+                          value={programme.contactEmail}
+                          onChange={e => setProgramme(s => ({ ...s, contactEmail: e.target.value }))}
+                          placeholder="development@npcrwanda.org"
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-dark mb-1">Programme Overview &amp; Description</label>
+                        <textarea
+                          className="form-control rounded-3"
+                          rows={3}
+                          value={programme.description}
+                          onChange={e => setProgramme(s => ({ ...s, description: e.target.value }))}
+                          placeholder="Describe the training syllabus, coaching team, facilities, equipment provided, and pathway opportunities..."
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.9rem', resize: 'vertical' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 4: Publishing Status */}
+                  <div
+                    className="p-3 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3"
+                    style={{ background: '#F8FAFC', border: '1.5px solid #E2E8F0' }}
+                  >
+                    <div>
+                      <div className="fw-bold small text-dark mb-0.5">Publication Status</div>
+                      <div className="small text-muted" style={{ fontSize: '0.78rem' }}>
+                        Set to <strong>Published</strong> to display on the public Sports Development portal.
+                      </div>
+                    </div>
+                    <select
+                      className="form-select form-select-sm fw-bold w-auto"
+                      value={programme.status}
+                      onChange={e => setProgramme(s => ({ ...s, status: e.target.value }))}
+                      style={{ border: '1.5px solid #CBD5E1', borderRadius: '8px', padding: '6px 14px' }}
+                    >
+                      <option value="Draft">Draft (Saved Privately)</option>
+                      <option value="Published">Published (Public)</option>
+                      <option value="Archived">Archived (Closed)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Footer Controls */}
+                <div className="modal-footer bg-light px-4 py-3 d-flex justify-content-between">
+                  <button
+                    type="button"
+                    className="btn btn-light border px-4 py-2 fw-semibold rounded-3"
+                    onClick={() => setShowProgrammeModal(false)}
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary px-4 py-2 fw-bold rounded-3 d-inline-flex align-items-center gap-2"
+                    style={{ background: '#0B5F9F', borderColor: '#0B5F9F', fontSize: '0.85rem' }}
+                    disabled={busy === 'programme'}
+                  >
+                    {busy === 'programme' ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                        <span>Saving Programme...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-check" />
+                        <span>Create Training Programme</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
