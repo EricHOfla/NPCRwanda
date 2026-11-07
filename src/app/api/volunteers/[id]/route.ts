@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
+const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 const updateSchema = z.object({
   read: z.boolean(),
 });
@@ -14,9 +16,9 @@ export async function GET(
     const { id } = await params;
     const item = await prisma.volunteerApplication.findUnique({ where: { id } });
     if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json(item);
+    return NextResponse.json(item, { headers: NO_STORE_HEADERS });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500, headers: NO_STORE_HEADERS });
   }
 }
 
