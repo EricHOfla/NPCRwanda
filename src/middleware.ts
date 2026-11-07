@@ -240,18 +240,7 @@ export async function middleware(request: NextRequest) {
           }
         }
 
-        // 4. Admin Community & Spam cleaning: Administrator or Super Administrator only
-        if (pathname.startsWith('/api/admin/clean-spam') || pathname.startsWith('/api/admin/community')) {
-          if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
-            return NextResponse.json(
-              {
-                error: "You don't have permission to access this resource. Please contact your administrator if you believe you should have access.",
-                code: 'FORBIDDEN',
-              },
-              { status: 403 }
-            );
-          }
-        }
+        // Community and inbox access is governed by the granular permission map above.
 
         if (method === 'DELETE') {
           if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
