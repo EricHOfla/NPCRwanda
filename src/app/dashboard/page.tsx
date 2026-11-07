@@ -1059,6 +1059,15 @@ export default function DashboardPage() {
   const canAccessMembers = hasPermission(userRole, 'members.view');
   const canAccessDonations = hasPermission(userRole, 'donations.view');
   const canAccessCommunity = hasPermission(userRole, 'community.view');
+  const canCreateContent = hasPermission(userRole, 'content.create');
+  const canUpdateContent = hasPermission(userRole, 'content.update');
+  const canDeleteContent = hasPermission(userRole, 'content.delete');
+  const canManageInbox = hasPermission(userRole, 'inbox.manage');
+  const canDeleteInbox = hasPermission(userRole, 'inbox.delete');
+  const canManageDonations = hasPermission(userRole, 'donations.manage');
+  const canManageMembers = hasPermission(userRole, 'members.manage');
+  const canDeleteMembers = hasPermission(userRole, 'members.delete');
+  const canDeleteUsers = hasPermission(userRole, 'users.delete');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
     // The server layout has already authenticated the user and applied the
@@ -3695,8 +3704,8 @@ uploadMediaFile={uploadMediaFile}
                                   <td className="small text-muted">{l.committee}</td>
                                   <td>
                                     <div className="d-flex gap-2">
-                                      <button onClick={() => handleEditLeaderClick(l)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit leader"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => { if (confirm(`Delete leader ${l.name}?`)) deleteLeader(l.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete leader"><i className="fas fa-trash" /></button>
+                                      <button onClick={() => handleEditLeaderClick(l)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit leader" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete leader ${l.name}?`)) deleteLeader(l.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete leader" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -3817,8 +3826,8 @@ uploadMediaFile={uploadMediaFile}
                                         setAthleteForm({ name: a.name, sport: a.sport, status: a.status, country: a.country, avatar: a.avatar, desc: a.desc, achievements: a.achievements || '' });
                                         setEditingAthleteId(a.id);
                                         setAthleteFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit athlete"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => { if (confirm(`Delete athlete ${a.name}?`)) deleteAthlete(a.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete athlete"><i className="fas fa-trash" /></button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit athlete" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete athlete ${a.name}?`)) deleteAthlete(a.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete athlete" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -3920,8 +3929,8 @@ uploadMediaFile={uploadMediaFile}
                                         setSportForm({ slug: s.slug, title: s.title, img: s.img, desc: s.desc });
                                         setEditingSportId(s.id);
                                         setSportFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit sport"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => { if (confirm(`Delete sport ${s.title}?`)) deleteSport(s.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete sport"><i className="fas fa-trash" /></button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit sport" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete sport ${s.title}?`)) deleteSport(s.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete sport" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4052,8 +4061,8 @@ uploadMediaFile={uploadMediaFile}
                                         setNewsForm({ title: n.title, date: n.date, category: n.category, status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
                                         setEditingNewsId(n.id);
                                         setNewsFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit article"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => { if (confirm(`Delete article "${n.title}"?`)) deleteNews(n.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete article"><i className="fas fa-trash" /></button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit article" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete article "${n.title}"?`)) deleteNews(n.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete article" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4190,8 +4199,8 @@ uploadMediaFile={uploadMediaFile}
                                           setNewsForm({ title: n.title, date: n.date, category: n.category || 'Announcement', status: n.status, img: n.img, desc: n.desc, content: n.content || '', slug: n.slug });
                                           setEditingNewsId(n.id);
                                           setNewsFormOpen(true);
-                                        }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit announcement"><i className="fas fa-pen" /></button>
-                                        <button onClick={() => deleteNews(n.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete announcement"><i className="fas fa-trash" /></button>
+                                        }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit announcement" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                        <button onClick={() => deleteNews(n.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete announcement" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                       </div>
                                     </td>
                                   </tr>
@@ -4345,8 +4354,8 @@ uploadMediaFile={uploadMediaFile}
                                         setEventForm({ title: e.title, description: e.description, date: e.date, endDate: e.endDate, location: e.location, category: e.category, status: e.status, img: e.img, featured: e.featured, resultsSummary: e.resultsSummary || '', results: e.results || '' });
                                         setEditingEventId(e.id);
                                         setEventFormOpen(true);
-                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit event"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => { if (confirm(`Delete event "${e.title}"?`)) deleteEvent(e.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete event"><i className="fas fa-trash" /></button>
+                                      }} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit event" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => { if (confirm(`Delete event "${e.title}"?`)) deleteEvent(e.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete event" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4515,7 +4524,7 @@ uploadMediaFile={uploadMediaFile}
                                             }
                                           }}
                                           className="btn btn-sm btn-outline-danger py-0 px-2"
-                                          title="Delete position"
+                                          title="Delete position" hidden={!canDeleteContent}
                                         >
                                           <i className="fas fa-trash" />
                                         </button>
@@ -4650,8 +4659,8 @@ uploadMediaFile={uploadMediaFile}
                                   </td>
                                   <td>
                                     <div className="d-flex gap-2">
-                                      <button onClick={() => handleEditSocialClick(s)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit social link"><i className="fas fa-pen" /></button>
-                                      <button onClick={() => deleteSocialLink(s.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete social link"><i className="fas fa-trash" /></button>
+                                      <button onClick={() => handleEditSocialClick(s)} className="btn btn-sm btn-outline-primary py-0 px-2" title="Edit social link" hidden={!canUpdateContent}><i className="fas fa-pen" /></button>
+                                      <button onClick={() => deleteSocialLink(s.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete social link" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                     </div>
                                   </td>
                                 </tr>
@@ -4790,9 +4799,9 @@ uploadMediaFile={uploadMediaFile}
                                                 setGovFormOpen(true);
                                               }} 
                                               className="btn btn-xs btn-outline-primary py-0 px-2"
-                                              title="Edit document"
+                                              title="Edit document" hidden={!canUpdateContent}
                                             ><i className="fas fa-pen" /></button>
-                                            <button onClick={() => deleteGovItem('doc', d.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete document"><i className="fas fa-trash" /></button>
+                                            <button onClick={() => deleteGovItem('doc', d.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete document" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                           </div>
                                         </td>
                                       </tr>
@@ -4860,9 +4869,9 @@ uploadMediaFile={uploadMediaFile}
                                                 setGovFormOpen(true);
                                               }} 
                                               className="btn btn-xs btn-outline-primary py-0 px-2"
-                                              title="Edit policy"
+                                              title="Edit policy" hidden={!canUpdateContent}
                                             ><i className="fas fa-pen" /></button>
-                                            <button onClick={() => deleteGovItem('policy', p.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete policy"><i className="fas fa-trash" /></button>
+                                            <button onClick={() => deleteGovItem('policy', p.id)} className="btn btn-xs btn-outline-danger py-0 px-2" title="Delete policy" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                           </div>
                                         </td>
                                       </tr>
@@ -4993,9 +5002,9 @@ uploadMediaFile={uploadMediaFile}
                                         setPartnerFormOpen(true);
                                       }} 
                                       className="btn btn-sm btn-outline-primary py-0 px-2"
-                                      title="Edit partner"
+                                      title="Edit partner" hidden={!canUpdateContent}
                                     ><i className="fas fa-pen" /></button>
-                                    <button onClick={() => deletePartner(p.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete partner"><i className="fas fa-trash" /></button>
+                                    <button onClick={() => deletePartner(p.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete partner" hidden={!canDeleteContent}><i className="fas fa-trash" /></button>
                                   </div>
                                 </td>
                               </tr>
@@ -5124,7 +5133,7 @@ uploadMediaFile={uploadMediaFile}
                               <td>
                                 <div className="d-flex gap-2">
                                   <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0">Open Details</button>
-                                  <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1">{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
+                                  <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-1" hidden={!canDeleteInbox}>{deletingSubmissionIds.includes(v.id) ? 'Deleting…' : 'Delete'}</button>
                                 </div>
                               </td>
                             </tr>
@@ -5402,7 +5411,7 @@ uploadMediaFile={uploadMediaFile}
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveMessage(c)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View message"><i className="fas fa-eye" /></button>
-                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage, 'Contact message'); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete message"><i className="fas fa-trash" /></button>
+                                <button onClick={async () => { if (confirm(`Delete contact message from ${c.name}?`)) { await runSubmissionDelete(c.id, deleteContactMessage, 'Contact message'); } }} disabled={deletingSubmissionIds.includes(c.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete message" hidden={!canDeleteInbox}><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5445,7 +5454,7 @@ uploadMediaFile={uploadMediaFile}
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View volunteer application"><i className="fas fa-eye" /></button>
-                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete application"><i className="fas fa-trash" /></button>
+                                <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete application" hidden={!canDeleteInbox}><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5488,7 +5497,7 @@ uploadMediaFile={uploadMediaFile}
                             <td>
                               <div className="d-flex gap-2">
                                 <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View donation inquiry"><i className="fas fa-eye" /></button>
-                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete inquiry"><i className="fas fa-trash" /></button>
+                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete inquiry" hidden={!canManageDonations}><i className="fas fa-trash" /></button>
                               </div>
                             </td>
                           </tr>
@@ -5634,6 +5643,7 @@ uploadMediaFile={uploadMediaFile}
                                   }}
                                   disabled={deletingSubmissionIds.includes(a.id)}
                                   className="btn btn-sm btn-outline-danger py-0 px-2"
+                                  hidden={!canDeleteInbox}
                                   title="Delete application"
                                 >
                                   <i className="fas fa-trash" />
@@ -5719,8 +5729,8 @@ uploadMediaFile={uploadMediaFile}
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.acronym}</td>
                       <td>
-                        <button onClick={() => { setAssocForm(p); setEditingAssocId(p.id); setAssocFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit association"><i className="fas fa-pen" /></button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcAssociation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete association"><i className="fas fa-trash" /></button>
+                        <button onClick={() => { setAssocForm(p); setEditingAssocId(p.id); setAssocFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit association" hidden={!canManageMembers}><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcAssociation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete association" hidden={!canDeleteMembers}><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
@@ -5755,8 +5765,8 @@ uploadMediaFile={uploadMediaFile}
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.location}</td>
                       <td>
-                        <button onClick={() => { setClubForm(p); setEditingClubId(p.id); setClubFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit club"><i className="fas fa-pen" /></button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcClub(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete club"><i className="fas fa-trash" /></button>
+                        <button onClick={() => { setClubForm(p); setEditingClubId(p.id); setClubFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit club" hidden={!canManageMembers}><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcClub(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete club" hidden={!canDeleteMembers}><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
@@ -5804,8 +5814,8 @@ uploadMediaFile={uploadMediaFile}
                       <td className="fw-bold">{p.name}</td>
                       <td>{p.role}</td>
                       <td>
-                        <button onClick={() => { setFedForm({name:p.name, logo:p.logo, website:p.website||'', role:p.role, desc:p.desc, order:p.order, active:p.active}); setEditingFedId(p.id); setFedFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit federation"><i className="fas fa-pen" /></button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteNpcFederation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete federation"><i className="fas fa-trash" /></button>
+                        <button onClick={() => { setFedForm({name:p.name, logo:p.logo, website:p.website||'', role:p.role, desc:p.desc, order:p.order, active:p.active}); setEditingFedId(p.id); setFedFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit federation" hidden={!canManageMembers}><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteNpcFederation(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete federation" hidden={!canDeleteMembers}><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
@@ -5850,8 +5860,8 @@ uploadMediaFile={uploadMediaFile}
                       <td>{p.phone}</td>
                       <td>{p.email}</td>
                       <td>
-                        <button onClick={() => { setDpscoForm(p); setEditingDpscoId(p.id); setDpscoFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit DPSCO contact"><i className="fas fa-pen" /></button>
-                        <button onClick={() => { if(confirm('Delete?')) deleteDpscoContact(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete contact"><i className="fas fa-trash" /></button>
+                        <button onClick={() => { setDpscoForm(p); setEditingDpscoId(p.id); setDpscoFormOpen(true); }} className="btn btn-sm btn-outline-primary py-0 px-2 me-2" title="Edit DPSCO contact" hidden={!canManageMembers}><i className="fas fa-pen" /></button>
+                        <button onClick={() => { if(confirm('Delete?')) deleteDpscoContact(p.id); }} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete contact" hidden={!canDeleteMembers}><i className="fas fa-trash" /></button>
                       </td>
                     </tr>
                   ))}
@@ -6209,6 +6219,7 @@ uploadMediaFile={uploadMediaFile}
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteUser(u)}
+                                    hidden={!canDeleteUsers}
                                     disabled={isSelf}
                                     className="btn btn-outline-danger btn-sm px-2.5"
                                     title={isSelf ? 'Cannot delete your own active account' : 'Delete user account'}
