@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
@@ -19,16 +20,24 @@ const eventSchema = z.object({
   results: z.string().default(''),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const adminScope = searchParams.get('scope') === 'admin';
+    if (adminScope) {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const status = searchParams.get('status') || '';
     const category = searchParams.get('category') || '';
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || '10';
 
-    const whereClause: any = {};
-    if (status && status !== 'All') whereClause.status = status;
+    const whereClause: any = adminScope ? {} : { status: { not: 'Cancelled' } };
+    if (status && status !== 'All') {
+      if (status === 'Cancelled' && !adminScope) return NextResponse.json([]);
+      whereClause.status = status;
+    }
     if (category && category !== 'All') whereClause.category = category;
 
     if (page) {
