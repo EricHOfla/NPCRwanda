@@ -6,7 +6,6 @@ import { authorizeRequest } from '@/lib/rbac-server';
 export const dynamic = 'force-dynamic';
 
 const types = ['programmes', 'athleteEnquiries', 'eventRegistrations', 'sponsorEnquiries'] as const;
-type ItemType = typeof types[number];
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +31,6 @@ const updateSchema = z.object({
   type: z.enum(types),
   id: z.string().min(1),
   status: z.string().optional(),
-  published: z.boolean().optional(),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -44,7 +42,7 @@ export async function PATCH(request: NextRequest) {
 
     const parsed = updateSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid update request' }, { status: 400 });
-    const { type, id, status, published } = parsed.data;
+    const { type, id, status } = parsed.data;
     let updated: unknown;
     switch (type) {
       case 'programmes':
