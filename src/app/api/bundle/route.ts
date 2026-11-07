@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
+import { getSessionUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,11 @@ const PUBLIC_SETTING_KEYS = [
 export async function GET() {
   try {
     await ensureAutoMigrated();
+    // Admin sessions need drafts and inactive records for management. Public visitors
+    // receive only records that are currently intended for public display.
+    const session = await getSessionUser();
+    const isAdminRequest = Boolean(session);
+
     // Fire-and-forget — keep event statuses accurate without blocking the response
     autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
 
@@ -50,10 +56,12 @@ export async function GET() {
         orderBy: { createdAt: 'desc' },
       }),
       prisma.newsArticle.findMany({
+        where: isAdminRequest ? undefined : { status: 'Published' },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.career.findMany({
+        where: isAdminRequest ? undefined : { status: 'Open' },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
@@ -79,24 +87,30 @@ export async function GET() {
         orderBy: { date: 'asc' },
       }),
       prisma.partner.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: { order: 'asc' },
       }),
       prisma.siteContent.findMany(),
       prisma.contactInfo.findFirst(),
       prisma.socialLink.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.systemSetting.findMany({ where: { key: { in: [...PUBLIC_SETTING_KEYS] } } }),
       prisma.npcAssociation.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.npcClub.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.npcFederation.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.dpscoContact.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ province: 'asc' }, { district: 'asc' }],
       }),
     ]);
