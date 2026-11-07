@@ -2797,9 +2797,6 @@ export default function DashboardPage() {
                         <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
                         <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
                       </div>
-                        <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
-                        <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
-                      </div>
 
                       <div className="p-3 border rounded mb-4" style={{ background: '#f8fafc' }}>
                         <h5 className="fw-bold text-dark mb-2">Governing Board & Management</h5>
