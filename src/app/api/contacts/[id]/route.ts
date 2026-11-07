@@ -21,7 +21,7 @@ export async function GET(
       return NextResponse.json({ error: 'Message not found' }, { status: 404 });
     }
 
-    return NextResponse.json(message);
+    return NextResponse.json(message, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error('Fetch contact message error:', error);
     return NextResponse.json(
