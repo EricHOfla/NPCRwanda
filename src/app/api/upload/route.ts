@@ -24,6 +24,17 @@ export async function POST(request: NextRequest) {
     const category = (formData.get('folder') as string) || (formData.get('category') as string) || 'site';
     const entity = (formData.get('entity') as string) || '';
 
+    // Profile photos have a strict server-side type and size limit.
+    if (category === 'profile') {
+      const allowedProfileTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedProfileTypes.includes(file.type)) {
+        return NextResponse.json({ error: 'Profile photos must be JPG, PNG, or WebP images.' }, { status: 400 });
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: 'Profile photos must be 5 MB or smaller.' }, { status: 400 });
+      }
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
