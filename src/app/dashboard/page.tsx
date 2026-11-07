@@ -2642,7 +2642,7 @@ export default function DashboardPage() {
                         } else if (target === 'about') {
                           handleSectionSave(['about.pageTitle', 'about.pageIntro', 'about.milestones', 'about.affiliations', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth', 'about.objective.outcome.Athlete Excellence', 'about.objective.outcome.Grassroots Development', 'about.objective.outcome.Safeguarding & Governance', 'about.objective.outcome.Partnership Growth']);
                         } else if (target === 'npc-background') {
-                          handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
+                          handleSectionSave(['background.pageTitle', 'background.pageIntro', 'background.foundationLabel', 'background.foundationTitle', 'background.foundationParagraph1', 'background.foundationParagraph2', 'background.corePillarsTitle', 'background.pillarsTitle', 'background.pillarsIntro', 'background.pillarTitle.1', 'background.pillarTitle.2', 'background.pillarTitle.3', 'background.pillarTitle.4', 'background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
                         } else if (target === 'leadership') {
                           handleSectionSave(['leadership.mandatePeriod']);
                         }
@@ -2770,7 +2770,33 @@ export default function DashboardPage() {
 
                   {activeEditPage === 'npc-background' && (
                     <div className="border rounded bg-white overflow-hidden shadow p-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                      <div className="custom-card p-4 mb-4">
+                        <h4 className="h6 fw-bold mb-3 text-success">NPC Background Page Copy</h4>
+                        {[
+                          ['background.pageTitle', 'Page Title'],
+                          ['background.pageIntro', 'Page Introduction'],
+                          ['background.foundationLabel', 'Foundation Label'],
+                          ['background.foundationTitle', 'Foundation Heading'],
+                          ['background.foundationParagraph1', 'Foundation Paragraph 1'],
+                          ['background.foundationParagraph2', 'Foundation Paragraph 2'],
+                          ['background.corePillarsTitle', 'Core Pillars Heading'],
+                          ['background.pillarsTitle', 'Strategic Objectives Heading'],
+                          ['background.pillarsIntro', 'Strategic Objectives Introduction'],
+                          ['background.pillarTitle.1', 'Pillar 1 Title'],
+                          ['background.pillarTitle.2', 'Pillar 2 Title'],
+                          ['background.pillarTitle.3', 'Pillar 3 Title'],
+                          ['background.pillarTitle.4', 'Pillar 4 Title'],
+                        ].map(([key, label]) => (
+                          <div className="mb-3" key={key}>
+                            <label className="form-label small fw-bold">{label}</label>
+                            <textarea className="form-control" rows={key.includes('Paragraph') || key.endsWith('Intro') ? 3 : 1} value={siteForm[key] || ''} onChange={e => setSiteForm({ ...siteForm, [key]: e.target.value })} />
+                          </div>
+                        ))}
+                      </div>
                       <div className="text-center py-4 bg-light mb-4 rounded">
+                        <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
+                        <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
+                      </div>
                         <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
                         <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
                       </div>
