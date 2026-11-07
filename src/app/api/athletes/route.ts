@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -16,11 +17,15 @@ const athleteSchema = z.object({
 });
 
 // GET: Fetch list of athletes with optional search, status filtering, and pagination
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
-    const status = searchParams.get('status') || '';
+    const status = searchParams.get('status') || 'Active';
+    if (status !== 'Active') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || '10';
 
