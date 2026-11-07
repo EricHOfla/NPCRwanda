@@ -26,20 +26,14 @@ export async function GET(request: NextRequest) {
       if (!settingsMap.address && contact.address) settingsMap.address = contact.address;
     }
 
-    // Auto-seed required keys into DB if missing (runs once, then DB is source of truth)
-    const seedDefaults: Record<string, string> = {
-      siteName:     'NPC Rwanda',
+    // Supply presentation defaults without writing sample/configuration rows to production.
+    const responseDefaults: Record<string, string> = {
+      siteName: 'NPC Rwanda',
       siteSubtitle: 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA',
-      siteLogo:     '/assets/img/logo.png',
+      siteLogo: '/assets/img/logo.png',
     };
-    const missingEntries = Object.entries(seedDefaults).filter(([k]) => !settingsMap[k]);
-    if (missingEntries.length > 0) {
-      await prisma.$transaction(
-        missingEntries.map(([key, value]) =>
-          prisma.systemSetting.upsert({ where: { key }, update: {}, create: { key, value } })
-        )
-      );
-      missingEntries.forEach(([k, v]) => { settingsMap[k] = v; });
+    for (const [key, value] of Object.entries(responseDefaults)) {
+      if (!settingsMap[key]) settingsMap[key] = value;
     }
 
     return NextResponse.json(settingsMap);
