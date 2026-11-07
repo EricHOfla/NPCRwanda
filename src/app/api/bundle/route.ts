@@ -4,6 +4,22 @@ import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
+// Only settings required by public components may leave the server boundary.
+// SMTP credentials, per-user preferences, and other private settings stay server-side.
+const PUBLIC_SETTING_KEYS = [
+  'siteName',
+  'siteSubtitle',
+  'siteLogo',
+  'contactPhone',
+  'contactEmail',
+  'address',
+  'facebook',
+  'twitter',
+  'instagram',
+  'youtube',
+  'linkedin',
+] as const;
+
 export async function GET() {
   try {
     await ensureAutoMigrated();
@@ -70,7 +86,7 @@ export async function GET() {
       prisma.socialLink.findMany({
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
-      prisma.systemSetting.findMany(),
+      prisma.systemSetting.findMany({ where: { key: { in: [...PUBLIC_SETTING_KEYS] } } }),
       prisma.npcAssociation.findMany({
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
