@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
 import { getSessionUser } from '@/lib/auth';
@@ -21,13 +21,17 @@ const PUBLIC_SETTING_KEYS = [
   'linkedin',
 ] as const;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await ensureAutoMigrated();
-    // Admin sessions need drafts and inactive records for management. Public visitors
-    // receive only records that are currently intended for public display.
-    const session = await getSessionUser();
-    const isAdminRequest = Boolean(session);
+    // Admin data is requested explicitly and requires a valid session. Public requests
+    // never receive drafts, inactive records, or private administrative data.
+    const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
+    const session = adminScope ? await getSessionUser(request) : null;
+    if (adminScope && !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const isAdminRequest = adminScope && Boolean(session);
 
     // Fire-and-forget — keep event statuses accurate without blocking the response
     autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
