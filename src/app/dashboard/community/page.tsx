@@ -11,20 +11,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PUBLIC_BUNDLE_QUERY_KEY } from '@/context/DataContext';
 
 type Row = Record<string, any> & { id: string };
-type CommunityTab = 'athleteEnquiries' | 'programmes' | 'eventRegistrations' | 'sponsorEnquiries';
-const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes', 'eventRegistrations', 'sponsorEnquiries'];
+type CommunityTab = 'athleteEnquiries' | 'programmes';
+const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes'];
 type Data = {
   programmes: Row[];
   athleteEnquiries: Row[];
-  eventRegistrations: Row[];
-  sponsorEnquiries: Row[];
 };
 
 const empty: Data = {
   programmes: [],
   athleteEnquiries: [],
-  eventRegistrations: [],
-  sponsorEnquiries: [],
 };
 
 function CommunityManagementContent() {
@@ -111,8 +107,6 @@ function CommunityManagementContent() {
       setData({
         programmes: Array.isArray(payload.programmes) ? payload.programmes : [],
         athleteEnquiries: Array.isArray(payload.athleteEnquiries) ? payload.athleteEnquiries : [],
-        eventRegistrations: Array.isArray(payload.eventRegistrations) ? payload.eventRegistrations : [],
-        sponsorEnquiries: Array.isArray(payload.sponsorEnquiries) ? payload.sponsorEnquiries : [],
       });
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Unable to load data'); 
@@ -496,7 +490,7 @@ function CommunityManagementContent() {
                       Sports Development Desk
                     </h1>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
-                      Manage athlete scouting submissions, public event registrations, partnership enquiries, and grassroots training programmes.
+                      Manage athlete scouting submissions and grassroots training programmes.
                     </p>
                   </div>
 
@@ -618,26 +612,6 @@ function CommunityManagementContent() {
                       {data.programmes.length}
                     </span>
                   </button>
-                  <button
-                    type="button"
-                    className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'eventRegistrations' ? 'btn-primary' : 'btn-light border text-secondary'}`}
-                    onClick={() => setActiveTab('eventRegistrations')}
-                    style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '0.85rem' }}
-                  >
-                    <i className="fas fa-calendar-check" />
-                    <span>Event Registrations</span>
-                    <span className="badge rounded-pill bg-secondary text-white" style={{ fontSize: '0.7rem' }}>{data.eventRegistrations.length}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'sponsorEnquiries' ? 'btn-primary' : 'btn-light border text-secondary'}`}
-                    onClick={() => setActiveTab('sponsorEnquiries')}
-                    style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '0.85rem' }}
-                  >
-                    <i className="fas fa-handshake" />
-                    <span>Partnership Enquiries</span>
-                    <span className="badge rounded-pill bg-secondary text-white" style={{ fontSize: '0.7rem' }}>{data.sponsorEnquiries.length}</span>
-                  </button>
                 </div>
 
                 {activeTab === 'programmes' && (
@@ -732,23 +706,6 @@ function CommunityManagementContent() {
                   },
                 ], ['New', 'Contacted', 'Accepted', 'Closed'])
               )}
-
-              {activeTab === 'eventRegistrations' && renderTable('Public Event Registrations', 'eventRegistrations', [
-                { label: 'Event', key: 'eventTitle', format: (val) => <span className="fw-bold text-dark">{val}</span> },
-                { label: 'Registrant', key: 'fullName', format: (val, item) => <div><span className="fw-semibold text-dark d-block">{val}</span><span className="small text-muted">{item.organization || 'Individual'}</span></div> },
-                { label: 'Contact', key: 'email', format: (val, item) => <div className="small"><a href={`mailto:${val}`} className="d-block text-primary text-decoration-none">{val}</a>{item.phone && <a href={`tel:${item.phone}`} className="text-muted text-decoration-none">{item.phone}</a>}</div> },
-                { label: 'Accessibility Needs', key: 'accessibilityNeeds', format: (val) => <span className="small text-dark">{val || 'None specified'}</span> },
-                { label: 'Received', key: 'createdAt', format: (val) => <span className="small text-muted">{val ? new Date(val).toLocaleDateString('en-GB') : '—'}</span> },
-              ], ['Pending', 'Confirmed', 'Declined', 'Cancelled'])}
-
-              {activeTab === 'sponsorEnquiries' && renderTable('Public Partnership Enquiries', 'sponsorEnquiries', [
-                { label: 'Organization', key: 'organization', format: (val) => <span className="fw-bold text-dark">{val}</span> },
-                { label: 'Contact Person', key: 'contactName' },
-                { label: 'Contact', key: 'email', format: (val, item) => <div className="small"><a href={`mailto:${val}`} className="d-block text-primary text-decoration-none">{val}</a>{item.phone && <a href={`tel:${item.phone}`} className="text-muted text-decoration-none">{item.phone}</a>}</div> },
-                { label: 'Support Type', key: 'supportType' },
-                { label: 'Message', key: 'message', format: (val) => <span className="small text-dark d-block text-truncate" style={{ maxWidth: '260px' }} title={val}>{val || '—'}</span> },
-                { label: 'Received', key: 'createdAt', format: (val) => <span className="small text-muted">{val ? new Date(val).toLocaleDateString('en-GB') : '—'}</span> },
-              ], ['New', 'Contacted', 'In Progress', 'Accepted', 'Declined', 'Closed'])}
 
               {activeTab === 'programmes' && (
                 <>
