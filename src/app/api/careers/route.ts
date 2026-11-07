@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
       whereClause.status = status;
     }
     if (status === 'Open') {
-      whereClause.AND = [{ OR: [{ deadline: null }, { deadline: { gte: new Date().toISOString().slice(0, 10) } }] }];
+      whereClause.AND = [{ OR: [{ deadline: null }, { deadline: { gte: getRwandaDateString() } }] }];
     }
     if (slug) {
       whereClause.slug = slug;
