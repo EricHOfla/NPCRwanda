@@ -20,7 +20,6 @@ import {
   Sport,
   Leader,
   VolunteerApplication,
-  DonationInquiry,
   Partner,
   SocialLink,
   Event,
@@ -513,7 +512,6 @@ export default function DashboardPage() {
     sports,
     leadership,
     volunteers,
-    donations,
     jobApplications,
     markJobApplicationRead,
     updateJobApplicationStatus,
@@ -547,8 +545,6 @@ export default function DashboardPage() {
     deleteLeader,
     markVolunteerAsRead,
     deleteVolunteerApplication,
-    markDonationAsRead,
-    deleteDonationInquiry,
     addPartner,
     updatePartner,
     deletePartner,
@@ -771,10 +767,9 @@ export default function DashboardPage() {
   // Inbox Modal Detail states
   const [activeMessage, setActiveMessage] = useState<ContactMessage | null>(null);
   const [activeVolunteer, setActiveVolunteer] = useState<VolunteerApplication | null>(null);
-  const [activeDonation, setActiveDonation] = useState<DonationInquiry | null>(null);
   const [activeJobApplication, setActiveJobApplication] = useState<JobApplication | null>(null);
   const [jobAppSearch, setJobAppSearch] = useState('');
-  const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'donations' | 'applications'>('messages');
+  const [inboxSubTab, setInboxSubTab] = useState<'messages' | 'volunteers' | 'applications'>('messages');
 
   const [inboxFeedback, setInboxFeedback] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
 
@@ -820,16 +815,15 @@ export default function DashboardPage() {
   };
 
   const [cleaningSpam, setCleaningSpam] = useState(false);
-  const handleCleanSpam = async (target: 'messages' | 'volunteers' | 'donations' | 'applications') => {
+  const handleCleanSpam = async (target: 'messages' | 'volunteers' | 'applications') => {
     const targetMap: Record<string, string> = {
       messages: 'contacts',
       volunteers: 'volunteers',
-      donations: 'donations',
       applications: 'applications',
     };
     const apiTarget = targetMap[target];
     if (!apiTarget || apiTarget === 'applications') {
-      alert('Spam cleanup is available for Messages, Volunteers, and Donations.');
+      alert('Spam cleanup is available for Messages and Volunteers.');
       return;
     }
 
@@ -870,7 +864,7 @@ export default function DashboardPage() {
     const params = new URLSearchParams(window.location.search);
     const urlTab = params.get('tab') as AdminTab | null;
     const urlPage = params.get('page');
-    const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
+    const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'applications' | null;
 
     // The URL is the single source of truth. Old localStorage values must not
     // reopen a previously edited page when the user refreshes Admin Overview.
@@ -890,7 +884,7 @@ export default function DashboardPage() {
       }
     }
 
-    if (targetSubTab && ['messages', 'volunteers', 'donations', 'applications'].includes(targetSubTab)) {
+    if (targetSubTab && ['messages', 'volunteers', 'applications'].includes(targetSubTab)) {
       setInboxSubTab(targetSubTab);
     }
 
@@ -948,7 +942,7 @@ export default function DashboardPage() {
       const params = new URLSearchParams(window.location.search);
       const urlTab = (params.get('tab') as AdminTab | null) || 'overview';
       const urlPage = params.get('page');
-      const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
+      const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'applications' | null;
 
       const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners', 'npc-background', 'contact'];
       if (PAGE_IDS.includes(urlTab)) {
@@ -958,7 +952,7 @@ export default function DashboardPage() {
         setAdminTab(urlTab);
         setActiveEditPage(urlTab === 'pages' ? urlPage : null);
       }
-      if (urlSubTab && ['messages', 'volunteers', 'donations', 'applications'].includes(urlSubTab)) {
+      if (urlSubTab && ['messages', 'volunteers', 'applications'].includes(urlSubTab)) {
         setInboxSubTab(urlSubTab);
       }
     };
@@ -976,7 +970,6 @@ export default function DashboardPage() {
     leaders: 10,
     partners: 10,
     media: 10,
-    donations: 10,
     volunteers: 10,
     applications: 10,
     announcements: 10,
@@ -999,7 +992,6 @@ export default function DashboardPage() {
     leaders: 1,
     partners: 1,
     media: 1,
-    donations: 1,
     volunteers: 1,
     applications: 1,
     announcements: 1,
@@ -1057,14 +1049,12 @@ export default function DashboardPage() {
   const canAccessSettings = hasPermission(userRole, 'system-settings.view');
   const canAccessUsers = hasPermission(userRole, 'users.view');
   const canAccessMembers = hasPermission(userRole, 'members.view');
-  const canAccessDonations = hasPermission(userRole, 'donations.view');
   const canAccessCommunity = hasPermission(userRole, 'community.view');
   const canCreateContent = hasPermission(userRole, 'content.create');
   const canUpdateContent = hasPermission(userRole, 'content.update');
   const canDeleteContent = hasPermission(userRole, 'content.delete');
   const canManageInbox = hasPermission(userRole, 'inbox.manage');
   const canDeleteInbox = hasPermission(userRole, 'inbox.delete');
-  const canManageDonations = hasPermission(userRole, 'donations.manage');
   const canManageMembers = hasPermission(userRole, 'members.manage');
   const canDeleteMembers = hasPermission(userRole, 'members.delete');
   const canDeleteUsers = hasPermission(userRole, 'users.delete');
@@ -2065,9 +2055,8 @@ export default function DashboardPage() {
               {!isEditor && (() => {
                 const unreadMessages = contacts.filter(c => !c.read).length;
                 const unreadVolunteers = volunteers.filter(v => !v.read).length;
-                const unreadDonations = donations.filter(d => !d.read).length;
                 const unreadJobApps = jobApplications.filter(a => !a.read).length;
-                const totalPending = unreadMessages + unreadVolunteers + unreadDonations + unreadJobApps;
+                const totalPending = unreadMessages + unreadVolunteers + unreadJobApps;
 
                 if (totalPending === 0) return null;
 
@@ -2128,16 +2117,6 @@ export default function DashboardPage() {
                           <i className="fas fa-hands-helping text-success me-1" /> {unreadVolunteers} Volunteer{unreadVolunteers > 1 ? 's' : ''}
                         </button>
                       )}
-                      {unreadDonations > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => { setAdminTab('contacts'); setInboxSubTab('donations'); }}
-                          className="btn btn-xs"
-                          style={{ background: '#FFFFFF', border: '1px solid #FCD34D', color: '#92400E', fontWeight: 700, borderRadius: '8px', fontSize: '0.75rem', padding: '5px 12px' }}
-                        >
-                          <i className="fas fa-hand-holding-usd text-warning me-1" /> {unreadDonations} Donation{unreadDonations > 1 ? 's' : ''}
-                        </button>
-                      )}
                       {unreadJobApps > 0 && (
                         <button
                           type="button"
@@ -2173,7 +2152,7 @@ export default function DashboardPage() {
                     }
                     if (action.tab === 'contacts') {
                       setAdminTab('contacts');
-                      if (action.subtab && ['messages', 'volunteers', 'donations', 'applications'].includes(action.subtab)) {
+                      if (action.subtab && ['messages', 'volunteers', 'applications'].includes(action.subtab)) {
                         setInboxSubTab(action.subtab as any);
                       }
                       return;
@@ -2336,14 +2315,14 @@ export default function DashboardPage() {
                         </div>
                       </>
                     ) : (
-                      /* ── ADMIN / SUPER ADMIN: Inbox Panel with Messages, Volunteers, Donations & Job Applications ── */
+                      /* ── ADMIN / SUPER ADMIN: Inbox Panel with Messages, Volunteers & Job Applications ── */
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                           <div>
                             <div className="d-flex align-items-center gap-2">
                               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Inbox Activity</h3>
                               {(() => {
-                                const unreadTotal = contacts.filter(c => !c.read).length + volunteers.filter(v => !v.read).length + donations.filter(d => !d.read).length + jobApplications.filter(a => !a.read).length;
+                                const unreadTotal = contacts.filter(c => !c.read).length + volunteers.filter(v => !v.read).length + jobApplications.filter(a => !a.read).length;
                                 return unreadTotal > 0 ? (
                                   <span className="badge bg-danger rounded-pill" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
                                     {unreadTotal} Unread
@@ -2355,7 +2334,7 @@ export default function DashboardPage() {
                                 );
                               })()}
                             </div>
-                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Messages, volunteer registrations, donations & job applications</p>
+                            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0' }}>Messages, volunteer registrations & job applications</p>
                           </div>
                           <button
                             onClick={() => setAdminTab('contacts')}
@@ -2367,15 +2346,12 @@ export default function DashboardPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           {(() => {
-                            const items: { type: 'message' | 'volunteer' | 'donation' | 'application'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
+                            const items: { type: 'message' | 'volunteer' | 'application'; raw: any; date: string; sender: string; title: string; subtitle: string }[] = [];
                             contacts.filter(c => !c.read).slice(0, 3).forEach(c => {
                               items.push({ type: 'message', raw: c, date: c.date, sender: c.name, title: `Message: ${c.subject}`, subtitle: c.message });
                             });
                             volunteers.filter(v => !v.read).slice(0, 3).forEach(v => {
                               items.push({ type: 'volunteer', raw: v, date: 'New Application', sender: v.name, title: `Volunteer Registration`, subtitle: `Interested in ${v.interest}` });
-                            });
-                            donations.filter(d => !d.read).slice(0, 3).forEach(d => {
-                              items.push({ type: 'donation', raw: d, date: 'New Donation', sender: d.name, title: `Donation: ${d.supportType}`, subtitle: `Category: ${d.category}` });
                             });
                             jobApplications.filter(a => !a.read).slice(0, 3).forEach(a => {
                               items.push({
@@ -2402,7 +2378,6 @@ export default function DashboardPage() {
                               let badgeColor = '#0369A1';
                               let icon = 'fa-envelope';
                               if (item.type === 'volunteer') { badgeBg = '#D1FAE5'; badgeColor = '#065F46'; icon = 'fa-hands-helping'; }
-                              else if (item.type === 'donation') { badgeBg = '#FEF3C7'; badgeColor = '#92400E'; icon = 'fa-hand-holding-usd'; }
                               else if (item.type === 'application') { badgeBg = '#EDE9FE'; badgeColor = '#6D28D9'; icon = 'fa-briefcase'; }
                               return (
                                 <div
@@ -2411,7 +2386,6 @@ export default function DashboardPage() {
                                     setAdminTab('contacts');
                                     if (item.type === 'message') { setInboxSubTab('messages'); setActiveMessage(item.raw); markContactAsRead(item.raw.id); }
                                     else if (item.type === 'volunteer') { setInboxSubTab('volunteers'); setActiveVolunteer(item.raw); markVolunteerAsRead(item.raw.id); }
-                                    else if (item.type === 'donation') { setInboxSubTab('donations'); setActiveDonation(item.raw); markDonationAsRead(item.raw.id); }
                                     else if (item.type === 'application') { setInboxSubTab('applications'); setActiveJobApplication(item.raw); markJobApplicationRead(item.raw.id, true); }
                                   }}
                                   style={{ display: 'flex', gap: '16px', padding: '14px', border: '1px solid #E8ECF0', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s ease', background: '#FFFFFF' }}
@@ -5283,7 +5257,6 @@ uploadMediaFile={uploadMediaFile}
                     { id: 'messages', label: `Messages Inbox (${contacts.filter(c => !c.read).length})` },
                     { id: 'applications', label: `Job Applications (${jobApplications.filter(a => !a.read).length})` },
                     { id: 'volunteers', label: `Volunteers (${volunteers.filter(v => !v.read).length})` },
-                    { id: 'donations', label: `Donation Inquiries (${donations.filter(d => !d.read).length})` },
                   ].map(sub => (
                     <button
                       key={sub.id}
@@ -5455,24 +5428,6 @@ uploadMediaFile={uploadMediaFile}
                 </div>
               )}
 
-              {activeDonation && (
-                <div className="custom-card p-4 mb-4" style={{ background: '#FFFDF5', border: '1px solid #FFE082' }}>
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <h4 className="h5 fw-bold mb-0">Donation Inquiry: {activeDonation.name} &lt;{activeDonation.email}&gt;</h4>
-                    <button onClick={() => setActiveDonation(null)} className="btn btn-close btn-sm"></button>
-                  </div>
-                  <p className="small"><strong>Category:</strong> {activeDonation.category}</p>
-                  <p className="small"><strong>Support Type:</strong> {activeDonation.supportType}</p>
-                  <p className="small text-dark p-3 rounded bg-white" style={{ border: '1px solid #F1F5F9' }}>{activeDonation.details}</p>
-                  <div className="d-flex gap-2 mt-3">
-                    {!activeDonation.read && (
-                      <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm" hidden={!canManageDonations}>Mark Read</button>
-                    )}
-                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry, 'Donation inquiry')) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm" hidden={!canManageDonations}>{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
-                  </div>
-                </div>
-              )}
-
               {/* Tab views */}
               {inboxSubTab === 'messages' && (
                 <div className="custom-card">
@@ -5555,49 +5510,6 @@ uploadMediaFile={uploadMediaFile}
                       currentPage={currentPage.volunteers} 
                       totalPages={totalPages(volunteers.length, pageSizes.volunteers)}
                       onPageChange={(page) => setCurrentPage({ ...currentPage, volunteers: page })}
-                    />
-                  )}
-                </div>
-              )}
-
-              {inboxSubTab === 'donations' && (
-                <div className="custom-card">
-                  <div className="table-responsive">
-                    <table className="table table-hover mb-0 align-middle">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Category</th>
-                          <th>Support Type</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {donations.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No donation inquiries have been received yet.</td></tr> : paginate(donations, currentPage.donations, pageSizes.donations).map(d => (
-                          <tr key={d.id}>
-                            <td className="fw-semibold small">{d.name}</td>
-                            <td className="small">{d.category}</td>
-                            <td className="small text-muted">{d.supportType}</td>
-                            <td>
-                              <span className={`badge ${d.read ? 'bg-light text-dark' : 'bg-primary text-white'}`}>{d.read ? 'Read' : 'Unread'}</span>
-                            </td>
-                            <td>
-                              <div className="d-flex gap-2">
-                                <button onClick={() => setActiveDonation(d)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View donation inquiry"><i className="fas fa-eye" /></button>
-                                <button onClick={async () => { if (confirm(`Delete donation inquiry from ${d.name}?`)) { await runSubmissionDelete(d.id, deleteDonationInquiry, 'Donation inquiry'); } }} disabled={deletingSubmissionIds.includes(d.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete inquiry" hidden={!canManageDonations}><i className="fas fa-trash" /></button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {donations.length > 0 && (
-                    <PaginationComponent 
-                      currentPage={currentPage.donations} 
-                      totalPages={totalPages(donations.length, pageSizes.donations)}
-                      onPageChange={(page) => setCurrentPage({ ...currentPage, donations: page })}
                     />
                   )}
                 </div>
