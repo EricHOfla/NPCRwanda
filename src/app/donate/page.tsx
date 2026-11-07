@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useData } from '@/context/DataContext';
 
 interface PurposeOption {
   value: string;
@@ -49,6 +50,8 @@ const formatMoney = (value: number, currency: 'RWF' | 'USD') =>
   }).format(value);
 
 export default function DonatePage() {
+  const { athletes } = useData();
+
   // Wizard steps: 1: Amount & Cause | 2: Donor Info | 3: Payment
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -262,7 +265,7 @@ export default function DonatePage() {
                 </p>
                 <div className="impact-metrics-grid">
                   <div className="metric-box">
-                    <span className="metric-value">1,200+</span>
+                    <span className="metric-value">{athletes.length}</span>
                     <span className="metric-label">Active Athletes</span>
                   </div>
                   <div className="metric-box">
