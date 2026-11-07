@@ -4,7 +4,6 @@ import { jwtVerify } from 'jose';
 import { hasPermission, type Permission } from '@/lib/rbac';
 import {
   PUBLIC_HOSTNAMES,
-  getAdminAppUrl,
   normalizeHostname,
   isAdminHostname,
 } from '@/lib/site-domain';
