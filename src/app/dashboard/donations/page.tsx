@@ -438,7 +438,7 @@ function DonationManagementContent() {
           {/* Hero Banner */}
           <div
             style={{
-              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+              background: 'linear-gradient(135deg, #64748B 0%, #475569 100%)',
               borderRadius: '16px',
               padding: '24px 28px',
               color: '#FFFFFF',
@@ -448,13 +448,13 @@ function DonationManagementContent() {
           >
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
               <div>
-                <div className="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill bg-white bg-opacity-10 text-white small mb-2" style={{ fontSize: '0.72rem', letterSpacing: '0.5px' }}>
+                <div className="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill small mb-2" style={{ fontSize: '0.72rem', letterSpacing: '0.5px', background: '#F8FAFC', color: '#111827', fontWeight: 700 }}>
                   <i className="fas fa-hand-holding-heart text-warning" /> NPC RWANDA FINANCIAL & SUPPORT DESK
                 </div>
-                <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.3px' }}>
+                <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.3px', color: '#FFFFFF' }}>
                   Donations, Payments & Partnership Desk
                 </h1>
-                <p style={{ fontSize: '0.84rem', color: '#CBD5E1', margin: '4px 0 0 0', maxWidth: '720px' }}>
+                <p style={{ fontSize: '0.84rem', color: '#FFFFFF', margin: '4px 0 0 0', maxWidth: '720px', lineHeight: 1.6 }}>
                   Monitor verified online contributions processed via Flutterwave (MTN MoMo, Airtel Money, Visa/Mastercard) and review incoming donor sponsorship & equipment pledges.
                 </p>
               </div>
