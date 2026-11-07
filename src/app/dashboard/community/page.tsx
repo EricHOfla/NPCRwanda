@@ -395,6 +395,11 @@ function CommunityManagementContent() {
   return (
     <>
       <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+          <div className="d-flex justify-content-end mb-3">
+            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => void load()} disabled={loading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
+              <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
+            </button>
+          </div>
           <div style={{ maxWidth: 1400, width: '100%', margin: '0 auto' }}>
           {!isAuthorized ? (
             <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
