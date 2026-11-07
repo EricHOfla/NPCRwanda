@@ -26,7 +26,8 @@ export async function GET(
     });
 
     if (!career) return NextResponse.json({ error: 'Career not found' }, { status: 404 });
-    if (career.status !== 'Open') {
+    const deadlinePassed = Boolean(career.deadline && career.deadline < new Date().toISOString().slice(0, 10));
+    if (career.status !== 'Open' || deadlinePassed) {
       const auth = await authorizeRequest(request, 'content.view');
       if (!auth.authorized) return NextResponse.json({ error: 'Career not found' }, { status: 404 });
     }
