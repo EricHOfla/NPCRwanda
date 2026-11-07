@@ -7,6 +7,8 @@ import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, us
 import Link from 'next/link';
 import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { PUBLIC_BUNDLE_QUERY_KEY } from '@/context/DataContext';
 
 type Row = Record<string, any> & { id: string };
 type Data = { 
@@ -21,6 +23,7 @@ const empty: Data = {
 
 function CommunityManagementContent() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const userProfile = useDashboardAuth();
 
@@ -148,7 +151,8 @@ function CommunityManagementContent() {
       resetProgrammeForm();
       setEditingProgrammeId(null);
       setShowProgrammeModal(false);
-      setSuccess(editingProgrammeId ? 'Training programme updated successfully.' : 'Training programme created successfully.'); 
+      setSuccess(editingProgrammeId ? 'Training programme updated successfully.' : 'Training programme created successfully.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Save failed'); 
@@ -170,7 +174,8 @@ function CommunityManagementContent() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Update failed');
-      setSuccess('Record updated successfully.'); 
+      setSuccess('Record updated successfully.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Update failed'); 
@@ -193,7 +198,8 @@ function CommunityManagementContent() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Delete failed');
-      setSuccess('Record deleted.'); 
+      setSuccess('Record deleted.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Delete failed'); 
