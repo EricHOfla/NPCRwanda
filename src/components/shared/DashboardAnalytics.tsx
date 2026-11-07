@@ -392,8 +392,11 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
 
-                {/* Analytics Details Grid with Links to All Pages */}
+          {/* Analytics Details Grid with Links to All Pages */}
           <div className="live-analytics-grid">
             {/* Panel 1: Donation Activity */}
             <Panel 
