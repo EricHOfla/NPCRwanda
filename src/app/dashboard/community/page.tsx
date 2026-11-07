@@ -12,6 +12,7 @@ import { PUBLIC_BUNDLE_QUERY_KEY } from '@/context/DataContext';
 
 type Row = Record<string, any> & { id: string };
 type CommunityTab = 'athleteEnquiries' | 'programmes' | 'eventRegistrations' | 'sponsorEnquiries';
+const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes', 'eventRegistrations', 'sponsorEnquiries'];
 type Data = {
   programmes: Row[];
   athleteEnquiries: Row[];
@@ -41,7 +42,6 @@ function CommunityManagementContent() {
 
   // Tab navigation — Default to 'athleteEnquiries' because that is where the live public submissions are!
   const paramTab = searchParams.get('tab') as CommunityTab | null;
-  const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes', 'eventRegistrations', 'sponsorEnquiries'];
   const initialTab: CommunityTab = paramTab && validTabs.includes(paramTab) ? paramTab : 'athleteEnquiries';
   const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
 
