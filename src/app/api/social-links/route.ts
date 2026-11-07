@@ -17,12 +17,13 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const activeStr = searchParams.get('active');
-    if (activeStr === 'all') {
+    const adminScope = searchParams.get('scope') === 'admin';
+    if (activeStr === 'all' || adminScope) {
       const auth = await authorizeRequest(request, 'content.view');
       if (!auth.authorized) return auth.response;
     }
 
-    const whereClause: any = activeStr === 'all' ? {} : { active: true };
+    const whereClause: any = activeStr === 'all' || adminScope ? {} : { active: true };
 
     const links = await prisma.socialLink.findMany({
       where: whereClause,
