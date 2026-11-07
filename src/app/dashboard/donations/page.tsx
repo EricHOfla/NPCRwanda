@@ -3,9 +3,8 @@
 import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
-import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 type Payment = {
   id: string;
@@ -31,18 +30,6 @@ type Payment = {
   checkoutUrl?: string | null;
 };
 
-type Inquiry = {
-  id: string;
-  name: string;
-  email: string;
-  category: string;
-  supportType: string;
-  details: string;
-  read: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
 type Summary = {
   successfulRwfAmount: number;
   successfulUsdAmount: number;
@@ -54,16 +41,11 @@ type Summary = {
 const money = (value: number) => new Intl.NumberFormat('en-RW').format(value);
 
 function DonationManagementContent() {
-  const searchParams = useSearchParams();
-
   const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({
     name: 'Admin',
     email: '',
     role: 'ADMIN',
   });
-
-  const urlTab = (searchParams.get('tab') as 'payments' | 'inquiries') || 'payments';
-  const [activeTab, setActiveTab] = useState<'payments' | 'inquiries'>(urlTab);
 
   // Payments State
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -80,16 +62,8 @@ function DonationManagementContent() {
   const [paymentPage, setPaymentPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
-  // Inquiries State
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [inquiryFilter, setInquiryFilter] = useState<'ALL' | 'UNREAD' | 'READ'>('ALL');
-  const [inquirySearch, setInquirySearch] = useState('');
-  const [inquiryPage, setInquiryPage] = useState(1);
-  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
-
   // Common UI State
   const [loading, setLoading] = useState(true);
-  const [inquiryLoading, setInquiryLoading] = useState(false);
   const [busyAction, setBusyAction] = useState<string>('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -125,21 +99,6 @@ function DonationManagementContent() {
     }
   }, []);
 
-  // Fetch inquiries records
-  const loadInquiries = useCallback(async () => {
-    setInquiryLoading(true);
-    try {
-      const response = await fetch('/api/donations', { cache: 'no-store' });
-      const payload = await response.json().catch(() => []);
-      if (!response.ok) throw new Error(payload.error || 'Unable to load donation inquiries.');
-      setInquiries(Array.isArray(payload) ? payload : []);
-    } catch (err) {
-      console.error('Failed to load inquiries:', err);
-    } finally {
-      setInquiryLoading(false);
-    }
-  }, []);
-
   // Single mount effect: fetch profile and data in parallel — no waterfall
   useEffect(() => {
     const init = async () => {
@@ -158,7 +117,7 @@ function DonationManagementContent() {
 
       if (hasPermission(realRole, 'donations.view') && !dataFetchedRef.current) {
         dataFetchedRef.current = true;
-        await Promise.all([loadPayments(), loadInquiries()]);
+        await loadPayments();
       } else if (!hasPermission(realRole, 'donations.view')) {
         setLoading(false);
       }
@@ -168,78 +127,17 @@ function DonationManagementContent() {
 
   const isAuthorized = hasPermission(userProfile.role, 'donations.view');
 
-  // Debounced search terms — prevents expensive filter re-runs on every keystroke
-  const debouncedPaymentSearch = useDebounce(paymentSearch, 300);
-  const debouncedInquirySearch = useDebounce(inquirySearch, 300);
-
-  // Sync tab with URL
-  useEffect(() => {
-    const tab = searchParams.get('tab') as 'payments' | 'inquiries';
-    if (tab && ['payments', 'inquiries'].includes(tab)) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
-
-  // Reset pagination on tab/filter change
+  // Reset payment pagination when filters change.
   useEffect(() => {
     setPaymentPage(1);
   }, [paymentFilter, currencyFilter, debouncedPaymentSearch]);
 
-  useEffect(() => {
-    setInquiryPage(1);
-  }, [inquiryFilter, debouncedInquirySearch]);
 
   // Copy reference to clipboard
   const copyToClipboard = (text: string) => {
     void navigator.clipboard.writeText(text);
     setCopiedRef(text);
     setTimeout(() => setCopiedRef(''), 2000);
-  };
-
-  // Mark inquiry read / unread
-  const toggleInquiryRead = async (inquiry: Inquiry, newStatus?: boolean) => {
-    const targetStatus = typeof newStatus === 'boolean' ? newStatus : !inquiry.read;
-    setBusyAction(`inquiry-${inquiry.id}`);
-    try {
-      const res = await fetch(`/api/donations/${inquiry.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ read: targetStatus }),
-      });
-      if (!res.ok) throw new Error('Failed to update inquiry status');
-      setInquiries((prev) =>
-        prev.map((item) => (item.id === inquiry.id ? { ...item, read: targetStatus } : item))
-      );
-      if (selectedInquiry?.id === inquiry.id) {
-        setSelectedInquiry({ ...selectedInquiry, read: targetStatus });
-      }
-      setSuccess(`Inquiry marked as ${targetStatus ? 'read' : 'unread'}.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    } finally {
-      setBusyAction('');
-    }
-  };
-
-  // Delete inquiry
-  const deleteInquiry = async (inquiry: Inquiry) => {
-    if (!window.confirm(`Delete donation inquiry from ${inquiry.name}?`)) return;
-    setBusyAction(`delete-${inquiry.id}`);
-    try {
-      const res = await fetch(`/api/donations/${inquiry.id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Failed to delete inquiry');
-      setInquiries((prev) => prev.filter((item) => item.id !== inquiry.id));
-      if (selectedInquiry?.id === inquiry.id) {
-        setSelectedInquiry(null);
-      }
-      setSuccess('Inquiry deleted successfully.');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Action failed');
-    } finally {
-      setBusyAction('');
-    }
   };
 
   // Verify pending payment status
@@ -297,39 +195,9 @@ function DonationManagementContent() {
     return visiblePayments.slice((paymentPage - 1) * pageSize, paymentPage * pageSize);
   }, [visiblePayments, paymentPage, pageSize]);
 
-  // Filtered Inquiries
-  const visibleInquiries = useMemo(() => {
-    return inquiries.filter((item) => {
-      const matchesFilter =
-        inquiryFilter === 'ALL' ||
-        (inquiryFilter === 'UNREAD' && !item.read) ||
-        (inquiryFilter === 'READ' && item.read);
-      const term = debouncedInquirySearch.toLowerCase().trim();
-      const matchesSearch =
-        !term ||
-        item.name.toLowerCase().includes(term) ||
-        item.email.toLowerCase().includes(term) ||
-        item.category.toLowerCase().includes(term) ||
-        item.supportType.toLowerCase().includes(term) ||
-        item.details.toLowerCase().includes(term);
-      return matchesFilter && matchesSearch;
-    });
-  }, [inquiries, inquiryFilter, debouncedInquirySearch]);
-
-  const totalInquiryPages = Math.max(1, Math.ceil(visibleInquiries.length / pageSize));
-  const paginatedInquiries = useMemo(() => {
-    return visibleInquiries.slice((inquiryPage - 1) * pageSize, inquiryPage * pageSize);
-  }, [visibleInquiries, inquiryPage, pageSize]);
-
-  // Unread Inquiries Count
-  const unreadInquiriesCount = useMemo(() => {
-    return inquiries.filter((i) => !i.read).length;
-  }, [inquiries]);
-
   // Export CSV Handler
   function exportCsv() {
-    if (activeTab === 'payments') {
-      const columns = [
+    const columns = [
         'Date',
         'Reference',
         'Donor',
@@ -368,27 +236,6 @@ function DonationManagementContent() {
       anchor.download = `npc-rwanda-payments-${new Date().toISOString().split('T')[0]}.csv`;
       anchor.click();
       URL.revokeObjectURL(url);
-    } else {
-      const columns = ['Date', 'Name', 'Email', 'Category', 'Support Type', 'Details', 'Read Status'];
-      const rows = visibleInquiries.map((item) => [
-        new Date(item.createdAt).toISOString(),
-        item.name,
-        item.email,
-        item.category,
-        item.supportType,
-        item.details,
-        item.read ? 'Read' : 'Unread',
-      ]);
-      const csv = [columns, ...rows]
-        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-        .join('\n');
-      const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `npc-rwanda-donation-inquiries-${new Date().toISOString().split('T')[0]}.csv`;
-      anchor.click();
-      URL.revokeObjectURL(url);
-    }
   }
 
   return (
@@ -407,11 +254,11 @@ function DonationManagementContent() {
           @media (max-width: 767.98px) { .donations-admin-shell { padding: 16px !important; } }
         `}</style>
           <div className="d-flex flex-wrap justify-content-end gap-2 mb-3">
-            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); void loadInquiries(); }} disabled={loading || inquiryLoading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
-              <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
+            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); }} disabled={loading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
+              <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
             </button>
             <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold" onClick={exportCsv} style={{ borderRadius: '8px', padding: '6px 16px', background: '#0F172A', border: 'none', fontSize: '0.82rem' }}>
-              <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
+              <i className="fas fa-file-csv" /> Export Payments ({visiblePayments.length})
             </button>
           </div>
           <div style={{ maxWidth: 1600, width: '100%', margin: '0 auto' }}>
@@ -455,7 +302,7 @@ function DonationManagementContent() {
                   Donations, Payments & Partnership Desk
                 </h1>
                 <p style={{ fontSize: '0.84rem', color: '#FFFFFF', margin: '4px 0 0 0', maxWidth: '720px', lineHeight: 1.6 }}>
-                  Monitor verified online contributions processed via Flutterwave (MTN MoMo, Airtel Money, Visa/Mastercard) and review incoming donor sponsorship & equipment pledges.
+                  Monitor verified online contributions processed via Flutterwave (MTN MoMo, Airtel Money, Visa/Mastercard).
                 </p>
               </div>
 
@@ -488,7 +335,6 @@ function DonationManagementContent() {
                   transition: 'transform 0.15s, border-color 0.15s',
                 }}
                 onClick={() => {
-                  setActiveTab('payments');
                   setPaymentFilter('SUCCESSFUL');
                 }}
               >
@@ -547,7 +393,6 @@ function DonationManagementContent() {
                   cursor: 'pointer',
                 }}
                 onClick={() => {
-                  setActiveTab('payments');
                   setPaymentFilter('PENDING');
                 }}
               >
@@ -567,74 +412,11 @@ function DonationManagementContent() {
                 </div>
               </div>
             </div>
-
-            <div className="col-12 col-sm-6 col-xl-3">
-              <div
-                style={{
-                  background: '#FFFFFF',
-                  borderRadius: '14px',
-                  border: '1px solid #E2E8F0',
-                  padding: '18px 22px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
-                  cursor: 'pointer',
-                }}
-                onClick={() => {
-                  setActiveTab('inquiries');
-                  setInquiryFilter('UNREAD');
-                }}
-              >
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Support Inquiries
-                  </span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: unreadInquiriesCount > 0 ? '#FEF2F2' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className={`fas ${unreadInquiriesCount > 0 ? 'fa-envelope-open-text text-danger' : 'fa-inbox text-secondary'}`} style={{ fontSize: '1rem' }} />
-                  </div>
-                </div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
-                  {inquiries.length}
-                </div>
-                <div style={{ fontSize: '0.74rem', color: unreadInquiriesCount > 0 ? '#DC2626' : '#64748B', marginTop: '6px', fontWeight: 600 }}>
-                  {unreadInquiriesCount > 0 ? (
-                    <><i className="fas fa-circle-exclamation me-1" /> {unreadInquiriesCount} unread / awaiting follow-up</>
-                  ) : (
-                    <><i className="fas fa-check me-1 text-success" /> All inquiries addressed</>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Master Tabs Switcher */}
-          <div className="d-flex align-items-center gap-2 mb-3 border-bottom pb-2">
-            <button
-              type="button"
-              className={`btn btn-sm d-inline-flex align-items-center gap-2 fw-bold px-3 py-2 ${activeTab === 'payments' ? 'btn-primary' : 'btn-light border text-secondary'}`}
-              onClick={() => setActiveTab('payments')}
-              style={{ borderRadius: '10px', fontSize: '0.86rem' }}
-            >
-              <i className="fas fa-credit-card" /> Online Payments ({payments.length})
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm d-inline-flex align-items-center gap-2 fw-bold px-3 py-2 position-relative ${activeTab === 'inquiries' ? 'btn-primary' : 'btn-light border text-secondary'}`}
-              onClick={() => setActiveTab('inquiries')}
-              style={{ borderRadius: '10px', fontSize: '0.86rem' }}
-            >
-              <i className="fas fa-envelope" /> Support & Pledges ({inquiries.length})
-              {unreadInquiriesCount > 0 && (
-                <span className="badge rounded-pill bg-danger ms-1" style={{ fontSize: '0.68rem' }}>
-                  {unreadInquiriesCount} new
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════
-              TAB 1: ONLINE PAYMENTS & GATEWAY TRANSACTIONS
+          {/* Online Payment Transactions */}
              ══════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'payments' && (
-            <section style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+          <section style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
               {/* Header with Search and Filters */}
               <div style={{ padding: '18px 24px', borderBottom: '1px solid #F1F5F9', background: '#FAFAFA' }} className="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div className="d-flex align-items-center gap-2">
@@ -920,280 +702,8 @@ function DonationManagementContent() {
                   Flutterwave v3 Integrated
                 </span>
               </div>
-            </section>
-          )}
+          </section>
 
-          {/* ══════════════════════════════════════════════════════════════════
-              TAB 2: DONATION INQUIRIES & PLEDGES
-             ══════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'inquiries' && (
-            <section style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
-              {/* Header with Search and Filter */}
-              <div style={{ padding: '18px 24px', borderBottom: '1px solid #F1F5F9', background: '#FAFAFA' }} className="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <div className="d-flex align-items-center gap-2">
-                  <h2 style={{ fontWeight: 700, fontSize: '1rem', color: '#0F172A', margin: 0 }}>
-                    Support Inquiries & Pledges
-                  </h2>
-                  <span className="badge rounded-pill bg-light text-secondary border px-2 py-1" style={{ fontSize: '0.74rem' }}>
-                    {visibleInquiries.length} records
-                  </span>
-                  {unreadInquiriesCount > 0 && (
-                    <span className="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style={{ fontSize: '0.74rem' }}>
-                      {unreadInquiriesCount} unread
-                    </span>
-                  )}
-                </div>
-
-                <div className="d-flex align-items-center gap-2 flex-wrap">
-                  {/* Search box */}
-                  <div className="input-group input-group-sm" style={{ width: '250px' }}>
-                    <span className="input-group-text bg-white border-end-0 text-muted">
-                      <i className="fas fa-search" style={{ fontSize: '0.75rem' }} />
-                    </span>
-                    <input
-                      type="text"
-                      className="form-control border-start-0"
-                      placeholder="Search donor, category, details..."
-                      value={inquirySearch}
-                      onChange={(e) => setInquirySearch(e.target.value)}
-                      style={{ fontSize: '0.82rem' }}
-                    />
-                    {inquirySearch && (
-                      <button className="btn btn-outline-secondary border-start-0 bg-white" onClick={() => setInquirySearch('')}>
-                        <i className="fas fa-times" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Filter Tabs */}
-                  <div className="btn-group btn-group-sm" role="group">
-                    {(['ALL', 'UNREAD', 'READ'] as const).map((filter) => (
-                      <button
-                        key={filter}
-                        type="button"
-                        className={`btn fw-semibold ${inquiryFilter === filter ? 'btn-primary' : 'btn-light text-secondary border'}`}
-                        onClick={() => setInquiryFilter(filter)}
-                        style={{ fontSize: '0.76rem' }}
-                      >
-                        {filter === 'ALL' ? 'All' : filter === 'UNREAD' ? 'Unread' : 'Read'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Inquiries Content */}
-              {inquiryLoading ? (
-                <div className="text-center py-5 text-muted">
-                  <i className="fas fa-circle-notch fa-spin fa-2x mb-3 text-primary d-block" />
-                  <span className="small fw-semibold">Loading donation inquiries...</span>
-                </div>
-              ) : visibleInquiries.length === 0 ? (
-                <div className="text-center py-5 text-muted">
-                  <i className="fas fa-envelope-open fa-3x mb-3 text-secondary opacity-50 d-block" />
-                  <p className="fw-semibold mb-1" style={{ color: '#475569' }}>No support inquiries found</p>
-                  <p className="small mb-0 text-muted">
-                    {inquiries.length === 0 ? 'No partnership or donation inquiries have been received yet.' : 'Try adjusting your search criteria.'}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="table-responsive">
-                    <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.86rem' }}>
-                      <thead style={{ background: '#F8FAFC', color: '#475569', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        <tr>
-                          <th style={{ padding: '14px 22px' }}>Date</th>
-                          <th>Contributor</th>
-                          <th>Category</th>
-                          <th>Support Type</th>
-                          <th style={{ minWidth: '220px' }}>Inquiry Details</th>
-                          <th>Status</th>
-                          <th className="text-end" style={{ paddingRight: '22px' }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedInquiries.map((item) => (
-                          <tr
-                            key={item.id}
-                            style={{
-                              borderBottom: '1px solid #F1F5F9',
-                              background: !item.read ? 'rgba(254, 243, 199, 0.25)' : 'transparent',
-                            }}
-                          >
-                            <td style={{ padding: '14px 22px' }}>
-                              <span className="d-block fw-semibold text-dark" style={{ fontSize: '0.82rem' }}>
-                                {new Date(item.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                              </span>
-                              <span className="text-muted d-block" style={{ fontSize: '0.72rem' }}>
-                                {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </td>
-
-                            <td>
-                              <div className="d-flex align-items-center gap-2">
-                                <div
-                                  style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '50%',
-                                    background: '#FEF3C7',
-                                    color: '#B45309',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 700,
-                                    fontSize: '0.78rem',
-                                    flexShrink: 0,
-                                  }}
-                                >
-                                  {item.name ? item.name.charAt(0).toUpperCase() : 'C'}
-                                </div>
-                                <div>
-                                  <span className="fw-bold text-dark d-block" style={{ fontSize: '0.86rem' }}>
-                                    {item.name}
-                                  </span>
-                                  <a
-                                    href={`mailto:${item.email}`}
-                                    className="text-decoration-none text-muted small d-block"
-                                    style={{ fontSize: '0.75rem' }}
-                                  >
-                                    <i className="fas fa-envelope me-1 text-primary opacity-75" />
-                                    {item.email}
-                                  </a>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td>
-                              <span className="badge bg-light text-dark border px-2 py-1" style={{ fontSize: '0.72rem' }}>
-                                {item.category}
-                              </span>
-                            </td>
-
-                            <td>
-                              <span className="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-1" style={{ fontSize: '0.74rem', fontWeight: 600 }}>
-                                {item.supportType}
-                              </span>
-                            </td>
-
-                            <td>
-                              <p
-                                className="mb-0 text-muted"
-                                style={{
-                                  fontSize: '0.8rem',
-                                  maxWidth: '340px',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                                title={item.details}
-                              >
-                                {item.details}
-                              </p>
-                            </td>
-
-                            <td>
-                              <span
-                                className={`badge px-2 py-1 rounded-pill ${item.read ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'}`}
-                                style={{ fontSize: '0.72rem', fontWeight: 600 }}
-                              >
-                                <i className={`fas ${item.read ? 'fa-check' : 'fa-bell'} me-1`} />
-                                {item.read ? 'Read' : 'New Inquiry'}
-                              </span>
-                            </td>
-
-                            <td className="text-end" style={{ paddingRight: '22px' }}>
-                              <div className="d-inline-flex align-items-center gap-1">
-                                <button
-                                  type="button"
-                                  className="btn btn-sm btn-outline-primary p-1 px-2"
-                                  onClick={() => setSelectedInquiry(item)}
-                                  title="View message & reply"
-                                  style={{ fontSize: '0.78rem' }}
-                                >
-                                  <i className="fas fa-eye me-1" /> View
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-sm btn-light border p-1 px-2 text-secondary"
-                                  onClick={() => void toggleInquiryRead(item)}
-                                  disabled={busyAction === `inquiry-${item.id}`}
-                                  title={item.read ? 'Mark as Unread' : 'Mark as Read'}
-                                  style={{ fontSize: '0.78rem' }}
-                                >
-                                  <i className={`fas ${item.read ? 'fa-envelope' : 'fa-envelope-open'}`} />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-sm btn-outline-danger p-1 px-2"
-                                  onClick={() => void deleteInquiry(item)}
-                                  disabled={busyAction === `delete-${item.id}`}
-                                  title="Delete inquiry"
-                                  style={{ fontSize: '0.78rem' }}
-                                >
-                                  <i className="fas fa-trash" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination Controls */}
-                  {totalInquiryPages > 1 && (
-                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3 border-top bg-white">
-                      <span className="small text-muted" style={{ fontSize: '0.82rem' }}>
-                        Showing <strong>{(inquiryPage - 1) * pageSize + 1}</strong> to{' '}
-                        <strong>{Math.min(inquiryPage * pageSize, visibleInquiries.length)}</strong> of{' '}
-                        <strong>{visibleInquiries.length}</strong> inquiries
-                      </span>
-                      <nav>
-                        <ul className="pagination pagination-sm mb-0 gap-1">
-                          <li className={`page-item ${inquiryPage <= 1 ? 'disabled' : ''}`}>
-                            <button
-                              className="page-link"
-                              onClick={() => setInquiryPage((prev) => Math.max(1, prev - 1))}
-                              disabled={inquiryPage <= 1}
-                            >
-                              <i className="fas fa-chevron-left" />
-                            </button>
-                          </li>
-                          {Array.from({ length: totalInquiryPages }, (_, i) => i + 1).map((p) => (
-                            <li key={p} className={`page-item ${p === inquiryPage ? 'active' : ''}`}>
-                              <button className="page-link" onClick={() => setInquiryPage(p)}>
-                                {p}
-                              </button>
-                            </li>
-                          ))}
-                          <li className={`page-item ${inquiryPage >= totalInquiryPages ? 'disabled' : ''}`}>
-                            <button
-                              className="page-link"
-                              onClick={() => setInquiryPage((prev) => Math.min(totalInquiryPages, prev + 1))}
-                              disabled={inquiryPage >= totalInquiryPages}
-                            >
-                              <i className="fas fa-chevron-right" />
-                            </button>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Table Footer */}
-              <div style={{ padding: '12px 24px', background: '#F8FAFC', borderTop: '1px solid #F1F5F9' }} className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span className="small text-muted" style={{ fontSize: '0.74rem' }}>
-                  <i className="fas fa-info-circle me-1 text-secondary" /> Contributor inquiries submitted via the public donation inquiry form.
-                </span>
-                <span className="small text-muted font-monospace" style={{ fontSize: '0.74rem' }}>
-                  NPC Rwanda Partner Network
-                </span>
-              </div>
-            </section>
-          )}
             </>
           )}
           </div>
@@ -1351,105 +861,7 @@ function DonationManagementContent() {
         </div>
       )}
 
-      {/* ── Modal: Inquiry Details & Follow-up ── */}
-      {selectedInquiry && (
-        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
-              <div className="modal-header text-white" style={{ background: 'linear-gradient(135deg, #0F172A, #1E293B)' }}>
-                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
-                  <i className="fas fa-hand-holding-heart text-warning" /> Support & Partnership Inquiry
-                </h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedInquiry(null)} aria-label="Close" />
-              </div>
 
-              <div className="modal-body p-4">
-                <div className="row g-3 mb-3">
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Contributor / Contact Name</label>
-                    <span className="h5 fw-bold text-dark d-block mb-0">{selectedInquiry.name}</span>
-                  </div>
-
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Email Address</label>
-                    <a href={`mailto:${selectedInquiry.email}`} className="text-primary fw-semibold">
-                      {selectedInquiry.email}
-                    </a>
-                  </div>
-
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Contributor Category</label>
-                    <span className="badge bg-light text-dark border px-3 py-1 fw-semibold">
-                      {selectedInquiry.category}
-                    </span>
-                  </div>
-
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Proposed Support Type</label>
-                    <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 fw-semibold">
-                      {selectedInquiry.supportType}
-                    </span>
-                  </div>
-
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Received On</label>
-                    <span className="text-dark small">
-                      {new Date(selectedInquiry.createdAt).toLocaleString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
-
-                  <div className="col-sm-6">
-                    <label className="small text-muted fw-bold d-block">Status</label>
-                    <span className={`badge px-3 py-1 rounded-pill ${selectedInquiry.read ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'}`}>
-                      {selectedInquiry.read ? 'Reviewed' : 'Awaiting Review'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mb-3">
-                  <label className="small text-muted fw-bold d-block mb-1">Message / Proposal Details</label>
-                  <div
-                    className="p-3 rounded bg-light border text-dark"
-                    style={{ fontSize: '0.88rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}
-                  >
-                    {selectedInquiry.details}
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer bg-light d-flex justify-content-between align-items-center">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={() => void toggleInquiryRead(selectedInquiry)}
-                >
-                  <i className={`fas ${selectedInquiry.read ? 'fa-envelope' : 'fa-check'} me-1`} />
-                  Mark as {selectedInquiry.read ? 'Unread' : 'Read'}
-                </button>
-
-                <div className="d-flex gap-2">
-                  <a
-                    href={`mailto:${selectedInquiry.email}?subject=NPC Rwanda Support & Partnership - Follow Up&body=Dear ${encodeURIComponent(selectedInquiry.name)},%0D%0A%0D%0AThank you for reaching out to the National Paralympic Committee of Rwanda regarding ${encodeURIComponent(selectedInquiry.supportType)}.`}
-                    className="btn btn-sm btn-primary fw-semibold"
-                    style={{ background: '#0F172A', border: 'none' }}
-                  >
-                    <i className="fas fa-paper-plane me-1" /> Follow Up via Email
-                  </a>
-                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedInquiry(null)}>
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </>
   );
