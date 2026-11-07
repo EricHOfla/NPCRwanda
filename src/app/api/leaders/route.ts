@@ -6,9 +6,6 @@ export const dynamic = 'force-dynamic';
 // GET: Fetch leadership list
 export async function GET() {
   try {
-    const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
-    await ensureAutoMigrated();
-
     const leadership = await prisma.leader.findMany({
       orderBy: [{ order: 'asc' }, { name: 'asc' }],
     }).catch(() =>
