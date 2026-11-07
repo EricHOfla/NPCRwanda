@@ -29,7 +29,7 @@ function getRequiredApiPermission(pathname: string, method: string): Permission 
   }
   const publicDonationRoutes = ['/api/donations/checkout', '/api/donations/verify', '/api/donations/webhook', '/api/donations/exchange-rate'];
   if (publicDonationRoutes.includes(pathname)) return null;
-  if (is('/api/donations/payments') || pathname === '/api/donations' && method === 'GET' || /^\\/api\\/donations\\/[^/]+$/.test(pathname)) {
+  if (is('/api/donations/payments') || (pathname === '/api/donations' && method === 'GET') || /^\/api\/donations\/[^/]+$/.test(pathname)) {
     if (method === 'GET') return 'donations.view';
     if (isWrite) return 'donations.manage';
   }
