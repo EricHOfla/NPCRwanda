@@ -2480,8 +2480,33 @@ body.accessibility-center-text {
 /* ==========================================================================
    NPC RWANDA PROFESSIONAL ADMIN DASHBOARD DESIGN SYSTEM OVERRIDES
    ========================================================================== */
-.admin-dashboard-root {
+.admin-dashboard-root,
+.dashboard-layout {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    display: flex !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: #F8FAFC !important;
+}
+
+.admin-dashboard-root .dashboard-sidebar,
+.dashboard-layout .dashboard-sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    flex-shrink: 0 !important;
+    z-index: 1060 !important;
+    overflow: hidden !important;
+}
+
+.admin-dashboard-root .dashboard-main-content,
+.dashboard-layout .dashboard-main-content {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 /* Scrollbar tweaks */
@@ -2809,7 +2834,8 @@ body.accessibility-center-text {
    23. ADMIN DASHBOARD MOBILE RESPONSIVENESS
    ────────────────────────────── */
 @media (max-width: 991px) {
-  .admin-dashboard-root {
+  .admin-dashboard-root,
+  .dashboard-layout {
     position: relative;
     overflow-x: hidden !important;
   }

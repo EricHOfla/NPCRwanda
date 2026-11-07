@@ -43,23 +43,6 @@ const PURPOSES: PurposeOption[] = [
   },
 ];
 
-const PRESET_AMOUNTS: Record<'RWF' | 'USD', { amount: number; impact: string }[]> = {
-  RWF: [
-    { amount: 5000, impact: 'Nutrition & hydration for 1 training week' },
-    { amount: 15000, impact: 'Adaptive training apparel for 1 athlete' },
-    { amount: 30000, impact: 'Local tournament transport & meals' },
-    { amount: 50000, impact: 'Specialized physiotherapy & recovery session' },
-    { amount: 100000, impact: 'National squad high-performance support' },
-  ],
-  USD: [
-    { amount: 10, impact: 'Training hydration and daily essentials' },
-    { amount: 25, impact: 'Adaptive sportswear & protective gear' },
-    { amount: 50, impact: 'Tournament entry and travel allowance' },
-    { amount: 100, impact: 'Para-sports wheelchair maintenance & parts' },
-    { amount: 250, impact: 'International championship qualifiers funding' },
-  ],
-};
-
 const formatMoney = (value: number, currency: 'RWF' | 'USD') =>
   new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'en-RW', {
     maximumFractionDigits: 0,
@@ -69,12 +52,10 @@ export default function DonatePage() {
   // Wizard steps: 1: Amount & Cause | 2: Donor Info | 3: Payment
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  // Donation Parameters
+  // Donation Parameters — user enters amount directly
   const [currency, setCurrency] = useState<'RWF' | 'USD'>('RWF');
   const [frequency, setFrequency] = useState<'One-time' | 'Monthly'>('One-time');
-  const [amount, setAmount] = useState<number>(15000);
-  const [isCustomAmount, setIsCustomAmount] = useState<boolean>(false);
-  const [customInput, setCustomInput] = useState<string>('');
+  const [amountInput, setAmountInput] = useState<string>('');
   const [purpose, setPurpose] = useState<string>('General Support');
 
   // Donor Details
@@ -92,14 +73,6 @@ export default function DonatePage() {
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [exchangeRateDate, setExchangeRateDate] = useState('');
   const [exchangeRateError, setExchangeRateError] = useState('');
-
-  // When currency changes, reset default preset amount
-  const handleCurrencyChange = (newCurrency: 'RWF' | 'USD') => {
-    setCurrency(newCurrency);
-    setIsCustomAmount(false);
-    setCustomInput('');
-    setAmount(newCurrency === 'USD' ? 25 : 15000);
-  };
 
   // Fetch exchange rate when USD is selected with Mobile Money
   useEffect(() => {
@@ -130,26 +103,18 @@ export default function DonatePage() {
     };
   }, [currency, paymentMethod]);
 
-  // Current selected amount value
-  const effectiveAmount = isCustomAmount ? Number(customInput) : amount;
-
-  // Find impact description for selected amount
-  const currentPreset = PRESET_AMOUNTS[currency].find((p) => p.amount === effectiveAmount);
-  const currentImpact = currentPreset
-    ? currentPreset.impact
-    : effectiveAmount > 0
-    ? `Directly empowers athletes with disabilities across Rwanda.`
-    : '';
+  // Current entered amount value
+  const effectiveAmount = Number(amountInput);
 
   // Validation handlers for step progression
   const validateStep1 = () => {
     setError('');
     const minAmount = currency === 'USD' ? 1 : 1000;
-    if (!effectiveAmount || !Number.isSafeInteger(effectiveAmount) || effectiveAmount < minAmount) {
+    if (!amountInput || !Number.isSafeInteger(effectiveAmount) || effectiveAmount < minAmount) {
       setError(
         currency === 'USD'
-          ? 'Please enter or select an amount of at least USD 1.'
-          : 'Please enter or select an amount of at least RWF 1,000.'
+          ? 'Please enter a donation amount of at least USD 1.'
+          : 'Please enter a donation amount of at least RWF 1,000.'
       );
       return false;
     }
@@ -331,7 +296,7 @@ export default function DonatePage() {
                       onClick={() => setStep(1)}
                     >
                       <span className="step-num">{step > 1 ? <i className="fas fa-check" /> : '1'}</span>
-                      <span className="step-title">Choose Gift</span>
+                      <span className="step-title">Your Gift</span>
                     </button>
                     <div className={`step-connector ${step > 1 ? 'completed' : ''}`} />
                     <button
@@ -367,7 +332,7 @@ export default function DonatePage() {
                 )}
 
                 {/* ═══════════════════════════════════════════════
-                    STEP 1: AMOUNT & CAUSE
+                    STEP 1: AMOUNT INPUT & CAUSE
                    ═══════════════════════════════════════════════ */}
                 {step === 1 && (
                   <form onSubmit={handleNextToStep2} className="wizard-step-content">
@@ -396,94 +361,55 @@ export default function DonatePage() {
                         <button
                           type="button"
                           className={`currency-btn ${currency === 'RWF' ? 'active' : ''}`}
-                          onClick={() => handleCurrencyChange('RWF')}
+                          onClick={() => setCurrency('RWF')}
                         >
                           🇷🇼 RWF
                         </button>
                         <button
                           type="button"
                           className={`currency-btn ${currency === 'USD' ? 'active' : ''}`}
-                          onClick={() => handleCurrencyChange('USD')}
+                          onClick={() => setCurrency('USD')}
                         >
                           🇺🇸 USD ($)
                         </button>
                       </div>
                     </div>
 
-                    {/* Amount Preset Grid */}
-                    <label className="section-subheading mb-2">Select Donation Amount</label>
-                    <div className="amount-grid mb-3">
-                      {PRESET_AMOUNTS[currency].map((preset) => {
-                        const isSelected = !isCustomAmount && amount === preset.amount;
-                        return (
-                          <button
-                            key={preset.amount}
-                            type="button"
-                            className={`amount-chip ${isSelected ? 'active' : ''}`}
-                            onClick={() => {
-                              setIsCustomAmount(false);
-                              setAmount(preset.amount);
-                              setCustomInput('');
-                            }}
-                          >
-                            <span className="chip-currency">{currency}</span>
-                            <span className="chip-value">{formatMoney(preset.amount, currency)}</span>
-                          </button>
-                        );
-                      })}
-                      <button
-                        type="button"
-                        className={`amount-chip custom-chip ${isCustomAmount ? 'active' : ''}`}
-                        onClick={() => {
-                          setIsCustomAmount(true);
-                          if (!customInput) setCustomInput(String(amount));
-                        }}
-                      >
-                        <span className="chip-currency">Custom</span>
-                        <span className="chip-value">{isCustomAmount && customInput ? formatMoney(Number(customInput), currency) : 'Other'}</span>
-                      </button>
-                    </div>
-
-                    {/* Custom Input Field (Expandable when Custom is active) */}
-                    {isCustomAmount && (
-                      <div className="custom-input-box mb-3">
-                        <label htmlFor="customAmountInput" className="form-label small fw-bold text-muted mb-1">
-                          Enter your custom amount ({currency})
-                        </label>
-                        <div className="input-group">
-                          <span className="input-group-text fw-bold">{currency}</span>
-                          <input
-                            id="customAmountInput"
-                            type="number"
-                            min={currency === 'USD' ? 1 : 1000}
-                            step="1"
-                            inputMode="numeric"
-                            autoFocus
-                            className="form-control form-control-lg fw-bold"
-                            placeholder={currency === 'USD' ? 'e.g. 75' : 'e.g. 75,000'}
-                            value={customInput}
-                            onChange={(e) => setCustomInput(e.target.value)}
-                          />
-                        </div>
-                        <small className="text-muted mt-1 d-block">
+                    {/* Direct Amount Input Card */}
+                    <div className="amount-input-card mb-4">
+                      <label htmlFor="donationAmountInput" className="amount-input-label">
+                        Enter Contribution Amount ({currency})
+                      </label>
+                      <div className="amount-input-wrapper">
+                        <span className="currency-badge">{currency}</span>
+                        <input
+                          id="donationAmountInput"
+                          type="number"
+                          min={currency === 'USD' ? 1 : 1000}
+                          step="1"
+                          inputMode="numeric"
+                          autoFocus
+                          className="form-control amount-large-input"
+                          placeholder={currency === 'USD' ? 'e.g. 50' : 'e.g. 20,000'}
+                          value={amountInput}
+                          onChange={(e) => setAmountInput(e.target.value)}
+                        />
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center mt-2 px-1">
+                        <small className="text-muted">
                           Minimum: {currency === 'USD' ? 'USD 1' : 'RWF 1,000'}
                         </small>
+                        {Number.isFinite(effectiveAmount) && effectiveAmount > 0 && (
+                          <span className="amount-preview-pill">
+                            {currency} {formatMoney(effectiveAmount, currency)} {frequency === 'Monthly' ? '/ mo' : ''}
+                          </span>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Live Impact Note */}
-                    {currentImpact && (
-                      <div className="impact-callout mb-4">
-                        <i className="fas fa-heart text-danger me-2" />
-                        <span>
-                          <strong>Your impact:</strong> {currentImpact}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Compact Purpose Grid */}
+                    {/* Purpose / Cause Selector */}
                     <div className="mt-4">
-                      <label className="section-subheading mb-2">Designate Your Gift</label>
+                      <label className="section-subheading mb-2">Designate Your Contribution</label>
                       <div className="purpose-grid">
                         {PURPOSES.map((item) => {
                           const isSelected = purpose === item.value;
@@ -512,12 +438,6 @@ export default function DonatePage() {
 
                     {/* Step 1 Footer Action */}
                     <div className="wizard-actions mt-4 pt-3 border-top">
-                      <div className="d-flex align-items-center justify-content-between mb-3">
-                        <span className="text-muted small">Selected Gift:</span>
-                        <span className="h5 fw-bold text-primary mb-0">
-                          {currency} {formatMoney(effectiveAmount || 0, currency)} {frequency === 'Monthly' ? '/ mo' : ''}
-                        </span>
-                      </div>
                       <button type="submit" className="btn btn-primary btn-lg w-100 wizard-btn">
                         Continue to Your Details <i className="fas fa-arrow-right ms-2" />
                       </button>
@@ -1045,71 +965,70 @@ export default function DonatePage() {
           display: block;
         }
 
-        /* Preset Amount Grid */
-        .amount-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
+        /* Direct Amount Input Card */
+        .amount-input-card {
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 20px;
+          transition: border-color 0.2s ease;
         }
-        @media (max-width: 500px) {
-          .amount-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+        .amount-input-card:focus-within {
+          border-color: #0b5f9f;
+          background: #ffffff;
+          box-shadow: 0 4px 14px rgba(11, 95, 159, 0.06);
         }
-        .amount-chip {
+        .amount-input-label {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #0f172a;
+          display: block;
+          margin-bottom: 12px;
+        }
+        .amount-input-wrapper {
           display: flex;
-          flex-direction: column;
+          align-items: stretch;
+          background: #ffffff;
+          border: 2px solid #cbd5e1;
+          border-radius: 12px;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        }
+        .amount-input-wrapper:focus-within {
+          border-color: #0b5f9f;
+          box-shadow: 0 0 0 3px rgba(11, 95, 159, 0.12);
+        }
+        .currency-badge {
+          background: #edf2f7;
+          color: #1e293b;
+          font-weight: 800;
+          font-size: 1.05rem;
+          padding: 0 16px;
+          display: flex;
           align-items: center;
           justify-content: center;
-          padding: 12px 8px;
-          border: 1.5px solid #e2e8f0;
-          border-radius: 12px;
-          background: #fff;
-          cursor: pointer;
-          transition: all 0.16s ease;
+          border-right: 1.5px solid #cbd5e1;
         }
-        .amount-chip:hover {
-          border-color: #cbd5e1;
-          background: #f8fafc;
-        }
-        .amount-chip.active {
-          border-color: #0b5f9f;
-          background: #eff6ff;
-          box-shadow: 0 0 0 1px #0b5f9f;
-        }
-        .chip-currency {
-          font-size: 0.72rem;
-          font-weight: 700;
-          color: #64748b;
-          text-transform: uppercase;
-        }
-        .chip-value {
-          font-size: 1.05rem;
+        .amount-large-input {
+          border: none;
+          outline: none;
+          font-size: 1.35rem;
           font-weight: 800;
           color: #0f172a;
+          padding: 12px 16px;
+          width: 100%;
         }
-        .amount-chip.active .chip-currency,
-        .amount-chip.active .chip-value {
+        .amount-large-input:focus {
+          border: none;
+          box-shadow: none;
+        }
+        .amount-preview-pill {
+          background: #eff6ff;
           color: #0b5f9f;
-        }
-
-        .custom-input-box {
-          background: #f8fafc;
-          border: 1px dashed #cbd5e1;
-          border-radius: 12px;
-          padding: 14px;
-        }
-
-        /* Impact Callout */
-        .impact-callout {
-          background: #fffbeb;
-          border: 1px solid #fef3c7;
-          border-radius: 10px;
-          padding: 10px 14px;
+          font-weight: 700;
           font-size: 0.85rem;
-          color: #92400e;
-          display: flex;
-          align-items: center;
+          padding: 4px 10px;
+          border-radius: 20px;
         }
 
         /* Purpose Grid */

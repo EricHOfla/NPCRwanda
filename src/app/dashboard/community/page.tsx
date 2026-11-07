@@ -408,7 +408,7 @@ function CommunityManagementContent() {
   };
 
   return (
-    <div className="dashboard-layout" style={{ display: 'flex', minHeight: '100vh', background: '#F8FAFC' }}>
+    <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
       {/* ── System Sidebar (Unified with main dashboard) ── */}
       <AppSidebar
         sidebarOpen={sidebarOpen}
@@ -418,9 +418,9 @@ function CommunityManagementContent() {
       />
 
       {/* ── Main Dashboard Workspace ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0 }}>
         {/* Top Header Bar */}
-        <header style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '14px 28px', position: 'sticky', top: 0, zIndex: 100 }}>
+        <header style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '14px 28px', flexShrink: 0, zIndex: 100 }}>
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div className="d-flex align-items-center gap-3">
               <button 
@@ -463,7 +463,8 @@ function CommunityManagementContent() {
         </header>
 
         {/* Workspace Body */}
-        <main className="py-4 px-3 px-lg-4" style={{ flex: 1, maxWidth: 1600, width: '100%', margin: '0 auto' }}>
+        <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+          <div style={{ maxWidth: 1600, width: '100%', margin: '0 auto' }}>
           {!isAuthorized ? (
             <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
           ) : (
@@ -806,6 +807,7 @@ function CommunityManagementContent() {
           )}
         </>
           )}
+          </div>
         </main>
       </div>
 

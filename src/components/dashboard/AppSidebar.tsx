@@ -205,6 +205,8 @@ export default function AppSidebar({
           position: 'sticky',
           top: 0,
           height: '100vh',
+          maxHeight: '100vh',
+          overflow: 'hidden',
         }}
       >
         {/* Logo block */}
