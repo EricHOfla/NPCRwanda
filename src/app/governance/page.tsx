@@ -3,27 +3,28 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
+import { useData } from '@/context/DataContext';
 
 const governancePrinciples = [
   {
     icon: 'fa-scale-balanced',
-    title: 'Accountability',
-    description: 'Leadership and management are responsible for decisions, resources, and the results delivered to athletes and members.',
+    title: content('accountabilityTitle', 'Accountability'),
+    description: content('accountabilityDesc', 'Leadership and management are responsible for decisions, resources, and the results delivered to athletes and members.'),
   },
   {
     icon: 'fa-eye',
-    title: 'Transparency',
-    description: 'We aim to make our governance approach, responsibilities, and institutional direction clear to our stakeholders.',
+    title: content('transparencyTitle', 'Transparency'),
+    description: content('transparencyDesc', 'We aim to make our governance approach, responsibilities, and institutional direction clear to our stakeholders.'),
   },
   {
     icon: 'fa-handshake-angle',
-    title: 'Integrity',
-    description: 'We promote ethical conduct, fairness, and respect throughout the Paralympic movement in Rwanda.',
+    title: content('integrityTitle', 'Integrity'),
+    description: content('integrityDesc', 'We promote ethical conduct, fairness, and respect throughout the Paralympic movement in Rwanda.'),
   },
   {
     icon: 'fa-people-group',
-    title: 'Representation',
-    description: 'Athletes, members, and disability groups should have a meaningful voice in the decisions that affect them.',
+    title: content('representationTitle', 'Representation'),
+    description: content('representationDesc', 'Athletes, members, and disability groups should have a meaningful voice in the decisions that affect them.'),
   },
 ];
 
@@ -31,21 +32,21 @@ const governanceLevels = [
   {
     number: '01',
     title: 'General Assembly',
-    description: 'The supreme member body that provides the institutional mandate and considers major decisions.',
+    description: content('generalAssemblyDesc', 'The supreme member body that provides the institutional mandate and considers major decisions.'),
     icon: 'fa-users',
     level: 'primary',
   },
   {
     number: '02',
     title: 'Board of Directors',
-    description: 'Provides strategic oversight, governance direction, and accountability for the committee.',
+    description: content('boardDesc', 'Provides strategic oversight, governance direction, and accountability for the committee.'),
     icon: 'fa-landmark',
     level: 'primary',
   },
   {
     number: '03',
     title: 'Executive Secretariat',
-    description: 'Coordinates daily operations and implements approved plans, programmes, and decisions.',
+    description: content('secretariatDesc', 'Coordinates daily operations and implements approved plans, programmes, and decisions.'),
     icon: 'fa-building',
     level: 'primary',
   },
@@ -54,18 +55,20 @@ const governanceLevels = [
 const supportingStructures = [
   {
     title: 'Technical Commissions',
-    description: 'Support technical standards, sport development, athlete preparation, and specialist functions.',
+    description: content('technicalDesc', 'Support technical standards, sport development, athlete preparation, and specialist functions.'),
     icon: 'fa-medal',
   },
   {
     title: 'District Committees',
-    description: 'Help extend participation, talent identification, and adapted sport activities across Rwanda.',
+    description: content('districtDesc', 'Help extend participation, talent identification, and adapted sport activities across Rwanda.'),
     icon: 'fa-map-location-dot',
   },
 ];
 
 export default function GovernancePage() {
   const { t } = useTranslation();
+  const { siteContent } = useData();
+  const content = (key: string, fallback: string) => siteContent[`governance.${key}`] || fallback;
 
   return (
     <main id="main-content" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
@@ -92,11 +95,11 @@ export default function GovernancePage() {
           <div className="row align-items-center g-4">
             <div className="col-lg-8">
               <span className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 mb-3" style={{ background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.25)', fontSize: '.78rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                <i className="fas fa-landmark" /> Governance &amp; institutional leadership
+                <i className="fas fa-landmark" /> {content('pageEyebrow', 'Governance & institutional leadership')}
               </span>
               <h1 className="display-5 fw-bold mb-3 text-white">{t('phrase.Governance & Transparency') || 'Governance & Transparency'}</h1>
               <p className="lead mb-0" style={{ maxWidth: '760px', color: 'rgba(255,255,255,.86)', lineHeight: 1.7 }}>
-                NPC Rwanda is committed to responsible leadership, clear accountability, and inclusive decision-making in the development of Paralympic sport.
+                {content('pageIntro', 'NPC Rwanda is committed to responsible leadership, clear accountability, and inclusive decision-making in the development of Paralympic sport.')}
               </p>
             </div>
             <div className="col-lg-4">
@@ -117,10 +120,10 @@ export default function GovernancePage() {
       <section className="container py-5" aria-labelledby="governance-approach">
         <div className="row g-4 align-items-end mb-4">
           <div className="col-lg-8">
-            <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>Our commitment</span>
+            <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>{content('commitmentEyebrow', 'Our commitment')}</span>
             <h2 id="governance-approach" className="fw-bold text-dark mt-2 mb-3">{t('phrase.How We Are Managed') || 'How We Are Managed'}</h2>
             <p className="text-muted mb-0" style={{ maxWidth: '850px', lineHeight: 1.8 }}>
-              NPC Rwanda operates under governance standards aligned with the International Paralympic Committee. We work to ensure that our strategic direction, leadership responsibilities, and institutional decisions support fair and inclusive sport.
+              {content('approachIntro', 'NPC Rwanda operates under governance standards aligned with the International Paralympic Committee. We work to ensure that our strategic direction, leadership responsibilities, and institutional decisions support fair and inclusive sport.')}
             </p>
           </div>
           <div className="col-lg-4 text-lg-end">
@@ -148,9 +151,9 @@ export default function GovernancePage() {
           <div className="col-lg-8">
             <section className="bg-white border rounded-4 p-4 p-md-5 shadow-sm h-100" aria-labelledby="governance-structure">
               <div className="mb-4">
-                <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>Institutional framework</span>
+                <span className="text-uppercase fw-bold small text-primary" style={{ letterSpacing: '.1em' }}>{content('frameworkEyebrow', 'Institutional framework')}</span>
                 <h2 id="governance-structure" className="h3 fw-bold text-dark mt-2 mb-2">{t('phrase.Our Structure') || 'Our Structure'}</h2>
-                <p className="text-muted mb-0">The committee works through member representation, strategic oversight, and operational coordination.</p>
+                <p className="text-muted mb-0">{content('frameworkIntro', 'The committee works through member representation, strategic oversight, and operational coordination.')}</p>
               </div>
 
               <div className="d-flex flex-column align-items-center">
@@ -194,10 +197,10 @@ export default function GovernancePage() {
               <div className="bg-white border rounded-4 p-4 shadow-sm">
                 <div className="d-flex align-items-center gap-2 mb-3">
                   <i className="fas fa-people-arrows-left-right text-primary fa-lg" />
-                  <h2 className="h5 fw-bold mb-0">Inclusive leadership</h2>
+                  <h2 className="h5 fw-bold mb-0">{content('inclusiveTitle', 'Inclusive leadership')}</h2>
                 </div>
                 <p className="small text-muted mb-0" style={{ lineHeight: 1.75 }}>
-                  Governance should reflect the diversity of the Paralympic movement and support meaningful participation by athletes and people with disabilities.
+                  {content('inclusiveDesc', 'Governance should reflect the diversity of the Paralympic movement and support meaningful participation by athletes and people with disabilities.')}
                 </p>
               </div>
               <div className="rounded-4 p-4 text-white flex-grow-1" style={{ background: 'linear-gradient(145deg, #087B78, #075B68)' }}>
@@ -206,7 +209,7 @@ export default function GovernancePage() {
                   <h2 className="h5 fw-bold text-white mb-0">{t('phrase.Need Information?') || 'Need Information?'}</h2>
                 </div>
                 <p className="small mb-4" style={{ color: 'rgba(255,255,255,.86)', lineHeight: 1.75 }}>
-                  For governance questions, institutional enquiries, or requests for official records, please contact the NPC Rwanda secretariat.
+                  {content('contactDesc', 'For governance questions, institutional enquiries, or requests for official records, please contact the NPC Rwanda secretariat.')}
                 </p>
                 <Link href="/contact" className="btn btn-light rounded-pill px-4 fw-bold">
                   <i className="fas fa-envelope me-2" />{t('phrase.Contact Secretariat') || 'Contact Secretariat'}
