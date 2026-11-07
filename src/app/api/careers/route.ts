@@ -16,15 +16,9 @@ const careerSchema = z.object({
   deadline: z.string().optional().nullable(),
 });
 
-async function ensureCareerDeadlineColumnAndAutoClose() {
-  const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
-  await ensureAutoMigrated();
-}
-
 // GET: Fetch careers list with optional filters and pagination
 export async function GET(request: NextRequest) {
   try {
-    await ensureCareerDeadlineColumnAndAutoClose();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'Open';
     if (status !== 'Open') {
@@ -39,6 +33,9 @@ export async function GET(request: NextRequest) {
     const whereClause: any = {};
     if (status && status !== 'All') {
       whereClause.status = status;
+    }
+    if (status === 'Open') {
+      whereClause.AND = [{ OR: [{ deadline: null }, { deadline: { gte: new Date().toISOString().slice(0, 10) } }] }];
     }
     if (slug) {
       whereClause.slug = slug;
