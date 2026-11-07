@@ -27,7 +27,7 @@ export default function DpscoContactsPage() {
     fromDb.forEach(p => {
       if (!ordered.includes(p)) ordered.push(p);
     });
-    return ordered.length > 0 ? ordered : DEFAULT_PROVINCES;
+    return ordered;
   }, [activeContacts]);
 
   const districtCount = new Set(activeContacts.map(contact => contact.district.trim().toLowerCase()).filter(Boolean)).size;
