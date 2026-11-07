@@ -613,7 +613,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 <div 
                   role="button"
                   tabIndex={0}
-                  onClick={() => handleNav({ tab: 'contacts' })}
+                  onClick={() => handleNav({ tab: 'subscribers' })}
                   style={{ cursor: 'pointer', transition: 'all 0.15s' }}
                   title="Open Newsletter Subscribers"
                 >
