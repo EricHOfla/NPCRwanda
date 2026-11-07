@@ -7,7 +7,7 @@ import { useData } from '@/context/DataContext';
 
 export default function AboutPage() {
   const { t } = useTranslation();
-  const { siteContent, dpscoContacts } = useData();
+  const { siteContent, dpscoContacts, athletes } = useData();
   const districtCount = new Set(dpscoContacts.filter(contact => contact.active).map(contact => contact.district.trim().toLowerCase()).filter(Boolean)).size;
 
   const getSiteText = (key: string, fallback: string) => {
@@ -239,10 +239,10 @@ export default function AboutPage() {
                 }}
               >
                 <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  1,200+
+                  {athletes.length}
                 </div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Para-Athletes Supported
+                  Active Athlete Profiles
                 </div>
               </div>
             </div>
