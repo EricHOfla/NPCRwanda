@@ -5,6 +5,7 @@ import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useSearchParams } from 'next/navigation';
 
 type Row = Record<string, any> & { id: string };
@@ -21,7 +22,7 @@ const empty: Data = {
 function CommunityManagementContent() {
   const searchParams = useSearchParams();
 
-  const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({ name: 'Admin', email: '', role: 'ADMIN' });
+  const userProfile = useDashboardAuth();
 
   // Data states
   const [data, setData] = useState<Data>(empty);
@@ -82,15 +83,6 @@ function CommunityManagementContent() {
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-
-    fetch('/api/auth/profile')
-      .then(res => res.json())
-      .then(d => {
-        if (d?.user) {
-          setUserProfile({ name: d.user.name || 'Admin', email: d.user.email || '', role: d.user.role || 'ADMIN' });
-        }
-      })
-      .catch(() => {});
 
     void load();
   }, [load]);
