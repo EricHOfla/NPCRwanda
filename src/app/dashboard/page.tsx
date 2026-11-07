@@ -5037,6 +5037,9 @@ uploadMediaFile={uploadMediaFile}
                   )}
                 </div>
               )}
+            </div>
+          )}
+
           {/* ──────────────────────────────
              TAB: MEDIA LIBRARY
              ────────────────────────────── */}
