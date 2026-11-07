@@ -2582,38 +2582,7 @@ export default function DashboardPage() {
           {/* ──────────────────────────────
              TAB: PAGES CMS
              ────────────────────────────── */}
-          {adminTab === 'pages' && (
-            isPageRestricted(activeEditPage) ? null : (
-              <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className="fas fa-pen-slash" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>
-                      Editor Access Restricted
-                    </h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
-                      Editors are authorized to manage: Athletes Directory, Sports Programs, News Room, Announcements, Events Calendar, and Careers & Vacancies only.
-                    </p>
-                  </div>
-                  <div className="card-body text-center py-3">
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        if (isEditor) {
-                          setAdminTab('pages');
-                          setActiveEditPage('athletes');
-                        } else {
-                          setAdminTab('overview');
-                        }
-                      }}
-                    >
-                      <i className="fas fa-arrow-left me-2" />
-                      {isEditor ? 'Go to Athletes Directory' : 'Back to Overview'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
+          {adminTab === 'pages' && !isPageRestricted(activeEditPage) && (
             <div>
               {/* Page Editor Header Toolbar */}
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-white border rounded">
