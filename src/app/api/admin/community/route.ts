@@ -5,7 +5,7 @@ import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
-const types = ['programmes', 'athleteEnquiries', 'eventRegistrations', 'sponsorEnquiries'] as const;
+const types = ['programmes', 'athleteEnquiries'] as const;
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,13 +14,11 @@ export async function GET(request: NextRequest) {
       return auth.response;
     }
 
-    const [programmes, athleteEnquiries, eventRegistrations, sponsorEnquiries] = await Promise.all([
+    const [programmes, athleteEnquiries] = await Promise.all([
       prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.athleteEnquiry.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.eventRegistration.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.sponsorInquiry.findMany({ orderBy: { createdAt: 'desc' } }),
     ]);
-    return NextResponse.json({ programmes, athleteEnquiries, eventRegistrations, sponsorEnquiries });
+    return NextResponse.json({ programmes, athleteEnquiries });
   } catch (error) {
     console.error('Community admin data fetch failed:', error);
     return NextResponse.json({ error: 'Unable to load community management data' }, { status: 500 });
@@ -52,12 +50,6 @@ export async function PATCH(request: NextRequest) {
       case 'athleteEnquiries':
         if (!status || !['New', 'Contacted', 'Accepted', 'Closed'].includes(status)) return NextResponse.json({ error: 'Invalid enquiry status' }, { status: 400 });
         updated = await prisma.athleteEnquiry.update({ where: { id }, data: { status } }); break;
-      case 'eventRegistrations':
-        if (!status || !['Pending', 'Confirmed', 'Declined', 'Cancelled'].includes(status)) return NextResponse.json({ error: 'Invalid event registration status' }, { status: 400 });
-        updated = await prisma.eventRegistration.update({ where: { id }, data: { status } }); break;
-      case 'sponsorEnquiries':
-        if (!status || !['New', 'Contacted', 'In Progress', 'Accepted', 'Declined', 'Closed'].includes(status)) return NextResponse.json({ error: 'Invalid sponsor enquiry status' }, { status: 400 });
-        updated = await prisma.sponsorInquiry.update({ where: { id }, data: { status } }); break;
     }
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
@@ -80,8 +72,6 @@ export async function DELETE(request: NextRequest) {
     switch (type) {
       case 'programmes': await prisma.trainingProgram.delete({ where: { id } }); break;
       case 'athleteEnquiries': await prisma.athleteEnquiry.delete({ where: { id } }); break;
-      case 'eventRegistrations': await prisma.eventRegistration.delete({ where: { id } }); break;
-      case 'sponsorEnquiries': await prisma.sponsorInquiry.delete({ where: { id } }); break;
     }
     return NextResponse.json({ success: true });
   } catch (error) {

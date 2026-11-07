@@ -393,66 +393,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                   </div>
                 </div>
 
-                {/* 4. Event Registrations -> Navigates to Community Event Signups */}
-                <div className="col-sm-6 col-md-4 col-lg">
-                  <div 
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' })}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' }); } }}
-                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#16A34A'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
-                    title="Open Event Attendee Registrations"
-                  >
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16A34A', textTransform: 'uppercase' }}>Event Signups</span>
-                        <i className="fas fa-calendar-check text-success" style={{ fontSize: '0.85rem' }} />
-                      </div>
-                      <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
-                        {number(data.engagement.eventRegistrations)}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '0.7rem', color: '#16A34A', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>Review Signups</span>
-                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. Sponsor Enquiries -> Navigates to Community Sponsor Inquiries */}
-                <div className="col-sm-6 col-md-4 col-lg">
-                  <div 
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' })}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' }); } }}
-                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
-                    title="Open Sponsorship & Partner Leads"
-                  >
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>Sponsor Leads</span>
-                        <i className="fas fa-handshake text-warning" style={{ fontSize: '0.85rem' }} />
-                      </div>
-                      <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
-                        {number(data.engagement.sponsorInquiries)}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '0.7rem', color: '#D97706', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>Review Leads</span>
-                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Analytics Details Grid with Links to All Pages */}
+                {/* Analytics Details Grid with Links to All Pages */}
           <div className="live-analytics-grid">
             {/* Panel 1: Donation Activity */}
             <Panel 
@@ -672,29 +613,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 <div 
                   role="button"
                   tabIndex={0}
-                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=eventRegistrations' })}
-                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
-                  title="Open Event Registrations"
-                >
-                  <span><i className="fas fa-calendar-check text-success me-2" />Event registrations</span>
-                  <strong>{number(data.engagement.eventRegistrations)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
-                </div>
-
-                <div 
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=sponsorEnquiries' })}
-                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
-                  title="Open Sponsor Leads"
-                >
-                  <span><i className="fas fa-handshake text-warning me-2" />Sponsor enquiries</span>
-                  <strong>{number(data.engagement.sponsorInquiries)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
-                </div>
-
-                <div 
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleNav({ tab: 'contacts' })}
+                  onClick={() => handleNav({ tab: 'subscribers' })}
                   style={{ cursor: 'pointer', transition: 'all 0.15s' }}
                   title="Open Newsletter Subscribers"
                 >

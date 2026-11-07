@@ -839,24 +839,21 @@ export default function SubscribersTab() {
             </select>
 
             <button
-              onClick={fetchSubscribers}
+              type="button"
+              onClick={() => { void fetchSubscribers(); }}
               disabled={loading}
+              aria-label="Refresh subscriber list"
+              title={loading ? 'Refreshing subscribers…' : 'Refresh subscriber list'}
               className="btn btn-light subscribers-filter-refresh"
             >
               <i className={`fas fa-rotate-right ${loading ? 'fa-spin' : ''}`} />
-              <span className="d-none d-sm-inline">Refresh</span>
+              <span className="d-none d-sm-inline">{loading ? 'Refreshing…' : 'Refresh'}</span>
             </button>
           </div>
         </div>
 
         {/* Loading state */}
-        {loading && subscribers.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '50px 20px', color: '#64748B' }}>
-            <i className="fas fa-spinner fa-spin fa-2x mb-3" style={{ color: '#0072C6' }} />
-            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Loading subscribers…</div>
-            <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '4px' }}>Optimized query with fast database indexing</div>
-          </div>
-        ) : subscribers.length === 0 ? (
+        {!loading && subscribers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '50px 20px', color: '#94A3B8' }}>
             <i className="fas fa-bell-slash fa-2x mb-3" style={{ display: 'block', color: '#CBD5E1' }} />
             <div style={{ fontWeight: 600, fontSize: '1rem', color: '#475569' }}>
