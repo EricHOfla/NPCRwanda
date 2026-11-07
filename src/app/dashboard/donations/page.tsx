@@ -1188,6 +1188,259 @@ function DonationManagementContent() {
           )}
           </div>
         </main>
+
+      {/* ── Modal: Payment Receipt & Details ── */}
+      {selectedPayment && (
+        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div
+                className="modal-header text-white"
+                style={{
+                  background: selectedPayment.status === 'SUCCESSFUL' ? 'linear-gradient(135deg, #16A34A, #15803D)' : selectedPayment.status === 'PENDING' ? 'linear-gradient(135deg, #D97706, #B45309)' : 'linear-gradient(135deg, #DC2626, #B91C1C)',
+                }}
+              >
+                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
+                  <i className={`fas ${selectedPayment.status === 'SUCCESSFUL' ? 'fa-check-circle' : selectedPayment.status === 'PENDING' ? 'fa-clock' : 'fa-circle-xmark'}`} />
+                  Donation Receipt & Transaction Details
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedPayment(null)} aria-label="Close" />
+              </div>
+
+              <div className="modal-body p-4">
+                {/* Financial Overview Strip */}
+                <div className="p-3 rounded mb-4" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div className="row g-3">
+                    <div className="col-sm-6">
+                      <span className="small text-muted text-uppercase fw-bold d-block" style={{ fontSize: '0.7rem' }}>Contributed Amount</span>
+                      <span className="h4 fw-bold text-dark mb-0">
+                        {selectedPayment.donorCurrency || selectedPayment.currency} {money(selectedPayment.donorAmount ?? selectedPayment.amount)}
+                      </span>
+                    </div>
+                    <div className="col-sm-6">
+                      <span className="small text-muted text-uppercase fw-bold d-block" style={{ fontSize: '0.7rem' }}>Settled in RWF</span>
+                      <span className="h4 fw-bold text-success mb-0">
+                        RWF {money(selectedPayment.amount)}
+                      </span>
+                    </div>
+                  </div>
+                  {selectedPayment.exchangeRate && (
+                    <div className="small text-muted mt-2 pt-2 border-top" style={{ fontSize: '0.75rem' }}>
+                      Exchange Rate applied: <strong>1 USD = {selectedPayment.exchangeRate.toLocaleString()} RWF</strong>
+                      {selectedPayment.exchangeRateDate && ` · Dated ${selectedPayment.exchangeRateDate}`}
+                    </div>
+                  )}
+                </div>
+
+                <div className="row g-3">
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Transaction Reference</label>
+                    <div className="d-flex align-items-center gap-2">
+                      <code className="bg-light px-2 py-1 rounded border text-dark font-monospace" style={{ fontSize: '0.8rem' }}>
+                        {selectedPayment.txRef}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(selectedPayment.txRef)}
+                        className="btn btn-sm btn-outline-secondary py-0 px-2"
+                        title="Copy"
+                      >
+                        <i className={`fas ${copiedRef === selectedPayment.txRef ? 'fa-check text-success' : 'fa-copy'}`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Status</label>
+                    <span
+                      className="badge px-3 py-1 rounded-pill"
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        background: selectedPayment.status === 'SUCCESSFUL' ? '#DCFCE7' : selectedPayment.status === 'PENDING' ? '#FEF3C7' : '#FEE2E2',
+                        color: selectedPayment.status === 'SUCCESSFUL' ? '#16A34A' : selectedPayment.status === 'PENDING' ? '#B45309' : '#DC2626',
+                      }}
+                    >
+                      {selectedPayment.status}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Donor Name</label>
+                    <span className="fw-semibold text-dark">
+                      {selectedPayment.anonymous ? `${selectedPayment.name} (Marked Anonymous)` : selectedPayment.name}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Donor Email</label>
+                    <a href={`mailto:${selectedPayment.email}`} className="text-primary text-decoration-none fw-semibold">
+                      {selectedPayment.email}
+                    </a>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Donor Phone</label>
+                    <span className="text-dark">{selectedPayment.phone || '—'}</span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Payment Method</label>
+                    <span className="text-dark fw-semibold">
+                      {selectedPayment.paymentMethod === 'card' ? 'Credit / Debit Card' : 'Mobile Money (MTN / Airtel)'}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Purpose / Program</label>
+                    <span className="badge bg-light text-dark border px-3 py-1">
+                      {selectedPayment.supportType || 'General Para-Sport Support'}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Payment Date</label>
+                    <span className="text-dark">
+                      {new Date(selectedPayment.createdAt).toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+
+                  {selectedPayment.providerRef && (
+                    <div className="col-sm-12">
+                      <label className="small text-muted fw-bold d-block">Provider Reference ID</label>
+                      <span className="text-muted font-monospace small">{selectedPayment.providerRef}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-footer bg-light d-flex justify-content-between align-items-center">
+                <span className="small text-muted font-monospace" style={{ fontSize: '0.72rem' }}>
+                  Gateway: {selectedPayment.provider || 'Flutterwave'}
+                </span>
+                <div className="d-flex gap-2">
+                  <a
+                    href={`mailto:${selectedPayment.email}?subject=NPC Rwanda Donation Receipt Confirmation - ${selectedPayment.txRef}`}
+                    className="btn btn-sm btn-outline-primary fw-semibold"
+                  >
+                    <i className="fas fa-envelope me-1" /> Email Donor
+                  </a>
+                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedPayment(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Inquiry Details & Follow-up ── */}
+      {selectedInquiry && (
+        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="modal-header text-white" style={{ background: 'linear-gradient(135deg, #0284C7, #0369A1)' }}>
+                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
+                  <i className="fas fa-hand-holding-heart text-warning" /> Support & Partnership Inquiry
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedInquiry(null)} aria-label="Close" />
+              </div>
+
+              <div className="modal-body p-4">
+                <div className="row g-3 mb-3">
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Contributor / Contact Name</label>
+                    <span className="h5 fw-bold text-dark d-block mb-0">{selectedInquiry.name}</span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Email Address</label>
+                    <a href={`mailto:${selectedInquiry.email}`} className="text-primary fw-semibold">
+                      {selectedInquiry.email}
+                    </a>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Contributor Category</label>
+                    <span className="badge bg-light text-dark border px-3 py-1 fw-semibold">
+                      {selectedInquiry.category}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Proposed Support Type</label>
+                    <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 fw-semibold">
+                      {selectedInquiry.supportType}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Received On</label>
+                    <span className="text-dark small">
+                      {new Date(selectedInquiry.createdAt).toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="col-sm-6">
+                    <label className="small text-muted fw-bold d-block">Status</label>
+                    <span className={`badge px-3 py-1 rounded-pill ${selectedInquiry.read ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis'}`}>
+                      {selectedInquiry.read ? 'Reviewed' : 'Awaiting Review'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="small text-muted fw-bold d-block mb-1">Message / Proposal Details</label>
+                  <div
+                    className="p-3 rounded bg-light border text-dark"
+                    style={{ fontSize: '0.88rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}
+                  >
+                    {selectedInquiry.details}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer bg-light d-flex justify-content-between align-items-center">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => void toggleInquiryRead(selectedInquiry)}
+                >
+                  <i className={`fas ${selectedInquiry.read ? 'fa-envelope' : 'fa-check'} me-1`} />
+                  Mark as {selectedInquiry.read ? 'Unread' : 'Read'}
+                </button>
+
+                <div className="d-flex gap-2">
+                  <a
+                    href={`mailto:${selectedInquiry.email}?subject=NPC Rwanda Support & Partnership - Follow Up&body=Dear ${encodeURIComponent(selectedInquiry.name)},%0D%0A%0D%0AThank you for reaching out to the National Paralympic Committee of Rwanda regarding ${encodeURIComponent(selectedInquiry.supportType)}.`}
+                    className="btn btn-sm btn-primary fw-semibold"
+                    style={{ background: '#0284C7', border: 'none' }}
+                  >
+                    <i className="fas fa-paper-plane me-1" /> Follow Up via Email
+                  </a>
+                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedInquiry(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
