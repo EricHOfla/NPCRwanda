@@ -126,60 +126,60 @@ export default function LeadersPage() {
       {/* ═══════════════════════════════════════════════════════════
           EXECUTIVE LEADERSHIP PAGE HEADER
       ═══════════════════════════════════════════════════════════ */}
-      <header className="page-header" style={{ borderBottom: '3px solid #0072C6', background: 'linear-gradient(135deg, #071D38 0%, #0F3A6C 60%, #082142 100%)', color: '#FFFFFF', padding: '60px 0 50px' }}>
+      <header className="page-header" style={{ borderBottom: '1px solid #E2E8F0', background: '#F8FAFC', color: '#000000', padding: '44px 0 48px' }}>
         <div className="container">
           <nav aria-label="breadcrumb" data-aos="fade-up">
             <ol className="breadcrumb mb-3">
               <li className="breadcrumb-item">
-                <Link href="/" className="text-white-50 text-decoration-none">
+                <Link href="/" style={{ color: '#000000', fontWeight: 600, textDecoration: 'none' }}>
                   Home
                 </Link>
               </li>
-              <li className="breadcrumb-item active text-white" aria-current="page">
+              <li className="breadcrumb-item active" aria-current="page" style={{ color: '#000000', fontWeight: 800 }}>
                 {t('phrase.Our Leadership')}
               </li>
             </ol>
           </nav>
 
-          <div className="d-flex align-items-center gap-2 mb-2" data-aos="fade-up" data-aos-delay="30">
-            <span className="badge rounded-pill text-uppercase fw-bold px-3 py-2 border border-white-50" style={{ background: 'rgba(255, 255, 255, 0.12)', fontSize: '0.72rem', letterSpacing: '0.8px' }}>
-              <i className="fas fa-landmark text-warning me-2" aria-hidden="true" />
+          <div className="d-flex align-items-center gap-2 mb-3" data-aos="fade-up" data-aos-delay="30">
+            <span className="badge rounded-pill text-uppercase fw-bold px-3 py-2" style={{ background: '#FEF3C7', color: '#000000', border: '1.5px solid #F59E0B', fontSize: '0.78rem', letterSpacing: '0.08em' }}>
+              <i className="fas fa-landmark me-2" style={{ color: '#D97706' }} aria-hidden="true" />
               Institutional Governance &amp; Executive Leadership
             </span>
           </div>
 
-          <h1 className="page-title mb-3 text-white fw-extrabold" data-aos="fade-up" data-aos-delay="60" style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', letterSpacing: '-0.5px' }}>
+          <h1 className="page-title mb-3 fw-bold" data-aos="fade-up" data-aos-delay="60" style={{ color: '#000000', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
             {t('phrase.Our Leadership')} &amp; Governing Organs
           </h1>
 
-          <p className="page-subtitle text-white-50 mb-4" data-aos="fade-up" data-aos-delay="90" style={{ maxWidth: '880px', fontSize: '1.05rem', lineHeight: 1.65 }}>
+          <p className="page-subtitle mb-4" data-aos="fade-up" data-aos-delay="90" style={{ color: '#000000', maxWidth: '880px', fontSize: '1.08rem', lineHeight: 1.65, fontWeight: 500 }}>
             Meet the elected executive board, statutory oversight committees, and professional secretariat guiding the National Paralympic Committee of Rwanda in delivering athlete excellence, integrity, and social inclusion.
           </p>
 
           {/* Institutional Governance Highlights KPIs */}
           <div className="row g-3 pt-2" data-aos="fade-up" data-aos-delay="120">
             <div className="col-6 col-md-3">
-              <div className="p-3 rounded-3" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div className="h3 mb-0 fw-bold text-warning">{leadership.length || 23}</div>
-                <div className="small text-white-50">Governing Leaders</div>
+              <div className="p-3 rounded-3" style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' }}>
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>{leadership.length || 23}</div>
+                <div className="small fw-bold" style={{ color: '#000000' }}>Governing Leaders</div>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3 rounded-3" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div className="h3 mb-0 fw-bold text-white">4</div>
-                <div className="small text-white-50">Statutory Organs</div>
+              <div className="p-3 rounded-3" style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' }}>
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>4</div>
+                <div className="small fw-bold" style={{ color: '#000000' }}>Statutory Organs</div>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3 rounded-3" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div className="h3 mb-0 fw-bold text-info">100%</div>
-                <div className="small text-white-50">Inclusive Representation</div>
+              <div className="p-3 rounded-3" style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' }}>
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>100%</div>
+                <div className="small fw-bold" style={{ color: '#000000' }}>Inclusive Representation</div>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3 rounded-3" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div className="h3 mb-0 fw-bold text-success">{mandatePeriod}</div>
-                <div className="small text-white-50">Mandate Period</div>
+              <div className="p-3 rounded-3" style={{ background: '#FFFFFF', border: '1.5px solid #CBD5E1', borderRadius: '14px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' }}>
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>{mandatePeriod}</div>
+                <div className="small fw-bold" style={{ color: '#000000' }}>Mandate Period</div>
               </div>
             </div>
           </div>
