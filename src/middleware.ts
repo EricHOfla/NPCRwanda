@@ -159,6 +159,7 @@ export async function middleware(request: NextRequest) {
     let requiresAuth = false;
 
     const isAdminApiRoute = pathname.startsWith('/api/admin/');
+    const isPublicDonationRoute = ['/api/donations/checkout', '/api/donations/verify', '/api/donations/webhook', '/api/donations/exchange-rate'].includes(pathname);
     const isPublicFormRoute =
       pathname.startsWith('/api/contacts') ||
       pathname.startsWith('/api/volunteers') ||
@@ -176,7 +177,7 @@ export async function middleware(request: NextRequest) {
 
     if (isAdminApiRoute) {
       requiresAuth = true;
-    } else if (isUnsubscribeRoute) {
+    } else if (isPublicDonationRoute || isUnsubscribeRoute) {
       requiresAuth = false;
     } else if (isPublicFormRoute) {
       if (['GET', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
