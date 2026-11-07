@@ -59,71 +59,64 @@ export default function AboutPage() {
     },
   ];
 
+  const parseEditorialRows = (
+    value: string | undefined,
+    fallback: Array<{ first: string; second: string; third: string }>
+  ) => {
+    if (!value?.trim()) return fallback;
+    const rows = value.split('\n').map((line) => line.trim()).filter(Boolean);
+    const parsed = rows.map((line) => {
+      const [first, second, ...rest] = line.split('|');
+      return { first: first?.trim() || '', second: second?.trim() || '', third: rest.join('|').trim() };
+    }).filter((row) => row.first && row.second && row.third);
+    return parsed.length ? parsed : fallback;
+  };
+
   const strategicObjectives = [
     {
       num: '01',
       icon: 'fa-chart-line',
       title: 'phrase.Athlete Excellence',
-      desc: 'phrase.Strengthen coaching, science, and athlete support to compete for podium finishes internationally.',
-      outcome: 'Podium focus & high-performance science',
+      desc: getSiteText('about.objective.phrase.Athlete Excellence', 'Strengthen coaching, science, and athlete support to compete for podium finishes internationally.'),
+      outcome: getSiteText('about.objective.outcome.Athlete Excellence', 'Podium focus & high-performance science'),
     },
     {
       num: '02',
       icon: 'fa-users-viewfinder',
       title: 'phrase.Grassroots Development',
-      desc: 'phrase.Expand access across Rwanda and identify talent early for long-term development.',
-      outcome: `${districtCount} active district pathways`,
+      desc: getSiteText('about.objective.phrase.Grassroots Development', 'Expand access across Rwanda and identify talent early for long-term development.'),
+      outcome: getSiteText('about.objective.outcome.Grassroots Development', `${districtCount} active district pathways`) || `${districtCount} active district pathways`,
     },
     {
       num: '03',
       icon: 'fa-shield-halved',
       title: 'phrase.Safeguarding & Governance',
-      desc: 'phrase.Maintain strong safeguarding practices and transparent governance at all levels.',
-      outcome: 'Zero-tolerance safeguarding & compliance',
+      desc: getSiteText('about.objective.phrase.Safeguarding & Governance', 'Maintain strong safeguarding practices and transparent governance at all levels.'),
+      outcome: getSiteText('about.objective.outcome.Safeguarding & Governance', 'Zero-tolerance safeguarding & compliance'),
     },
     {
       num: '04',
       icon: 'fa-handshake-angle',
       title: 'phrase.Partnership Growth',
-      desc: 'phrase.Build sustainable partnerships with government, federations, and private sector sponsors.',
-      outcome: 'Long-term funding & commercial partnerships',
+      desc: getSiteText('about.objective.phrase.Partnership Growth', 'Build sustainable partnerships with government, federations, and private sector sponsors.'),
+      outcome: getSiteText('about.objective.outcome.Partnership Growth', 'Long-term funding & commercial partnerships'),
     },
   ];
 
-  const milestones = [
-    {
-      year: '2001',
-      title: 'Foundation of NPC Rwanda',
-      desc: 'Officially constituted in November 2001 to organize, develop, and advocate for Paralympic sports across Rwanda.',
-    },
-    {
-      year: '2004',
-      title: 'First Paralympic Appearance',
-      desc: 'Athens 2004 marked Rwanda’s Paralympic debut, initiating a legacy of high-performance international competition.',
-    },
-    {
-      year: '2016',
-      title: 'Historic Rio Qualification',
-      desc: "Rwanda's Women's Sitting Volleyball team became the first women's team from Sub-Saharan Africa to qualify for the Paralympic Games.",
-    },
-    {
-      year: '2021',
-      title: 'Tokyo 2020 Expansion',
-      desc: 'Fielded athletes across Sitting Volleyball and Para-Athletics while launching district grassroots classification clinics.',
-    },
-    {
-      year: '2024–2028',
-      title: 'Quadrennial Strategic Plan',
-      desc: 'Executing a comprehensive multi-year strategy to modernize training centers, empower youth, and achieve podium excellence.',
-    },
-  ];
+  const milestones = parseEditorialRows(siteContent['about.milestones'], [
+    { first: '2001', second: 'Foundation of NPC Rwanda', third: 'Officially constituted in November 2001 to organize, develop, and advocate for Paralympic sports across Rwanda.' },
+    { first: '2004', second: 'First Paralympic Appearance', third: 'Athens 2004 marked Rwanda’s Paralympic debut, initiating a legacy of high-performance international competition.' },
+    { first: '2016', second: 'Historic Rio Qualification', third: "Rwanda's Women's Sitting Volleyball team became the first women's team from Sub-Saharan Africa to qualify for the Paralympic Games." },
+    { first: '2021', second: 'Tokyo 2020 Expansion', third: 'Fielded athletes across Sitting Volleyball and Para-Athletics while launching district grassroots classification clinics.' },
+    { first: '2024–2028', second: 'Quadrennial Strategic Plan', third: 'Executing a comprehensive multi-year strategy to modernize training centers, empower youth, and achieve podium excellence.' },
+  ]).map((item) => ({ year: item.first, title: item.second, desc: item.third }));
 
-  const affiliations = [
-    { name: 'International Paralympic Committee', tag: 'IPC Member', role: 'Global governing body of the Paralympic Movement' },
-    { name: 'African Paralympic Committee', tag: 'APC Member', role: 'Continental confederation coordinating African Para-Sport' },
-    { name: 'Ministry of Sports (MINISPORTS)', tag: 'National Authority', role: 'Institutional partner and national policy stakeholder' },
-    { name: 'World ParaVolley (WPV)', tag: 'Global Federation', role: 'International governing body for Sitting Volleyball' },
-  ];
+  const affiliations = parseEditorialRows(siteContent['about.affiliations'], [
+    { first: 'International Paralympic Committee', second: 'IPC Member', third: 'Global governing body of the Paralympic Movement' },
+    { first: 'African Paralympic Committee', second: 'APC Member', third: 'Continental confederation coordinating African Para-Sport' },
+    { first: 'Ministry of Sports (MINISPORTS)', second: 'National Authority', third: 'Institutional partner and national policy stakeholder' },
+    { first: 'World ParaVolley (WPV)', second: 'Global Federation', third: 'International governing body for Sitting Volleyball' },
+  ]).map((item) => ({ name: item.first, tag: item.second, role: item.third }));
 
   const histImg = siteContent['about.historyImage'];
   const hasHistImg = Boolean(histImg && histImg.trim() !== '' && !histImg.includes('/assets/img/curated/'));
@@ -173,7 +166,7 @@ export default function AboutPage() {
               lineHeight: 1.15,
             }}
           >
-            Championing Inclusion Through Para-Sport Excellence
+            {getSiteText('about.pageTitle', 'Championing Inclusion Through Para-Sport Excellence')}
           </h1>
 
           <p
@@ -186,8 +179,7 @@ export default function AboutPage() {
               fontWeight: 500,
             }}
           >
-            Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda,
-            dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.
+            {getSiteText('about.pageIntro', 'Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda, dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.')}
           </p>
 
           {/* Quick Metrics Bar */}

@@ -31,6 +31,21 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
+  'about.pageTitle': 'Championing Inclusion Through Para-Sport Excellence',
+  'about.pageIntro': 'Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda, dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.',
+  'about.milestones': `2001|Foundation of NPC Rwanda|Officially constituted in November 2001 to organize, develop, and advocate for Paralympic sports across Rwanda.
+2004|First Paralympic Appearance|Athens 2004 marked Rwanda’s Paralympic debut, initiating a legacy of high-performance international competition.
+2016|Historic Rio Qualification|Rwanda's Women's Sitting Volleyball team became the first women's team from Sub-Saharan Africa to qualify for the Paralympic Games.
+2021|Tokyo 2020 Expansion|Fielded athletes across Sitting Volleyball and Para-Athletics while launching district grassroots classification clinics.
+2024–2028|Quadrennial Strategic Plan|Executing a comprehensive multi-year strategy to modernize training centers, empower youth, and achieve podium excellence.`,
+  'about.affiliations': `International Paralympic Committee|IPC Member|Global governing body of the Paralympic Movement
+African Paralympic Committee|APC Member|Continental confederation coordinating African Para-Sport
+Ministry of Sports (MINISPORTS)|National Authority|Institutional partner and national policy stakeholder
+World ParaVolley (WPV)|Global Federation|International governing body for Sitting Volleyball`,
+  'about.objective.outcome.Athlete Excellence': 'Podium focus & high-performance science',
+  'about.objective.outcome.Grassroots Development': '',
+  'about.objective.outcome.Safeguarding & Governance': 'Zero-tolerance safeguarding & compliance',
+  'about.objective.outcome.Partnership Growth': 'Long-term funding & commercial partnerships',
   'about.heroImage': '',
   'about.vision': 'To be the leading Paralympic nation in Africa.',
   'about.mission': 'To develop a sustainable Paralympic sport system in Rwanda for enabling Para-athletes to achieve their sporting aspirations in local and International sport arena.',
@@ -49,6 +64,19 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'about.objective.phrase.Partnership Growth': 'Build sustainable partnerships with government, federations, and private sector sponsors.',
 
   // NPC Background Page
+  'background.pageTitle': 'NPC Background & Objectives',
+  'background.pageIntro': 'Explore the historical background, strategic plan pillars, swot analysis, and structures guiding the Paralympic Movement in Rwanda.',
+  'background.foundationLabel': 'Our Foundation',
+  'background.foundationTitle': 'Welcome to NPC Rwanda',
+  'background.foundationParagraph1': 'Established on November 1, 2001 (originally founded as FERHANDIS), the National Paralympic Committee of Rwanda has transitioned from a small advocacy group into a highly structured national movement. Following compliance regulations of the International Paralympic Committee (IPC), the name was updated in 2007 to represent our unified Paralympic focus.',
+  'background.foundationParagraph2': 'In the aftermath of the 1994 genocide against the Tutsi, adapted sports served as a powerful vehicle for rehabilitation, social inclusion, and the empowerment of persons with physical, visual, and intellectual impairments. Today, NPC Rwanda coordinates with sports associations, clubs, and local governments to scout talent and secure global representation.',
+  'background.corePillarsTitle': 'Core Pillars of Action',
+  'background.pillarsTitle': '14 Strategic Objectives',
+  'background.pillarsIntro': 'Grouped by our 4 core pillars of intervention under the 2024-2028 Strategic Framework.',
+  'background.pillarTitle.1': 'Pillar 1: Promotion & Participation',
+  'background.pillarTitle.2': 'Pillar 2: Performance & Competitions',
+  'background.pillarTitle.3': 'Pillar 3: Capacity & Professional Development',
+  'background.pillarTitle.4': 'Pillar 4: Strategic Partnerships & Diplomacy',
   'background.governingText': 'The supreme decision-making body of NPC Rwanda. The Governing Board consists of the Executive Board (Chairperson, Vice-Chairpersons, Secretary General, Treasurer) alongside specialized Advisors representing physical, visual, deaf, and intellectual impairment categories, ensuring comprehensive representation.',
   'background.tocText': 'Our Theory of Change process map directs the annual retreat and board guidelines. We hypothesize that by providing targeted athletic training and raising community awareness, we systematically dismantle social prejudices against persons with disabilities, enabling long-term social rehabilitation, confidence, and international athletic representation.',
   'background.strengths': `Active governing board and efficient, knowledgeable staff.

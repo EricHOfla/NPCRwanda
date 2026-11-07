@@ -2640,9 +2640,9 @@ export default function DashboardPage() {
                         if (target === 'home') {
                           handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl']);
                         } else if (target === 'about') {
-                          handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
+                          handleSectionSave(['about.pageTitle', 'about.pageIntro', 'about.milestones', 'about.affiliations', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth', 'about.objective.outcome.Athlete Excellence', 'about.objective.outcome.Grassroots Development', 'about.objective.outcome.Safeguarding & Governance', 'about.objective.outcome.Partnership Growth']);
                         } else if (target === 'npc-background') {
-                          handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
+                          handleSectionSave(['background.pageTitle', 'background.pageIntro', 'background.foundationLabel', 'background.foundationTitle', 'background.foundationParagraph1', 'background.foundationParagraph2', 'background.corePillarsTitle', 'background.pillarsTitle', 'background.pillarsIntro', 'background.pillarTitle.1', 'background.pillarTitle.2', 'background.pillarTitle.3', 'background.pillarTitle.4', 'background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4']);
                         } else if (target === 'leadership') {
                           handleSectionSave(['leadership.mandatePeriod']);
                         }
@@ -2770,7 +2770,33 @@ export default function DashboardPage() {
 
                   {activeEditPage === 'npc-background' && (
                     <div className="border rounded bg-white overflow-hidden shadow p-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
+                      <div className="custom-card p-4 mb-4">
+                        <h4 className="h6 fw-bold mb-3 text-success">NPC Background Page Copy</h4>
+                        {[
+                          ['background.pageTitle', 'Page Title'],
+                          ['background.pageIntro', 'Page Introduction'],
+                          ['background.foundationLabel', 'Foundation Label'],
+                          ['background.foundationTitle', 'Foundation Heading'],
+                          ['background.foundationParagraph1', 'Foundation Paragraph 1'],
+                          ['background.foundationParagraph2', 'Foundation Paragraph 2'],
+                          ['background.corePillarsTitle', 'Core Pillars Heading'],
+                          ['background.pillarsTitle', 'Strategic Objectives Heading'],
+                          ['background.pillarsIntro', 'Strategic Objectives Introduction'],
+                          ['background.pillarTitle.1', 'Pillar 1 Title'],
+                          ['background.pillarTitle.2', 'Pillar 2 Title'],
+                          ['background.pillarTitle.3', 'Pillar 3 Title'],
+                          ['background.pillarTitle.4', 'Pillar 4 Title'],
+                        ].map(([key, label]) => (
+                          <div className="mb-3" key={key}>
+                            <label className="form-label small fw-bold">{label}</label>
+                            <textarea className="form-control" rows={key.includes('Paragraph') || key.endsWith('Intro') ? 3 : 1} value={siteForm[key] || ''} onChange={e => setSiteForm({ ...siteForm, [key]: e.target.value })} />
+                          </div>
+                        ))}
+                      </div>
                       <div className="text-center py-4 bg-light mb-4 rounded">
+                        <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
+                        <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
+                      </div>
                         <h2 className="fw-bold text-dark">NPC Background & Strategic Framework</h2>
                         <span className="small text-muted">Governance, Theory of Change, SWOT & Strategic Pillars Mockup</span>
                       </div>
@@ -3368,16 +3394,26 @@ export default function DashboardPage() {
                   {/* ABOUT US PAGE EDITOR */}
                   {activeEditPage === 'about' && (
                     <div>
-                      {/* Hero Image */}
+                      {/* About page hero copy and image */}
                       <div className="custom-card p-4 mb-4">
-                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-success"><i className="fas fa-image me-2" />About Page Hero Background</h4>
-                        <div className="col-md-6">
-                          <CMSImageField 
-                            label="Hero Header Background" 
-                            value={siteForm['about.heroImage'] || ''} 
-                            onChange={(url) => setSiteForm({ ...siteForm, 'about.heroImage': url })}
-                            uploadMediaFile={uploadMediaFile}
-                          />
+                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-success"><i className="fas fa-image me-2" />About Page Header</h4>
+                        <div className="row g-3">
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Page Title</label>
+                            <input className="form-control" value={siteForm['about.pageTitle'] || ''} onChange={e => setSiteForm({ ...siteForm, 'about.pageTitle': e.target.value })} />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">Introduction</label>
+                            <textarea className="form-control" rows={3} value={siteForm['about.pageIntro'] || ''} onChange={e => setSiteForm({ ...siteForm, 'about.pageIntro': e.target.value })} />
+                          </div>
+                          <div className="col-md-6">
+                            <CMSImageField
+                              label="Hero Header Background"
+                              value={siteForm['about.heroImage'] || ''}
+                              onChange={(url) => setSiteForm({ ...siteForm, 'about.heroImage': url })}
+                              uploadMediaFile={uploadMediaFile}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -3429,6 +3465,16 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
+                      {/* Editable About page timeline and affiliations */}
+                      <div className="custom-card p-4 mb-4">
+                        <h4 className="h6 fw-bold mb-2 border-bottom pb-2 text-success"><i className="fas fa-timeline me-2" />Heritage Timeline</h4>
+                        <p className="small text-muted">One item per line, using: year | milestone title | description.</p>
+                        <textarea className="form-control font-monospace" rows={6} value={siteForm['about.milestones'] || ''} onChange={e => setSiteForm({ ...siteForm, 'about.milestones': e.target.value })} />
+                        <h4 className="h6 fw-bold mt-4 mb-2 border-bottom pb-2 text-success"><i className="fas fa-handshake me-2" />Affiliations & Governing Bodies</h4>
+                        <p className="small text-muted">One item per line, using: organization | membership label | description.</p>
+                        <textarea className="form-control font-monospace" rows={5} value={siteForm['about.affiliations'] || ''} onChange={e => setSiteForm({ ...siteForm, 'about.affiliations': e.target.value })} />
+                      </div>
+
                       {/* Core Values */}
                       <div className="custom-card p-4 mb-4">
                         <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-success"><i className="fas fa-heart me-2" />Core Organizational Values</h4>
@@ -3449,7 +3495,9 @@ export default function DashboardPage() {
                           {['Athlete Excellence', 'Grassroots Development', 'Safeguarding & Governance', 'Partnership Growth'].map(objKey => (
                             <div key={objKey} className="col-md-6">
                               <label className="form-label small fw-bold">{objKey}</label>
-                              <textarea className="form-control form-control-sm" rows={2} value={siteForm[`about.objective.phrase.${objKey}`] || ''} onChange={e => setSiteForm({ ...siteForm, [`about.objective.phrase.${objKey}`]: e.target.value })} />
+                              <textarea className="form-control form-control-sm mb-2" rows={2} value={siteForm[`about.objective.phrase.${objKey}`] || ''} onChange={e => setSiteForm({ ...siteForm, [`about.objective.phrase.${objKey}`]: e.target.value })} />
+                              <label className="form-label small fw-bold">Outcome / Success Measure</label>
+                              <input className="form-control form-control-sm" value={siteForm[`about.objective.outcome.${objKey}`] || ''} onChange={e => setSiteForm({ ...siteForm, [`about.objective.outcome.${objKey}`]: e.target.value })} placeholder="Optional outcome text" />
                             </div>
                           ))}
                         </div>
@@ -3464,7 +3512,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving || !canUpdateContent}
-                          onClick={() => handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth'])}
+                          onClick={() => handleSectionSave(['about.pageTitle', 'about.pageIntro', 'about.milestones', 'about.affiliations', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth', 'about.objective.outcome.Athlete Excellence', 'about.objective.outcome.Grassroots Development', 'about.objective.outcome.Safeguarding & Governance', 'about.objective.outcome.Partnership Growth'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save About Us Content'}
