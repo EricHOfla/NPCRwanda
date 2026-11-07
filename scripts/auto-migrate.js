@@ -18,24 +18,24 @@ const dbUrl = process.env.DATABASE_URL;
 
 if (!dbUrl) {
   console.log('[auto-migrate] DATABASE_URL is not set in this build environment.');
-  console.log('[auto-migrate] Runtime auto-migration will synchronize the database upon first request.');
+  console.log('[auto-migrate] No database writes will be attempted during this build.');
+  console.log('[auto-migrate] Apply committed Prisma migrations separately in the deployment environment.');
   console.log('----------------------------------------------------');
   process.exit(0);
 }
 
 try {
-  console.log('[auto-migrate] Synchronizing database schema with Prisma...');
-  execSync('npx prisma db push --skip-generate --accept-data-loss', {
+  console.log('[auto-migrate] Applying committed Prisma migrations (no schema reset or data-loss flags)...');
+  execSync('npx prisma migrate deploy', {
     stdio: 'inherit',
     env: process.env,
-    timeout: 45000,
+    timeout: 120000,
   });
-  console.log('[auto-migrate] Database schema successfully synchronized with remote database.');
+  console.log('[auto-migrate] Committed database migrations applied successfully.');
 } catch (err) {
-  console.warn('[auto-migrate] Notice: Build-time prisma db push was skipped or could not connect to database.');
-  console.warn('[auto-migrate] Reason:', err.message || err);
-  console.warn('[auto-migrate] The application runtime auto-migrator will safely self-heal tables/columns when the server boots.');
+  console.error('[auto-migrate] Prisma migrations failed. Aborting the build to prevent deploying against an incompatible schema.');
+  console.error('[auto-migrate] Reason:', err.message || err);
+  process.exit(1);
 }
 
 console.log('----------------------------------------------------');
-process.exit(0);
