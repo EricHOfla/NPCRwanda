@@ -12,30 +12,30 @@ try {
 }
 
 console.log('----------------------------------------------------');
-console.log('[auto-migrate] Checking database configuration...');
+console.log('[auto-migrate] Build-time database migration is disabled by default.');
+console.log('[auto-migrate] This avoids modifying a live database during a frontend build.');
 
-const dbUrl = process.env.DATABASE_URL;
+if (process.env.RUN_PRISMA_MIGRATIONS === 'true') {
+  if (!process.env.DATABASE_URL) {
+    console.error('[auto-migrate] RUN_PRISMA_MIGRATIONS=true requires DATABASE_URL.');
+    process.exit(1);
+  }
 
-if (!dbUrl) {
-  console.log('[auto-migrate] DATABASE_URL is not set in this build environment.');
-  console.log('[auto-migrate] No database writes will be attempted during this build.');
-  console.log('[auto-migrate] Apply committed Prisma migrations separately in the deployment environment.');
-  console.log('----------------------------------------------------');
-  process.exit(0);
-}
-
-try {
-  console.log('[auto-migrate] Applying committed Prisma migrations (no schema reset or data-loss flags)...');
-  execSync('npx prisma migrate deploy', {
-    stdio: 'inherit',
-    env: process.env,
-    timeout: 120000,
-  });
-  console.log('[auto-migrate] Committed database migrations applied successfully.');
-} catch (err) {
-  console.error('[auto-migrate] Prisma migrations failed. Aborting the build to prevent deploying against an incompatible schema.');
-  console.error('[auto-migrate] Reason:', err.message || err);
-  process.exit(1);
+  try {
+    console.log('[auto-migrate] Applying committed Prisma migrations...');
+    execSync('npx prisma migrate deploy', {
+      stdio: 'inherit',
+      env: process.env,
+      timeout: 120000,
+    });
+    console.log('[auto-migrate] Committed Prisma migrations applied successfully.');
+  } catch (err) {
+    console.error('[auto-migrate] Prisma migrations failed. Aborting the build.');
+    console.error('[auto-migrate] Reason:', err.message || err);
+    process.exit(1);
+  }
+} else {
+  console.log('[auto-migrate] Skipping database writes. Enable RUN_PRISMA_MIGRATIONS=true only after the production migration history has been safely baselined.');
 }
 
 console.log('----------------------------------------------------');
