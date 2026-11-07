@@ -81,7 +81,7 @@ Boost the number and performance of athletes in international competitions, focu
 Develop elite training pathways for Sitting Volleyball, Para Athletics, Goalball, Wheelchair Basketball, Para-Powerlifting, and Boccia.`,
   'background.pillar3': `Strengthen the capacity of NPC Board members, internal audit committee, conflict resolution committee, commissions, staff, and volunteers.
 Enhance NPC staff skills in international resource mobilization, proposal development, and project management.
-Strengthen sports leadership and administrative capacity in all 30 district Paralympic committees.
+Strengthen sports leadership and administrative capacity in district Paralympic committees across Rwanda.
 Advocate and build accessible sports infrastructure (offices, stadiums, hostels) capable of hosting international competitions.`,
   'background.pillar4': `Conduct research and archive key achievements in disability sports to share at international seminars and conferences.
 Develop a sustainable strategy to attract national and international investors to support disability sports activities.
