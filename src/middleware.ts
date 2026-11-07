@@ -81,6 +81,7 @@ function getRequiredApiPermission(pathname: string, method: string): Permission 
     '/api/media', '/api/upload',
   ];
   if (contentRoots.some(is)) {
+    if (pathname === '/api/media' && method === 'GET') return 'content.view';
     if (!isWrite) return null; // public content reads are filtered by their handlers
     if (method === 'DELETE') return 'content.delete';
     if (method === 'POST') return 'content.create';
