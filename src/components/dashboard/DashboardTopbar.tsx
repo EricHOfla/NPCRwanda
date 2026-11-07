@@ -18,6 +18,7 @@ interface NotificationItem {
   snippet: string;
   date: string;
   color: string;
+  href: string;
 }
 
 interface DashboardTopbarProps {
@@ -267,7 +268,7 @@ export default function DashboardTopbar({
                   notifications.map((item) => (
                     <Link
                       key={item.id}
-                      href="/dashboard?tab=contacts"
+                      href={item.href}
                       onClick={() => setBellOpen(false)}
                       style={{
                         width: '100%',
