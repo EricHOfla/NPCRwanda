@@ -813,46 +813,6 @@ export default function DashboardPage() {
     }
   };
 
-  const [cleaningSpam, setCleaningSpam] = useState(false);
-  const handleCleanSpam = async (target: 'messages' | 'volunteers' | 'applications') => {
-    const targetMap: Record<string, string> = {
-      messages: 'contacts',
-      volunteers: 'volunteers',
-      applications: 'applications',
-    };
-    const apiTarget = targetMap[target];
-    if (!apiTarget || apiTarget === 'applications') {
-      alert('Spam cleanup is available for Messages and Volunteers.');
-      return;
-    }
-
-    const choice = prompt(
-      `Spam Cleanup for ${target.toUpperCase()}:\n\n` +
-      `Type 'spam' to delete obvious bot and test submissions (e.g. example.com, test.com).\n` +
-      `Type 'all' to delete all submissions in this tab.\n\n` +
-      `Enter 'spam' or 'all':`,
-      'spam'
-    );
-    if (!choice || (choice.trim() !== 'spam' && choice.trim() !== 'all')) return;
-
-    try {
-      setCleaningSpam(true);
-      const res = await fetch('/api/admin/clean-spam', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: apiTarget, mode: choice.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to clean records');
-      await fetchProtectedData();
-      alert(`Cleanup complete: Removed ${data.cleaned?.[apiTarget] ?? 0} record(s).`);
-    } catch (err: any) {
-      alert(err.message || 'Error executing cleanup');
-    } finally {
-      setCleaningSpam(false);
-    }
-  };
-
   // Track whether tab/page state has been restored on client mount
   const [isTabInitialized, setIsTabInitialized] = useState(false);
 
@@ -1058,7 +1018,6 @@ export default function DashboardPage() {
   const canManageMembers = hasPermission(userRole, 'members.manage');
   const canDeleteMembers = hasPermission(userRole, 'members.delete');
   const canDeleteUsers = hasPermission(userRole, 'users.delete');
-  const canCleanSpam = hasPermission(userRole, 'inbox.clean-spam');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
     // The server layout has already authenticated the user and applied the
@@ -5279,18 +5238,6 @@ uploadMediaFile={uploadMediaFile}
                     >{sub.label}</button>
                   ))}
                 </div>
-                {inboxSubTab !== 'applications' && (
-                  <button
-                    onClick={() => handleCleanSpam(inboxSubTab)} hidden={!canCleanSpam}
-                    disabled={cleaningSpam}
-                    className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2"
-                    style={{ borderRadius: '8px', fontWeight: 600 }}
-                    title={`Clean spam submissions from ${inboxSubTab}`}
-                  >
-                    <i className={`fas ${cleaningSpam ? 'fa-spinner fa-spin' : 'fa-broom'}`} />
-                    <span>{cleaningSpam ? 'Cleaning...' : `Clean ${inboxSubTab === 'messages' ? 'Spam Messages' : inboxSubTab === 'volunteers' ? 'Spam Volunteers' : 'Spam Inquiries'}`}</span>
-                  </button>
-                )}
               </div>
 
               {inboxFeedback && (
