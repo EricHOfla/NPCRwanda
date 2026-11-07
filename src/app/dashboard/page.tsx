@@ -4,8 +4,8 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
+import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/context/LanguageContext';
 import { DEFAULT_SITE_CONTENT } from '@/lib/defaultSiteContent';
@@ -503,6 +503,7 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const router = useRouter();
+  const sessionProfile = useDashboardAuth();
   const {
     athletes,
     news,
@@ -854,7 +855,7 @@ export default function DashboardPage() {
   };
 
   // Track whether tab/page state has been restored on client mount
-  const isTabInitializedRef = useRef(false);
+  const [isTabInitialized, setIsTabInitialized] = useState(false);
 
   // Restore active tab and page on client mount from URL or localStorage
   useEffect(() => {
@@ -865,13 +866,11 @@ export default function DashboardPage() {
     const urlPage = params.get('page');
     const urlSubTab = params.get('subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
 
-    const storedTab = localStorage.getItem('admin_active_tab') as AdminTab | null;
-    const storedPage = localStorage.getItem('admin_active_page');
-    const storedSubTab = localStorage.getItem('admin_inbox_subtab') as 'messages' | 'volunteers' | 'donations' | 'applications' | null;
-
-    const targetTab = urlTab || storedTab || 'overview';
-    const targetPage = urlPage !== null && urlPage !== undefined ? urlPage : storedPage;
-    const targetSubTab = urlSubTab || storedSubTab;
+    // The URL is the single source of truth. Old localStorage values must not
+    // reopen a previously edited page when the user refreshes Admin Overview.
+    const targetTab = urlTab || 'overview';
+    const targetPage = urlPage;
+    const targetSubTab = urlSubTab;
 
     const PAGE_IDS = ['athletes', 'sports', 'news', 'announcements', 'events', 'governance', 'leadership', 'careers', 'home', 'about', 'partners', 'npc-background', 'contact'];
 
@@ -889,13 +888,13 @@ export default function DashboardPage() {
       setInboxSubTab(targetSubTab);
     }
 
-    isTabInitializedRef.current = true;
+    setIsTabInitialized(true);
   }, []);
 
   // Sync active tab, page, and subtab to URL and localStorage when changed
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!isTabInitializedRef.current) return;
+    if (!isTabInitialized) return;
 
     try {
       localStorage.setItem('admin_active_tab', adminTab);
@@ -933,7 +932,7 @@ export default function DashboardPage() {
     } catch {
       // Ignore storage/url write errors
     }
-  }, [adminTab, activeEditPage, inboxSubTab]);
+  }, [adminTab, activeEditPage, inboxSubTab, isTabInitialized]);
 
   // Support browser Back and Forward navigation
   useEffect(() => {
@@ -1015,11 +1014,11 @@ export default function DashboardPage() {
   const [settingsMsg, setSettingsMsg] = useState('');
 
   // Admin Profile state
-  const [profile, setProfile] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [profile, setProfile] = useState({ name: sessionProfile.name, email: sessionProfile.email, password: '', confirmPassword: '' });
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState('');
   const [profileError, setProfileError] = useState('');
-  const [currentUser, setCurrentUser] = useState<{ id?: string; name?: string; email?: string; role?: string }>({});
+  const [currentUser, setCurrentUser] = useState<{ id?: string; name?: string; email?: string; role?: string }>({ name: sessionProfile.name, email: sessionProfile.email, role: sessionProfile.role });
 
   // System User Management States & CRUD
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
@@ -1056,6 +1055,9 @@ export default function DashboardPage() {
   const canAccessCommunity = hasPermission(userRole, 'community.view');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
+    // The server layout has already authenticated the user and applied the
+    // route-level permission check before this page is rendered.
+    if (!authVerified) return false;
     if (isSuperAdmin) return false;
     if (isEditor && !editorAllowedPages.includes(page || 'home')) return true;
     return false;
@@ -1259,6 +1261,37 @@ export default function DashboardPage() {
   const lastActivityRef = useRef<number>(Date.now());
   const [authVerified, setAuthVerified] = useState(true);
 
+  // Handle permission failures for in-dashboard tab changes as well as direct
+  // URL navigation. The shared layout handles direct URL access; this covers
+  // internal controls that change adminTab without a Next.js navigation.
+  useEffect(() => {
+    if (!authVerified) return;
+
+    const restricted =
+      (adminTab === 'pages' && isPageRestricted(activeEditPage)) ||
+      (adminTab === 'settings' && !canAccessSettings) ||
+      (adminTab === 'users' && !canAccessUsers) ||
+      (adminTab === 'members' && !canAccessMembers) ||
+      (adminTab === 'subscribers' && !hasPermission(userRole, 'subscribers.view')) ||
+      ((adminTab === 'contacts' || adminTab === 'volunteers') && !hasPermission(userRole, 'inbox.view'));
+
+    if (!restricted) return;
+
+    window.alert('Access denied. You do not have permission to view this page. You are being returned to Admin Overview.');
+    setAdminTab('overview');
+    setActiveEditPage(null);
+    router.replace('/dashboard?tab=overview');
+  }, [
+    authVerified,
+    adminTab,
+    activeEditPage,
+    canAccessSettings,
+    canAccessUsers,
+    canAccessMembers,
+    userRole,
+    router,
+  ]);
+
   const verifySession = useCallback(async (): Promise<boolean> => {
     try {
       const res = await fetch('/api/auth/profile');
@@ -1287,13 +1320,11 @@ export default function DashboardPage() {
 
   // Initial mount data fetch with session verification guard
   useEffect(() => {
-    verifySession().then(isValid => {
-      if (isValid) {
-        // Run all three in parallel - no sequential waterfall
-        void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
-      }
-    });
-  }, [verifySession, fetchSystemUsers]);
+    // The server dashboard layout has already verified the signed session and
+    // supplied the user's role/profile. Load dashboard data without another
+    // profile request on every full page refresh.
+    void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
+  }, [fetchSystemUsers]);
 
   // Real-time synchronization handler
   const refreshRealTimeData = useCallback(async () => {
@@ -1517,8 +1548,11 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('admin_avatar', selectedAvatar);
+        const updatedUser = data.user || { name: profile.name, email: profile.email, role: currentUser.role };
+        setCurrentUser(updatedUser);
         setProfileMsg('Profile updated successfully!');
-        setProfile(prev => ({ ...prev, password: '', confirmPassword: '' }));
+        setProfile(prev => ({ ...prev, name: updatedUser.name || profile.name, email: updatedUser.email || profile.email, password: '', confirmPassword: '' }));
+        router.refresh();
       } else {
         setProfileError(data.error || 'Failed to update profile.');
       }
@@ -2548,38 +2582,7 @@ export default function DashboardPage() {
           {/* ──────────────────────────────
              TAB: PAGES CMS
              ────────────────────────────── */}
-          {adminTab === 'pages' && (
-            isPageRestricted(activeEditPage) ? (
-              <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
-                    <i className="fas fa-pen-slash" style={{ fontSize: '2.5rem', marginBottom: '16px', display: 'block', color: '#FFA000' }} />
-                    <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>
-                      Editor Access Restricted
-                    </h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0' }}>
-                      Editors are authorized to manage: Athletes Directory, Sports Programs, News Room, Announcements, Events Calendar, and Careers & Vacancies only.
-                    </p>
-                  </div>
-                  <div className="card-body text-center py-3">
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        if (isEditor) {
-                          setAdminTab('pages');
-                          setActiveEditPage('athletes');
-                        } else {
-                          setAdminTab('overview');
-                        }
-                      }}
-                    >
-                      <i className="fas fa-arrow-left me-2" />
-                      {isEditor ? 'Go to Athletes Directory' : 'Back to Overview'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
+          {adminTab === 'pages' && !isPageRestricted(activeEditPage) && (
             <div>
               {/* Page Editor Header Toolbar */}
               <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-white border rounded">
@@ -5699,7 +5702,7 @@ uploadMediaFile={uploadMediaFile}
           
           {adminTab === 'members' && (
             !canAccessMembers ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div className="animation-fade-in">
               <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
@@ -5889,7 +5892,7 @@ uploadMediaFile={uploadMediaFile}
              ────────────────────────────── */}
           {adminTab === 'users' && (
             !canAccessUsers ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div className="animation-fade-in">
               {/* Header */}
@@ -6275,7 +6278,7 @@ uploadMediaFile={uploadMediaFile}
 
           {adminTab === 'settings' && (
             !canAccessSettings ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div style={{ maxWidth: '800px' }}>
               <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>

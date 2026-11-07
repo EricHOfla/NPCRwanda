@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import AppSidebar from '@/components/dashboard/AppSidebar';
 import DashboardTopbar, { type DashboardUserProfile } from '@/components/dashboard/DashboardTopbar';
+import { DashboardAuthProvider } from '@/context/DashboardAuthContext';
 import { canAccessSection, normalizeRole, type DashboardSection } from '@/lib/rbac';
 
 const pageTitles: Record<string, string> = {
@@ -144,7 +145,7 @@ export default function DashboardLayoutClient({
           userProfile={profile}
         />
         <div key={`${pathname}?${queryString}`} className="dashboard-layout-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-          {children}
+          <DashboardAuthProvider profile={profile}>{children}</DashboardAuthProvider>
         </div>
       </div>
     </div>
