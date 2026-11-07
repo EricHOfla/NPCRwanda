@@ -2622,7 +2622,7 @@ export default function DashboardPage() {
                       onClick={() => {
                         const target = activeEditPage || 'home';
                         if (target === 'home') {
-                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'stats.districts', 'stats.disciplines', 'stats.founded', 'stats.clubs', 'stats.athletes', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl']);
+                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl']);
                         } else if (target === 'about') {
                           handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth']);
                         } else if (target === 'npc-background') {
@@ -3225,30 +3225,7 @@ export default function DashboardPage() {
                             <textarea className="form-control" rows={2} value={siteForm['impact.desc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'impact.desc': e.target.value })} />
                           </div>
                         </div>
-                        <hr />
-                        <h5 className="small fw-bold text-muted mb-3">Counters numerical values:</h5>
-                        <div className="row g-3">
-                          <div className="col-6 col-md">
-                            <label className="form-label small fw-bold">Districts Count</label>
-                            <input type="text" className="form-control" value={siteForm['stats.districts'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.districts': e.target.value })} />
-                          </div>
-                          <div className="col-6 col-md">
-                            <label className="form-label small fw-bold">Disciplines Count</label>
-                            <input type="text" className="form-control" value={siteForm['stats.disciplines'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.disciplines': e.target.value })} />
-                          </div>
-                          <div className="col-6 col-md">
-                            <label className="form-label small fw-bold">Athletes Count</label>
-                            <input type="text" className="form-control" value={siteForm['stats.athletes'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.athletes': e.target.value })} placeholder="500+" />
-                          </div>
-                          <div className="col-6 col-md">
-                            <label className="form-label small fw-bold">Founded Year</label>
-                            <input type="text" className="form-control" value={siteForm['stats.founded'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.founded': e.target.value })} />
-                          </div>
-                          <div className="col-6 col-md">
-                            <label className="form-label small fw-bold">Member Clubs</label>
-                            <input type="text" className="form-control" value={siteForm['stats.clubs'] || ''} onChange={e => setSiteForm({ ...siteForm, 'stats.clubs': e.target.value })} />
-                          </div>
-                        </div>
+
                       </div>
 
                       {/* About Preview Section */}
@@ -3358,7 +3335,7 @@ export default function DashboardPage() {
                       <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 p-3 bg-white border rounded shadow-sm gap-2">
                         <div>
                           <span className="fw-bold text-dark d-block">Save Home Page Changes</span>
-                          <span className="small text-muted">All hero, statistics, impact snapshot, about preview, YouTube, and Instagram details will update live on the site.</span>
+                          <span className="small text-muted">Hero content, impact text, about preview, YouTube, and Instagram details update live. Public impact counts are calculated from current records.</span>
                         </div>
                         <button 
                           type="button" 
