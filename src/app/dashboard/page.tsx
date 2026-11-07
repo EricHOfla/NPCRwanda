@@ -1068,6 +1068,7 @@ export default function DashboardPage() {
   const canManageMembers = hasPermission(userRole, 'members.manage');
   const canDeleteMembers = hasPermission(userRole, 'members.delete');
   const canDeleteUsers = hasPermission(userRole, 'users.delete');
+  const canCleanSpam = hasPermission(userRole, 'inbox.clean-spam');
   const editorAllowedPages = ['athletes', 'sports', 'news', 'announcements', 'events', 'careers'];
   const isPageRestricted = (page: string | null) => {
     // The server layout has already authenticated the user and applied the
@@ -5088,9 +5089,9 @@ uploadMediaFile={uploadMediaFile}
                     </div>
                     <div className="d-flex gap-2">
                       {!activeVolunteer.read && (
-                        <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm">Mark Read</button>
+                        <button onClick={() => { markVolunteerAsRead(activeVolunteer.id); setActiveVolunteer(null); }} className="btn btn-success btn-sm" hidden={!canManageInbox}>Mark Read</button>
                       )}
-                      <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication, 'Volunteer application')) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
+                      <button onClick={async () => { if (confirm(`Delete volunteer application from ${activeVolunteer.name}?`)) { if (await runSubmissionDelete(activeVolunteer.id, deleteVolunteerApplication, 'Volunteer application')) setActiveVolunteer(null); } }} disabled={deletingSubmissionIds.includes(activeVolunteer.id)} className="btn btn-danger btn-sm" hidden={!canDeleteInbox}>{deletingSubmissionIds.includes(activeVolunteer.id) ? 'Deleting…' : 'Delete Application'}</button>
                     </div>
                   </div>
                 )}
@@ -5215,7 +5216,7 @@ uploadMediaFile={uploadMediaFile}
                 </div>
                 {inboxSubTab !== 'applications' && (
                   <button
-                    onClick={() => handleCleanSpam(inboxSubTab)}
+                    onClick={() => handleCleanSpam(inboxSubTab)} hidden={!canCleanSpam}
                     disabled={cleaningSpam}
                     className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-2"
                     style={{ borderRadius: '8px', fontWeight: 600 }}
@@ -5326,6 +5327,7 @@ uploadMediaFile={uploadMediaFile}
                       }}
                       disabled={deletingSubmissionIds.includes(activeJobApplication.id)}
                       className="btn btn-danger btn-sm"
+                      hidden={!canDeleteInbox}
                     >
                       <i className="fas fa-trash me-1" /> {deletingSubmissionIds.includes(activeJobApplication.id) ? 'Deleting…' : 'Delete Application'}
                     </button>
@@ -5342,9 +5344,9 @@ uploadMediaFile={uploadMediaFile}
                   <p className="small text-dark p-3 rounded bg-white" style={{ border: '1px solid #F1F5F9' }}>{activeMessage.message}</p>
                   <div className="d-flex gap-2 mt-3">
                     {!activeMessage.read && (
-                      <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm">Mark Read</button>
+                      <button onClick={() => { markContactAsRead(activeMessage.id); setActiveMessage(null); }} className="btn btn-success btn-sm" hidden={!canManageDonations}>Mark Read</button>
                     )}
-                    <button onClick={async () => { if (confirm(`Delete contact message from ${activeMessage.name}?`)) { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage, 'Contact message')) setActiveMessage(null); } }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete Message'}</button>
+                    <button onClick={async () => { if (confirm(`Delete contact message from ${activeMessage.name}?`)) { if (await runSubmissionDelete(activeMessage.id, deleteContactMessage, 'Contact message')) setActiveMessage(null); } }} disabled={deletingSubmissionIds.includes(activeMessage.id)} className="btn btn-danger btn-sm" hidden={!canDeleteInbox}>{deletingSubmissionIds.includes(activeMessage.id) ? 'Deleting…' : 'Delete Message'}</button>
                   </div>
                 </div>
               )}
@@ -5380,7 +5382,7 @@ uploadMediaFile={uploadMediaFile}
                     {!activeDonation.read && (
                       <button onClick={() => { markDonationAsRead(activeDonation.id); setActiveDonation(null); }} className="btn btn-success btn-sm">Mark Read</button>
                     )}
-                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry, 'Donation inquiry')) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm">{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
+                    <button onClick={async () => { if (confirm(`Delete donation inquiry from ${activeDonation.name}?`)) { if (await runSubmissionDelete(activeDonation.id, deleteDonationInquiry, 'Donation inquiry')) setActiveDonation(null); } }} disabled={deletingSubmissionIds.includes(activeDonation.id)} className="btn btn-danger btn-sm" hidden={!canManageDonations}>{deletingSubmissionIds.includes(activeDonation.id) ? 'Deleting…' : 'Delete Inquiry'}</button>
                   </div>
                 </div>
               )}
