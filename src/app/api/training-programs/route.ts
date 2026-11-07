@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) return auth.response;
+
     await ensureAutoMigrated();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
