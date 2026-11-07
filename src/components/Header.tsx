@@ -192,12 +192,13 @@ export const Header: React.FC = () => {
               </li>
 
               <li className="nav-item dropdown">
-                <Link className={`nav-link dropdown-toggle${isActive('/sports') || isActive('/athletes') ? ' active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <Link className={`nav-link dropdown-toggle${isActive('/sports') || isActive('/athletes') || isActive('/sports-development') ? ' active' : ''}`} href="/sports" id="sportsMembersMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Sports &amp; Athletes
                 </Link>
                 <ul className="dropdown-menu" aria-labelledby="sportsMembersMenu">
                   <li><Link href="/sports" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-medal me-2" aria-hidden="true"></i>Sports</Link></li>
                   <li><Link href="/athletes" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-person-running me-2" aria-hidden="true"></i>Athletes</Link></li>
+                  <li><Link href="/sports-development" className="dropdown-item" onClick={closeMobileMenu}><i className="fas fa-chart-line me-2" aria-hidden="true"></i>Sports Development</Link></li>
                 </ul>
               </li>
 
