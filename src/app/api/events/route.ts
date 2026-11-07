@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         data: data.map((event) => {
           if (event.status === 'Cancelled' || !event.date) return event;
-          const today = new Date().toISOString().slice(0, 10);
+          const today = getRwandaDateString();
           const start = event.date.trim();
           const end = event.endDate?.trim() || '';
           const currentStatus = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
     }
 
     const events = await prisma.event.findMany({ where: whereClause, orderBy: { date: 'asc' } });
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getRwandaDateString();
     const responseEvents = events.map((event) => {
       if (event.status === 'Cancelled' || !event.date) return event;
       const start = event.date.trim();
