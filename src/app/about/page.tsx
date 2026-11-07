@@ -202,24 +202,6 @@ export default function AboutPage() {
                 }}
               >
                 <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  2001
-                </div>
-                <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Founded in Rwanda
-                </div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div
-                className="p-3"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1.5px solid #CBD5E1',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                }}
-              >
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
                   30
                 </div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>
@@ -256,10 +238,28 @@ export default function AboutPage() {
                 }}
               >
                 <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  Athens 2004
+                  8+
                 </div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>
-                  First Paralympic Games
+                  Para-Sport Disciplines
+                </div>
+              </div>
+            </div>
+            <div className="col-6 col-md-3">
+              <div
+                className="p-3"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1.5px solid #CBD5E1',
+                  borderRadius: '14px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                }}
+              >
+                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
+                  6
+                </div>
+                <div className="small fw-bold" style={{ color: '#000000' }}>
+                  Paralympic Games Editions
                 </div>
               </div>
             </div>
