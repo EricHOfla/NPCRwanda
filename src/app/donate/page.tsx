@@ -748,62 +748,64 @@ export default function DonatePage() {
         .donation-hero {
           position: relative;
           overflow: hidden;
-          padding: 44px 0 68px;
-          background: linear-gradient(135deg, #06152B 0%, #0B2545 60%, #0F325E 100%);
-          color: #ffffff;
+          padding: 44px 0 60px;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+          color: #000000;
         }
         .donation-hero:after {
-          content: '';
-          position: absolute;
-          width: 500px;
-          height: 500px;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          right: -100px;
-          top: -200px;
-          pointer-events: none;
+          display: none;
+        }
+        .donation-hero .breadcrumb {
+          margin-bottom: 0;
         }
         .donation-hero .breadcrumb a,
         .donation-hero .breadcrumb-item {
-          color: #cbd5e1;
+          color: #000000;
           font-size: 0.88rem;
-          font-weight: 500;
+          font-weight: 600;
         }
         .donation-hero .breadcrumb a:hover {
-          color: #ffffff;
+          color: #0b5f9f;
           text-decoration: underline;
         }
         .donation-hero .breadcrumb-item.active {
-          color: #ffffff;
-          font-weight: 700;
+          color: #000000;
+          font-weight: 800;
+        }
+        .donation-hero .breadcrumb-item + .breadcrumb-item::before {
+          color: #64748b;
         }
         .donation-eyebrow {
           display: inline-flex;
           align-items: center;
-          background: rgba(245, 158, 11, 0.2);
-          color: #fde047;
-          border: 1.5px solid rgba(245, 158, 11, 0.5);
-          font-size: 0.78rem;
+          background: #fef3c7;
+          color: #000000;
+          border: 1.5px solid #f59e0b;
+          font-size: 0.8rem;
           letter-spacing: 0.12em;
           font-weight: 800;
           padding: 6px 14px;
           border-radius: 20px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .donation-eyebrow i {
+          color: #d97706;
         }
         .donation-title {
           font-size: clamp(2.2rem, 4.2vw, 3.4rem);
           font-weight: 800;
           line-height: 1.15;
-          color: #ffffff;
+          color: #000000;
           margin-bottom: 16px;
           letter-spacing: -0.02em;
         }
         .donation-hero-copy {
           font-size: 1.1rem;
           line-height: 1.7;
-          color: #f1f5f9;
+          color: #000000;
           max-width: 620px;
-          font-weight: 400;
+          font-weight: 500;
         }
         .donation-trust-grid {
           display: flex;
@@ -814,42 +816,42 @@ export default function DonatePage() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #ffffff;
-          background: #0d2d54;
-          border: 1.5px solid #2563eb;
+          font-size: 0.86rem;
+          font-weight: 700;
+          color: #000000;
+          background: #ffffff;
+          border: 1.5px solid #cbd5e1;
           padding: 8px 14px;
           border-radius: 24px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         .trust-icon-shield {
-          color: #38bdf8;
-          font-size: 1rem;
+          color: #0284c7;
+          font-size: 1.05rem;
         }
         .trust-icon-momo {
-          color: #fbbf24;
-          font-size: 1rem;
+          color: #d97706;
+          font-size: 1.05rem;
         }
         .trust-icon-receipt {
-          color: #34d399;
-          font-size: 1rem;
+          color: #059669;
+          font-size: 1.05rem;
         }
 
         /* Impact Card in Hero */
         .donation-impact-card {
-          background: #071930;
-          border: 2px solid #1e3a8a;
+          background: #ffffff;
+          border: 2px solid #cbd5e1;
           border-radius: 20px;
           padding: 28px;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
         }
         .impact-icon {
           width: 48px;
           height: 48px;
           border-radius: 12px;
-          background: #f59e0b;
-          color: #06152b;
+          background: #fef3c7;
+          color: #b45309;
           display: grid;
           place-items: center;
           font-size: 1.3rem;
@@ -859,26 +861,27 @@ export default function DonatePage() {
           font-size: 0.72rem;
           font-weight: 800;
           letter-spacing: 0.14em;
-          color: #fde047;
+          color: #0b5f9f;
           display: block;
           margin-bottom: 2px;
         }
         .impact-title {
           font-size: 1.25rem;
           font-weight: 800;
-          color: #ffffff;
+          color: #000000;
         }
         .impact-description {
           font-size: 0.94rem;
           line-height: 1.65;
-          color: #e2e8f0;
+          color: #1e293b;
+          font-weight: 500;
         }
         .impact-metrics-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 10px;
-          background: #0b2545;
-          border: 1px solid #1e40af;
+          background: #f1f5f9;
+          border: 1px solid #cbd5e1;
           border-radius: 14px;
           padding: 14px 8px;
           text-align: center;
@@ -893,13 +896,13 @@ export default function DonatePage() {
           display: block;
           font-size: 1.35rem;
           font-weight: 800;
-          color: #38bdf8;
+          color: #0b5f9f;
         }
         .metric-label {
           display: block;
           font-size: 0.78rem;
-          font-weight: 600;
-          color: #f8fafc;
+          font-weight: 700;
+          color: #000000;
           margin-top: 3px;
         }
 
