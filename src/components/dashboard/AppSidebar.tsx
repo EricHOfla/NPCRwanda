@@ -80,6 +80,7 @@ export default function AppSidebar({
 
   const activeProfile = propProfile || internalProfile;
   const activeAvatar = propAvatar || internalAvatar;
+  const activeAvatarSrc = activeAvatar.startsWith('http') || activeAvatar.startsWith('/') ? activeAvatar : `/assets/img/${activeAvatar}`;
 
   const role = (activeProfile.role || 'ADMIN').toUpperCase();
   const isSuperAdmin = role === 'SUPER_ADMIN';
@@ -380,7 +381,7 @@ export default function AppSidebar({
           {sidebarOpen && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 8px' }}>
               <img
-                src={`/assets/img/${activeAvatar}`}
+                src={activeAvatarSrc}
                 style={{
                   width: '32px',
                   height: '32px',
