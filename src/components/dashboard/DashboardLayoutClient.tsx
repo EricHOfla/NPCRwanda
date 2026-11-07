@@ -58,7 +58,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       <AppSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeId={activeId} />
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
         <DashboardTopbar title={title} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="dashboard-layout-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <div key={`${pathname}?${searchParams.toString()}`} className="dashboard-layout-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
           {children}
         </div>
       </div>
