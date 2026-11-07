@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
     const event = await prisma.event.findUnique({ where: { id: parsed.data.eventId } });
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getRwandaDateString();
     const start = event?.date?.trim() || '';
     const end = event?.endDate?.trim() || '';
     const isPast = Boolean(start && (end ? end < today : start < today));
