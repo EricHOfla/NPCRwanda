@@ -59,6 +59,7 @@ function DonationManagementContent() {
   const [paymentFilter, setPaymentFilter] = useState('ALL');
   const [currencyFilter, setCurrencyFilter] = useState('ALL');
   const [paymentSearch, setPaymentSearch] = useState('');
+  const debouncedPaymentSearch = useDebounce(paymentSearch, 300);
   const [paymentPage, setPaymentPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
@@ -415,7 +416,6 @@ function DonationManagementContent() {
           </div>
 
           {/* Online Payment Transactions */}
-             ══════════════════════════════════════════════════════════════════ */}
           <section style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
               {/* Header with Search and Filters */}
               <div style={{ padding: '18px 24px', borderBottom: '1px solid #F1F5F9', background: '#FAFAFA' }} className="d-flex flex-wrap justify-content-between align-items-center gap-3">
