@@ -592,7 +592,6 @@ export default function DashboardPage() {
   const [sportSearch, setSportSearch] = useState('');
   const [leaderSearch, setLeaderSearch] = useState('');
   const [volunteerSearch, setVolunteerSearch] = useState('');
-  const [donationSearch, setDonationSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
   const [activeEditPage, setActiveEditPage] = useState<string | null>('home');
   const [previewModeEnabled, setPreviewModeEnabled] = useState(false);
@@ -1887,7 +1886,6 @@ export default function DashboardPage() {
   const debouncedEventSearch = useDebounce(eventSearch, 300);
   const debouncedCareerSearch = useDebounce(careerSearch, 300);
   const debouncedVolunteerSearch = useDebounce(volunteerSearch, 300);
-  const debouncedDonationSearch = useDebounce(donationSearch, 300);
   const debouncedPartnerSearch = useDebounce(partnerSearch, 300);
   const debouncedSportSearch = useDebounce(sportSearch, 300);
   const debouncedLeaderSearch = useDebounce(leaderSearch, 300);
