@@ -64,6 +64,19 @@ World ParaVolley (WPV)|Global Federation|International governing body for Sittin
   'about.objective.phrase.Partnership Growth': 'Build sustainable partnerships with government, federations, and private sector sponsors.',
 
   // NPC Background Page
+  'background.pageTitle': 'NPC Background & Objectives',
+  'background.pageIntro': 'Explore the historical background, strategic plan pillars, swot analysis, and structures guiding the Paralympic Movement in Rwanda.',
+  'background.foundationLabel': 'Our Foundation',
+  'background.foundationTitle': 'Welcome to NPC Rwanda',
+  'background.foundationParagraph1': 'Established on November 1, 2001 (originally founded as FERHANDIS), the National Paralympic Committee of Rwanda has transitioned from a small advocacy group into a highly structured national movement. Following compliance regulations of the International Paralympic Committee (IPC), the name was updated in 2007 to represent our unified Paralympic focus.',
+  'background.foundationParagraph2': 'In the aftermath of the 1994 genocide against the Tutsi, adapted sports served as a powerful vehicle for rehabilitation, social inclusion, and the empowerment of persons with physical, visual, and intellectual impairments. Today, NPC Rwanda coordinates with sports associations, clubs, and local governments to scout talent and secure global representation.',
+  'background.corePillarsTitle': 'Core Pillars of Action',
+  'background.pillarsTitle': '14 Strategic Objectives',
+  'background.pillarsIntro': 'Grouped by our 4 core pillars of intervention under the 2024-2028 Strategic Framework.',
+  'background.pillarTitle.1': 'Pillar 1: Promotion & Participation',
+  'background.pillarTitle.2': 'Pillar 2: Performance & Competitions',
+  'background.pillarTitle.3': 'Pillar 3: Capacity & Professional Development',
+  'background.pillarTitle.4': 'Pillar 4: Strategic Partnerships & Diplomacy',
   'background.governingText': 'The supreme decision-making body of NPC Rwanda. The Governing Board consists of the Executive Board (Chairperson, Vice-Chairpersons, Secretary General, Treasurer) alongside specialized Advisors representing physical, visual, deaf, and intellectual impairment categories, ensuring comprehensive representation.',
   'background.tocText': 'Our Theory of Change process map directs the annual retreat and board guidelines. We hypothesize that by providing targeted athletic training and raising community awareness, we systematically dismantle social prejudices against persons with disabilities, enabling long-term social rehabilitation, confidence, and international athletic representation.',
   'background.strengths': `Active governing board and efficient, knowledgeable staff.
