@@ -84,7 +84,7 @@ export default function HomeClient() {
   // Public impact counters are derived from current managed records, never manually entered or seeded figures.
   const activeDistricts = new Set(
     dpscoContacts
-      .filter(contact => contact.active !== false)
+      .filter(contact => contact.active)
       .map(contact => contact.district.trim().toLocaleLowerCase())
       .filter(Boolean)
   );
