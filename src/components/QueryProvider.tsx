@@ -56,7 +56,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             // Never persist private admin queries or failed queries
             return (
               query.state.status === 'success' &&
-              query.queryKey[0] === 'npc-public-bundle'
+              query.queryKey.length === 1 && query.queryKey[0] === 'npc-public-bundle'
             );
           },
         },
