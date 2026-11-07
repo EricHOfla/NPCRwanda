@@ -44,7 +44,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'about.value.phrase.Empowerment': 'Equipping athletes with the tools, training, and support they need to thrive.',
   'about.value.phrase.Intersectionality': 'Recognizing the diverse experiences that shape our athletes and communities.',
   'about.objective.phrase.Athlete Excellence': 'Strengthen coaching, science, and athlete support to compete for podium finishes internationally.',
-  'about.objective.phrase.Grassroots Development': 'Expand access in all 30 districts and identify talent early for long-term development.',
+  'about.objective.phrase.Grassroots Development': 'Expand access across Rwanda and identify talent early for long-term development.',
   'about.objective.phrase.Safeguarding & Governance': 'Maintain strong safeguarding practices and transparent governance at all levels.',
   'about.objective.phrase.Partnership Growth': 'Build sustainable partnerships with government, federations, and private sector sponsors.',
 
