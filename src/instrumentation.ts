@@ -1,11 +1,8 @@
+/**
+ * Database schema changes are applied through explicit Prisma migrations.
+ * Application startup must remain read-only and must never seed or rewrite
+ * production records as a side effect of starting a web worker.
+ */
 export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    try {
-      const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
-      await ensureAutoMigrated();
-      console.log('[AutoMigrate] Server startup database schema check completed.');
-    } catch (err) {
-      console.error('[AutoMigrate] Error during startup auto-migration:', err);
-    }
-  }
+  // Intentionally no database writes during application startup.
 }
