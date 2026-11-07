@@ -96,7 +96,6 @@ export async function GET(request: NextRequest) {
 // POST: Create a new job position
 export async function POST(request: Request) {
   try {
-    await ensureCareerDeadlineColumnAndAutoClose();
     const body = await request.json();
 
     // Auto-generate slug if not provided
