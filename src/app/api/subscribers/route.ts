@@ -6,36 +6,6 @@ import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 export const dynamic = 'force-dynamic';
 
-let tableEnsured = false;
-
-// Auto-creates the Subscriber table if it doesn't exist yet (production safety)
-async function ensureSubscriberTable() {
-  if (tableEnsured) return;
-  try {
-    await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "Subscriber" (
-        "id"         TEXT NOT NULL,
-        "email"      TEXT NOT NULL,
-        "active"     BOOLEAN NOT NULL DEFAULT true,
-        "categories" TEXT[] NOT NULL DEFAULT '{}',
-        "token"      TEXT,
-        "createdAt"  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt"  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT "Subscriber_pkey" PRIMARY KEY ("id")
-      )
-    `;
-    await prisma.$executeRaw`
-      CREATE UNIQUE INDEX IF NOT EXISTS "Subscriber_email_key" ON "Subscriber"("email")
-    `;
-    await prisma.$executeRaw`
-      CREATE INDEX IF NOT EXISTS "Subscriber_createdAt_idx" ON "Subscriber"("createdAt" DESC)
-    `;
-    tableEnsured = true;
-  } catch {
-    tableEnsured = true;
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     const session = await getSessionUser(request);
@@ -43,7 +13,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await ensureSubscriberTable();
 
     const { searchParams } = new URL(request.url);
     const pageParam = searchParams.get('page');
@@ -145,7 +114,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
 
-    await ensureSubscriberTable();
 
     // Generate a unique ID and token
     const { randomBytes } = await import('crypto');
