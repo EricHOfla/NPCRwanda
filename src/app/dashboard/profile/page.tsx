@@ -1,0 +1,244 @@
+'use client';
+
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+type Profile = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+};
+
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+export default function ProfileSettingsPage() {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profile, setProfile] = useState<Profile>({ id: '', name: '', email: '', role: 'EDITOR', avatar: '' });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/auth/profile', { cache: 'no-store' })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Unable to load your profile.');
+        if (active) setProfile(data);
+      })
+      .catch((error) => {
+        if (active) setMessage({ type: 'danger', text: error.message || 'Unable to load your profile.' });
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!photoFile) {
+      setPreviewUrl('');
+      return;
+    }
+    const url = URL.createObjectURL(photoFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
+
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setMessage({ type: 'danger', text: 'Choose a JPG, PNG, or WebP image.' });
+      event.target.value = '';
+      return;
+    }
+    if (file.size > MAX_PHOTO_SIZE) {
+      setMessage({ type: 'danger', text: 'Profile photos must be 5 MB or smaller.' });
+      event.target.value = '';
+      return;
+    }
+    setMessage(null);
+    setPhotoFile(file);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessage(null);
+
+    if (password && password.length < 6) {
+      setMessage({ type: 'danger', text: 'Your new password must contain at least 6 characters.' });
+      return;
+    }
+    if (password !== confirmPassword) {
+      setMessage({ type: 'danger', text: 'The password confirmation does not match.' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      let avatar = profile.avatar || '';
+      if (photoFile) {
+        const formData = new FormData();
+        formData.append('file', photoFile);
+        formData.append('folder', 'profile');
+        formData.append('entity', profile.id || 'admin-profile');
+
+        const uploadResponse = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadResponse.json().catch(() => ({}));
+        if (!uploadResponse.ok || !uploadData.url) {
+          throw new Error(uploadData.error || 'Profile photo upload failed.');
+        }
+        avatar = uploadData.url;
+      }
+
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: profile.name,
+          email: profile.email,
+          password: password || undefined,
+          avatar,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Unable to save profile changes.');
+
+      setProfile(data.user);
+      setPhotoFile(null);
+      setPassword('');
+      setConfirmPassword('');
+      setMessage({ type: 'success', text: 'Your profile has been updated successfully.' });
+      router.refresh();
+    } catch (error) {
+      setMessage({ type: 'danger', text: error instanceof Error ? error.message : 'Unable to save profile changes.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const avatarSrc = previewUrl || (profile.avatar
+    ? profile.avatar.startsWith('http') || profile.avatar.startsWith('/')
+      ? profile.avatar
+      : `/assets/img/${profile.avatar}`
+    : '/assets/img/avatar-1.svg');
+
+  if (loading) {
+    return (
+      <main className="p-4 d-flex align-items-center justify-content-center" style={{ minHeight: '320px' }}>
+        <div className="text-center text-muted">
+          <i className="fas fa-circle-notch fa-spin fa-2x mb-3 text-primary" />
+          <p className="small fw-semibold mb-0">Loading profile settings...</p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="p-3 p-md-4" style={{ background: '#F8FAFC', minHeight: '100%' }}>
+      <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+        <div className="mb-4">
+          <span className="small fw-bold text-uppercase" style={{ color: '#B7791F', letterSpacing: '1px' }}>Account</span>
+          <h2 className="h3 fw-bold mb-1" style={{ color: '#0F172A' }}>Profile Settings</h2>
+          <p className="text-muted mb-0">Manage your personal details, profile photo, and sign-in password.</p>
+        </div>
+
+        {message && (
+          <div className={`alert alert-${message.type} d-flex align-items-center gap-2`} role="status">
+            <i className={`fas ${message.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`} />
+            <span>{message.text}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <section className="card border-0 shadow-sm rounded-4 mb-4">
+            <div className="card-body p-3 p-md-4">
+              <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4">
+                <div className="text-center">
+                  <img
+                    src={avatarSrc}
+                    alt="Profile photo preview"
+                    className="rounded-circle border"
+                    style={{ width: '116px', height: '116px', objectFit: 'cover', background: '#F1F5F9', borderColor: '#E2E8F0' }}
+                    onError={(event) => { event.currentTarget.src = '/assets/img/avatar-1.svg'; }}
+                  />
+                </div>
+                <div className="flex-grow-1 text-center text-sm-start">
+                  <h3 className="h5 fw-bold mb-1" style={{ color: '#0F172A' }}>Profile photo</h3>
+                  <p className="small text-muted mb-3">Choose a clear photo to identify your account across the admin dashboard.</p>
+                  <div className="d-flex flex-wrap justify-content-center justify-content-sm-start gap-2">
+                    <button type="button" className="btn btn-sm fw-semibold text-white" style={{ background: '#0F172A', borderColor: '#0F172A' }} onClick={() => fileInputRef.current?.click()}>
+                      <i className="fas fa-upload me-2" />Choose photo from computer
+                    </button>
+                    {(photoFile || profile.avatar) && (
+                      <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => { setPhotoFile(null); setProfile((current) => ({ ...current, avatar: '' })); }}>
+                        Remove photo
+                      </button>
+                    )}
+                  </div>
+                  <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="d-none" onChange={handlePhotoChange} />
+                  <small className="text-muted d-block mt-2">JPG, PNG, or WebP · Maximum 5 MB</small>
+                  {photoFile && <small className="text-success d-block mt-1"><i className="fas fa-check-circle me-1" />{photoFile.name} selected</small>}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="card border-0 shadow-sm rounded-4 mb-4">
+            <div className="card-body p-3 p-md-4">
+              <h3 className="h5 fw-bold mb-3" style={{ color: '#0F172A' }}>Personal information</h3>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label small fw-semibold">Full name</label>
+                  <input className="form-control" value={profile.name} onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} required minLength={2} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label small fw-semibold">Email address</label>
+                  <input type="email" className="form-control" value={profile.email} onChange={(event) => setProfile((current) => ({ ...current, email: event.target.value }))} required />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label small fw-semibold">System role</label>
+                  <input className="form-control text-uppercase" value={profile.role.replace('_', ' ')} readOnly />
+                  <small className="text-muted">Your access role is managed by the system administrator.</small>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="card border-0 shadow-sm rounded-4 mb-4">
+            <div className="card-body p-3 p-md-4">
+              <h3 className="h5 fw-bold mb-1" style={{ color: '#0F172A' }}>Change password</h3>
+              <p className="small text-muted mb-3">Leave these fields empty if you do not want to change your password.</p>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label small fw-semibold">New password</label>
+                  <input type="password" className="form-control" autoComplete="new-password" minLength={6} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 6 characters" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label small fw-semibold">Confirm new password</label>
+                  <input type="password" className="form-control" autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Re-enter new password" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className="d-flex flex-wrap gap-2 justify-content-end">
+            <button type="button" className="btn btn-light border px-4" onClick={() => router.push('/dashboard?tab=overview')}>Cancel</button>
+            <button type="submit" className="btn px-4 fw-semibold text-white" style={{ background: '#0F172A', borderColor: '#0F172A' }} disabled={saving}>
+              {saving ? <><i className="fas fa-spinner fa-spin me-2" />Saving...</> : <><i className="fas fa-floppy-disk me-2" />Save profile</>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  );
+}

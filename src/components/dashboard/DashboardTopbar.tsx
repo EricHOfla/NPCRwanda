@@ -158,7 +158,7 @@ export default function DashboardTopbar({
   const isSuperAdmin = profile.role === 'SUPER_ADMIN';
   const isAdmin = profile.role === 'ADMIN' || isSuperAdmin;
   const avatarSrc = profile.avatar
-    ? profile.avatar.startsWith('/')
+    ? (profile.avatar.startsWith('/') || profile.avatar.startsWith('http'))
       ? profile.avatar
       : `/assets/img/${profile.avatar}`
     : '/assets/img/avatar-1.svg';
@@ -495,7 +495,7 @@ export default function DashboardTopbar({
 
               <div style={{ padding: '4px 0' }}>
                 <Link
-                  href="/dashboard?tab=profile"
+                  href="/dashboard/profile"
                   onClick={() => setProfileDropdownOpen(false)}
                   style={{
                     width: '100%',

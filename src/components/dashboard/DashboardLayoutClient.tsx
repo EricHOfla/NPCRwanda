@@ -46,6 +46,7 @@ const editorRestrictedPages = new Set([
 ]);
 
 function getRequiredSection(pathname: string, tab: string): DashboardSection | null {
+  if (pathname.endsWith('/profile')) return 'profile';
   if (pathname.endsWith('/community')) return 'community';
   if (pathname.endsWith('/donations')) return 'donations';
 
@@ -110,12 +111,14 @@ export default function DashboardLayoutClient({
   }, [hasRouteAccess, router, pathname, queryString]);
 
   const activeId = useMemo(() => {
+    if (pathname.endsWith('/profile')) return 'profile';
     if (pathname.endsWith('/community')) return 'community-sports';
     if (pathname.endsWith('/donations')) return 'donations-payments';
     return tab === 'pages' ? `page-${page}` : tab;
   }, [pathname, tab, page]);
 
   const title = useMemo(() => {
+    if (pathname.endsWith('/profile')) return 'Profile Settings';
     if (pathname.endsWith('/community')) return 'Sports Development';
     if (pathname.endsWith('/donations')) return 'Donations & Contributions';
     return tab === 'pages'

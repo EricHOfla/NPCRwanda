@@ -393,12 +393,24 @@ function DonationManagementContent() {
 
   return (
     <>
-      <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <main className="dashboard-main-content donations-admin-shell" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+        <style>{`
+          .donations-admin-shell { --npc-navy: #0F172A; --npc-gold: #FFA000; --npc-border: #E2E8F0; }
+          .donations-admin-shell .btn-primary, .donations-admin-shell .page-item.active .page-link { background-color: var(--npc-navy) !important; border-color: var(--npc-navy) !important; color: #fff !important; }
+          .donations-admin-shell .btn-primary:hover, .donations-admin-shell .page-item.active .page-link:hover { background-color: #1E293B !important; border-color: #1E293B !important; }
+          .donations-admin-shell .btn-outline-primary { color: var(--npc-navy) !important; border-color: var(--npc-navy) !important; }
+          .donations-admin-shell .btn-outline-primary:hover { background: var(--npc-navy) !important; color: #fff !important; }
+          .donations-admin-shell .text-primary { color: var(--npc-navy) !important; }
+          .donations-admin-shell .bg-primary-subtle { background-color: #FFF7E6 !important; }
+          .donations-admin-shell .border-primary-subtle { border-color: #FDE3A7 !important; }
+          .donations-admin-shell .form-control:focus, .donations-admin-shell .form-select:focus { border-color: var(--npc-gold); box-shadow: 0 0 0 .2rem rgba(255,160,0,.16); }
+          @media (max-width: 767.98px) { .donations-admin-shell { padding: 16px !important; } }
+        `}</style>
           <div className="d-flex flex-wrap justify-content-end gap-2 mb-3">
             <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); void loadInquiries(); }} disabled={loading || inquiryLoading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
               <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
             </button>
-            <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold" onClick={exportCsv} style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}>
+            <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold" onClick={exportCsv} style={{ borderRadius: '8px', padding: '6px 16px', background: '#0F172A', border: 'none', fontSize: '0.82rem' }}>
               <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
             </button>
           </div>
@@ -426,7 +438,7 @@ function DonationManagementContent() {
           {/* Hero Banner */}
           <div
             style={{
-              background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #0369A1 100%)',
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
               borderRadius: '16px',
               padding: '24px 28px',
               color: '#FFFFFF',
@@ -511,8 +523,8 @@ function DonationManagementContent() {
                   <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Settled Amount (RWF)
                   </span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#E0F2FE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className="fas fa-coins" style={{ color: '#0284C7', fontSize: '1rem' }} />
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#FFF7E6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-coins" style={{ color: '#0F172A', fontSize: '1rem' }} />
                   </div>
                 </div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
@@ -748,8 +760,8 @@ function DonationManagementContent() {
                                       width: '32px',
                                       height: '32px',
                                       borderRadius: '50%',
-                                      background: item.anonymous ? '#E2E8F0' : '#E0F2FE',
-                                      color: item.anonymous ? '#475569' : '#0284C7',
+                                      background: item.anonymous ? '#E2E8F0' : '#FFF7E6',
+                                      color: item.anonymous ? '#475569' : '#0F172A',
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
@@ -1344,7 +1356,7 @@ function DonationManagementContent() {
         <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
-              <div className="modal-header text-white" style={{ background: 'linear-gradient(135deg, #0284C7, #0369A1)' }}>
+              <div className="modal-header text-white" style={{ background: 'linear-gradient(135deg, #0F172A, #1E293B)' }}>
                 <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
                   <i className="fas fa-hand-holding-heart text-warning" /> Support & Partnership Inquiry
                 </h5>
@@ -1425,7 +1437,7 @@ function DonationManagementContent() {
                   <a
                     href={`mailto:${selectedInquiry.email}?subject=NPC Rwanda Support & Partnership - Follow Up&body=Dear ${encodeURIComponent(selectedInquiry.name)},%0D%0A%0D%0AThank you for reaching out to the National Paralympic Committee of Rwanda regarding ${encodeURIComponent(selectedInquiry.supportType)}.`}
                     className="btn btn-sm btn-primary fw-semibold"
-                    style={{ background: '#0284C7', border: 'none' }}
+                    style={{ background: '#0F172A', border: 'none' }}
                   >
                     <i className="fas fa-paper-plane me-1" /> Follow Up via Email
                   </a>
