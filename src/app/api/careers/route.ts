@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
@@ -21,11 +22,15 @@ async function ensureCareerDeadlineColumnAndAutoClose() {
 }
 
 // GET: Fetch careers list with optional filters and pagination
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     await ensureCareerDeadlineColumnAndAutoClose();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || '';
+    const status = searchParams.get('status') || 'Open';
+    if (status !== 'Open') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const slug = searchParams.get('slug') || '';
     const search = searchParams.get('search') || '';
     const page = searchParams.get('page');
