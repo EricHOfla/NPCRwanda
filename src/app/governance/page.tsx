@@ -5,70 +5,70 @@ import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 
-const governancePrinciples = [
-  {
-    icon: 'fa-scale-balanced',
-    title: content('accountabilityTitle', 'Accountability'),
-    description: content('accountabilityDesc', 'Leadership and management are responsible for decisions, resources, and the results delivered to athletes and members.'),
-  },
-  {
-    icon: 'fa-eye',
-    title: content('transparencyTitle', 'Transparency'),
-    description: content('transparencyDesc', 'We aim to make our governance approach, responsibilities, and institutional direction clear to our stakeholders.'),
-  },
-  {
-    icon: 'fa-handshake-angle',
-    title: content('integrityTitle', 'Integrity'),
-    description: content('integrityDesc', 'We promote ethical conduct, fairness, and respect throughout the Paralympic movement in Rwanda.'),
-  },
-  {
-    icon: 'fa-people-group',
-    title: content('representationTitle', 'Representation'),
-    description: content('representationDesc', 'Athletes, members, and disability groups should have a meaningful voice in the decisions that affect them.'),
-  },
-];
-
-const governanceLevels = [
-  {
-    number: '01',
-    title: 'General Assembly',
-    description: content('generalAssemblyDesc', 'The supreme member body that provides the institutional mandate and considers major decisions.'),
-    icon: 'fa-users',
-    level: 'primary',
-  },
-  {
-    number: '02',
-    title: 'Board of Directors',
-    description: content('boardDesc', 'Provides strategic oversight, governance direction, and accountability for the committee.'),
-    icon: 'fa-landmark',
-    level: 'primary',
-  },
-  {
-    number: '03',
-    title: 'Executive Secretariat',
-    description: content('secretariatDesc', 'Coordinates daily operations and implements approved plans, programmes, and decisions.'),
-    icon: 'fa-building',
-    level: 'primary',
-  },
-];
-
-const supportingStructures = [
-  {
-    title: 'Technical Commissions',
-    description: content('technicalDesc', 'Support technical standards, sport development, athlete preparation, and specialist functions.'),
-    icon: 'fa-medal',
-  },
-  {
-    title: 'District Committees',
-    description: content('districtDesc', 'Help extend participation, talent identification, and adapted sport activities across Rwanda.'),
-    icon: 'fa-map-location-dot',
-  },
-];
-
 export default function GovernancePage() {
   const { t } = useTranslation();
   const { siteContent } = useData();
   const content = (key: string, fallback: string) => siteContent[`governance.${key}`] || fallback;
+
+  const governancePrinciples = [
+    {
+      icon: 'fa-scale-balanced',
+      title: content('accountabilityTitle', 'Accountability'),
+      description: content('accountabilityDesc', 'Leadership and management are responsible for decisions, resources, and the results delivered to athletes and members.'),
+    },
+    {
+      icon: 'fa-eye',
+      title: content('transparencyTitle', 'Transparency'),
+      description: content('transparencyDesc', 'We aim to make our governance approach, responsibilities, and institutional direction clear to our stakeholders.'),
+    },
+    {
+      icon: 'fa-handshake-angle',
+      title: content('integrityTitle', 'Integrity'),
+      description: content('integrityDesc', 'We promote ethical conduct, fairness, and respect throughout the Paralympic movement in Rwanda.'),
+    },
+    {
+      icon: 'fa-people-group',
+      title: content('representationTitle', 'Representation'),
+      description: content('representationDesc', 'Athletes, members, and disability groups should have a meaningful voice in the decisions that affect them.'),
+    },
+  ];
+  
+  const governanceLevels = [
+    {
+      number: '01',
+      title: 'General Assembly',
+      description: content('generalAssemblyDesc', 'The supreme member body that provides the institutional mandate and considers major decisions.'),
+      icon: 'fa-users',
+      level: 'primary',
+    },
+    {
+      number: '02',
+      title: 'Board of Directors',
+      description: content('boardDesc', 'Provides strategic oversight, governance direction, and accountability for the committee.'),
+      icon: 'fa-landmark',
+      level: 'primary',
+    },
+    {
+      number: '03',
+      title: 'Executive Secretariat',
+      description: content('secretariatDesc', 'Coordinates daily operations and implements approved plans, programmes, and decisions.'),
+      icon: 'fa-building',
+      level: 'primary',
+    },
+  ];
+  
+  const supportingStructures = [
+    {
+      title: 'Technical Commissions',
+      description: content('technicalDesc', 'Support technical standards, sport development, athlete preparation, and specialist functions.'),
+      icon: 'fa-medal',
+    },
+    {
+      title: 'District Committees',
+      description: content('districtDesc', 'Help extend participation, talent identification, and adapted sport activities across Rwanda.'),
+      icon: 'fa-map-location-dot',
+    },
+  ];
 
   return (
     <main id="main-content" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
