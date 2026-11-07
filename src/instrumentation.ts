@@ -1,8 +1,18 @@
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
+
 /**
- * Database schema changes are applied through explicit Prisma migrations.
- * Application startup must remain read-only and must never seed or rewrite
- * production records as a side effect of starting a web worker.
+ * Keep the existing additive schema compatibility checks during startup.
+ * These checks only create missing tables/columns/indexes; they never seed,
+ * update, or delete application records. Destructive or data-changing work
+ * belongs in reviewed Prisma migrations.
  */
 export async function register() {
-  // Intentionally no database writes during application startup.
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    try {
+      await ensureAutoMigrated();
+      console.log('[AutoMigrate] Additive schema compatibility check completed.');
+    } catch (err) {
+      console.error('[AutoMigrate] Schema compatibility check failed:', err);
+    }
+  }
 }
