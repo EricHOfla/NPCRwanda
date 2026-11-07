@@ -36,7 +36,7 @@ export default function AnnouncementsPage() {
   }, [announcementsOnly]);
 
   const published = useMemo(() => {
-    return announcementsOnly.filter(n => n.status === 'Published' || !n.status);
+    return announcementsOnly.filter(n => n.status === 'Published');
   }, [announcementsOnly]);
 
   const filtered = useMemo(() => {
