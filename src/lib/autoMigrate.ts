@@ -432,40 +432,7 @@ async function runAutoMigration(): Promise<void> {
     // Safe ignore
   }
 
-  // Self-heal default site content keys if missing
-  try {
-    const essentialKeys: [string, string][] = [
-      ['hero.showcaseBadge', 'Team Rwanda Spotlight'],
-      ['hero.showcaseTitle', 'Excellence in Motion: Leading Africa in Para-Sport'],
-      ['hero.showcaseDesc', 'Showcasing Rwandan resilience, elite athletic pathways, and world-class achievements across continental and global championships.'],
-      ['leadership.mandatePeriod', '2024–2028'],
-      ['media.youtubeUrl', 'https://www.youtube.com/@npcrwandaofficial1716'],
-      ['media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys'],
-      ['media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.'],
-      ['media.instagramTitle', 'Instagram @npc.rwanda'],
-      ['media.instagramSubtitle', 'Official Photo & Reel Updates'],
-      ['media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation."],
-      ['media.instagramUrl', 'https://www.instagram.com/npc.rwanda/'],
-      ['media.instagramPostUrl', ''],
-    ];
-    for (const [key, val] of essentialKeys) {
-      const exist = await prisma.siteContent.findUnique({ where: { key } });
-      if (!exist) {
-        await prisma.siteContent.create({ data: { key, value: val, type: 'text' } });
-      }
-    }
 
-    // Wipe any legacy hardcoded placeholder image URLs
-    await prisma.siteContent.updateMany({
-      where: {
-        key: { in: ['about.heroImage', 'about.historyImage', 'about.previewImage', 'hero.image'] },
-        value: { contains: '/assets/img/curated/' },
-      },
-      data: { value: '' },
-    });
-  } catch {
-    // Safe ignore
-  }
 
   migrationExecuted = true;
 }
