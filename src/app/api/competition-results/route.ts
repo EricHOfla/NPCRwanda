@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
 import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +20,6 @@ const schema = z.object({
 
 export async function GET() {
   try {
-    await ensureAutoMigrated();
     const data = await prisma.competitionResult.findMany({
       where: { published: true },
       orderBy: [{ competitionDate: 'desc' }, { createdAt: 'desc' }],
