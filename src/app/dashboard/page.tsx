@@ -3465,6 +3465,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
+                          disabled={!canUpdateContent}
                           onClick={() => handleSectionSave(['about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
@@ -3546,6 +3547,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
+                          disabled={!canUpdateContent}
                           onClick={() => handleSectionSave(['background.governingText', 'background.tocText', 'background.strengths', 'background.weaknesses', 'background.opportunities', 'background.threats', 'background.pillar1', 'background.pillar2', 'background.pillar3', 'background.pillar4'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
@@ -3570,7 +3572,8 @@ export default function DashboardPage() {
                           <button
                             type="button"
                             disabled={pageSaving}
-                            onClick={() => handleSectionSave(['leadership.mandatePeriod'])}
+                            disabled={!canUpdateContent}
+                          onClick={() => handleSectionSave(['leadership.mandatePeriod'])}
                             className="btn btn-primary btn-sm fw-bold px-3"
                           >
                             <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-1`} /> {pageSaving ? 'Saving...' : 'Save Mandate'}
