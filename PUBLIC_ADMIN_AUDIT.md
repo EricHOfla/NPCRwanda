@@ -37,13 +37,14 @@ The public bundle filters inactive or unpublished records for the public scope. 
 - About page heading and introduction are now stored in `SiteContent`.
 - About page milestone timeline and affiliations are stored as editable line-based content in `SiteContent` and exposed in the About page editor.
 - Strategic objective descriptions and outcome text now read managed content instead of being fixed in the public page.
+- NPC Background page heading, introduction, foundation copy, strategic-objective headings, and pillar titles now read from editable SiteContent fields exposed in the Admin page editor.
 - Dashboard notification previews now use one permission-checked summary endpoint rather than downloading three full inbox lists. Donation previews are included only for roles with `donations.view`, and each notification links to its corresponding inbox tab.
 
 ## Editorial copy still requiring a product decision / follow-up
 
 These are currently part of the designed page presentation rather than independently managed records. Decide whether each needs a CMS field or should remain stable interface copy:
 
-- NPC Background hero title/introduction and the four core-pillar labels.
+- NPC Background core-pillar bullet labels and some section headings/supporting copy.
 - Sports Development pathway stage titles, descriptions and bullet points.
 - About page section labels and explanatory supporting copy around the managed vision/mission.
 - Public page metadata (titles, descriptions, social preview text) where the organization wants editors to control SEO copy.
