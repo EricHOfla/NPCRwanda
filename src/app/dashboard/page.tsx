@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppSidebar, { SidebarNavItem } from '@/components/dashboard/AppSidebar';
@@ -1252,11 +1253,7 @@ export default function DashboardPage() {
     }
   }, [contactInfo]);
 
-  // Fetch settings on mount and when adminTab switches to settings
-  useEffect(() => {
-    fetchSystemSettings();
-  }, [fetchSystemSettings]);
-
+  // Lazy-load system settings only when the settings tab is opened
   useEffect(() => {
     if (adminTab === 'settings') {
       fetchSystemSettings();
@@ -1297,9 +1294,8 @@ export default function DashboardPage() {
   useEffect(() => {
     verifySession().then(isValid => {
       if (isValid) {
-            fetchGovData();
-        fetchProtectedData();
-        fetchSystemUsers();
+        // Run all three in parallel - no sequential waterfall
+        void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
       }
     });
   }, [verifySession, fetchSystemUsers]);
@@ -1850,46 +1846,58 @@ export default function DashboardPage() {
     }
   };
 
+  // Debounced search terms — prevents expensive filter re-runs on every keystroke
+  const debouncedAthleteSearch = useDebounce(athleteSearch, 300);
+  const debouncedNewsSearch = useDebounce(newsSearch, 300);
+  const debouncedEventSearch = useDebounce(eventSearch, 300);
+  const debouncedCareerSearch = useDebounce(careerSearch, 300);
+  const debouncedVolunteerSearch = useDebounce(volunteerSearch, 300);
+  const debouncedDonationSearch = useDebounce(donationSearch, 300);
+  const debouncedPartnerSearch = useDebounce(partnerSearch, 300);
+  const debouncedSportSearch = useDebounce(sportSearch, 300);
+  const debouncedLeaderSearch = useDebounce(leaderSearch, 300);
+  const debouncedContentSearch = useDebounce(contentSearch, 300);
+
   // Searching logic
   const filteredAthletes = athletes.filter(a =>
-    a.name.toLowerCase().includes(athleteSearch.toLowerCase()) ||
-    a.sport.toLowerCase().includes(athleteSearch.toLowerCase())
+    a.name.toLowerCase().includes(debouncedAthleteSearch.toLowerCase()) ||
+    a.sport.toLowerCase().includes(debouncedAthleteSearch.toLowerCase())
   );
 
   const filteredNews = news
     .filter(n => !isAnnouncementCategory(n.category))
     .filter(n =>
-      n.title.toLowerCase().includes(newsSearch.toLowerCase()) ||
-      n.category.toLowerCase().includes(newsSearch.toLowerCase())
+      n.title.toLowerCase().includes(debouncedNewsSearch.toLowerCase()) ||
+      n.category.toLowerCase().includes(debouncedNewsSearch.toLowerCase())
     );
 
   const announcementsList = news.filter(n => isAnnouncementCategory(n.category));
 
   const filteredEvents = events.filter(e =>
-    e.title.toLowerCase().includes(eventSearch.toLowerCase()) ||
-    e.category.toLowerCase().includes(eventSearch.toLowerCase())
+    e.title.toLowerCase().includes(debouncedEventSearch.toLowerCase()) ||
+    e.category.toLowerCase().includes(debouncedEventSearch.toLowerCase())
   );
 
   const filteredCareers = careers.filter(c =>
-    c.title.toLowerCase().includes(careerSearch.toLowerCase())
+    c.title.toLowerCase().includes(debouncedCareerSearch.toLowerCase())
   );
 
   const filteredSports = sports.filter(s =>
-    s.title.toLowerCase().includes(sportSearch.toLowerCase())
+    s.title.toLowerCase().includes(debouncedSportSearch.toLowerCase())
   );
 
   const filteredLeaders = leadership.filter(l =>
-    l.name.toLowerCase().includes(leaderSearch.toLowerCase()) ||
-    l.role.toLowerCase().includes(leaderSearch.toLowerCase())
+    l.name.toLowerCase().includes(debouncedLeaderSearch.toLowerCase()) ||
+    l.role.toLowerCase().includes(debouncedLeaderSearch.toLowerCase())
   );
 
   const filteredPartners = partners.filter(p =>
-    p.name.toLowerCase().includes(partnerSearch.toLowerCase())
+    p.name.toLowerCase().includes(debouncedPartnerSearch.toLowerCase())
   );
 
   const filteredContent = siteContentList.filter(c =>
-    c.key.toLowerCase().includes(contentSearch.toLowerCase()) ||
-    c.value.toLowerCase().includes(contentSearch.toLowerCase())
+    c.key.toLowerCase().includes(debouncedContentSearch.toLowerCase()) ||
+    c.value.toLowerCase().includes(debouncedContentSearch.toLowerCase())
   );
 
   // Pagination helper

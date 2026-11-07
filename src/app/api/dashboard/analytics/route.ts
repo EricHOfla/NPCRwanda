@@ -6,6 +6,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const noStore = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+const analyticsCache = { 'Cache-Control': 'private, max-age=0, stale-while-revalidate=30', 'Vary': 'Cookie' };
 
 export async function GET(request: NextRequest) {
   const user = await getSessionUser(request);
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
         daily: buckets
       },
       sports: athleteSports.map((item) => ({ sport: item.sport || 'Unspecified', athletes: item._count._all }))
-    }, { headers: noStore });
+    }, { headers: analyticsCache });
   } catch (error) {
     console.error('[Dashboard analytics] Failed to aggregate live data:', error);
     return NextResponse.json({ error: 'Unable to load dashboard analytics.' }, { status: 500, headers: noStore });

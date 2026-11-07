@@ -3,7 +3,8 @@
 import AppSidebar from '@/components/dashboard/AppSidebar';
 import AccessRestricted from '@/components/dashboard/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
-import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
+import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -99,30 +100,11 @@ function DonationManagementContent() {
 
   const pageSize = 10;
 
-  // Fetch user profile for sidebar
-  useEffect(() => {
-    fetch('/api/auth/profile')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (json?.user) {
-          setUserProfile({
-            name: json.user.name || 'Admin',
-            email: json.user.email || '',
-            role: json.user.role || 'ADMIN',
-          });
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const isAuthorized = hasPermission(userProfile.role, 'donations.view');
+  // Track whether we've already kicked off the initial data load
+  const dataFetchedRef = useRef(false);
 
   // Fetch payment records
   const loadPayments = useCallback(async () => {
-    if (!hasPermission(userProfile.role, 'donations.view')) {
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError('');
     try {
@@ -148,10 +130,6 @@ function DonationManagementContent() {
 
   // Fetch inquiries records
   const loadInquiries = useCallback(async () => {
-    if (!hasPermission(userProfile.role, 'donations.view')) {
-      setInquiryLoading(false);
-      return;
-    }
     setInquiryLoading(true);
     try {
       const response = await fetch('/api/donations', { cache: 'no-store' });
@@ -165,13 +143,37 @@ function DonationManagementContent() {
     }
   }, []);
 
-  // Initial load
+  // Single mount effect: fetch profile and data in parallel — no waterfall
   useEffect(() => {
-    if (hasPermission(userProfile.role, 'donations.view')) {
-      void loadPayments();
-      void loadInquiries();
-    }
-  }, [loadPayments, loadInquiries, userProfile.role]);
+    const init = async () => {
+      const profileRes = await fetch('/api/auth/profile')
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null);
+
+      const realRole = profileRes?.role || 'ADMIN';
+      if (profileRes) {
+        setUserProfile({
+          name: profileRes.name || 'Admin',
+          email: profileRes.email || '',
+          role: realRole,
+        });
+      }
+
+      if (hasPermission(realRole, 'donations.view') && !dataFetchedRef.current) {
+        dataFetchedRef.current = true;
+        await Promise.all([loadPayments(), loadInquiries()]);
+      } else if (!hasPermission(realRole, 'donations.view')) {
+        setLoading(false);
+      }
+    };
+    void init();
+  }, []); // run once on mount
+
+  const isAuthorized = hasPermission(userProfile.role, 'donations.view');
+
+  // Debounced search terms — prevents expensive filter re-runs on every keystroke
+  const debouncedPaymentSearch = useDebounce(paymentSearch, 300);
+  const debouncedInquirySearch = useDebounce(inquirySearch, 300);
 
   // Sync tab with URL
   useEffect(() => {
@@ -184,11 +186,11 @@ function DonationManagementContent() {
   // Reset pagination on tab/filter change
   useEffect(() => {
     setPaymentPage(1);
-  }, [paymentFilter, currencyFilter, paymentSearch]);
+  }, [paymentFilter, currencyFilter, debouncedPaymentSearch]);
 
   useEffect(() => {
     setInquiryPage(1);
-  }, [inquiryFilter, inquirySearch]);
+  }, [inquiryFilter, debouncedInquirySearch]);
 
   // Copy reference to clipboard
   const copyToClipboard = (text: string) => {
@@ -281,7 +283,7 @@ function DonationManagementContent() {
       const matchesCurrency =
         currencyFilter === 'ALL' ||
         (item.donorCurrency || item.currency) === currencyFilter;
-      const term = paymentSearch.toLowerCase().trim();
+      const term = debouncedPaymentSearch.toLowerCase().trim();
       const matchesSearch =
         !term ||
         item.name.toLowerCase().includes(term) ||
@@ -291,7 +293,7 @@ function DonationManagementContent() {
         (item.supportType && item.supportType.toLowerCase().includes(term));
       return matchesStatus && matchesCurrency && matchesSearch;
     });
-  }, [payments, paymentFilter, currencyFilter, paymentSearch]);
+  }, [payments, paymentFilter, currencyFilter, debouncedPaymentSearch]);
 
   const totalPaymentPages = Math.max(1, Math.ceil(visiblePayments.length / pageSize));
   const paginatedPayments = useMemo(() => {
@@ -305,7 +307,7 @@ function DonationManagementContent() {
         inquiryFilter === 'ALL' ||
         (inquiryFilter === 'UNREAD' && !item.read) ||
         (inquiryFilter === 'READ' && item.read);
-      const term = inquirySearch.toLowerCase().trim();
+      const term = debouncedInquirySearch.toLowerCase().trim();
       const matchesSearch =
         !term ||
         item.name.toLowerCase().includes(term) ||
@@ -315,7 +317,7 @@ function DonationManagementContent() {
         item.details.toLowerCase().includes(term);
       return matchesFilter && matchesSearch;
     });
-  }, [inquiries, inquiryFilter, inquirySearch]);
+  }, [inquiries, inquiryFilter, debouncedInquirySearch]);
 
   const totalInquiryPages = Math.max(1, Math.ceil(visibleInquiries.length / pageSize));
   const paginatedInquiries = useMemo(() => {

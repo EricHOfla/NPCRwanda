@@ -3,7 +3,8 @@
 import AppSidebar from '@/components/dashboard/AppSidebar';
 import AccessRestricted from '@/components/dashboard/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
-import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
+import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -74,30 +75,14 @@ function CommunityManagementContent() {
     category: 'General', eventDate: '', published: false 
   });
 
-  // Fetch user profile for sidebar
-  useEffect(() => {
-    fetch('/api/auth/profile')
-      .then(res => res.ok ? res.json() : null)
-      .then(json => {
-        if (json?.user) {
-          setUserProfile({
-            name: json.user.name || 'Admin',
-            email: json.user.email || '',
-            role: json.user.role || 'ADMIN'
-          });
-        }
-      })
-      .catch(() => {});
-  }, []);
+  // Track whether we've already kicked off the initial data load
+  const dataFetchedRef = useRef(false);
 
-  // Fetch community data
+  // Derived permission — recomputed whenever userProfile changes
   const isAuthorized = hasPermission(userProfile.role, 'community.view');
 
+  // Fetch community data
   const load = useCallback(async () => {
-    if (!hasPermission(userProfile.role, 'community.view')) {
-      setLoading(false);
-      return;
-    }
     setLoading(true); 
     setError('');
     try {
@@ -112,7 +97,31 @@ function CommunityManagementContent() {
     }
   }, []);
 
-  useEffect(() => { if (hasPermission(userProfile.role, 'community.view')) { void load(); } }, [load, userProfile.role]);
+  // Single mount effect: fetch profile + data in parallel — no waterfall
+  useEffect(() => {
+    const init = async () => {
+      const profileRes = await fetch('/api/auth/profile')
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null);
+
+      const realRole = profileRes?.role || 'ADMIN';
+      if (profileRes) {
+        setUserProfile({
+          name: profileRes.name || 'Admin',
+          email: profileRes.email || '',
+          role: realRole,
+        });
+      }
+
+      if (hasPermission(realRole, 'community.view') && !dataFetchedRef.current) {
+        dataFetchedRef.current = true;
+        await load();
+      } else if (!hasPermission(realRole, 'community.view')) {
+        setLoading(false);
+      }
+    };
+    void init();
+  }, []); // run once on mount
 
   // Sync tab from URL if present
   useEffect(() => {
@@ -202,6 +211,8 @@ function CommunityManagementContent() {
   }
 
   // Render Table Helper
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
   const renderTable = (
     title: string, 
     type: keyof Data, 
@@ -212,8 +223,8 @@ function CommunityManagementContent() {
     
     // Filter list
     const filtered = rawList.filter(item => {
-      const matchesSearch = !searchQuery.trim() || Object.values(item).some(
-        val => typeof val === 'string' && val.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesSearch = !debouncedSearchQuery.trim() || Object.values(item).some(
+        val => typeof val === 'string' && val.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       );
       const matchesStatus = statusFilter === 'ALL' || (
         type === 'programmes' ? item.status === statusFilter :

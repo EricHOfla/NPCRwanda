@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await ensureAutoMigrated();
-    // Keep event statuses accurate on every public bundle request
-    await autoUpdateEventStatuses();
+    // Fire-and-forget — keep event statuses accurate without blocking the response
+    autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
 
     const [
       athletes,
