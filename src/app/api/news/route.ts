@@ -24,8 +24,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || '';
-    const status = searchParams.get('status') || 'Published';
-    const adminScope = searchParams.get('scope') === 'admin' || (status !== 'Published' && status !== '');
+    const requestedStatus = searchParams.get('status');
+    const adminScope = searchParams.get('scope') === 'admin' || Boolean(requestedStatus && requestedStatus !== 'Published');
+    const status = requestedStatus || (adminScope ? 'All' : 'Published');
     if (adminScope) {
       const auth = await authorizeRequest(request, 'content.view');
       if (!auth.authorized) return auth.response;
