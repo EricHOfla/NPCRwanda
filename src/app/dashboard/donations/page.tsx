@@ -393,7 +393,19 @@ function DonationManagementContent() {
 
   return (
     <>
-      <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <main className="dashboard-main-content donations-admin-shell" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+        <style>{`
+          .donations-admin-shell { --npc-navy: #0F172A; --npc-gold: #FFA000; --npc-border: #E2E8F0; }
+          .donations-admin-shell .btn-primary, .donations-admin-shell .page-item.active .page-link { background-color: var(--npc-navy) !important; border-color: var(--npc-navy) !important; color: #fff !important; }
+          .donations-admin-shell .btn-primary:hover, .donations-admin-shell .page-item.active .page-link:hover { background-color: #1E293B !important; border-color: #1E293B !important; }
+          .donations-admin-shell .btn-outline-primary { color: var(--npc-navy) !important; border-color: var(--npc-navy) !important; }
+          .donations-admin-shell .btn-outline-primary:hover { background: var(--npc-navy) !important; color: #fff !important; }
+          .donations-admin-shell .text-primary { color: var(--npc-navy) !important; }
+          .donations-admin-shell .bg-primary-subtle { background-color: #FFF7E6 !important; }
+          .donations-admin-shell .border-primary-subtle { border-color: #FDE3A7 !important; }
+          .donations-admin-shell .form-control:focus, .donations-admin-shell .form-select:focus { border-color: var(--npc-gold); box-shadow: 0 0 0 .2rem rgba(255,160,0,.16); }
+          @media (max-width: 767.98px) { .donations-admin-shell { padding: 16px !important; } }
+        `}</style>
           <div className="d-flex flex-wrap justify-content-end gap-2 mb-3">
             <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); void loadInquiries(); }} disabled={loading || inquiryLoading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
               <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
