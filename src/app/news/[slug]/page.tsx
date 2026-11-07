@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { matchesSlug } from '@/lib/slug';
+import { isAnnouncementCategory } from '@/lib/newsUtils';
 
 export default function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const unwrappedParams = React.use(params);
@@ -13,32 +14,15 @@ export default function ArticleDetailPage({ params }: { params: Promise<{ slug: 
   const { t } = useTranslation();
   const { news, loading } = useData();
 
-  const [directArticle, setDirectArticle] = useState<any>(null);
-  const [isFetchingDirect, setIsFetchingDirect] = useState(false);
+  // Public detail pages may render published news articles only.
+  const article = news.find(
+    item =>
+      matchesSlug(item, slug) &&
+      item.status === 'Published' &&
+      !isAnnouncementCategory(item.category || '')
+  );
 
-  // Look in DataContext news array first
-  const contextArticle = news.find(n => matchesSlug(n, slug));
-  const article = directArticle || contextArticle;
-
-  // Fallback: If not found in context (e.g. fresh navigation / stale cache), fetch directly from API
-  useEffect(() => {
-    if (!contextArticle && slug) {
-      setIsFetchingDirect(true);
-      fetch(`/api/news/${encodeURIComponent(slug)}`)
-        .then(res => (res.ok ? res.json() : null))
-        .then(data => {
-          if (data && !data.error) {
-            setDirectArticle(data);
-          }
-        })
-        .catch(() => {})
-        .finally(() => {
-          setIsFetchingDirect(false);
-        });
-    }
-  }, [contextArticle, slug]);
-
-  if (loading || (!article && isFetchingDirect)) {
+  if (loading) {
     return (
       <main className="py-5 text-center">
         <div className="container py-5 my-5">
