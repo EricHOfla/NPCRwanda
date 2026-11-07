@@ -396,6 +396,14 @@ function DonationManagementContent() {
   return (
     <>
       <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+          <div className="d-flex flex-wrap justify-content-end gap-2 mb-3">
+            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); void loadInquiries(); }} disabled={loading || inquiryLoading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
+              <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
+            </button>
+            <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold" onClick={exportCsv} style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}>
+              <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
+            </button>
+          </div>
           <div style={{ maxWidth: 1600, width: '100%', margin: '0 auto' }}>
           {!isAuthorized ? (
             <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
