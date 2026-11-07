@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authorizeRequest } from '@/lib/rbac-server';
-import { hasPermission } from '@/lib/rbac';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,11 +15,9 @@ export async function GET(request: NextRequest) {
   if (!auth.authorized) return auth.response;
 
   try {
-    const canViewDonations = hasPermission(auth.user.role, 'donations.view');
-    const [messageCount, volunteerCount, donationCount, messages, volunteers, donations] = await Promise.all([
+    const [messageCount, volunteerCount, messages, volunteers] = await Promise.all([
       prisma.contactMessage.count({ where: { read: false } }),
       prisma.volunteerApplication.count({ where: { read: false } }),
-      canViewDonations ? prisma.donationInquiry.count({ where: { read: false } }) : Promise.resolve(0),
       prisma.contactMessage.findMany({
         where: { read: false },
         orderBy: { createdAt: 'desc' },
@@ -33,12 +30,6 @@ export async function GET(request: NextRequest) {
         take: 5,
         select: { id: true, name: true, interest: true, createdAt: true },
       }),
-      canViewDonations ? prisma.donationInquiry.findMany({
-        where: { read: false },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        select: { id: true, name: true, supportType: true, createdAt: true },
-      }) : Promise.resolve([]),
     ]);
 
     const items = [
@@ -62,21 +53,12 @@ export async function GET(request: NextRequest) {
         color: '#2e9e57',
         href: '/dashboard?tab=contacts&subtab=volunteers',
       })),
-      ...donations.map((item) => ({
-        id: item.id,
-        type: 'Donation Inquiry',
-        sender: item.name,
-        snippet: `Type: ${item.supportType || 'Support'}`,
-        date: item.createdAt.toISOString(),
-        createdAt: item.createdAt.toISOString(),
-        color: '#B7791F',
-        href: '/dashboard?tab=contacts&subtab=donations',
-      })),
+
     ].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 12)
       .map(({ createdAt: _createdAt, ...item }) => item);
 
     return NextResponse.json({
-      unreadCount: messageCount + volunteerCount + donationCount,
+      unreadCount: messageCount + volunteerCount,
       items,
     }, { headers: NO_STORE_HEADERS });
   } catch (error) {
