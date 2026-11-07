@@ -439,7 +439,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return res.json();
     },
-    // Cached data renders immediately; shared query defaults refresh it every 60 seconds.
+    // Admin data renders from the in-memory cache immediately but is always revalidated.
+    // Public content keeps a short freshness window to reduce unnecessary requests.
+    staleTime: pathname.startsWith('/dashboard') ? 0 : 60_000,
+    refetchOnMount: pathname.startsWith('/dashboard') ? 'always' : true,
     // Mutations invalidate this key when public content changes.
   });
 
