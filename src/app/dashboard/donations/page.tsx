@@ -56,8 +56,6 @@ const money = (value: number) => new Intl.NumberFormat('en-RW').format(value);
 function DonationManagementContent() {
   const searchParams = useSearchParams();
 
-  // Navigation & view states
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({
     name: 'Admin',
     email: '',
