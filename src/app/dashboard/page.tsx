@@ -1020,6 +1020,7 @@ export default function DashboardPage() {
   // System User Management States & CRUD
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const usersFetchedRef = useRef(false);
   const [userFormOpen, setUserFormOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [userForm, setUserForm] = useState<{
@@ -1328,8 +1329,15 @@ export default function DashboardPage() {
     // The server dashboard layout has already verified the signed session and
     // supplied the user's role/profile. Load dashboard data without another
     // profile request on every full page refresh.
-    void Promise.all([fetchGovData(), fetchProtectedData(), fetchSystemUsers()]);
-  }, [fetchSystemUsers]);
+    void Promise.all([fetchGovData(), fetchProtectedData()]);
+  }, []);
+
+  // Load the user registry only when its tab is opened, not during every dashboard visit.
+  useEffect(() => {
+    if (adminTab !== 'users' || !canAccessUsers || usersFetchedRef.current) return;
+    usersFetchedRef.current = true;
+    void fetchSystemUsers();
+  }, [adminTab, canAccessUsers, fetchSystemUsers]);
 
   // Real-time synchronization handler
   const refreshRealTimeData = useCallback(async () => {
@@ -6111,14 +6119,7 @@ uploadMediaFile={uploadMediaFile}
                       </tr>
                     </thead>
                     <tbody>
-                      {usersLoading ? (
-                        <tr>
-                          <td colSpan={6} className="text-center py-5">
-                            <div className="spinner-border spinner-border-sm text-primary mb-2" role="status" />
-                            <div className="small text-muted">Loading system user registry...</div>
-                          </td>
-                        </tr>
-                      ) : (() => {
+                      {!usersLoading && (() => {
                         const filtered = systemUsers.filter((u: any) => {
                           const query = userSearch.toLowerCase().trim();
                           const matchesQuery = !query || u.name?.toLowerCase().includes(query) || u.email?.toLowerCase().includes(query);
