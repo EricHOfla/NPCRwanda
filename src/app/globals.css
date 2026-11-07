@@ -5613,3 +5613,181 @@ body.accessibility-center-text {
 .live-analytics-footnote{padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px}.live-analytics-footnote i{color:#1769c2;margin-right:6px}.live-analytics-error{padding:12px;background:#fff1f2;color:#9f1239;border-radius:8px;margin-bottom:12px}.live-analytics-error button{margin-left:8px}.live-analytics-loading,.live-analytics-empty{padding:24px;text-align:center;color:#64748b;font-size:.82rem}
 @media(max-width:900px){.live-analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.live-analytics-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.live-analytics-kpi{padding:13px}.live-analytics-kpi strong{font-size:1.2rem}.live-analytics-toolbar>div:first-child{flex-wrap:wrap}.live-analytics-updated{width:100%}.live-analytics-bars{gap:2px}.live-analytics-bar-col small{font-size:.5rem}}
+
+
+/* Admin dashboard: phone and small-tablet layout */
+@media (max-width: 991.98px) {
+  .admin-dashboard-root {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .admin-dashboard-root > .dashboard-sidebar {
+    width: min(290px, 86vw) !important;
+    max-width: 86vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .admin-dashboard-root > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 100dvh !important;
+  }
+
+  .dashboard-layout-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+  }
+
+  .dashboard-main-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 14px !important;
+    overflow-x: hidden;
+  }
+
+  .dashboard-topbar {
+    min-height: 58px;
+    height: auto !important;
+    padding: 8px 12px !important;
+    gap: 8px;
+  }
+
+  .dashboard-topbar > div:first-child {
+    flex: 1 1 auto;
+    gap: 6px !important;
+  }
+
+  .dashboard-topbar > div:last-child {
+    flex: 0 0 auto;
+    gap: 8px !important;
+  }
+
+  .dashboard-topbar-title {
+    max-width: min(42vw, 220px) !important;
+    font-size: 0.9rem !important;
+  }
+
+  .dashboard-topbar button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .admin-dashboard-root .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .admin-dashboard-root .row > [class*="col-"] {
+    min-width: 0;
+  }
+
+  .admin-dashboard-root .card,
+  .admin-dashboard-root .custom-card,
+  .admin-dashboard-root .table-responsive,
+  .admin-dashboard-root .live-analytics-panel {
+    max-width: 100%;
+  }
+
+  .admin-dashboard-root .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain;
+  }
+
+  .admin-dashboard-root .modal-dialog {
+    width: calc(100% - 1rem);
+    max-width: calc(100% - 1rem);
+    margin: 0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-main-content {
+    padding: 12px !important;
+  }
+
+  .dashboard-topbar {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .dashboard-topbar-title {
+    max-width: 38vw !important;
+    font-size: 0.84rem !important;
+  }
+
+  .admin-dashboard-root .dashboard-welcome-banner {
+    padding: 16px !important;
+    border-radius: 12px;
+  }
+
+  .admin-dashboard-root .dashboard-welcome-banner h1,
+  .admin-dashboard-root .dashboard-welcome-banner h2 {
+    font-size: clamp(1.05rem, 5vw, 1.35rem) !important;
+    line-height: 1.3;
+  }
+
+  .admin-dashboard-root .d-flex.justify-content-between {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .admin-dashboard-root .table-responsive > table {
+    width: max-content;
+    max-width: none;
+  }
+
+  .admin-dashboard-root .form-control,
+  .admin-dashboard-root .form-select,
+  .admin-dashboard-root input,
+  .admin-dashboard-root select,
+  .admin-dashboard-root textarea {
+    font-size: 16px !important;
+  }
+
+  .admin-dashboard-root .modal-content {
+    max-height: calc(100dvh - 1rem);
+    overflow-y: auto;
+  }
+
+  .admin-dashboard-root .modal-body {
+    padding: 14px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .dashboard-main-content {
+    padding: 9px !important;
+  }
+
+  .dashboard-topbar-title {
+    max-width: 34vw !important;
+    font-size: 0.78rem !important;
+  }
+
+  .admin-dashboard-root .card-body {
+    padding: 0.7rem !important;
+  }
+
+  .admin-dashboard-root .btn,
+  .admin-dashboard-root button.btn {
+    min-height: 34px;
+    font-size: 0.74rem !important;
+  }
+
+  .admin-dashboard-root .live-analytics-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
