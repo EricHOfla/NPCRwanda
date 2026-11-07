@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -16,9 +17,15 @@ const schema = z.object({
 });
     
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    const showAll = request.nextUrl.searchParams.get('active') === 'all';
+    if (showAll) {
+      const auth = await authorizeRequest(request, 'members.view');
+      if (!auth.authorized) return auth.response;
+    }
     const data = await prisma.npcFederation.findMany({
+      where: showAll ? undefined : { active: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
     return NextResponse.json(data);
