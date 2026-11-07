@@ -5791,3 +5791,113 @@ body.accessibility-center-text {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Final mobile admin layout correction.
+   The sidebar is an off-canvas overlay; it must never take width away
+   from the dashboard content when the drawer is open or closed. */
+@media (max-width: 991.98px) {
+  .admin-dashboard-root {
+    display: flex !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .admin-dashboard-root > .dashboard-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: min(280px, 86vw) !important;
+    min-width: 0 !important;
+    max-width: 86vw !important;
+    flex: 0 0 auto !important;
+    transform: translateX(-100%) !important;
+    z-index: 1060 !important;
+  }
+
+  .admin-dashboard-root > .dashboard-sidebar.sidebar-open-mobile {
+    transform: translateX(0) !important;
+  }
+
+  .admin-dashboard-root > div:not(.dashboard-sidebar) {
+    flex: 1 1 0% !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .admin-dashboard-root .dashboard-layout-content,
+  .admin-dashboard-root .dashboard-main-content {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar > div:last-child {
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar button,
+  .admin-dashboard-root .dashboard-topbar a {
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  .admin-dashboard-root .dashboard-topbar-title {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .admin-dashboard-root .dashboard-layout-content > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .admin-dashboard-root .dashboard-main-content {
+    padding: 10px !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar {
+    gap: 4px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar > div:last-child {
+    gap: 4px !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar-title {
+    max-width: 34vw !important;
+    font-size: 0.78rem !important;
+  }
+
+  .admin-dashboard-root .dashboard-topbar > div:last-child > div {
+    min-width: 0;
+  }
+
+  .admin-dashboard-root .dashboard-layout-content .row {
+    --bs-gutter-x: 0.75rem;
+  }
+}
