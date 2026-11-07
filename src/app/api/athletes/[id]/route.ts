@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -15,19 +16,18 @@ const athleteUpdateSchema = z.object({
 
 // GET: Fetch a single athlete
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const athlete = await prisma.athlete.findUnique({
-      where: { id },
-    });
+    const athlete = await prisma.athlete.findUnique({ where: { id } });
 
-    if (!athlete) {
-      return NextResponse.json({ error: 'Athlete not found' }, { status: 404 });
+    if (!athlete) return NextResponse.json({ error: 'Athlete not found' }, { status: 404 });
+    if (athlete.status !== 'Active') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return NextResponse.json({ error: 'Athlete not found' }, { status: 404 });
     }
-
     return NextResponse.json(athlete);
   } catch (error) {
     console.error('Fetch athlete by id error:', error);
