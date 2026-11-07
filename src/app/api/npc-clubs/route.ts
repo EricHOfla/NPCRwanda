@@ -16,7 +16,7 @@ const schema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const showAll = request.nextUrl.searchParams.get('active') === 'all';
+    const showAll = request.nextUrl.searchParams.get('active') === 'all' || request.nextUrl.searchParams.get('scope') === 'admin';
     if (showAll) {
       const auth = await authorizeRequest(request, 'members.view');
       if (!auth.authorized) return auth.response;
