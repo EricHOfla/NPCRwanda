@@ -2020,21 +2020,21 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', position: 'relative', zIndex: 2 }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     <button 
-                      onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); setNewsFormOpen(true); }}
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); setNewsFormOpen(true); }} hidden={!canCreateContent && !canUpdateContent}
                       className="btn btn-sm"
                       style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
                     >
                       <i className="fas fa-plus" /> Write News Article
                     </button>
                     <button 
-                      onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }}
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }} hidden={!canCreateContent && !canUpdateContent}
                       className="btn btn-sm"
                       style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
                       <i className="fas fa-user-plus" /> Add Athlete
                     </button>
                     <button 
-                      onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); setEventFormOpen(true); }}
+                      onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); setEventFormOpen(true); }} hidden={!canCreateContent && !canUpdateContent}
                       className="btn btn-sm"
                       style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
@@ -3356,6 +3356,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving}
+                          disabled={!canUpdateContent}
                           onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramPostUrl'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
@@ -3593,6 +3594,7 @@ export default function DashboardPage() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Leadership Directory ({leadership.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingLeaderId(null);
                             setLeaderForm({ name: '', role: 'President', desc: '', avatar: 'avatar-4.svg', committee: 'Board of Directors', email: '', phone: '', impairment: '', order: 0 });
@@ -3737,6 +3739,7 @@ uploadMediaFile={uploadMediaFile}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Athletes Database ({filteredAthletes.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingAthleteId(null);
                             setAthleteForm({ name: '', sport: 'Sitting Volleyball', status: 'Active', country: 'Rwanda', avatar: 'avatar-1.svg', desc: '', achievements: '' });
@@ -3859,6 +3862,7 @@ uploadMediaFile={uploadMediaFile}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Sports Programs ({sports.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingSportId(null);
                             setSportForm({ slug: '', title: '', img: 'index-sport-1.jpg', desc: '' });
@@ -3962,6 +3966,7 @@ uploadMediaFile={uploadMediaFile}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>News Articles ({news.filter(n => !isAnnouncementCategory(n.category)).length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingNewsId(null);
                             setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: '', desc: '', content: '', slug: '' });
@@ -4227,6 +4232,7 @@ uploadMediaFile={uploadMediaFile}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Scheduled Events ({events.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingEventId(null);
                             setEventForm({ title: '', description: '', date: new Date().toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0], location: '', category: 'National', status: 'Upcoming', img: '', featured: false, resultsSummary: '', results: '' });
@@ -4689,6 +4695,7 @@ uploadMediaFile={uploadMediaFile}
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <h3 className="h6 fw-bold mb-0 text-dark">Governance Documents & Policies ({govDocs.length + govPolicies.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingGovId(null);
                             setGovFormType('doc');
@@ -4903,6 +4910,7 @@ uploadMediaFile={uploadMediaFile}
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <h3 className="h6 fw-bold mb-0 text-dark">Partners & Sponsors Directory ({partners.length})</h3>
                         <button
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingPartnerId(null);
                             setPartnerForm({ name: '', logo: '', website: '', category: 'Government Sector', order: 0, active: true });
@@ -5710,7 +5718,7 @@ uploadMediaFile={uploadMediaFile}
               <div className="mb-5">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h3 className="h5 fw-bold mb-0">National Associations</h3>
-                  <button onClick={() => { setEditingAssocId(null); setAssocFormOpen(!assocFormOpen); }} className="btn btn-primary btn-sm fw-bold px-4">
+                  <button onClick={() => { setEditingAssocId(null); setAssocFormOpen(!assocFormOpen); }} hidden={!canManageMembers} className="btn btn-primary btn-sm fw-bold px-4">
                     <i className="fas fa-plus me-2"></i> {assocFormOpen ? 'Close Form' : 'New Association'}
                   </button>
                 </div>
@@ -5750,7 +5758,7 @@ uploadMediaFile={uploadMediaFile}
               <div className="mb-5">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h3 className="h5 fw-bold mb-0">Member Clubs & Founder Teams</h3>
-                  <button onClick={() => { setEditingClubId(null); setClubFormOpen(!clubFormOpen); }} className="btn btn-primary btn-sm fw-bold px-4">
+                  <button onClick={() => { setEditingClubId(null); setClubFormOpen(!clubFormOpen); }} hidden={!canManageMembers} className="btn btn-primary btn-sm fw-bold px-4">
                     <i className="fas fa-plus me-2"></i> {clubFormOpen ? 'Close Form' : 'New Club/Team'}
                   </button>
                 </div>
@@ -5786,7 +5794,7 @@ uploadMediaFile={uploadMediaFile}
               <div className="mb-5">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h3 className="h5 fw-bold mb-0">NPC Federations</h3>
-                  <button onClick={() => { setEditingFedId(null); setFedFormOpen(!fedFormOpen); }} className="btn btn-primary btn-sm fw-bold px-4">
+                  <button onClick={() => { setEditingFedId(null); setFedFormOpen(!fedFormOpen); }} hidden={!canManageMembers} className="btn btn-primary btn-sm fw-bold px-4">
                     <i className="fas fa-plus me-2"></i> {fedFormOpen ? 'Close Form' : 'New Federation'}
                   </button>
                 </div>
@@ -5835,7 +5843,7 @@ uploadMediaFile={uploadMediaFile}
               <div className="mb-5">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h3 className="h5 fw-bold mb-0">DPSCO Contacts</h3>
-                  <button onClick={() => { setEditingDpscoId(null); setDpscoFormOpen(!dpscoFormOpen); }} className="btn btn-primary btn-sm fw-bold px-4">
+                  <button onClick={() => { setEditingDpscoId(null); setDpscoFormOpen(!dpscoFormOpen); }} hidden={!canManageMembers} className="btn btn-primary btn-sm fw-bold px-4">
                     <i className="fas fa-plus me-2"></i> {dpscoFormOpen ? 'Close Form' : 'New DPSCO Contact'}
                   </button>
                 </div>
