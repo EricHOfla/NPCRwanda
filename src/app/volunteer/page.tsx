@@ -140,7 +140,7 @@ export default function VolunteerPage() {
           </h1>
 
           <p
-            className="page-subtitle mb-4"
+            className="page-subtitle mb-0"
             style={{
               color: '#000000',
               maxWidth: '860px',
@@ -152,82 +152,6 @@ export default function VolunteerPage() {
             Join dedicated volunteers supporting Rwandan para-athletes, organizing national championships, and driving
             inclusion across communities. Your skills and passion create meaningful sporting opportunities.
           </p>
-
-          {/* Highlights KPI Bar */}
-          <div className="row g-3 pt-2">
-            <div className="col-6 col-md-3">
-              <div
-                className="p-3"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1.5px solid #CBD5E1',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                }}
-              >
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  4+
-                </div>
-                <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Volunteer Tracks
-                </div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div
-                className="p-3"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1.5px solid #CBD5E1',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                }}
-              >
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  30
-                </div>
-                <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Districts Covered
-                </div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div
-                className="p-3"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1.5px solid #CBD5E1',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                }}
-              >
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  Year-Round
-                </div>
-                <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Events &amp; Tournaments
-                </div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div
-                className="p-3"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1.5px solid #CBD5E1',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                }}
-              >
-                <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  Certified
-                </div>
-                <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Certificate of Service
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </header>
 
