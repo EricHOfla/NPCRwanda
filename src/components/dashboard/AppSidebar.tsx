@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { hasPermission } from '@/lib/rbac';
 
@@ -127,7 +128,7 @@ export default function AppSidebar({
   };
 
   const navItems: SidebarItem[] = [
-    { id: 'overview', type: 'tab', tabId: 'overview', href: '/dashboard', label: 'Overview', icon: 'fa-chart-pie' },
+    { id: 'overview', type: 'tab', tabId: 'overview', href: '/dashboard?tab=overview', label: 'Overview', icon: 'fa-chart-pie' },
 
     // Section: Website Pages (CMS)
     ...(canAccessContent
@@ -276,20 +277,72 @@ export default function AppSidebar({
 
             const isActive = activeId === item.id;
 
+            const commonStyle: React.CSSProperties = {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              width: '100%',
+              padding: sidebarOpen ? '10px 24px' : '12px 0',
+              justifyContent: sidebarOpen ? 'flex-start' : 'center',
+              background: isActive ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+              border: 'none',
+              color: isActive ? '#FFF' : 'rgba(255,255,255,0.7)',
+              cursor: 'pointer',
+              fontSize: '0.86rem',
+              fontWeight: isActive ? 600 : 400,
+              borderLeft: isActive ? '4px solid #FFA000' : '4px solid transparent',
+              transition: 'all 0.2s ease',
+              textAlign: 'left',
+              textDecoration: 'none',
+            };
+
+            const itemContent = (
+              <>
+                <i
+                  className={`fas ${item.icon}`}
+                  style={{
+                    fontSize: '0.95rem',
+                    width: '20px',
+                    textAlign: 'center',
+                    color: isActive ? '#FFA000' : 'inherit',
+                  }}
+                />
+                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
+              </>
+            );
+
+            if (onNavigate) {
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onNavigate(item)}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                      e.currentTarget.style.color = '#FFF';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                    }
+                  }}
+                  style={commonStyle}
+                >
+                  {itemContent}
+                </button>
+              );
+            }
+
             return (
-              <button
+              <Link
                 key={item.id}
-                type="button"
+                href={item.href || '/dashboard'}
                 onClick={() => {
-                  if (onNavigate) {
-                    onNavigate(item);
-                  } else {
-                    if (item.href) {
-                      router.push(item.href);
-                    }
-                    if (typeof window !== 'undefined' && window.innerWidth < 992) {
-                      setSidebarOpen(false);
-                    }
+                  if (typeof window !== 'undefined' && window.innerWidth < 992) {
+                    setSidebarOpen(false);
                   }
                 }}
                 onMouseEnter={(e) => {
@@ -304,35 +357,10 @@ export default function AppSidebar({
                     e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
                   }
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  width: '100%',
-                  padding: sidebarOpen ? '10px 24px' : '12px 0',
-                  justifyContent: sidebarOpen ? 'flex-start' : 'center',
-                  background: isActive ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-                  border: 'none',
-                  color: isActive ? '#FFF' : 'rgba(255,255,255,0.7)',
-                  cursor: 'pointer',
-                  fontSize: '0.86rem',
-                  fontWeight: isActive ? 600 : 400,
-                  borderLeft: isActive ? '4px solid #FFA000' : '4px solid transparent',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left',
-                }}
+                style={commonStyle}
               >
-                <i
-                  className={`fas ${item.icon}`}
-                  style={{
-                    fontSize: '0.95rem',
-                    width: '20px',
-                    textAlign: 'center',
-                    color: isActive ? '#FFA000' : 'inherit',
-                  }}
-                />
-                {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
-              </button>
+                {itemContent}
+              </Link>
             );
           })}
         </nav>

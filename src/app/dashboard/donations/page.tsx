@@ -443,6 +443,13 @@ function DonationManagementContent() {
 
             <div className="d-flex align-items-center gap-2">
               <Link
+                href="/dashboard/community"
+                className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2 fw-semibold"
+                style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
+              >
+                <i className="fas fa-people-group text-primary" /> Sports & Community Desk
+              </Link>
+              <Link
                 href="/donate"
                 target="_blank"
                 className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 fw-semibold"
