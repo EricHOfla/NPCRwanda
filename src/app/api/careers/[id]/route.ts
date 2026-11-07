@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -15,7 +16,7 @@ const careerUpdateSchema = z.object({
 
 // GET: Fetch a single career position
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -24,10 +25,11 @@ export async function GET(
       where: { id },
     });
 
-    if (!career) {
-      return NextResponse.json({ error: 'Career not found' }, { status: 404 });
+    if (!career) return NextResponse.json({ error: 'Career not found' }, { status: 404 });
+    if (career.status !== 'Open') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return NextResponse.json({ error: 'Career not found' }, { status: 404 });
     }
-
     return NextResponse.json(career);
   } catch (error) {
     console.error('Fetch career by id error:', error);
