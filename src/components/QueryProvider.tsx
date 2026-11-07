@@ -49,14 +49,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: 60 * 60 * 1000, // 1 hour — stale cache auto-clears; always refetches anyway
+        maxAge: 10 * 60 * 1000, // Keep persisted public content briefly; server remains the source of truth.
+        buster: 'npc-public-content-2026-11-audit-1',
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
             // Only persist public queries (e.g. ['npc-public-bundle'])
             // Never persist private admin queries or failed queries
             return (
               query.state.status === 'success' &&
-              query.queryKey[0] === 'npc-public-bundle'
+              query.queryKey.length === 1 && query.queryKey[0] === 'npc-public-bundle'
             );
           },
         },

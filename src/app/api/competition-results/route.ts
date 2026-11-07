@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +20,6 @@ const schema = z.object({
 
 export async function GET() {
   try {
-    await ensureAutoMigrated();
     const data = await prisma.competitionResult.findMany({
       where: { published: true },
       orderBy: [{ competitionDate: 'desc' }, { createdAt: 'desc' }],
@@ -32,9 +31,11 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    await ensureAutoMigrated();
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) return auth.response;
+
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid result details', details: parsed.error.flatten() }, { status: 400 });
     const data = await prisma.competitionResult.create({ data: parsed.data });

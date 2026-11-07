@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { authorizeRequest } from '@/lib/rbac-server';
 
+const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
 const updateSchema = z.object({
   read: z.boolean(),
 });
@@ -20,9 +22,9 @@ export async function GET(
     const { id } = await params;
     const item = await prisma.donationInquiry.findUnique({ where: { id } });
     if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json(item);
+    return NextResponse.json(item, { headers: NO_STORE_HEADERS });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500, headers: NO_STORE_HEADERS });
   }
 }
 
@@ -64,7 +66,7 @@ export async function DELETE(
 
     const { id } = await params;
     const deleted = await prisma.donationInquiry.deleteMany({ where: { id } });
-    return NextResponse.json({ success: true, count: deleted.count });
+    return NextResponse.json({ success: true, count: deleted.count }, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error('Delete donation inquiry error:', error);
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });

@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { sendCustomNewsletter } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
-    }
-
-    if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Permission denied. Admin privileges required.' }, { status: 403 });
-    }
+    const auth = await authorizeRequest(request, 'subscribers.send');
+    if (!auth.authorized) return auth.response;
 
     const body = await request.json();
     const { subject, contentHtml, category } = body;

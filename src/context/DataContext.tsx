@@ -427,17 +427,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: queryError,
     refetch,
   } = useQuery({
-    queryKey: PUBLIC_BUNDLE_QUERY_KEY,
+    // Keep public and authenticated admin payloads in separate cache entries.
+    queryKey: pathname.startsWith('/dashboard') ? [...PUBLIC_BUNDLE_QUERY_KEY, 'admin'] : PUBLIC_BUNDLE_QUERY_KEY,
     // The login screen has no public content to display; avoid a full database bundle request there.
     enabled: pathname !== '/login',
     queryFn: async () => {
-      const res = await fetch('/api/bundle', { cache: 'no-store' });
+      const bundleUrl = pathname.startsWith('/dashboard') ? '/api/bundle?scope=admin' : '/api/bundle';
+      const res = await fetch(bundleUrl, { cache: 'no-store' });
       if (!res.ok) {
         throw new Error(`Failed to fetch public bundle (status ${res.status})`);
       }
       return res.json();
     },
-    // Cached data renders immediately; shared query defaults refresh it every 60 seconds.
+    // Admin data renders from the in-memory cache immediately but is always revalidated.
+    // Public content keeps a short freshness window to reduce unnecessary requests.
+    staleTime: pathname.startsWith('/dashboard') ? 0 : 60_000,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     // Mutations invalidate this key when public content changes.
   });
 

@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 import { notifySubscribers } from '@/lib/mailer';
-import { autoUpdateEventStatuses } from '@/lib/autoMigrate';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,19 +21,24 @@ const eventSchema = z.object({
   results: z.string().default(''),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Auto-update event statuses based on today's date before returning results
-    await autoUpdateEventStatuses();
-
     const { searchParams } = new URL(request.url);
+    const adminScope = searchParams.get('scope') === 'admin';
+    if (adminScope) {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const status = searchParams.get('status') || '';
     const category = searchParams.get('category') || '';
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || '10';
 
-    const whereClause: any = {};
-    if (status && status !== 'All') whereClause.status = status;
+    const whereClause: any = adminScope ? {} : { status: { not: 'Cancelled' } };
+    if (status && status !== 'All') {
+      if (status === 'Cancelled' && !adminScope) return NextResponse.json([]);
+      whereClause.status = status;
+    }
     if (category && category !== 'All') whereClause.category = category;
 
     if (page) {
@@ -53,7 +59,14 @@ export async function GET(request: Request) {
       const totalPages = Math.ceil(totalRecords / limitNum);
 
       return NextResponse.json({
-        data,
+        data: data.map((event) => {
+          if (event.status === 'Cancelled' || !event.date) return event;
+          const today = getRwandaDateString();
+          const start = event.date.trim();
+          const end = event.endDate?.trim() || '';
+          const currentStatus = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
+          return { ...event, status: currentStatus };
+        }),
         pagination: {
           page: pageNum,
           limit: limitNum,
@@ -67,7 +80,15 @@ export async function GET(request: Request) {
     }
 
     const events = await prisma.event.findMany({ where: whereClause, orderBy: { date: 'asc' } });
-    return NextResponse.json(events);
+    const today = getRwandaDateString();
+    const responseEvents = events.map((event) => {
+      if (event.status === 'Cancelled' || !event.date) return event;
+      const start = event.date.trim();
+      const end = event.endDate?.trim() || '';
+      const currentStatus = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
+      return { ...event, status: currentStatus };
+    });
+    return NextResponse.json(responseEvents);
   } catch (error) {
     console.error('Fetch events error:', error);
     return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });

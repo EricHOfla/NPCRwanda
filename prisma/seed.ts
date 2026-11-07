@@ -6,6 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
+  // This seed script intentionally resets development data. Never allow it to run
+  // against production, and require an explicit opt-in on disposable databases.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Refusing to run the destructive seed script in production.');
+  }
+  if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+    throw new Error('This seed script deletes existing records. Set ALLOW_DESTRUCTIVE_SEED=true only when using a disposable development database.');
+  }
+
   // 1. Clean existing records
   await prisma.user.deleteMany({});
   await prisma.athlete.deleteMany({});

@@ -2,8 +2,6 @@ import { prisma } from './prisma';
 
 let migrationExecuted = false;
 let migrationRunningPromise: Promise<void> | null = null;
-// Avoid querying and recalculating every event status on every public page request.
-let lastEventStatusCheckAt = 0;
 
 const MIGRATION_STATEMENTS = [
   // 1. Table creation statements (safe if already exist)
@@ -389,88 +387,8 @@ async function runAutoMigration(): Promise<void> {
     }
   }
 
-  // Also auto-close any careers where application deadline has passed
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    await prisma.career.updateMany({
-      where: {
-        status: 'Open',
-        deadline: {
-          not: null,
-          lt: today,
-        },
-      },
-      data: {
-        status: 'Closed',
-      },
-    });
-  } catch {
-    // Safe ignore
-  }
-
-  // Self-heal news articles with spaces in slugs
-  try {
-    const articlesWithSpaces = await prisma.newsArticle.findMany({
-      where: {
-        slug: {
-          contains: ' ',
-        },
-      },
-    });
-    for (const art of articlesWithSpaces) {
-      const clean = art.slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const existing = await prisma.newsArticle.findFirst({ where: { slug: clean } });
-      if (!existing) {
-        await prisma.newsArticle.update({
-          where: { id: art.id },
-          data: { slug: clean },
-        });
-        console.log(`[AutoMigrate] Cleaned news slug from "${art.slug}" to "${clean}"`);
-      }
-    }
-  } catch {
-    // Safe ignore
-  }
-
-  // Self-heal default site content keys if missing
-  try {
-    const essentialKeys: [string, string][] = [
-      ['hero.showcaseBadge', 'Team Rwanda Spotlight'],
-      ['hero.showcaseTitle', 'Excellence in Motion: Leading Africa in Para-Sport'],
-      ['hero.showcaseDesc', 'Showcasing Rwandan resilience, elite athletic pathways, and world-class achievements across continental and global championships.'],
-      ['stats.athletes', '500+'],
-      ['stats.districts', '30'],
-      ['stats.disciplines', '12+'],
-      ['stats.founded', '2001'],
-      ['stats.clubs', '30+'],
-      ['leadership.mandatePeriod', '2024–2028'],
-      ['media.youtubeUrl', 'https://www.youtube.com/@npcrwandaofficial1716'],
-      ['media.videoTitle', 'Rwanda Paralympic Highlights & Athlete Journeys'],
-      ['media.videoDesc', 'Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines.'],
-      ['media.instagramTitle', 'Instagram @npc.rwanda'],
-      ['media.instagramSubtitle', 'Official Photo & Reel Updates'],
-      ['media.instagramDesc', "Follow Rwanda's para-athletes in training, continental qualification rounds, and community events across the nation."],
-      ['media.instagramUrl', 'https://www.instagram.com/npc.rwanda/'],
-      ['media.instagramPostUrl', ''],
-    ];
-    for (const [key, val] of essentialKeys) {
-      const exist = await prisma.siteContent.findUnique({ where: { key } });
-      if (!exist) {
-        await prisma.siteContent.create({ data: { key, value: val, type: 'text' } });
-      }
-    }
-
-    // Wipe any legacy hardcoded placeholder image URLs
-    await prisma.siteContent.updateMany({
-      where: {
-        key: { in: ['about.heroImage', 'about.historyImage', 'about.previewImage', 'hero.image'] },
-        value: { contains: '/assets/img/curated/' },
-      },
-      data: { value: '' },
-    });
-  } catch {
-    // Safe ignore
-  }
+  // This compatibility layer performs additive schema DDL only.
+  // It never inserts, updates, or deletes application records.
 
   migrationExecuted = true;
 }
@@ -491,74 +409,3 @@ export function ensureAutoMigrated(): Promise<void> {
   return migrationRunningPromise;
 }
 
-/**
- * Auto-update event statuses based on today's date.
- *
- * Rules (Cancelled events are never touched):
- *   - date > today               → Upcoming
- *   - date <= today <= endDate   → Ongoing
- *   - endDate < today (or date < today when no endDate)  → Completed
- *
- * Uses a single bulk UPDATE per status bucket for efficiency.
- */
-export async function autoUpdateEventStatuses(): Promise<void> {
-  // Event dates change daily; a one-minute cooldown avoids redundant database reads
-  // when many visitors request the public bundle at the same time.
-  const now = Date.now();
-  if (now - lastEventStatusCheckAt < 60_000) return;
-  lastEventStatusCheckAt = now;
-
-  try {
-    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
-
-    // Fetch all non-cancelled events
-    const events = await prisma.event.findMany({
-      where: { status: { not: 'Cancelled' } },
-      select: { id: true, date: true, endDate: true, status: true },
-    });
-
-    const toUpcoming: string[] = [];
-    const toOngoing: string[]  = [];
-    const toCompleted: string[] = [];
-
-    for (const ev of events) {
-      const start = ev.date?.trim() || '';            // "YYYY-MM-DD"
-      const end   = ev.endDate?.trim() || '';         // "YYYY-MM-DD" or ""
-
-      let computed: string;
-      if (!start) {
-        continue; // no date stored — skip
-      } else if (start > today) {
-        computed = 'Upcoming';
-      } else if (end && end >= today) {
-        // start <= today AND end >= today → Ongoing
-        computed = 'Ongoing';
-      } else if (!end && start === today) {
-        // single-day event, happening today
-        computed = 'Ongoing';
-      } else {
-        computed = 'Completed';
-      }
-
-      if (computed !== ev.status) {
-        if (computed === 'Upcoming')  toUpcoming.push(ev.id);
-        if (computed === 'Ongoing')   toOngoing.push(ev.id);
-        if (computed === 'Completed') toCompleted.push(ev.id);
-      }
-    }
-
-    // Bulk updates — only run if there is something to change
-    const updates: Promise<unknown>[] = [];
-    if (toUpcoming.length)  updates.push(prisma.event.updateMany({ where: { id: { in: toUpcoming } },  data: { status: 'Upcoming' } }));
-    if (toOngoing.length)   updates.push(prisma.event.updateMany({ where: { id: { in: toOngoing } },   data: { status: 'Ongoing' } }));
-    if (toCompleted.length) updates.push(prisma.event.updateMany({ where: { id: { in: toCompleted } }, data: { status: 'Completed' } }));
-
-    if (updates.length) {
-      await Promise.all(updates);
-      console.log(`[AutoStatus] Events updated — Upcoming:${toUpcoming.length} Ongoing:${toOngoing.length} Completed:${toCompleted.length}`);
-    }
-  } catch (err) {
-    // Non-fatal — log and continue
-    console.warn('[AutoStatus] Event status update skipped:', err);
-  }
-}

@@ -3,6 +3,7 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
+import { useData } from '@/context/DataContext';
 
 type Programme = {
   id: string;
@@ -29,6 +30,8 @@ const emptyAthlete = {
 
 export default function SportsDevelopmentPage() {
   const { t } = useTranslation();
+  const { dpscoContacts } = useData();
+  const districtCount = new Set(dpscoContacts.filter(contact => contact.active).map(contact => contact.district.trim().toLowerCase()).filter(Boolean)).size;
   const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [loading, setLoading] = useState(true);
   const [athlete, setAthlete] = useState(emptyAthlete);
@@ -110,7 +113,7 @@ export default function SportsDevelopmentPage() {
       title: 'Grassroots Scouting & School Outreach',
       icon: 'fa-magnifying-glass-chart',
       badge: 'Discovery Phase',
-      desc: 'Active talent scouting across all 30 districts of Rwanda in partnership with inclusive schools, district sports committees, and local disability support networks.',
+      desc: 'Active talent scouting across districts of Rwanda in partnership with inclusive schools, district sports committees, and local disability support networks.',
       points: [
         'Annual district talent identification clinics',
         'Inclusive physical education in primary & secondary schools',
@@ -225,7 +228,7 @@ export default function SportsDevelopmentPage() {
               }}
             >
               Building Rwanda&apos;s next generation of Paralympic champions through grassroots scouting, structured coaching,
-              district academies, and official sports classification across all 30 districts.
+              district academies, and official sports classification across Rwanda.
             </p>
 
             {/* High-Contrast Highlights KPI Bar */}
@@ -240,10 +243,10 @@ export default function SportsDevelopmentPage() {
                   }}
                 >
                   <div className="fw-black" style={{ color: '#0B5F9F', fontSize: '1.45rem', lineHeight: 1.2 }}>
-                    30
+                    {districtCount}
                   </div>
                   <div className="small fw-bold mt-1" style={{ color: '#000000', fontSize: '0.8rem' }}>
-                    Districts Covered
+                    Districts with Active Contacts
                   </div>
                 </div>
               </div>
@@ -629,7 +632,7 @@ export default function SportsDevelopmentPage() {
                 </h3>
                 <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6 }}>
                   High-performing athletes require qualified leaders. NPC Rwanda collaborates with the Ministry of Sports, the IPC, and continental
-                  sport federations to train certified coaches, referees, and national classifiers across all 30 districts.
+                  sport federations to train certified coaches, referees, and national classifiers across Rwanda.
                 </p>
 
                 <div className="d-flex flex-column gap-2 mb-4">
@@ -977,7 +980,7 @@ export default function SportsDevelopmentPage() {
                   </span>
                 </div>
                 <p className="text-muted small mb-0">
-                  Find direct contact details for DPSCO representatives in all 30 districts of Rwanda.
+                  Find direct contact details for DPSCO representatives across Rwanda.
                 </p>
               </Link>
             </div>

@@ -6,42 +6,8 @@ import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-async function ensureJobApplicationTable() {
-  try {
-    await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "JobApplication" (
-        "id"          TEXT NOT NULL,
-        "careerId"    TEXT,
-        "careerTitle" TEXT NOT NULL,
-        "fullName"    TEXT NOT NULL,
-        "email"       TEXT NOT NULL,
-        "phone"       TEXT NOT NULL,
-        "coverLetter" TEXT NOT NULL,
-        "resumeUrl"   TEXT,
-        "status"      TEXT NOT NULL DEFAULT 'Pending',
-        "read"        BOOLEAN NOT NULL DEFAULT false,
-        "createdAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT "JobApplication_pkey" PRIMARY KEY ("id")
-      )
-    `;
-    await prisma.$executeRaw`
-      CREATE INDEX IF NOT EXISTS "JobApplication_careerId_idx" ON "JobApplication"("careerId")
-    `;
-    await prisma.$executeRaw`
-      CREATE INDEX IF NOT EXISTS "JobApplication_read_idx" ON "JobApplication"("read")
-    `;
-    await prisma.$executeRaw`
-      CREATE INDEX IF NOT EXISTS "JobApplication_status_idx" ON "JobApplication"("status")
-    `;
-  } catch (e) {
-    // Table or index may already exist
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    await ensureJobApplicationTable();
 
     const contentType = request.headers.get('content-type') || '';
     let careerId: string | null = null;
@@ -51,6 +17,7 @@ export async function POST(request: NextRequest) {
     let phone = '';
     let coverLetter = '';
     let resumeUrl: string | null = null;
+    let resumeFileToUpload: File | null = null;
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
@@ -68,27 +35,15 @@ export async function POST(request: NextRequest) {
 
       const resumeFile = formData.get('resume') as File | null;
       if (resumeFile && resumeFile.size > 0) {
-        // Validate max 10MB
         if (resumeFile.size > 10 * 1024 * 1024) {
           return NextResponse.json({ error: 'Resume file size exceeds 10MB limit.' }, { status: 400 });
         }
-
         const ext = path.extname(resumeFile.name || '').toLowerCase();
         const allowedExts = ['.pdf', '.doc', '.docx', '.rtf', '.txt'];
         if (!allowedExts.includes(ext)) {
           return NextResponse.json({ error: 'Please upload a PDF or Word document (.pdf, .doc, .docx).' }, { status: 400 });
         }
-
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resumes');
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        const safeBase = path.basename(resumeFile.name, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
-        const fileName = `${safeBase}_${Date.now()}${ext}`;
-        const filePath = path.join(uploadDir, fileName);
-
-        const bytes = await resumeFile.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(bytes));
-        resumeUrl = `/uploads/resumes/${fileName}`;
+        resumeFileToUpload = resumeFile;
       }
     } else {
       const body = await request.json();
@@ -108,22 +63,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Please provide your full name, email, phone number, and cover letter.' }, { status: 400 });
     }
 
-    // Verify position is still open and deadline has not passed
+    // Verify the selected vacancy against the database; never trust a title/status from the browser.
     if (careerId) {
-      try {
-        const targetCareer = await prisma.career.findUnique({ where: { id: careerId } });
-        if (targetCareer) {
-          const today = new Date().toISOString().split('T')[0];
-          if (targetCareer.status !== 'Open' || (targetCareer.deadline && targetCareer.deadline < today)) {
-            return NextResponse.json(
-              { error: 'Applications for this position are now closed as the deadline has passed.' },
-              { status: 400 }
-            );
-          }
-        }
-      } catch {
-        // Fallback gracefully
+      const targetCareer = await prisma.career.findUnique({ where: { id: careerId } });
+      if (!targetCareer) {
+        return NextResponse.json({ error: 'The selected vacancy could not be found.' }, { status: 404 });
       }
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Kigali' }).format(new Date());
+      if (targetCareer.status !== 'Open' || (targetCareer.deadline && targetCareer.deadline < today)) {
+        return NextResponse.json(
+          { error: 'Applications for this position are closed.' },
+          { status: 400 }
+        );
+      }
+      careerTitle = targetCareer.title;
+    }
+
+    // Store a resume only after the application has passed validation.
+    if (resumeFileToUpload) {
+      const ext = path.extname(resumeFileToUpload.name || '').toLowerCase();
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resumes');
+      await fs.mkdir(uploadDir, { recursive: true });
+      const safeBase = path.basename(resumeFileToUpload.name, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const fileName = `${safeBase}_${Date.now()}${ext}`;
+      const filePath = path.join(uploadDir, fileName);
+      const bytes = await resumeFileToUpload.arrayBuffer();
+      await fs.writeFile(filePath, Buffer.from(bytes));
+      resumeUrl = `/uploads/resumes/${fileName}`;
     }
 
     // Create the JobApplication record
@@ -168,8 +134,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Application submitted successfully.',
-      application,
-    });
+      applicationId: application.id,
+    }, { status: 201 });
   } catch (error: any) {
     console.error('Error submitting job application:', error);
     return NextResponse.json(

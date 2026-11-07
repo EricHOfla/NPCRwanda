@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
     // Fetch all collections in parallel
     const [
       rawUsers,
+      systemComponents,
       athletes,
       newsArticles,
       careers,
@@ -86,6 +87,12 @@ export async function GET(request: NextRequest) {
       npcFederations,
       dpscoContacts,
       subscribers,
+      trainingPrograms,
+      competitionResults,
+      athleteEnquiries,
+      eventRegistrations,
+      sponsorInquiries,
+      galleryItems,
     ] = await Promise.all([
       prisma.user.findMany({
         select: {
@@ -97,6 +104,7 @@ export async function GET(request: NextRequest) {
           updatedAt: true,
         },
       }),
+      prisma.systemComponent.findMany(),
       prisma.athlete.findMany(),
       prisma.newsArticle.findMany(),
       prisma.career.findMany(),
@@ -121,6 +129,12 @@ export async function GET(request: NextRequest) {
       prisma.npcFederation.findMany(),
       prisma.dpscoContact.findMany(),
       prisma.subscriber.findMany(),
+      prisma.trainingProgram.findMany(),
+      prisma.competitionResult.findMany(),
+      prisma.athleteEnquiry.findMany(),
+      prisma.eventRegistration.findMany(),
+      prisma.sponsorInquiry.findMany(),
+      prisma.galleryItem.findMany(),
     ]);
 
     // Provide a safe placeholder password hash for User records so NOT NULL constraint is satisfied
@@ -133,6 +147,7 @@ export async function GET(request: NextRequest) {
     const dateFormatted = timestamp.slice(0, 10);
     const totalRecords =
       users.length +
+      systemComponents.length +
       athletes.length +
       newsArticles.length +
       careers.length +
@@ -156,7 +171,13 @@ export async function GET(request: NextRequest) {
       npcClubs.length +
       npcFederations.length +
       dpscoContacts.length +
-      subscribers.length;
+      subscribers.length +
+      trainingPrograms.length +
+      competitionResults.length +
+      athleteEnquiries.length +
+      eventRegistrations.length +
+      sponsorInquiries.length +
+      galleryItems.length;
 
     let sql = `-- ========================================================\n`;
     sql += `-- National Paralympic Committee of Rwanda (NPC Rwanda)\n`;
@@ -180,6 +201,7 @@ export async function GET(request: NextRequest) {
     sql += `BEGIN;\n\n`;
 
     sql += generateTableInserts('User', users);
+    sql += generateTableInserts('SystemComponent', systemComponents);
     sql += generateTableInserts('Athlete', athletes);
     sql += generateTableInserts('NewsArticle', newsArticles);
     sql += generateTableInserts('Career', careers);
@@ -204,6 +226,12 @@ export async function GET(request: NextRequest) {
     sql += generateTableInserts('NpcFederation', npcFederations);
     sql += generateTableInserts('DpscoContact', dpscoContacts);
     sql += generateTableInserts('Subscriber', subscribers);
+    sql += generateTableInserts('TrainingProgram', trainingPrograms);
+    sql += generateTableInserts('CompetitionResult', competitionResults);
+    sql += generateTableInserts('AthleteEnquiry', athleteEnquiries);
+    sql += generateTableInserts('EventRegistration', eventRegistrations);
+    sql += generateTableInserts('SponsorInquiry', sponsorInquiries);
+    sql += generateTableInserts('GalleryItem', galleryItems);
 
     sql += `COMMIT;\n\n`;
     sql += `-- ========================================================\n`;

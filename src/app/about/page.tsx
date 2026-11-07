@@ -7,7 +7,8 @@ import { useData } from '@/context/DataContext';
 
 export default function AboutPage() {
   const { t } = useTranslation();
-  const { siteContent } = useData();
+  const { siteContent, dpscoContacts, athletes } = useData();
+  const districtCount = new Set(dpscoContacts.filter(contact => contact.active).map(contact => contact.district.trim().toLowerCase()).filter(Boolean)).size;
 
   const getSiteText = (key: string, fallback: string) => {
     return siteContent[key] || fallback;
@@ -70,8 +71,8 @@ export default function AboutPage() {
       num: '02',
       icon: 'fa-users-viewfinder',
       title: 'phrase.Grassroots Development',
-      desc: 'phrase.Expand access in all 30 districts and identify talent early for long-term development.',
-      outcome: '30 districts active talent pathways',
+      desc: 'phrase.Expand access across Rwanda and identify talent early for long-term development.',
+      outcome: `${districtCount} active district pathways`,
     },
     {
       num: '03',
@@ -220,10 +221,10 @@ export default function AboutPage() {
                 }}
               >
                 <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  30
+                  {districtCount}
                 </div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Districts Covered
+                  Districts with Active Contacts
                 </div>
               </div>
             </div>
@@ -238,10 +239,10 @@ export default function AboutPage() {
                 }}
               >
                 <div className="h3 mb-1 fw-bold" style={{ color: '#0B5F9F' }}>
-                  1,200+
+                  {athletes.length}
                 </div>
                 <div className="small fw-bold" style={{ color: '#000000' }}>
-                  Para-Athletes Supported
+                  Active Athlete Profiles
                 </div>
               </div>
             </div>

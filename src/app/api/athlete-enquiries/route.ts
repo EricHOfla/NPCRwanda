@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
 import { validateAntiSpam, isRateLimited, getClientIp } from '@/lib/antiSpam';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +20,6 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
-    await ensureAutoMigrated();
     const body = await request.json();
 
     // Check rate limiting

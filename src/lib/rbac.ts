@@ -177,8 +177,9 @@ const ROLE_PERMISSIONS_MAP: Record<string, Permission[]> = {
  * Normalizes role string to standard uppercase format.
  */
 export function normalizeRole(role?: string | null): string {
-  if (!role || typeof role !== 'string') return 'EDITOR';
-  return role.trim().toUpperCase();
+  if (!role || typeof role !== 'string') return 'UNKNOWN';
+  const normalized = role.trim().toUpperCase();
+  return normalized || 'UNKNOWN';
 }
 
 /**
@@ -186,7 +187,7 @@ export function normalizeRole(role?: string | null): string {
  */
 export function getRolePermissions(role?: string | null): Permission[] {
   const norm = normalizeRole(role);
-  return ROLE_PERMISSIONS_MAP[norm] || ROLE_PERMISSIONS_MAP.EDITOR;
+  return ROLE_PERMISSIONS_MAP[norm] || [];
 }
 
 /**

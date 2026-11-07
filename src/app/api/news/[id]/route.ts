@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
@@ -18,10 +19,13 @@ const newsUpdateSchema = z.object({
 
 // GET: Fetch a single news article (by id or slug)
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
+    const authorization = adminScope ? await authorizeRequest(request, 'content.view') : null;
+    if (authorization && !authorization.authorized) return authorization.response;
     const { id } = await params;
     let decoded = id;
     try {
@@ -30,9 +34,12 @@ export async function GET(
 
     const clean = decoded.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
+    // Public callers may only resolve published articles; drafts require explicit admin scope.
+    const visibilityFilter = adminScope ? {} : { status: 'Published' };
     // 1. Try direct ID or direct slug match
     let article = await prisma.newsArticle.findFirst({
       where: {
+        ...visibilityFilter,
         OR: [
           { id },
           { slug: id },
@@ -44,7 +51,7 @@ export async function GET(
 
     // 2. If not found, search all for case-insensitive / normalized match
     if (!article) {
-      const all = await prisma.newsArticle.findMany();
+      const all = await prisma.newsArticle.findMany({ where: visibilityFilter });
       article = all.find(a => 
         a.id === id ||
         a.slug.toLowerCase() === id.toLowerCase() ||
@@ -69,10 +76,12 @@ export async function GET(
 
 // PUT: Update a news article
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await authorizeRequest(request, 'content.update');
+    if (!authorization.authorized) return authorization.response;
     const { id } = await params;
     const body = await request.json();
     const result = newsUpdateSchema.safeParse(body);
@@ -141,10 +150,12 @@ export async function PUT(
 
 // DELETE: Remove a news article
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await authorizeRequest(request, 'content.delete');
+    if (!authorization.authorized) return authorization.response;
     const { id } = await params;
     await prisma.newsArticle.delete({
       where: { id },

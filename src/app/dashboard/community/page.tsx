@@ -5,23 +5,33 @@ import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { PUBLIC_BUNDLE_QUERY_KEY } from '@/context/DataContext';
 
 type Row = Record<string, any> & { id: string };
-type Data = { 
-  programmes: Row[]; 
-  athleteEnquiries: Row[]; 
+type CommunityTab = 'athleteEnquiries' | 'programmes' | 'eventRegistrations' | 'sponsorEnquiries';
+const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes', 'eventRegistrations', 'sponsorEnquiries'];
+type Data = {
+  programmes: Row[];
+  athleteEnquiries: Row[];
+  eventRegistrations: Row[];
+  sponsorEnquiries: Row[];
 };
 
-const empty: Data = { 
-  programmes: [], 
-  athleteEnquiries: [], 
+const empty: Data = {
+  programmes: [],
+  athleteEnquiries: [],
+  eventRegistrations: [],
+  sponsorEnquiries: [],
 };
 
 function CommunityManagementContent() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
-  const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({ name: 'Admin', email: '', role: 'ADMIN' });
+  const userProfile = useDashboardAuth();
 
   // Data states
   const [data, setData] = useState<Data>(empty);
@@ -31,9 +41,9 @@ function CommunityManagementContent() {
   const [success, setSuccess] = useState('');
 
   // Tab navigation — Default to 'athleteEnquiries' because that is where the live public submissions are!
-  const paramTab = searchParams.get('tab') as 'athleteEnquiries' | 'programmes';
-  const initialTab = paramTab && ['athleteEnquiries', 'programmes'].includes(paramTab) ? paramTab : 'athleteEnquiries';
-  const [activeTab, setActiveTab] = useState<'athleteEnquiries' | 'programmes'>(initialTab);
+  const paramTab = searchParams.get('tab') as CommunityTab | null;
+  const initialTab: CommunityTab = paramTab && validTabs.includes(paramTab) ? paramTab : 'athleteEnquiries';
+  const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +55,7 @@ function CommunityManagementContent() {
 
   // Modal states
   const [showProgrammeModal, setShowProgrammeModal] = useState(false);
+  const [editingProgrammeId, setEditingProgrammeId] = useState<string | null>(null);
   const [selectedAthleteEnquiry, setSelectedAthleteEnquiry] = useState<Row | null>(null);
 
   // Form states for Training Programme
@@ -53,11 +64,41 @@ function CommunityManagementContent() {
     startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false 
   });
 
+  const resetProgrammeForm = () => setProgramme({
+    title: '', sport: '', description: '', location: '', schedule: '',
+    startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false,
+  });
+
+  const openNewProgramme = () => {
+    setEditingProgrammeId(null);
+    resetProgrammeForm();
+    setShowProgrammeModal(true);
+  };
+
+  const openEditProgramme = (item: Row) => {
+    setEditingProgrammeId(item.id);
+    setProgramme({
+      title: item.title || '',
+      sport: item.sport || '',
+      description: item.description || '',
+      location: item.location || '',
+      schedule: item.schedule || '',
+      startDate: item.startDate || '',
+      endDate: item.endDate || '',
+      eligibility: item.eligibility || '',
+      contactEmail: item.contactEmail || '',
+      status: item.status || 'Draft',
+      featured: Boolean(item.featured),
+    });
+    setShowProgrammeModal(true);
+  };
+
   // Track whether we've already kicked off the initial data load
   const dataFetchedRef = useRef(false);
 
   // Derived permission
   const isAuthorized = hasPermission(userProfile.role, 'community.view');
+  const canDeleteCommunityRecords = hasPermission(userProfile.role, 'community.delete');
 
   // Fetch sports development data
   const load = useCallback(async () => {
@@ -70,6 +111,8 @@ function CommunityManagementContent() {
       setData({
         programmes: Array.isArray(payload.programmes) ? payload.programmes : [],
         athleteEnquiries: Array.isArray(payload.athleteEnquiries) ? payload.athleteEnquiries : [],
+        eventRegistrations: Array.isArray(payload.eventRegistrations) ? payload.eventRegistrations : [],
+        sponsorEnquiries: Array.isArray(payload.sponsorEnquiries) ? payload.sponsorEnquiries : [],
       });
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Unable to load data'); 
@@ -83,22 +126,13 @@ function CommunityManagementContent() {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
 
-    fetch('/api/auth/profile')
-      .then(res => res.json())
-      .then(d => {
-        if (d?.user) {
-          setUserProfile({ name: d.user.name || 'Admin', email: d.user.email || '', role: d.user.role || 'ADMIN' });
-        }
-      })
-      .catch(() => {});
-
     void load();
   }, [load]);
 
   // Sync tab from URL if present
   useEffect(() => {
-    const tab = searchParams.get('tab') as 'athleteEnquiries' | 'programmes';
-    if (tab && ['athleteEnquiries', 'programmes'].includes(tab)) {
+    const tab = searchParams.get('tab') as CommunityTab | null;
+    if (tab && validTabs.includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -117,18 +151,17 @@ function CommunityManagementContent() {
     setSuccess('');
     try {
       const response = await fetch('/api/training-programs', { 
-        method: 'POST', 
+        method: editingProgrammeId ? 'PATCH' : 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(programme) 
+        body: JSON.stringify(editingProgrammeId ? { ...programme, id: editingProgrammeId } : programme) 
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Save failed');
-      setProgramme({ 
-        title: '', sport: '', description: '', location: '', schedule: '', 
-        startDate: '', endDate: '', eligibility: '', contactEmail: '', status: 'Draft', featured: false 
-      }); 
+      resetProgrammeForm();
+      setEditingProgrammeId(null);
       setShowProgrammeModal(false);
-      setSuccess('Training programme created successfully. Set to Published to display on public site.'); 
+      setSuccess(editingProgrammeId ? 'Training programme updated successfully.' : 'Training programme created successfully.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Save failed'); 
@@ -150,7 +183,8 @@ function CommunityManagementContent() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Update failed');
-      setSuccess('Record updated successfully.'); 
+      setSuccess('Record updated successfully.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Update failed'); 
@@ -173,7 +207,8 @@ function CommunityManagementContent() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Delete failed');
-      setSuccess('Record deleted.'); 
+      setSuccess('Record deleted.');
+      await queryClient.invalidateQueries({ queryKey: PUBLIC_BUNDLE_QUERY_KEY });
       await load();
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Delete failed'); 
@@ -263,7 +298,7 @@ function CommunityManagementContent() {
             {type === 'programmes' && (
               <button 
                 type="button" 
-                onClick={() => setShowProgrammeModal(true)} 
+                onClick={openNewProgramme} 
                 className="btn btn-sm btn-primary fw-semibold d-inline-flex align-items-center gap-1.5"
                 style={{ background: '#0B5F9F', borderColor: '#0B5F9F', fontSize: '0.8rem' }}
               >
@@ -286,7 +321,7 @@ function CommunityManagementContent() {
             {type === 'programmes' && (
               <button 
                 type="button" 
-                onClick={() => setShowProgrammeModal(true)} 
+                onClick={openNewProgramme} 
                 className="btn btn-sm btn-outline-primary mt-3 fw-semibold"
               >
                 <i className="fas fa-plus me-1" /> Create First Training Programme
@@ -338,6 +373,19 @@ function CommunityManagementContent() {
                         )}
                       </td>
                       <td className="text-end" style={{ paddingRight: '18px' }}>
+                        {type === 'programmes' && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-primary p-1 px-2 me-1"
+                            disabled={busy === item.id}
+                            onClick={() => openEditProgramme(item)}
+                            title="Edit programme"
+                            aria-label={`Edit ${item.title || 'training programme'}`}
+                          >
+                            <i className="fas fa-pen" />
+                          </button>
+                        )}
+                        {canDeleteCommunityRecords && (
                         <button 
                           type="button"
                           className="btn btn-sm btn-outline-danger p-1 px-2" 
@@ -348,6 +396,7 @@ function CommunityManagementContent() {
                         >
                           <i className="fas fa-trash" />
                         </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -447,14 +496,14 @@ function CommunityManagementContent() {
                       Sports Development Desk
                     </h1>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
-                      Review aspiring athlete talent submissions, manage scouting profiles, and create official grassroots training programmes.
+                      Manage athlete scouting submissions, public event registrations, partnership enquiries, and grassroots training programmes.
                     </p>
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     <button 
                       type="button"
-                      onClick={() => setShowProgrammeModal(true)}
+                      onClick={openNewProgramme}
                       className="btn btn-sm"
                       style={{ background: '#FFD700', color: '#000000', fontWeight: 700, borderRadius: '8px', border: 'none', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
                     >
@@ -569,12 +618,32 @@ function CommunityManagementContent() {
                       {data.programmes.length}
                     </span>
                   </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'eventRegistrations' ? 'btn-primary' : 'btn-light border text-secondary'}`}
+                    onClick={() => setActiveTab('eventRegistrations')}
+                    style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '0.85rem' }}
+                  >
+                    <i className="fas fa-calendar-check" />
+                    <span>Event Registrations</span>
+                    <span className="badge rounded-pill bg-secondary text-white" style={{ fontSize: '0.7rem' }}>{data.eventRegistrations.length}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'sponsorEnquiries' ? 'btn-primary' : 'btn-light border text-secondary'}`}
+                    onClick={() => setActiveTab('sponsorEnquiries')}
+                    style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '0.85rem' }}
+                  >
+                    <i className="fas fa-handshake" />
+                    <span>Partnership Enquiries</span>
+                    <span className="badge rounded-pill bg-secondary text-white" style={{ fontSize: '0.7rem' }}>{data.sponsorEnquiries.length}</span>
+                  </button>
                 </div>
 
                 {activeTab === 'programmes' && (
                   <button 
                     type="button" 
-                    onClick={() => setShowProgrammeModal(true)} 
+                    onClick={openNewProgramme} 
                     className="btn btn-sm btn-success fw-semibold d-flex align-items-center gap-2"
                     style={{ borderRadius: '8px', padding: '8px 16px', background: '#059669', borderColor: '#059669' }}
                   >
@@ -663,6 +732,23 @@ function CommunityManagementContent() {
                   },
                 ], ['New', 'Contacted', 'Accepted', 'Closed'])
               )}
+
+              {activeTab === 'eventRegistrations' && renderTable('Public Event Registrations', 'eventRegistrations', [
+                { label: 'Event', key: 'eventTitle', format: (val) => <span className="fw-bold text-dark">{val}</span> },
+                { label: 'Registrant', key: 'fullName', format: (val, item) => <div><span className="fw-semibold text-dark d-block">{val}</span><span className="small text-muted">{item.organization || 'Individual'}</span></div> },
+                { label: 'Contact', key: 'email', format: (val, item) => <div className="small"><a href={`mailto:${val}`} className="d-block text-primary text-decoration-none">{val}</a>{item.phone && <a href={`tel:${item.phone}`} className="text-muted text-decoration-none">{item.phone}</a>}</div> },
+                { label: 'Accessibility Needs', key: 'accessibilityNeeds', format: (val) => <span className="small text-dark">{val || 'None specified'}</span> },
+                { label: 'Received', key: 'createdAt', format: (val) => <span className="small text-muted">{val ? new Date(val).toLocaleDateString('en-GB') : '—'}</span> },
+              ], ['Pending', 'Confirmed', 'Declined', 'Cancelled'])}
+
+              {activeTab === 'sponsorEnquiries' && renderTable('Public Partnership Enquiries', 'sponsorEnquiries', [
+                { label: 'Organization', key: 'organization', format: (val) => <span className="fw-bold text-dark">{val}</span> },
+                { label: 'Contact Person', key: 'contactName' },
+                { label: 'Contact', key: 'email', format: (val, item) => <div className="small"><a href={`mailto:${val}`} className="d-block text-primary text-decoration-none">{val}</a>{item.phone && <a href={`tel:${item.phone}`} className="text-muted text-decoration-none">{item.phone}</a>}</div> },
+                { label: 'Support Type', key: 'supportType' },
+                { label: 'Message', key: 'message', format: (val) => <span className="small text-dark d-block text-truncate" style={{ maxWidth: '260px' }} title={val}>{val || '—'}</span> },
+                { label: 'Received', key: 'createdAt', format: (val) => <span className="small text-muted">{val ? new Date(val).toLocaleDateString('en-GB') : '—'}</span> },
+              ], ['New', 'Contacted', 'In Progress', 'Accepted', 'Declined', 'Closed'])}
 
               {activeTab === 'programmes' && (
                 <>
@@ -809,7 +895,7 @@ function CommunityManagementContent() {
                   </div>
                   <div>
                     <h5 className="modal-title fw-bold mb-0" style={{ fontSize: '1.2rem' }}>
-                      Create Training Programme
+                      {editingProgrammeId ? 'Edit Training Programme' : 'Create Training Programme'}
                     </h5>
                     <span className="small opacity-75" style={{ fontSize: '0.8rem' }}>
                       Publish official grassroots academies, youth training clinics &amp; training camps
@@ -819,7 +905,7 @@ function CommunityManagementContent() {
                 <button
                   type="button"
                   className="btn-close btn-close-white"
-                  onClick={() => setShowProgrammeModal(false)}
+                  onClick={() => { setShowProgrammeModal(false); setEditingProgrammeId(null); resetProgrammeForm(); }}
                   aria-label="Close"
                 />
               </div>
@@ -998,7 +1084,7 @@ function CommunityManagementContent() {
                   <button
                     type="button"
                     className="btn btn-light border px-4 py-2 fw-semibold rounded-3"
-                    onClick={() => setShowProgrammeModal(false)}
+                    onClick={() => { setShowProgrammeModal(false); setEditingProgrammeId(null); resetProgrammeForm(); }}
                     style={{ fontSize: '0.85rem' }}
                   >
                     Cancel
@@ -1017,7 +1103,7 @@ function CommunityManagementContent() {
                     ) : (
                       <>
                         <i className="fas fa-check" />
-                        <span>Create Training Programme</span>
+                        <span>{editingProgrammeId ? 'Save Changes' : 'Create Training Programme'}</span>
                       </>
                     )}
                   </button>

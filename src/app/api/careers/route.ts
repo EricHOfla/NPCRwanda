@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getRwandaDateString } from '@/lib/dateUtils';
 import { notifySubscribers } from '@/lib/mailer';
 
 export const dynamic = 'force-dynamic';
@@ -15,17 +17,16 @@ const careerSchema = z.object({
   deadline: z.string().optional().nullable(),
 });
 
-async function ensureCareerDeadlineColumnAndAutoClose() {
-  const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
-  await ensureAutoMigrated();
-}
-
 // GET: Fetch careers list with optional filters and pagination
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    await ensureCareerDeadlineColumnAndAutoClose();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || '';
+    const adminScope = searchParams.get('scope') === 'admin';
+    const status = searchParams.get('status') || (adminScope ? 'All' : 'Open');
+    if (adminScope || status !== 'Open') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const slug = searchParams.get('slug') || '';
     const search = searchParams.get('search') || '';
     const page = searchParams.get('page');
@@ -34,6 +35,9 @@ export async function GET(request: Request) {
     const whereClause: any = {};
     if (status && status !== 'All') {
       whereClause.status = status;
+    }
+    if (status === 'Open') {
+      whereClause.AND = [{ OR: [{ deadline: null }, { deadline: { gte: getRwandaDateString() } }] }];
     }
     if (slug) {
       whereClause.slug = slug;
@@ -94,7 +98,6 @@ export async function GET(request: Request) {
 // POST: Create a new job position
 export async function POST(request: Request) {
   try {
-    await ensureCareerDeadlineColumnAndAutoClose();
     const body = await request.json();
 
     // Auto-generate slug if not provided

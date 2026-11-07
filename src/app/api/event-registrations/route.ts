@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { autoUpdateEventStatuses, ensureAutoMigrated } from '@/lib/autoMigrate';
+import { getRwandaDateString } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,12 +16,14 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
-    await ensureAutoMigrated();
-    await autoUpdateEventStatuses();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
     const event = await prisma.event.findUnique({ where: { id: parsed.data.eventId } });
-    if (!event || event.status === 'Cancelled' || event.status === 'Completed') {
+    const today = getRwandaDateString();
+    const start = event?.date?.trim() || '';
+    const end = event?.endDate?.trim() || '';
+    const isPast = Boolean(start && (end ? end < today : start < today));
+    if (!event || event.status === 'Cancelled' || event.status === 'Completed' || isPast) {
       return NextResponse.json({ error: 'This event is not accepting registrations.' }, { status: 400 });
     }
     const item = await prisma.eventRegistration.create({

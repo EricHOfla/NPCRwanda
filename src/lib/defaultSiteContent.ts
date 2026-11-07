@@ -19,11 +19,6 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'impact.eyebrow': 'Impact Snapshot',
   'impact.title': 'Building Pathways for Inclusive Excellence',
   'impact.desc': 'From grassroots participation to elite competition, NPC Rwanda connects athletes, coaches, and communities to grow para-sport opportunities nationwide.',
-  'stats.districts': '30',
-  'stats.disciplines': '12+',
-  'stats.founded': '2001',
-  'stats.clubs': '30+',
-  'stats.athletes': '500+',
   'about.previewImage': '',
   'about.eyebrow': 'Who We Are',
   'about.previewTitle': 'Driving Inclusion Through Sport',
@@ -49,7 +44,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'about.value.phrase.Empowerment': 'Equipping athletes with the tools, training, and support they need to thrive.',
   'about.value.phrase.Intersectionality': 'Recognizing the diverse experiences that shape our athletes and communities.',
   'about.objective.phrase.Athlete Excellence': 'Strengthen coaching, science, and athlete support to compete for podium finishes internationally.',
-  'about.objective.phrase.Grassroots Development': 'Expand access in all 30 districts and identify talent early for long-term development.',
+  'about.objective.phrase.Grassroots Development': 'Expand access across Rwanda and identify talent early for long-term development.',
   'about.objective.phrase.Safeguarding & Governance': 'Maintain strong safeguarding practices and transparent governance at all levels.',
   'about.objective.phrase.Partnership Growth': 'Build sustainable partnerships with government, federations, and private sector sponsors.',
 
@@ -86,7 +81,7 @@ Boost the number and performance of athletes in international competitions, focu
 Develop elite training pathways for Sitting Volleyball, Para Athletics, Goalball, Wheelchair Basketball, Para-Powerlifting, and Boccia.`,
   'background.pillar3': `Strengthen the capacity of NPC Board members, internal audit committee, conflict resolution committee, commissions, staff, and volunteers.
 Enhance NPC staff skills in international resource mobilization, proposal development, and project management.
-Strengthen sports leadership and administrative capacity in all 30 district Paralympic committees.
+Strengthen sports leadership and administrative capacity in district Paralympic committees across Rwanda.
 Advocate and build accessible sports infrastructure (offices, stadiums, hostels) capable of hosting international competitions.`,
   'background.pillar4': `Conduct research and archive key achievements in disability sports to share at international seminars and conferences.
 Develop a sustainable strategy to attract national and international investors to support disability sports activities.

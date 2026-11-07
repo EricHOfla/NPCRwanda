@@ -6,9 +6,9 @@ function makeQueryClient() {
       queries: {
         // Reuse persisted data and avoid repeated requests while navigating the site.
         // Admin mutations invalidate the public bundle immediately when content changes.
-        staleTime: 60 * 1000,
-        gcTime: 24 * 60 * 60 * 1000,
-        refetchOnWindowFocus: false,
+        staleTime: 30 * 1000,
+        gcTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: true,
         refetchOnReconnect: true,
         retry: 1,
       },

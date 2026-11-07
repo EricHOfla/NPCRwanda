@@ -1,14 +1,37 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
+import { getRwandaDateString } from '@/lib/dateUtils';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+// Only settings required by public components may leave the server boundary.
+// SMTP credentials, per-user preferences, and other private settings stay server-side.
+const PUBLIC_SETTING_KEYS = [
+  'siteName',
+  'siteSubtitle',
+  'siteLogo',
+  'contactPhone',
+  'contactEmail',
+  'address',
+  'facebook',
+  'twitter',
+  'instagram',
+  'youtube',
+  'linkedin',
+] as const;
+
+export async function GET(request: NextRequest) {
   try {
-    await ensureAutoMigrated();
-    // Fire-and-forget — keep event statuses accurate without blocking the response
-    autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
+    // Admin data is requested explicitly and requires a valid session. Public requests
+    // never receive drafts, inactive records, or private administrative data.
+    const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
+    const authorization = adminScope
+      ? await authorizeRequest(request, 'content.view')
+      : null;
+    if (authorization && !authorization.authorized) return authorization.response;
+    const isAdminRequest = Boolean(authorization?.authorized);
+    const today = getRwandaDateString();
 
     const [
       athletes,
@@ -30,14 +53,17 @@ export async function GET() {
       dpscoContacts,
     ] = await Promise.all([
       prisma.athlete.findMany({
+        where: isAdminRequest ? undefined : { status: 'Active' },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.newsArticle.findMany({
+        where: isAdminRequest ? undefined : { status: 'Published' },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.career.findMany({
+        where: isAdminRequest ? undefined : { status: 'Open', OR: [{ deadline: null }, { deadline: { gte: today } }] },
         take: 100,
         orderBy: { createdAt: 'desc' },
       }),
@@ -51,36 +77,43 @@ export async function GET() {
         prisma.leader.findMany({ orderBy: { name: 'asc' } })
       ),
       prisma.governanceDocument.findMany({
-        where: { published: true },
+        where: isAdminRequest ? undefined : { published: true },
         orderBy: { order: 'asc' },
       }),
       prisma.governancePolicy.findMany({
-        where: { published: true },
+        where: isAdminRequest ? undefined : { published: true },
         orderBy: { order: 'asc' },
       }),
       prisma.event.findMany({
+        where: isAdminRequest ? undefined : { status: { not: 'Cancelled' } },
         take: 100,
         orderBy: { date: 'asc' },
       }),
       prisma.partner.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: { order: 'asc' },
       }),
       prisma.siteContent.findMany(),
       prisma.contactInfo.findFirst(),
       prisma.socialLink.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
-      prisma.systemSetting.findMany(),
+      prisma.systemSetting.findMany({ where: { key: { in: [...PUBLIC_SETTING_KEYS] } } }),
       prisma.npcAssociation.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.npcClub.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.npcFederation.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       }),
       prisma.dpscoContact.findMany({
+        where: isAdminRequest ? undefined : { active: true },
         orderBy: [{ province: 'asc' }, { district: 'asc' }],
       }),
     ]);
@@ -113,20 +146,10 @@ export async function GET() {
       siteSubtitle: 'NATIONAL PARALYMPIC COMMITTEE OF RWANDA',
       siteLogo: '/assets/img/logo.png',
     };
-    const missingEntries = Object.entries(seedDefaults).filter(([k]) => !settingsMap[k]);
-    if (missingEntries.length > 0) {
-      try {
-        await prisma.$transaction(
-          missingEntries.map(([key, value]) =>
-            prisma.systemSetting.upsert({ where: { key }, update: {}, create: { key, value } })
-          )
-        );
-        missingEntries.forEach(([k, v]) => { settingsMap[k] = v; });
-      } catch (seedErr) {
-        console.error('Failed to auto-seed system settings in bundle:', seedErr);
-        missingEntries.forEach(([k, v]) => { settingsMap[k] = v; });
-      }
-    }
+    // Defaults are response-only: reading the public bundle must never create records.
+    Object.entries(seedDefaults).forEach(([key, value]) => {
+      if (!settingsMap[key]) settingsMap[key] = value;
+    });
 
     const siteContentMap: Record<string, string> = {};
     siteContentList.forEach((c) => {
@@ -143,7 +166,13 @@ export async function GET() {
       leaders,
       governanceDocs,
       governancePolicies,
-      events,
+      events: events.map((event) => {
+        if (event.status === 'Cancelled' || !event.date) return event;
+        const start = event.date.trim();
+        const end = event.endDate?.trim() || '';
+        const status = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
+        return { ...event, status };
+      }),
       partners,
       siteContent: siteContentList,
       siteContentMap,

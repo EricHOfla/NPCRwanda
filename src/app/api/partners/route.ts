@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -13,17 +14,19 @@ const partnerSchema = z.object({
   active: z.boolean().default(true),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const activeStr = searchParams.get('active');
+    const adminScope = searchParams.get('scope') === 'admin';
+    if (activeStr === 'all' || adminScope) {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const page = searchParams.get('page');
     const limit = searchParams.get('limit') || '10';
 
-    const whereClause: any = {};
-    if (activeStr !== null) {
-      whereClause.active = activeStr === 'true';
-    }
+    const whereClause: any = activeStr === 'all' || adminScope ? {} : { active: true };
 
     if (page) {
       const pageNum = parseInt(page, 10) || 1;

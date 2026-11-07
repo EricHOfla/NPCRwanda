@@ -1,11 +1,18 @@
+import { ensureAutoMigrated } from '@/lib/autoMigrate';
+
+/**
+ * Keep the existing additive schema compatibility checks during startup.
+ * These checks only create missing tables/columns/indexes; they never seed,
+ * update, or delete application records. Destructive or data-changing work
+ * belongs in reviewed Prisma migrations.
+ */
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     try {
-      const { ensureAutoMigrated } = await import('@/lib/autoMigrate');
       await ensureAutoMigrated();
-      console.log('[AutoMigrate] Server startup database schema check completed.');
+      console.log('[AutoMigrate] Additive schema compatibility check completed.');
     } catch (err) {
-      console.error('[AutoMigrate] Error during startup auto-migration:', err);
+      console.error('[AutoMigrate] Schema compatibility check failed:', err);
     }
   }
 }

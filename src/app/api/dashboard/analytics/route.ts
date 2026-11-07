@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSessionUser, hasRequiredRole } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,10 +9,8 @@ const noStore = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age
 const analyticsCache = { 'Cache-Control': 'private, max-age=0, stale-while-revalidate=30', 'Vary': 'Cookie' };
 
 export async function GET(request: NextRequest) {
-  const user = await getSessionUser(request);
-  if (!user || !hasRequiredRole(user.role, ['SUPER_ADMIN', 'ADMIN'])) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStore });
-  }
+  const auth = await authorizeRequest(request, 'reports.view');
+  if (!auth.authorized) return auth.response;
 
   const requestedDays = Number(request.nextUrl.searchParams.get('days') || 30);
   const days = [7, 30, 90, 365].includes(requestedDays) ? requestedDays : 30;

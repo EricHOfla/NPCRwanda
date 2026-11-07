@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated } from '@/lib/autoMigrate';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +19,31 @@ const schema = z.object({
   featured: z.boolean().default(false),
 });
 
+const updateSchema = schema.partial().extend({
+  id: z.string().min(1),
+});
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) return auth.response;
+
+    const parsed = updateSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const { id, ...data } = parsed.data;
+    const updated = await prisma.trainingProgram.update({ where: { id }, data });
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Training programme update failed:', error);
+    return NextResponse.json({ error: 'Unable to update training programme' }, { status: 500 });
+  }
+}
+
 export async function GET() {
   try {
-    await ensureAutoMigrated();
     const data = await prisma.trainingProgram.findMany({
       where: { status: 'Published' },
       orderBy: [{ featured: 'desc' }, { startDate: 'asc' }, { createdAt: 'desc' }],
@@ -33,9 +55,11 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    await ensureAutoMigrated();
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) return auth.response;
+
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
     const data = await prisma.trainingProgram.create({ data: parsed.data });

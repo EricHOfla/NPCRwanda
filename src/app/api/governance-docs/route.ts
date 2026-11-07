@@ -1,14 +1,20 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
 // GET: Public — fetch all published governance documents ordered by `order`
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
+    if (adminScope) {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const docs = await prisma.governanceDocument.findMany({
-      where: { published: true },
+      where: adminScope ? undefined : { published: true },
       orderBy: { order: 'asc' },
     });
     return NextResponse.json(docs);

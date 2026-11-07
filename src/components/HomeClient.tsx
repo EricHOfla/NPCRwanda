@@ -81,11 +81,17 @@ export default function HomeClient() {
     { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
   ];
 
-  // Dynamic counts derived directly from database records or admin siteContent
-  const districtsCount = siteContent['stats.districts'] || (dpscoContacts.length > 0 ? `${dpscoContacts.length}` : '30');
-  const athletesCount = siteContent['stats.athletes'] || (athletes.length > 0 ? `${athletes.length}+` : '0');
-  const disciplinesCount = siteContent['stats.disciplines'] || (sports.length > 0 ? `${sports.length}` : '0');
-  const clubsCount = siteContent['stats.clubs'] || (npcClubs.length > 0 ? `${npcClubs.length}+` : '0');
+  // Public impact counters are derived from current managed records, never manually entered or seeded figures.
+  const activeDistricts = new Set(
+    dpscoContacts
+      .filter(contact => contact.active)
+      .map(contact => contact.district.trim().toLocaleLowerCase())
+      .filter(Boolean)
+  );
+  const districtsCount = String(activeDistricts.size);
+  const athletesCount = String(athletes.length);
+  const disciplinesCount = String(sports.length);
+  const clubsCount = String(npcClubs.filter(club => club.active).length);
   const hasMetricValue = (value: string) => value.trim() !== '' && !/^0+(?:\.0+)?\+?$/.test(value.trim());
   const hasAthletesCount = hasMetricValue(athletesCount);
   const hasDisciplinesCount = hasMetricValue(disciplinesCount);

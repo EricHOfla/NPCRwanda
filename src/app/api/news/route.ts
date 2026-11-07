@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { notifySubscribers } from '@/lib/mailer';
@@ -19,11 +20,17 @@ const newsSchema = z.object({
 });
 
 // GET: Fetch news articles with optional filters and pagination
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || '';
-    const status = searchParams.get('status') || '';
+    const requestedStatus = searchParams.get('status');
+    const adminScope = searchParams.get('scope') === 'admin' || Boolean(requestedStatus && requestedStatus !== 'Published');
+    const status = requestedStatus || (adminScope ? 'All' : 'Published');
+    if (adminScope) {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
+    }
     const slug = searchParams.get('slug') || '';
     const search = searchParams.get('search') || '';
     const page = searchParams.get('page');
@@ -35,7 +42,7 @@ export async function GET(request: Request) {
       whereClause.category = category;
     }
     
-    if (status) {
+    if (status && status !== 'All') {
       whereClause.status = status;
     }
 
