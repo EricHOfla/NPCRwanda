@@ -410,7 +410,6 @@ function DonationManagementContent() {
         {/* Unified System Dashboard Topbar */}
         <DashboardTopbar
           title="Donations & Contributions"
-          breadcrumb="Dashboard"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           userProfile={userProfile}

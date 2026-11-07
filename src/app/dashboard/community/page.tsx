@@ -410,7 +410,6 @@ function CommunityManagementContent() {
         {/* Unified System Dashboard Topbar */}
         <DashboardTopbar
           title="Sports Development"
-          breadcrumb="Dashboard"
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           userProfile={userProfile}
