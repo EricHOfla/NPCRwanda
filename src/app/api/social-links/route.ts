@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeRequest } from '@/lib/rbac-server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -12,15 +13,16 @@ const socialLinkSchema = z.object({
   order: z.number().int().default(0),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const activeStr = searchParams.get('active');
-
-    const whereClause: any = {};
-    if (activeStr !== null) {
-      whereClause.active = activeStr === 'true';
+    if (activeStr === 'all') {
+      const auth = await authorizeRequest(request, 'content.view');
+      if (!auth.authorized) return auth.response;
     }
+
+    const whereClause: any = activeStr === 'all' ? {} : { active: true };
 
     const links = await prisma.socialLink.findMany({
       where: whereClause,
