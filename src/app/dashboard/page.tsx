@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDashboardAuth } from '@/context/DashboardAuthContext';
 import { useQueryClient } from '@tanstack/react-query';
@@ -1261,6 +1260,37 @@ export default function DashboardPage() {
   // Session security & idle management
   const lastActivityRef = useRef<number>(Date.now());
   const [authVerified, setAuthVerified] = useState(true);
+
+  // Handle permission failures for in-dashboard tab changes as well as direct
+  // URL navigation. The shared layout handles direct URL access; this covers
+  // internal controls that change adminTab without a Next.js navigation.
+  useEffect(() => {
+    if (!authVerified) return;
+
+    const restricted =
+      (adminTab === 'pages' && isPageRestricted(activeEditPage)) ||
+      (adminTab === 'settings' && !canAccessSettings) ||
+      (adminTab === 'users' && !canAccessUsers) ||
+      (adminTab === 'members' && !canAccessMembers) ||
+      (adminTab === 'subscribers' && !hasPermission(userRole, 'subscribers.view')) ||
+      ((adminTab === 'contacts' || adminTab === 'volunteers') && !hasPermission(userRole, 'inbox.view'));
+
+    if (!restricted) return;
+
+    window.alert('Access denied. You do not have permission to view this page. You are being returned to Admin Overview.');
+    setAdminTab('overview');
+    setActiveEditPage(null);
+    router.replace('/dashboard?tab=overview');
+  }, [
+    authVerified,
+    adminTab,
+    activeEditPage,
+    canAccessSettings,
+    canAccessUsers,
+    canAccessMembers,
+    userRole,
+    router,
+  ]);
 
   const verifySession = useCallback(async (): Promise<boolean> => {
     try {
@@ -2553,7 +2583,7 @@ export default function DashboardPage() {
              TAB: PAGES CMS
              ────────────────────────────── */}
           {adminTab === 'pages' && (
-            isPageRestricted(activeEditPage) ? (
+            isPageRestricted(activeEditPage) ? null : (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '480px', borderRadius: '16px', overflow: 'hidden' }}>
                   <div style={{ background: 'linear-gradient(135deg, #1E293B, #334155)', padding: '32px', color: '#fff' }}>
@@ -5703,7 +5733,7 @@ uploadMediaFile={uploadMediaFile}
           
           {adminTab === 'members' && (
             !canAccessMembers ? (
-              <AccessRestricted onReturn={() => setAdminTab('overview')} />
+              null
             ) : (
             <div className="animation-fade-in">
               <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
