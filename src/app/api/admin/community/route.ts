@@ -68,7 +68,6 @@ export async function DELETE(request: NextRequest) {
       return auth.response;
     }
 
-    await ensureAutoMigrated();
     const parsed = deleteSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid delete request' }, { status: 400 });
     const { type, id } = parsed.data;
