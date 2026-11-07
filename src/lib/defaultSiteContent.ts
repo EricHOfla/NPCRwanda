@@ -31,6 +31,21 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
+  'about.pageTitle': 'Championing Inclusion Through Para-Sport Excellence',
+  'about.pageIntro': 'Founded in November 2001, NPC Rwanda is the recognized governing authority for Paralympic sports in Rwanda, dedicated to empowering persons with disabilities, developing elite champions, and transforming perceptions through sport.',
+  'about.milestones': `2001|Foundation of NPC Rwanda|Officially constituted in November 2001 to organize, develop, and advocate for Paralympic sports across Rwanda.
+2004|First Paralympic Appearance|Athens 2004 marked Rwanda’s Paralympic debut, initiating a legacy of high-performance international competition.
+2016|Historic Rio Qualification|Rwanda's Women's Sitting Volleyball team became the first women's team from Sub-Saharan Africa to qualify for the Paralympic Games.
+2021|Tokyo 2020 Expansion|Fielded athletes across Sitting Volleyball and Para-Athletics while launching district grassroots classification clinics.
+2024–2028|Quadrennial Strategic Plan|Executing a comprehensive multi-year strategy to modernize training centers, empower youth, and achieve podium excellence.`,
+  'about.affiliations': `International Paralympic Committee|IPC Member|Global governing body of the Paralympic Movement
+African Paralympic Committee|APC Member|Continental confederation coordinating African Para-Sport
+Ministry of Sports (MINISPORTS)|National Authority|Institutional partner and national policy stakeholder
+World ParaVolley (WPV)|Global Federation|International governing body for Sitting Volleyball`,
+  'about.objective.outcome.Athlete Excellence': 'Podium focus & high-performance science',
+  'about.objective.outcome.Grassroots Development': '',
+  'about.objective.outcome.Safeguarding & Governance': 'Zero-tolerance safeguarding & compliance',
+  'about.objective.outcome.Partnership Growth': 'Long-term funding & commercial partnerships',
   'about.heroImage': '',
   'about.vision': 'To be the leading Paralympic nation in Africa.',
   'about.mission': 'To develop a sustainable Paralympic sport system in Rwanda for enabling Para-athletes to achieve their sporting aspirations in local and International sport arena.',
