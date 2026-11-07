@@ -83,10 +83,19 @@ export default function DashboardLayoutClient({
   // Keep the full navigation visible on desktop, but start with the drawer
   // closed on phones so it never covers the dashboard content on first load.
   useEffect(() => {
-    const syncSidebarForViewport = () => setSidebarOpen(window.innerWidth >= 992);
-    syncSidebarForViewport();
-    window.addEventListener('resize', syncSidebarForViewport);
-    return () => window.removeEventListener('resize', syncSidebarForViewport);
+    let isMobile = window.innerWidth < 992;
+    setSidebarOpen(!isMobile);
+
+    const handleViewportChange = () => {
+      const nextIsMobile = window.innerWidth < 992;
+      if (nextIsMobile !== isMobile) {
+        isMobile = nextIsMobile;
+        setSidebarOpen(!nextIsMobile);
+      }
+    };
+
+    window.addEventListener('resize', handleViewportChange);
+    return () => window.removeEventListener('resize', handleViewportChange);
   }, []);
 
   // Profile and role are provided by the authenticated server layout from the
