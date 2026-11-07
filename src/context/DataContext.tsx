@@ -442,7 +442,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Admin data renders from the in-memory cache immediately but is always revalidated.
     // Public content keeps a short freshness window to reduce unnecessary requests.
     staleTime: pathname.startsWith('/dashboard') ? 0 : 60_000,
-    refetchOnMount: pathname.startsWith('/dashboard') ? 'always' : true,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     // Mutations invalidate this key when public content changes.
   });
 
