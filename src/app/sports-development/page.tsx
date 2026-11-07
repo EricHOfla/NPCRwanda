@@ -2,144 +2,1031 @@
 
 import React, { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/context/LanguageContext';
 
-type Programme = { id: string; title: string; sport: string; description: string; location: string; schedule: string; startDate: string; endDate: string; eligibility: string; featured: boolean };
-type Result = { id: string; eventTitle: string; competitionDate: string; athleteName: string; sport: string; position: string; medal: string; result: string };
-type GalleryItem = { id: string; title: string; description: string; mediaUrl: string; mediaType: string; category: string };
-type EventItem = { id: string; title: string; date: string; location: string; status: string };
+type Programme = {
+  id: string;
+  title: string;
+  sport: string;
+  description: string;
+  location: string;
+  schedule: string;
+  startDate: string;
+  endDate: string;
+  eligibility: string;
+  featured: boolean;
+};
 
-const inputClass = 'form-control py-2';
-const emptyAthlete = { fullName: '', email: '', phone: '', district: '', sport: '', ageRange: '', message: '' };
-const emptySponsor = { organization: '', contactName: '', email: '', phone: '', supportType: '', message: '' };
-const emptyRegistration = { eventId: '', fullName: '', email: '', phone: '', organization: '', accessibilityNeeds: '' };
+const emptyAthlete = {
+  fullName: '',
+  email: '',
+  phone: '',
+  district: '',
+  sport: '',
+  ageRange: '',
+  message: '',
+};
 
 export default function SportsDevelopmentPage() {
+  const { t } = useTranslation();
   const [programmes, setProgrammes] = useState<Programme[]>([]);
-  const [results, setResults] = useState<Result[]>([]);
-  const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [athlete, setAthlete] = useState(emptyAthlete);
-  const [sponsor, setSponsor] = useState(emptySponsor);
-  const [registration, setRegistration] = useState(emptyRegistration);
-  const [submitting, setSubmitting] = useState('');
-  const [notice, setNotice] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Anti-spam bot trap
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [hpField, setHpField] = useState('');
+  const [mountTime] = useState(() => Date.now());
 
   useEffect(() => {
     let active = true;
-    Promise.all([
-      fetch('/api/training-programs').then(r => r.ok ? r.json() : []),
-      fetch('/api/competition-results').then(r => r.ok ? r.json() : []),
-      fetch('/api/gallery').then(r => r.ok ? r.json() : []),
-      fetch('/api/events').then(r => r.ok ? r.json() : []),
-    ]).then(([p, r, g, e]) => {
-      if (!active) return;
-      setProgrammes(Array.isArray(p) ? p : []);
-      setResults(Array.isArray(r) ? r : []);
-      setGallery(Array.isArray(g) ? g : []);
-      setEvents(Array.isArray(e) ? e.filter((item: EventItem) => ['Upcoming', 'Ongoing'].includes(item.status)) : []);
-    }).catch(() => {
-      if (active) setNotice({ kind: 'error', text: 'Some information could not be loaded. Please refresh the page.' });
-    }).finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    fetch('/api/training-programs')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (!active) return;
+        setProgrammes(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        // Silently handle if offline or empty
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  async function submitForm<T extends object>(endpoint: string, kind: string, values: T, reset: () => void) {
-    setSubmitting(kind);
-    setNotice(null);
-    try {
-      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(values) });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || 'Submission failed. Please try again.');
-      reset();
-      setNotice({ kind: 'success', text: payload.message || 'Your request has been received.' });
-    } catch (error) {
-      setNotice({ kind: 'error', text: error instanceof Error ? error.message : 'Submission failed. Please try again.' });
-    } finally {
-      setSubmitting('');
+  const handleAthleteSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!athlete.fullName.trim() || !athlete.email.trim() || !athlete.phone.trim() || !athlete.district.trim() || !athlete.sport.trim()) {
+      return;
     }
-  }
 
-  const medalSummary = results.reduce((totals, item) => {
-    const medal = (item.medal || '').toLowerCase();
-    if (medal.includes('gold')) totals.gold += 1;
-    else if (medal.includes('silver')) totals.silver += 1;
-    else if (medal.includes('bronze')) totals.bronze += 1;
-    return totals;
-  }, { gold: 0, silver: 0, bronze: 0 });
+    setSubmitting(true);
+    setErrorMessage('');
 
-  const field = (label: string, value: string, onChange: (v: string) => void, type = 'text', required = true) => (
-    <div className="mb-3">
-      <label className="form-label fw-semibold">{label}{required ? ' *' : ''}</label>
-      <input className={inputClass} type={type} required={required} value={value} onChange={e => onChange(e.target.value)} />
-    </div>
-  );
+    try {
+      const response = await fetch('/api/athlete-enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: athlete.fullName.trim(),
+          email: athlete.email.trim(),
+          phone: athlete.phone.trim(),
+          district: athlete.district.trim(),
+          sport: athlete.sport.trim(),
+          ageRange: athlete.ageRange.trim(),
+          message: athlete.message.trim().length >= 10
+            ? athlete.message.trim()
+            : 'Aspiring athlete enquiry submitted via Sports Development portal.',
+          website_url: websiteUrl,
+          hp_field: hpField,
+          _ts: mountTime,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.error || 'Submission failed. Please try again.');
+      }
+
+      setAthlete(emptyAthlete);
+      setSubmitted(true);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Submission failed. Please check your network and try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const pathwayStages = [
+    {
+      step: '01',
+      title: 'Grassroots Scouting & School Outreach',
+      icon: 'fa-magnifying-glass-chart',
+      badge: 'Discovery Phase',
+      desc: 'Active talent scouting across all 30 districts of Rwanda in partnership with inclusive schools, district sports committees, and local disability support networks.',
+      points: [
+        'Annual district talent identification clinics',
+        'Inclusive physical education in primary & secondary schools',
+        'Basic physical assessment & medical screening',
+      ],
+    },
+    {
+      step: '02',
+      title: 'District Academies & Club Training',
+      icon: 'fa-dumbbell',
+      badge: 'Foundation Phase',
+      desc: 'Identified athletes join local clubs and district sports academies for structured technical coaching, physical conditioning, and adaptive equipment orientation.',
+      points: [
+        'Weekly structured training sessions with certified coaches',
+        'Provision of specialized adaptive sports equipment',
+        'Participation in regional youth and development tournaments',
+      ],
+    },
+    {
+      step: '03',
+      title: 'National Classification & League Play',
+      icon: 'fa-id-card-clip',
+      badge: 'Classification Phase',
+      desc: 'Athletes undergo official national and IPC-standard sports classification to establish eligible sport classes for competitive league play and national championships.',
+      points: [
+        'Physical, visual, and intellectual impairment classification',
+        'Regular season competition in national leagues',
+        'National Championship qualification and rankings',
+      ],
+    },
+    {
+      step: '04',
+      title: 'High-Performance & Paralympic Podium',
+      icon: 'fa-trophy',
+      badge: 'Podium Excellence',
+      desc: 'Top-tier athletes represent Rwanda in national squads, entering intensive training camps, continental championships, World Championships, and the Paralympic Games.',
+      points: [
+        'National team intensive residential training camps',
+        'Sports science, nutrition, and psychological support',
+        'African Para Games, World Championships & Paralympic representation',
+      ],
+    },
+  ];
 
   return (
-    <main id="main-content">
-      <header className="page-header">
+    <main id="main-content" style={{ background: '#F8FAFC', minHeight: '100vh' }}>
+      {/* ═══════════════════════════════════════════════════════════
+          PAGE HEADER (Consistent High-Contrast Light Design System)
+      ═══════════════════════════════════════════════════════════ */}
+      <header
+        className="page-header"
+        style={{
+          borderBottom: '1px solid #E2E8F0',
+          background: '#F8FAFC',
+          color: '#000000',
+          padding: '44px 0 52px',
+        }}
+      >
         <div className="container">
-          <nav aria-label="breadcrumb"><ol className="breadcrumb mb-2"><li className="breadcrumb-item"><Link href="/">Home</Link></li><li className="breadcrumb-item active">Sports Development</li></ol></nav>
-          <h1 className="page-title mb-2">Sports Development & Opportunities</h1>
-          <p className="page-subtitle">Discover training opportunities, follow Rwanda’s competition results, register for events and connect with NPC Rwanda.</p>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-3" style={{ fontSize: '0.88rem' }}>
+              <li className="breadcrumb-item">
+                <Link href="/" style={{ color: '#000000', fontWeight: 600, textDecoration: 'none' }}>
+                  <i className="fas fa-home me-1" />
+                  {t('nav.home') || 'Home'}
+                </Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page" style={{ color: '#000000', fontWeight: 800 }}>
+                Sports Development
+              </li>
+            </ol>
+          </nav>
+
+          <div className="text-center mx-auto" style={{ maxWidth: '960px' }}>
+            <span
+              className="badge rounded-pill text-uppercase fw-bold px-3 py-2 mb-3"
+              style={{
+                background: '#FEF3C7',
+                color: '#000000',
+                border: '1.5px solid #F59E0B',
+                fontSize: '0.78rem',
+                letterSpacing: '0.08em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <i className="fas fa-chart-line text-warning" />
+              GRASSROOTS TO PODIUM EXCELLENCE
+            </span>
+
+            <h1
+              className="fw-black mb-3"
+              style={{
+                color: '#000000',
+                fontSize: 'clamp(2.1rem, 3.8vw, 3.1rem)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+              }}
+            >
+              Sports Development &amp; Athlete Pathways
+            </h1>
+
+            <p
+              style={{
+                color: '#000000',
+                maxWidth: '860px',
+                fontSize: '1.1rem',
+                lineHeight: 1.7,
+                fontWeight: 500,
+                margin: '0 auto',
+              }}
+            >
+              Building Rwanda&apos;s next generation of Paralympic champions through grassroots scouting, structured coaching,
+              district academies, and official sports classification across all 30 districts.
+            </p>
+
+            {/* High-Contrast Highlights KPI Bar */}
+            <div className="row g-3 mt-4 pt-2 text-start">
+              <div className="col-6 col-md-3">
+                <div
+                  className="p-3 rounded-3 h-100 text-center"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="fw-black" style={{ color: '#0B5F9F', fontSize: '1.45rem', lineHeight: 1.2 }}>
+                    30
+                  </div>
+                  <div className="small fw-bold mt-1" style={{ color: '#000000', fontSize: '0.8rem' }}>
+                    Districts Covered
+                  </div>
+                </div>
+              </div>
+              <div className="col-6 col-md-3">
+                <div
+                  className="p-3 rounded-3 h-100 text-center"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="fw-black" style={{ color: '#0B5F9F', fontSize: '1.45rem', lineHeight: 1.2 }}>
+                    4-Tier
+                  </div>
+                  <div className="small fw-bold mt-1" style={{ color: '#000000', fontSize: '0.8rem' }}>
+                    Athlete Pathway
+                  </div>
+                </div>
+              </div>
+              <div className="col-6 col-md-3">
+                <div
+                  className="p-3 rounded-3 h-100 text-center"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="fw-black" style={{ color: '#0B5F9F', fontSize: '1.45rem', lineHeight: 1.2 }}>
+                    IPC Standards
+                  </div>
+                  <div className="small fw-bold mt-1" style={{ color: '#000000', fontSize: '0.8rem' }}>
+                    Certified Classification
+                  </div>
+                </div>
+              </div>
+              <div className="col-6 col-md-3">
+                <div
+                  className="p-3 rounded-3 h-100 text-center"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1.5px solid #CBD5E1',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="fw-black" style={{ color: '#0B5F9F', fontSize: '1.45rem', lineHeight: 1.2 }}>
+                    Grassroots
+                  </div>
+                  <div className="small fw-bold mt-1" style={{ color: '#000000', fontSize: '0.8rem' }}>
+                    Youth Talent Scouting
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      <section className="py-5 bg-light">
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 1: THE 4-STAGE ATHLETE DEVELOPMENT PATHWAY
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="py-5" style={{ background: '#FFFFFF' }}>
         <div className="container">
-          {notice && <div className={`alert ${notice.kind === 'success' ? 'alert-success' : 'alert-danger'}`} role="status">{notice.text}</div>}
-          <div className="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
-            <div><span className="text-primary fw-bold small text-uppercase">Developing talent</span><h2 className="h3 fw-bold mb-1">Training programmes</h2><p className="text-muted mb-0">Programmes published by NPC Rwanda.</p></div>
-            <Link href="/athletes" className="btn btn-outline-primary">Meet our athletes</Link>
+          <div className="text-center mx-auto mb-5" style={{ maxWidth: '780px' }}>
+            <span
+              className="badge px-3 py-1 mb-2 text-uppercase fw-bold"
+              style={{
+                background: '#E0F2FE',
+                color: '#075985',
+                fontSize: '0.75rem',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Development Framework
+            </span>
+            <h2 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '2rem' }}>
+              The Rwandan Para-Athlete Pathway
+            </h2>
+            <p style={{ color: '#475569', fontSize: '1rem', lineHeight: 1.6 }}>
+              Every Rwandan champion follows a clear, structured progression from school-level discovery to the international podium.
+            </p>
           </div>
-          {loading ? <div className="text-center py-4" role="status">Loading programmes…</div> : programmes.length === 0 ? <div className="bg-white border rounded-3 p-4 text-muted">There are no training programmes published at the moment. Please check again later or send an athlete enquiry below.</div> : (
-            <div className="row g-3 mb-5">{programmes.map(p => <div className="col-md-6 col-lg-4" key={p.id}><article className="card h-100 border-0 shadow-sm"><div className="card-body"><span className="badge bg-primary mb-2">{p.sport}</span>{p.featured && <span className="badge bg-warning text-dark ms-2">Featured</span>}<h3 className="h5 fw-bold">{p.title}</h3><p className="text-muted small">{p.description}</p><p className="small mb-1"><i className="fas fa-location-dot me-2 text-primary" />{p.location}</p>{p.schedule && <p className="small mb-1"><i className="fas fa-clock me-2 text-primary" />{p.schedule}</p>}{(p.startDate || p.endDate) && <p className="small mb-0"><i className="fas fa-calendar me-2 text-primary" />{p.startDate}{p.endDate ? ` – ${p.endDate}` : ''}</p>}{p.eligibility && <p className="small text-muted mt-3 mb-0"><strong>Eligibility:</strong> {p.eligibility}</p>}</div></article></div>)}</div>
+
+          <div className="row g-4">
+            {pathwayStages.map((stage) => (
+              <div className="col-md-6 col-lg-3" key={stage.step}>
+                <div
+                  className="p-4 rounded-4 h-100 d-flex flex-column position-relative"
+                  style={{
+                    background: '#F8FAFC',
+                    border: '1.5px solid #E2E8F0',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <span
+                      className="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        background: '#0B5F9F',
+                        color: '#FFFFFF',
+                        fontSize: '0.95rem',
+                      }}
+                    >
+                      {stage.step}
+                    </span>
+                    <span
+                      className="badge rounded-pill px-2.5 py-1 text-uppercase fw-bold"
+                      style={{
+                        background: '#EFF6FF',
+                        color: '#0B5F9F',
+                        fontSize: '0.7rem',
+                        border: '1px solid #BFDBFE',
+                      }}
+                    >
+                      {stage.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '1.15rem', lineHeight: 1.35 }}>
+                    {stage.title}
+                  </h3>
+
+                  <p className="mb-4" style={{ color: '#475569', fontSize: '0.88rem', lineHeight: 1.6 }}>
+                    {stage.desc}
+                  </p>
+
+                  <div className="mt-auto pt-3 border-top" style={{ borderColor: '#E2E8F0' }}>
+                    <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+                      {stage.points.map((pt, idx) => (
+                        <li key={idx} className="d-flex align-items-start gap-2 small" style={{ color: '#334155', fontSize: '0.82rem' }}>
+                          <i className="fas fa-check text-success mt-1 flex-shrink-0" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 2: ACTIVE TRAINING PROGRAMMES & CLINICS
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="py-5" style={{ background: '#F8FAFC', borderTop: '1px solid #E2E8F0' }}>
+        <div className="container">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+            <div>
+              <span
+                className="badge px-3 py-1 mb-2 text-uppercase fw-bold"
+                style={{
+                  background: '#FEF3C7',
+                  color: '#000000',
+                  border: '1.5px solid #F59E0B',
+                  fontSize: '0.72rem',
+                }}
+              >
+                Official Academies
+              </span>
+              <h2 className="fw-bold mb-1" style={{ color: '#000000', fontSize: '1.75rem' }}>
+                Published Training Programmes
+              </h2>
+              <p className="mb-0 text-muted small">
+                Official development camps, grassroots clinics, and high-performance sessions run by NPC Rwanda.
+              </p>
+            </div>
+            <Link
+              href="/athletes"
+              className="btn btn-outline-dark fw-bold btn-sm d-inline-flex align-items-center gap-1 rounded-3 px-3 py-2"
+              style={{ borderColor: '#CBD5E1', background: '#FFFFFF' }}
+            >
+              <span>View National Athletes</span>
+              <i className="fas fa-arrow-right ms-1" style={{ fontSize: '0.75rem' }} />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="p-5 text-center bg-white rounded-4 border" style={{ borderColor: '#E2E8F0' }}>
+              <div className="spinner-border text-primary mb-3" role="status" />
+              <p className="text-muted mb-0">Loading sports development programmes...</p>
+            </div>
+          ) : programmes.length > 0 ? (
+            <div className="row g-4">
+              {programmes.map((p) => (
+                <div className="col-md-6 col-lg-4" key={p.id}>
+                  <div
+                    className="p-4 rounded-4 h-100 d-flex flex-column bg-white"
+                    style={{
+                      border: '1.5px solid #E2E8F0',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                    }}
+                  >
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <span
+                        className="badge px-2.5 py-1 text-uppercase fw-bold rounded-pill"
+                        style={{ background: '#0B5F9F', color: '#FFFFFF', fontSize: '0.72rem' }}
+                      >
+                        {p.sport}
+                      </span>
+                      {p.featured && (
+                        <span
+                          className="badge px-2.5 py-1 text-uppercase fw-bold rounded-pill"
+                          style={{ background: '#FEF3C7', color: '#000000', border: '1px solid #F59E0B', fontSize: '0.7rem' }}
+                        >
+                          Featured
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '1.2rem' }}>
+                      {p.title}
+                    </h3>
+
+                    <p className="mb-3 text-muted" style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>
+                      {p.description}
+                    </p>
+
+                    <div className="mt-auto pt-3 border-top" style={{ borderColor: '#F1F5F9', fontSize: '0.85rem' }}>
+                      {p.location && (
+                        <div className="mb-1.5 d-flex align-items-center gap-2" style={{ color: '#334155' }}>
+                          <i className="fas fa-location-dot text-primary flex-shrink-0" />
+                          <span>{p.location}</span>
+                        </div>
+                      )}
+                      {p.schedule && (
+                        <div className="mb-1.5 d-flex align-items-center gap-2" style={{ color: '#334155' }}>
+                          <i className="fas fa-clock text-primary flex-shrink-0" />
+                          <span>{p.schedule}</span>
+                        </div>
+                      )}
+                      {(p.startDate || p.endDate) && (
+                        <div className="mb-1.5 d-flex align-items-center gap-2" style={{ color: '#334155' }}>
+                          <i className="fas fa-calendar text-primary flex-shrink-0" />
+                          <span>
+                            {p.startDate}
+                            {p.endDate ? ` – ${p.endDate}` : ''}
+                          </span>
+                        </div>
+                      )}
+                      {p.eligibility && (
+                        <div className="mt-2 p-2 rounded-2" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                          <span className="fw-bold" style={{ color: '#000000' }}>Eligibility: </span>
+                          <span style={{ color: '#475569' }}>{p.eligibility}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="p-4 p-md-5 rounded-4 bg-white text-center"
+              style={{
+                border: '1.5px solid #E2E8F0',
+                maxWidth: '820px',
+                margin: '0 auto',
+              }}
+            >
+              <div
+                className="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3"
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  background: '#EFF6FF',
+                  color: '#0B5F9F',
+                  fontSize: '1.5rem',
+                }}
+              >
+                <i className="fas fa-calendar-check" />
+              </div>
+              <h3 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '1.25rem' }}>
+                Seasonal Academy Schedule Under Preparation
+              </h3>
+              <p className="mb-4 text-muted" style={{ fontSize: '0.92rem', maxWidth: '560px', margin: '0 auto 1.5rem' }}>
+                District sports development camps and youth training sessions are scheduled in alignment with national championship calendars.
+                Aspiring athletes are encouraged to register their details below to receive early notifications.
+              </p>
+              <a
+                href="#talent-registration"
+                className="btn btn-primary fw-bold px-4 py-2.5 rounded-3 d-inline-flex align-items-center gap-2"
+                style={{ background: '#0B5F9F', borderColor: '#0B5F9F' }}
+              >
+                <span>Register as an Aspiring Athlete</span>
+                <i className="fas fa-arrow-down" />
+              </a>
+            </div>
           )}
+        </div>
+      </section>
 
-          <div className="row g-3 mb-5">
-            <div className="col-lg-6"><div className="bg-white border rounded-4 p-4 h-100"><h2 className="h5 fw-bold">Understanding sports classification</h2><p className="small text-muted mb-2">Para-sport classification is designed to support fair competition. Eligibility and classification requirements differ by sport and are determined through the relevant official process.</p><p className="small text-muted mb-3">An enquiry does not guarantee eligibility, a classification outcome or selection. NPC Rwanda can guide interested athletes on the appropriate next steps.</p><Link href="/resources" className="fw-semibold text-decoration-none">Explore official resources <i className="fas fa-arrow-right ms-1" /></Link></div></div>
-            <div className="col-lg-6"><div className="bg-white border rounded-4 p-4 h-100"><h2 className="h5 fw-bold">Find your local sports community</h2><p className="small text-muted mb-3">Connect with member associations, clubs and district sports contacts to learn about local opportunities.</p><div className="d-flex flex-wrap gap-2"><Link href="/members/associations" className="btn btn-sm btn-outline-primary">Associations &amp; clubs</Link><Link href="/members/dpsco" className="btn btn-sm btn-outline-primary">District contacts</Link><Link href="/volunteer" className="btn btn-sm btn-outline-primary">Volunteer</Link></div></div></div>
-          </div>
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 3: CLASSIFICATION & COACHING PILLARS
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="py-5" style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0' }}>
+        <div className="container">
+          <div className="row g-4">
+            {/* Pillar 1: Understanding Sports Classification */}
+            <div className="col-lg-6">
+              <div
+                className="p-4 p-md-5 rounded-4 h-100 d-flex flex-column"
+                style={{
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                }}
+              >
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center mb-3"
+                  style={{
+                    width: '50px',
+                    height: '50px',
+                    background: '#0B5F9F',
+                    color: '#FFFFFF',
+                    fontSize: '1.25rem',
+                  }}
+                >
+                  <i className="fas fa-scale-balanced" />
+                </div>
+                <h3 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '1.4rem' }}>
+                  Understanding Para-Sport Classification
+                </h3>
+                <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                  Classification is the foundation of Paralympic competition. It groups athletes into sport classes according to the extent
+                  to which their impairment impacts their athletic performance, ensuring that winning is determined by skill, fitness, and tactical excellence.
+                </p>
 
-          <div className="row g-4 mb-5">
-            <div className="col-lg-7">
-              <div className="bg-white rounded-4 shadow-sm p-4 h-100">
-                <span className="text-primary fw-bold small text-uppercase">Get involved</span><h2 className="h4 fw-bold">Interested in becoming an athlete?</h2><p className="text-muted small">Tell us about yourself and the sport you are interested in. This is an enquiry, not confirmation of athlete selection.</p>
-                <form onSubmit={(e: FormEvent) => { e.preventDefault(); void submitForm('/api/athlete-enquiries', 'athlete', athlete, () => setAthlete(emptyAthlete)); }}>
-                  <div className="row">{field('Full name', athlete.fullName, v => setAthlete(s => ({ ...s, fullName: v })))}<div className="col-md-6">{field('Email', athlete.email, v => setAthlete(s => ({ ...s, email: v })), 'email')}</div><div className="col-md-6">{field('Phone', athlete.phone, v => setAthlete(s => ({ ...s, phone: v })), 'tel')}</div><div className="col-md-6">{field('District', athlete.district, v => setAthlete(s => ({ ...s, district: v })))}</div><div className="col-md-6">{field('Sport of interest', athlete.sport, v => setAthlete(s => ({ ...s, sport: v })))}</div><div className="col-md-6">{field('Age range', athlete.ageRange, v => setAthlete(s => ({ ...s, ageRange: v })), 'text', false)}</div></div>
-                  <label className="form-label fw-semibold">Tell us more *</label><textarea className={inputClass} rows={3} minLength={10} required value={athlete.message} onChange={e => setAthlete(s => ({ ...s, message: e.target.value }))} />
-                  <button className="btn btn-primary mt-3" disabled={submitting === 'athlete'}>{submitting === 'athlete' ? 'Submitting…' : 'Send athlete enquiry'}</button>
-                </form>
+                <div className="d-flex flex-column gap-2 mb-4">
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-primary" />
+                    <span>Physical Impairments (limb deficiency, spinal injury, muscle weakness)</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-primary" />
+                    <span>Visual Impairments (low vision, partial sight, total blindness)</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-primary" />
+                    <span>Intellectual Impairments (diagnosed prior to age 18)</span>
+                  </div>
+                </div>
+
+                <div className="mt-auto">
+                  <Link
+                    href="/resources"
+                    className="fw-bold text-decoration-none d-inline-flex align-items-center gap-2"
+                    style={{ color: '#0B5F9F', fontSize: '0.9rem' }}
+                  >
+                    <span>Read Official Classification Documents &amp; Rules</span>
+                    <i className="fas fa-arrow-right" />
+                  </Link>
+                </div>
               </div>
             </div>
-            <div className="col-lg-5">
-              <div className="bg-white rounded-4 shadow-sm p-4 h-100">
-                <span className="text-primary fw-bold small text-uppercase">Partnerships</span><h2 className="h4 fw-bold">Support para-sports in Rwanda</h2><p className="text-muted small">Organisations interested in sponsorship, equipment, technical support or athlete development can contact our team.</p>
-                <form onSubmit={(e: FormEvent) => { e.preventDefault(); void submitForm('/api/sponsor-enquiries', 'sponsor', sponsor, () => setSponsor(emptySponsor)); }}>
-                  {field('Organisation', sponsor.organization, v => setSponsor(s => ({ ...s, organization: v })))}{field('Contact person', sponsor.contactName, v => setSponsor(s => ({ ...s, contactName: v })))}{field('Email', sponsor.email, v => setSponsor(s => ({ ...s, email: v })), 'email')}{field('Phone', sponsor.phone, v => setSponsor(s => ({ ...s, phone: v })), 'tel', false)}
-                  <label className="form-label fw-semibold">How would you like to support? *</label><select className={inputClass} required value={sponsor.supportType} onChange={e => setSponsor(s => ({ ...s, supportType: e.target.value }))}><option value="">Select support type</option><option>Sponsorship</option><option>Sports equipment</option><option>Training and coaching</option><option>Medical and rehabilitation support</option><option>Technical partnership</option><option>Other</option></select>
-                  <label className="form-label fw-semibold mt-3">Message *</label><textarea className={inputClass} rows={3} minLength={10} required value={sponsor.message} onChange={e => setSponsor(s => ({ ...s, message: e.target.value }))} />
-                  <button className="btn btn-outline-primary mt-3" disabled={submitting === 'sponsor'}>{submitting === 'sponsor' ? 'Submitting…' : 'Send partnership enquiry'}</button>
-                </form>
+
+            {/* Pillar 2: Coaching & Technical Officials Certification */}
+            <div className="col-lg-6">
+              <div
+                className="p-4 p-md-5 rounded-4 h-100 d-flex flex-column"
+                style={{
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                }}
+              >
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center mb-3"
+                  style={{
+                    width: '50px',
+                    height: '50px',
+                    background: '#10B981',
+                    color: '#FFFFFF',
+                    fontSize: '1.25rem',
+                  }}
+                >
+                  <i className="fas fa-chalkboard-user" />
+                </div>
+                <h3 className="fw-bold mb-2" style={{ color: '#000000', fontSize: '1.4rem' }}>
+                  Coaching &amp; Technical Officials Education
+                </h3>
+                <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                  High-performing athletes require qualified leaders. NPC Rwanda collaborates with the Ministry of Sports, the IPC, and continental
+                  sport federations to train certified coaches, referees, and national classifiers across all 30 districts.
+                </p>
+
+                <div className="d-flex flex-column gap-2 mb-4">
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-success" />
+                    <span>Level 1 &amp; Level 2 Para-Coaching certification clinics</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-success" />
+                    <span>Referee and line official accreditation for national leagues</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 small" style={{ color: '#1E293B', fontWeight: 600 }}>
+                    <i className="fas fa-circle-check text-success" />
+                    <span>Safeguarding in sport and inclusive sports administration workshops</span>
+                  </div>
+                </div>
+
+                <div className="mt-auto">
+                  <Link
+                    href="/contact"
+                    className="fw-bold text-decoration-none d-inline-flex align-items-center gap-2"
+                    style={{ color: '#059669', fontSize: '0.9rem' }}
+                  >
+                    <span>Inquire About Coaching Certification Courses</span>
+                    <i className="fas fa-arrow-right" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div id="event-registration" className="bg-white rounded-4 shadow-sm p-4 mb-5">
-            <span className="text-primary fw-bold small text-uppercase">Join an event</span><h2 className="h4 fw-bold">Event registration enquiry</h2><p className="text-muted small">Submit your details for an upcoming event. The event team will confirm your registration.</p>
-            {events.length === 0 ? <p className="text-muted mb-0">There are no events currently accepting registration. Visit the <Link href="/events">events page</Link> for updates.</p> : <form onSubmit={(e: FormEvent) => { e.preventDefault(); void submitForm('/api/event-registrations', 'registration', registration, () => setRegistration(emptyRegistration)); }}>
-              <div className="row"><div className="col-md-6 mb-3"><label className="form-label fw-semibold">Event *</label><select className={inputClass} required value={registration.eventId} onChange={e => setRegistration(s => ({ ...s, eventId: e.target.value }))}><option value="">Choose an event</option>{events.map(ev => <option key={ev.id} value={ev.id}>{ev.title} — {ev.date} ({ev.location})</option>)}</select></div><div className="col-md-6">{field('Full name', registration.fullName, v => setRegistration(s => ({ ...s, fullName: v })))}</div><div className="col-md-6">{field('Email', registration.email, v => setRegistration(s => ({ ...s, email: v })), 'email')}</div><div className="col-md-6">{field('Phone', registration.phone, v => setRegistration(s => ({ ...s, phone: v })), 'tel')}</div><div className="col-md-6">{field('Organisation / club', registration.organization, v => setRegistration(s => ({ ...s, organization: v })), 'text', false)}</div><div className="col-12 mb-3"><label className="form-label fw-semibold">Accessibility requirements (optional)</label><textarea className={inputClass} rows={2} value={registration.accessibilityNeeds} onChange={e => setRegistration(s => ({ ...s, accessibilityNeeds: e.target.value }))} placeholder="Please tell us about any access or support requirements." /></div></div>
-              <button className="btn btn-primary" disabled={submitting === 'registration'}>{submitting === 'registration' ? 'Submitting…' : 'Submit registration enquiry'}</button>
-            </form>}
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 4: SINGLE FOCUSED ACTION — TALENT REGISTRATION FORM
+      ═══════════════════════════════════════════════════════════ */}
+      <section id="talent-registration" className="py-5" style={{ background: '#F8FAFC', borderTop: '1px solid #E2E8F0' }}>
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              <div
+                className="p-4 p-md-5 rounded-4 shadow-sm"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1.5px solid #CBD5E1',
+                }}
+              >
+                <div className="text-center mb-4 pb-2 border-bottom">
+                  <span
+                    className="badge px-3 py-1 mb-2 text-uppercase fw-bold"
+                    style={{
+                      background: '#FEF3C7',
+                      color: '#000000',
+                      border: '1.5px solid #F59E0B',
+                      fontSize: '0.72rem',
+                    }}
+                  >
+                    Talent Scouting Portal
+                  </span>
+                  <h2 className="fw-bold mb-1" style={{ color: '#000000', fontSize: '1.75rem' }}>
+                    Join Rwanda&apos;s Para-Sports Pathway
+                  </h2>
+                  <p className="text-muted small mb-3">
+                    Are you a person with a physical, visual, or intellectual impairment interested in competing? Or a parent, teacher, or coach
+                    recommending an athlete? Submit your details directly to the NPC Rwanda technical department.
+                  </p>
+                </div>
+
+                {errorMessage && (
+                  <div className="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                    <i className="fas fa-circle-exclamation flex-shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                {submitted ? (
+                  <div
+                    className="p-4 rounded-3 text-center"
+                    style={{
+                      background: '#ECFDF5',
+                      border: '1.5px solid #A7F3D0',
+                    }}
+                  >
+                    <div
+                      className="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: '64px',
+                        height: '64px',
+                        background: '#10B981',
+                        color: '#FFFFFF',
+                        fontSize: '1.8rem',
+                      }}
+                    >
+                      <i className="fas fa-check" />
+                    </div>
+                    <h3 className="fw-bold mb-2" style={{ color: '#065F46', fontSize: '1.35rem' }}>
+                      Enquiry Received Successfully!
+                    </h3>
+                    <p className="mb-4" style={{ color: '#047857', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.5rem' }}>
+                      Thank you for submitting your sports development profile. The NPC Rwanda technical team reviews all enquiries and will contact you
+                      with details on the next district classification session or club training clinic in your area.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSubmitted(false)}
+                      className="btn fw-bold px-4 py-2 rounded-3 text-white"
+                      style={{ background: '#059669', border: 'none' }}
+                    >
+                      <i className="fas fa-rotate-left me-2" />
+                      Submit Another Athlete Profile
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleAthleteSubmit}>
+                    <div className="row g-3">
+                      {/* Full Name */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-name" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Full Name <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control py-2.5 rounded-3"
+                          id="athlete-name"
+                          placeholder="e.g. Jean Damascene Munyaneza"
+                          value={athlete.fullName}
+                          onChange={(e) => setAthlete((s) => ({ ...s, fullName: e.target.value }))}
+                          required
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-email" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Email Address <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control py-2.5 rounded-3"
+                          id="athlete-email"
+                          placeholder="name@example.com"
+                          value={athlete.email}
+                          onChange={(e) => setAthlete((s) => ({ ...s, email: e.target.value }))}
+                          required
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        />
+                      </div>
+
+                      {/* Phone */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-phone" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Phone / WhatsApp Number <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          className="form-control py-2.5 rounded-3"
+                          id="athlete-phone"
+                          placeholder="+250 788 000 000"
+                          value={athlete.phone}
+                          onChange={(e) => setAthlete((s) => ({ ...s, phone: e.target.value }))}
+                          required
+                          minLength={7}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        />
+                      </div>
+
+                      {/* District */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-district" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          District in Rwanda <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control py-2.5 rounded-3"
+                          id="athlete-district"
+                          placeholder="e.g. Gasabo, Huye, Musanze, Rubavu..."
+                          value={athlete.district}
+                          onChange={(e) => setAthlete((s) => ({ ...s, district: e.target.value }))}
+                          required
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        />
+                      </div>
+
+                      {/* Sport of Interest */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-sport" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Sport of Interest <span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className="form-select py-2.5 rounded-3"
+                          id="athlete-sport"
+                          value={athlete.sport}
+                          onChange={(e) => setAthlete((s) => ({ ...s, sport: e.target.value }))}
+                          required
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        >
+                          <option value="">Select a sport discipline</option>
+                          <option value="Sitting Volleyball">Sitting Volleyball</option>
+                          <option value="Para-Athletics (Track & Field)">Para-Athletics (Track &amp; Field)</option>
+                          <option value="Wheelchair Basketball">Wheelchair Basketball</option>
+                          <option value="Para-Powerlifting">Para-Powerlifting</option>
+                          <option value="Goalball (Visual Impairment)">Goalball (Visual Impairment)</option>
+                          <option value="Para-Swimming">Para-Swimming</option>
+                          <option value="Other Para-Sport">Other Para-Sport</option>
+                        </select>
+                      </div>
+
+                      {/* Age Range */}
+                      <div className="col-md-6">
+                        <label htmlFor="athlete-age" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Age Range / Category
+                        </label>
+                        <select
+                          className="form-select py-2.5 rounded-3"
+                          id="athlete-age"
+                          value={athlete.ageRange}
+                          onChange={(e) => setAthlete((s) => ({ ...s, ageRange: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        >
+                          <option value="">Select age range</option>
+                          <option value="Under 14 (Junior Talent)">Under 14 (Junior Talent)</option>
+                          <option value="15 – 18 (Youth)">15 – 18 (Youth)</option>
+                          <option value="19 – 25 (Senior)">19 – 25 (Senior)</option>
+                          <option value="26+ (Adult)">26+ (Adult)</option>
+                        </select>
+                      </div>
+
+                      {/* Message / Background details */}
+                      <div className="col-12">
+                        <label htmlFor="athlete-message" className="form-label fw-bold" style={{ color: '#000000', fontSize: '0.85rem' }}>
+                          Tell Us About Yourself &amp; Impairment Details
+                        </label>
+                        <textarea
+                          className="form-control rounded-3"
+                          id="athlete-message"
+                          rows={4}
+                          placeholder="Describe your sports background, athletic interests, physical condition or impairment, and any questions you have for our coaches..."
+                          value={athlete.message}
+                          onChange={(e) => setAthlete((s) => ({ ...s, message: e.target.value }))}
+                          style={{ border: '1.5px solid #CBD5E1', fontSize: '0.92rem' }}
+                        />
+                      </div>
+
+                      {/* Anti-spam honeypot bot trap fields */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '-9999px',
+                          top: '-9999px',
+                          opacity: 0,
+                          height: '1px',
+                          width: '1px',
+                          overflow: 'hidden',
+                        }}
+                        aria-hidden="true"
+                      >
+                        <input
+                          type="text"
+                          name="website_url"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={websiteUrl}
+                          onChange={(e) => setWebsiteUrl(e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          name="hp_field"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={hpField}
+                          onChange={(e) => setHpField(e.target.value)}
+                        />
+                      </div>
+
+                      {/* Submit CTA */}
+                      <div className="col-12 mt-4 pt-1">
+                        <button
+                          type="submit"
+                          className="btn btn-primary px-4 py-2.5 fw-bold rounded-3 d-inline-flex align-items-center gap-2"
+                          disabled={submitting}
+                          style={{
+                            background: '#0B5F9F',
+                            borderColor: '#0B5F9F',
+                            fontSize: '0.95rem',
+                            boxShadow: '0 2px 6px rgba(11,95,159,0.25)',
+                          }}
+                        >
+                          {submitting ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                              <span>Submitting Profile...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Submit Athlete Profile</span>
+                              <i className="fas fa-paper-plane" />
+                            </>
+                          )}
+                        </button>
+                        <span className="small ms-3 d-none d-sm-inline" style={{ color: '#64748B' }}>
+                          <i className="fas fa-shield-halved me-1 text-success" />
+                          Directly sent to the NPC Technical Directorate
+                        </span>
+                      </div>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 5: COMMUNITY CONNECTIONS & MEMBER DIRECTORIES
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="py-5" style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0' }}>
+        <div className="container">
+          <div className="text-center mx-auto mb-4" style={{ maxWidth: '700px' }}>
+            <h3 className="fw-bold mb-1" style={{ color: '#000000', fontSize: '1.4rem' }}>
+              Connect With Your Local Para-Sports Community
+            </h3>
+            <p className="text-muted small">
+              Explore our nationwide network of recognized federations, district sports coordinators, and registered clubs.
+            </p>
           </div>
 
-          <div className="mb-5"><div className="mb-3"><span className="text-primary fw-bold small text-uppercase">Performance</span><h2 className="h3 fw-bold mb-1">Competition results</h2><p className="text-muted mb-0">Published achievements and results from NPC Rwanda competitions.</p></div>
-            {results.length > 0 && <div className="row g-3 mb-3"><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.gold}</div><div className="small text-muted">Gold medals</div></div></div><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.silver}</div><div className="small text-muted">Silver medals</div></div></div><div className="col-4"><div className="bg-white border rounded-3 p-3 text-center"><div className="h3 fw-bold mb-0">{medalSummary.bronze}</div><div className="small text-muted">Bronze medals</div></div></div></div>}
-            {results.length === 0 ? <div className="bg-white border rounded-3 p-4 text-muted">Competition results will appear here when they are published.</div> : <div className="table-responsive bg-white rounded-3 shadow-sm"><table className="table table-hover align-middle mb-0"><thead className="table-light"><tr><th>Competition</th><th>Athlete</th><th>Sport</th><th>Result</th><th>Date</th></tr></thead><tbody>{results.map(r => <tr key={r.id}><td className="fw-semibold">{r.eventTitle}</td><td>{r.athleteName}</td><td>{r.sport}</td><td>{r.medal || r.position || r.result || '—'}</td><td>{r.competitionDate}</td></tr>)}</tbody></table></div>}
-          </div>
+          <div className="row g-3">
+            <div className="col-md-4">
+              <Link
+                href="/members/dpsco"
+                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
+                style={{
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                  color: '#000000',
+                  transition: 'border-color 0.2s ease',
+                }}
+              >
+                <div className="d-flex align-items-center gap-2 mb-1">
+                  <i className="fas fa-map-location-dot text-primary" />
+                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
+                    District Sports Coordinators
+                  </span>
+                </div>
+                <p className="text-muted small mb-0">
+                  Find direct contact details for DPSCO representatives in all 30 districts of Rwanda.
+                </p>
+              </Link>
+            </div>
 
-          <div><div className="mb-3"><span className="text-primary fw-bold small text-uppercase">In action</span><h2 className="h3 fw-bold mb-1">Photo & video gallery</h2><p className="text-muted mb-0">Highlights from training, events and para-sports activities.</p></div>
-            {gallery.length === 0 ? <div className="bg-white border rounded-3 p-4 text-muted">New photos and videos will be published here as they become available.</div> : <div className="row g-3">{gallery.map(item => <div className="col-6 col-md-4 col-lg-3" key={item.id}><article className="card h-100 border-0 shadow-sm overflow-hidden">{item.mediaType === 'video' ? <video src={item.mediaUrl} controls preload="metadata" className="w-100" style={{ aspectRatio: '4/3', objectFit: 'cover' }} /> : <img src={item.mediaUrl} alt={item.title} className="w-100" loading="lazy" style={{ aspectRatio: '4/3', objectFit: 'cover' }} />}<div className="card-body"><span className="small text-primary">{item.category}</span><h3 className="h6 fw-bold mt-1 mb-1">{item.title}</h3>{item.description && <p className="small text-muted mb-0">{item.description}</p>}</div></article></div>)}</div>}
+            <div className="col-md-4">
+              <Link
+                href="/members/associations"
+                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
+                style={{
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                  color: '#000000',
+                  transition: 'border-color 0.2s ease',
+                }}
+              >
+                <div className="d-flex align-items-center gap-2 mb-1">
+                  <i className="fas fa-users text-primary" />
+                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
+                    Clubs &amp; Member Associations
+                  </span>
+                </div>
+                <p className="text-muted small mb-0">
+                  Browse officially affiliated sitting volleyball clubs, para-athletics associations, and basketball teams.
+                </p>
+              </Link>
+            </div>
+
+            <div className="col-md-4">
+              <Link
+                href="/volunteer"
+                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
+                style={{
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                  color: '#000000',
+                  transition: 'border-color 0.2s ease',
+                }}
+              >
+                <div className="d-flex align-items-center gap-2 mb-1">
+                  <i className="fas fa-hands-helping text-primary" />
+                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
+                    Volunteer Program
+                  </span>
+                </div>
+                <p className="text-muted small mb-0">
+                  Support event operations, logistics, athlete assistance, and media coverage nationwide.
+                </p>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
