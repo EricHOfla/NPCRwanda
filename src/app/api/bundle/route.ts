@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { ensureAutoMigrated, autoUpdateEventStatuses } from '@/lib/autoMigrate';
 import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +22,6 @@ const PUBLIC_SETTING_KEYS = [
 
 export async function GET(request: NextRequest) {
   try {
-    await ensureAutoMigrated();
     // Admin data is requested explicitly and requires a valid session. Public requests
     // never receive drafts, inactive records, or private administrative data.
     const adminScope = request.nextUrl.searchParams.get('scope') === 'admin';
@@ -33,8 +31,6 @@ export async function GET(request: NextRequest) {
     if (authorization && !authorization.authorized) return authorization.response;
     const isAdminRequest = Boolean(authorization?.authorized);
 
-    // Fire-and-forget — keep event statuses accurate without blocking the response
-    autoUpdateEventStatuses().catch(err => console.error('[bundle] Event status update failed:', err));
 
     const [
       athletes,
@@ -44,7 +40,14 @@ export async function GET(request: NextRequest) {
       leadersRaw,
       governanceDocs,
       governancePolicies,
-      events,
+      events: events.map((event) => {
+        if (event.status === 'Cancelled' || !event.date) return event;
+        const today = new Date().toISOString().slice(0, 10);
+        const start = event.date.trim();
+        const end = event.endDate?.trim() || '';
+        const status = start > today ? 'Upcoming' : (end ? end >= today ? 'Ongoing' : 'Completed' : start === today ? 'Ongoing' : 'Completed');
+        return { ...event, status };
+      }),
       partners,
       siteContentList,
       rawContactInfo,
