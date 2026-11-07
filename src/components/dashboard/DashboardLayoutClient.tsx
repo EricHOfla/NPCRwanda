@@ -63,53 +63,24 @@ function getRequiredSection(pathname: string, tab: string): DashboardSection | n
   return sectionByTab[tab] || null;
 }
 
-function DashboardLoading() {
-  return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: '#F8FAFC' }}>
-      <div className="text-center text-muted">
-        <i className="fas fa-circle-notch fa-spin fa-2x mb-3" />
-        <p className="small fw-semibold mb-0">Checking dashboard access...</p>
-      </div>
-    </div>
-  );
+interface DashboardLayoutClientProps {
+  children: React.ReactNode;
+  initialProfile: DashboardUserProfile;
 }
 
-export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
+export default function DashboardLayoutClient({
+  children,
+  initialProfile,
+}: DashboardLayoutClientProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [profile, setProfile] = useState<DashboardUserProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-
-    fetch('/api/auth/profile', { credentials: 'same-origin', cache: 'no-store' })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('UNAUTHENTICATED');
-        const data = await response.json();
-        if (!data?.user) throw new Error('UNAUTHENTICATED');
-        if (!active) return;
-
-        setProfile({
-          name: data.user.name || 'Admin',
-          email: data.user.email || '',
-          role: data.user.role || 'EDITOR',
-          avatar: data.user.avatar || 'avatar-1.svg',
-        });
-        setProfileLoading(false);
-      })
-      .catch(() => {
-        if (!active) return;
-        router.replace('/login');
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
+  // Profile and role are provided by the authenticated server layout from the
+  // signed login session. No extra /api/auth/profile request is needed.
+  const profile = initialProfile;
 
   const tab = searchParams.get('tab') || 'overview';
   const page = searchParams.get('page') || 'home';
@@ -120,7 +91,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   );
 
   const hasRouteAccess = useMemo(() => {
-    if (!profile || !requiredSection) return false;
+    if (!requiredSection) return false;
     const role = normalizeRole(profile.role);
 
     if (requiredSection === 'pages' && role === 'EDITOR' && editorRestrictedPages.has(page)) {
@@ -128,14 +99,14 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
     }
 
     return canAccessSection(role, requiredSection);
-  }, [profile, requiredSection, page]);
+  }, [profile.role, requiredSection, page]);
 
   useEffect(() => {
-    if (!profile || profileLoading || hasRouteAccess) return;
+    if (hasRouteAccess) return;
 
     window.alert('Access denied. You do not have permission to view this page. You are being returned to Admin Overview.');
     router.replace('/dashboard?tab=overview');
-  }, [profile, profileLoading, hasRouteAccess, router, pathname, queryString]);
+  }, [hasRouteAccess, router, pathname, queryString]);
 
   const activeId = useMemo(() => {
     if (pathname.endsWith('/community')) return 'community-sports';
@@ -151,8 +122,9 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       : (pageTitles[tab] || 'Admin Dashboard');
   }, [pathname, tab, page]);
 
-  if (profileLoading || !profile || !hasRouteAccess) {
-    return <DashboardLoading />;
+  // Never render restricted page content, even for the brief moment before redirect.
+  if (!hasRouteAccess) {
+    return null;
   }
 
   return (
