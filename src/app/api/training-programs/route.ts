@@ -19,6 +19,29 @@ const schema = z.object({
   featured: z.boolean().default(false),
 });
 
+const updateSchema = schema.partial().extend({
+  id: z.string().min(1),
+});
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const auth = await authorizeRequest(request, 'community.manage');
+    if (!auth.authorized) return auth.response;
+
+    const parsed = updateSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const { id, ...data } = parsed.data;
+    const updated = await prisma.trainingProgram.update({ where: { id }, data });
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Training programme update failed:', error);
+    return NextResponse.json({ error: 'Unable to update training programme' }, { status: 500 });
+  }
+}
+
 export async function GET() {
   try {
     const data = await prisma.trainingProgram.findMany({
@@ -37,7 +60,6 @@ export async function POST(request: NextRequest) {
     const auth = await authorizeRequest(request, 'community.manage');
     if (!auth.authorized) return auth.response;
 
-    await ensureAutoMigrated();
     const parsed = schema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: 'Invalid programme details', details: parsed.error.flatten() }, { status: 400 });
     const data = await prisma.trainingProgram.create({ data: parsed.data });
