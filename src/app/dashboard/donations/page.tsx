@@ -1,8 +1,6 @@
 'use client';
 
-import AppSidebar from '@/components/dashboard/AppSidebar';
-import DashboardTopbar from '@/components/dashboard/DashboardTopbar';
-import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -58,8 +56,6 @@ const money = (value: number) => new Intl.NumberFormat('en-RW').format(value);
 function DonationManagementContent() {
   const searchParams = useSearchParams();
 
-  // Navigation & view states
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({
     name: 'Admin',
     email: '',
@@ -396,48 +392,16 @@ function DonationManagementContent() {
   }
 
   return (
-    <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
-      {/* ── System Sidebar (Unified with main dashboard) ── */}
-      <AppSidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        activeId="donations-payments"
-        profile={userProfile}
-      />
-
-      {/* ── Main Content Area ── */}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-        {/* Unified System Dashboard Topbar */}
-        <DashboardTopbar
-          title="Donations & Contributions"
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          userProfile={userProfile}
-        >
-          <button
-            type="button"
-            className="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 fw-semibold text-secondary"
-            onClick={() => {
-              void loadPayments();
-              void loadInquiries();
-            }}
-            disabled={loading || inquiryLoading}
-            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
-          >
-            <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
-          </button>
-          <button
-            type="button"
-            className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold"
-            onClick={exportCsv}
-            style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}
-          >
-            <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
-          </button>
-        </DashboardTopbar>
-
-        {/* Content Body */}
-        <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+    <>
+      <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+          <div className="d-flex flex-wrap justify-content-end gap-2 mb-3">
+            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => { void loadPayments(); void loadInquiries(); }} disabled={loading || inquiryLoading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
+              <i className={`fas fa-rotate ${loading || inquiryLoading ? 'fa-spin' : ''}`} /> Refresh
+            </button>
+            <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2 fw-semibold" onClick={exportCsv} style={{ borderRadius: '8px', padding: '6px 16px', background: '#0284C7', border: 'none', fontSize: '0.82rem' }}>
+              <i className="fas fa-file-csv" /> Export {activeTab === 'payments' ? `Payments (${visiblePayments.length})` : `Inquiries (${visibleInquiries.length})`}
+            </button>
+          </div>
           <div style={{ maxWidth: 1600, width: '100%', margin: '0 auto' }}>
           {!isAuthorized ? (
             <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
@@ -1222,7 +1186,6 @@ function DonationManagementContent() {
           )}
           </div>
         </main>
-      </div>
 
       {/* ── Modal: Payment Receipt & Details ── */}
       {selectedPayment && (
@@ -1475,7 +1438,8 @@ function DonationManagementContent() {
           </div>
         </div>
       )}
-    </div>
+
+    </>
   );
 }
 

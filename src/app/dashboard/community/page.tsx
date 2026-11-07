@@ -1,8 +1,6 @@
 'use client';
 
-import AppSidebar from '@/components/dashboard/AppSidebar';
-import DashboardTopbar from '@/components/dashboard/DashboardTopbar';
-import AccessRestricted from '@/components/dashboard/AccessRestricted';
+import AccessRestricted from '@/components/shared/AccessRestricted';
 import { hasPermission } from '@/lib/rbac';
 import { useDebounce } from '@/hooks/useDebounce';
 import React, { FormEvent, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,8 +21,6 @@ const empty: Data = {
 function CommunityManagementContent() {
   const searchParams = useSearchParams();
 
-  // Sidebar state
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({ name: 'Admin', email: '', role: 'ADMIN' });
 
   // Data states
@@ -395,38 +391,13 @@ function CommunityManagementContent() {
   };
 
   return (
-    <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
-      {/* ── System Sidebar ── */}
-      <AppSidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        activeId="community-sports"
-        profile={userProfile}
-      />
-
-      {/* ── Main Dashboard Workspace ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0 }}>
-        {/* Top Header Bar */}
-        {/* Unified System Dashboard Topbar */}
-        <DashboardTopbar
-          title="Sports Development"
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          userProfile={userProfile}
-        >
-          <button 
-            type="button"
-            className="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 fw-semibold text-secondary"
-            onClick={() => void load()} 
-            disabled={loading}
-            style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}
-          >
-            <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
-          </button>
-        </DashboardTopbar>
-
-        {/* Workspace Body */}
-        <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+    <>
+      <main className="dashboard-main-content" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+          <div className="d-flex justify-content-end mb-3">
+            <button type="button" className="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 fw-semibold text-secondary" onClick={() => void load()} disabled={loading} style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem' }}>
+              <i className={`fas fa-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
+            </button>
+          </div>
           <div style={{ maxWidth: 1400, width: '100%', margin: '0 auto' }}>
           {!isAuthorized ? (
             <AccessRestricted returnHref="/dashboard" returnLabel="Return to Dashboard" />
@@ -721,7 +692,6 @@ function CommunityManagementContent() {
           )}
           </div>
         </main>
-      </div>
 
       {/* ── Modal: View Athlete Talent Scouting Profile ── */}
       {selectedAthleteEnquiry && (
@@ -1057,7 +1027,8 @@ function CommunityManagementContent() {
           </div>
         </div>
       )}
-    </div>
+
+    </>
   );
 }
 
