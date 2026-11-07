@@ -33,7 +33,11 @@ function getRequiredApiPermission(pathname: string, method: string): Permission 
     if (isWrite) return 'donations.manage';
   }
   if (is('/api/admin/clean-spam')) return 'inbox.clean-spam';
-  if (is('/api/admin/community')) return method === 'GET' ? 'community.view' : 'community.manage';
+  if (is('/api/admin/community')) {
+    if (method === 'GET') return 'community.view';
+    if (method === 'DELETE') return 'community.delete';
+    return 'community.manage';
+  }
   if (is('/api/dashboard/analytics')) return 'reports.view';
 
   const inboxRoots = ['/api/contacts', '/api/volunteers', '/api/job-applications', '/api/athlete-enquiries', '/api/event-registrations', '/api/sponsor-enquiries'];
