@@ -570,7 +570,6 @@ export default function DashboardPage() {
   const todayMonthYear = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); // e.g. "Oct 2026"
 
   const [adminTab, setAdminTab] = useState<AdminTab>('overview');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [currentDateString, setCurrentDateString] = useState('');
