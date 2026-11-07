@@ -78,25 +78,25 @@ export default function NpcBackgroundPage() {
   const pillars = [
     {
       id: 1,
-      title: 'Pillar 1: Promotion & Participation',
+      title: siteContent['background.pillarTitle.1'] || 'Pillar 1: Promotion & Participation',
       icon: 'fa-users',
       objectives: pillar1Obj
     },
     {
       id: 2,
-      title: 'Pillar 2: Performance & Competitions',
+      title: siteContent['background.pillarTitle.2'] || 'Pillar 2: Performance & Competitions',
       icon: 'fa-medal',
       objectives: pillar2Obj
     },
     {
       id: 3,
-      title: 'Pillar 3: Capacity & Professional Development',
+      title: siteContent['background.pillarTitle.3'] || 'Pillar 3: Capacity & Professional Development',
       icon: 'fa-user-graduate',
       objectives: pillar3Obj
     },
     {
       id: 4,
-      title: 'Pillar 4: Strategic Partnerships & Diplomacy',
+      title: siteContent['background.pillarTitle.4'] || 'Pillar 4: Strategic Partnerships & Diplomacy',
       icon: 'fa-handshake',
       objectives: pillar4Obj
     }
@@ -126,9 +126,9 @@ export default function NpcBackgroundPage() {
               </li>
             </ol>
           </nav>
-          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">NPC Background &amp; Objectives</h1>
+          <h1 className="page-title mb-2" data-aos="fade-up" data-aos-delay="50">{siteContent['background.pageTitle'] || 'NPC Background & Objectives'}</h1>
           <p className="page-subtitle" data-aos="fade-up" data-aos-delay="100">
-            Explore the historical background, strategic plan pillars, swot analysis, and structures guiding the Paralympic Movement in Rwanda.
+            {siteContent['background.pageIntro'] || 'Explore the historical background, strategic plan pillars, swot analysis, and structures guiding the Paralympic Movement in Rwanda.'}
           </p>
         </div>
       </header>
@@ -140,18 +140,18 @@ export default function NpcBackgroundPage() {
         <section className="card border-0 shadow-sm p-4 p-md-5 mb-5 rounded-4 bg-white" data-aos="fade-up">
           <div className="row g-4 align-items-center">
             <div className="col-lg-7">
-              <span className="text-primary fw-bold text-uppercase small d-block mb-2">Our Foundation</span>
-              <h2 className="fw-bold text-dark mb-3">Welcome to NPC Rwanda</h2>
+              <span className="text-primary fw-bold text-uppercase small d-block mb-2">{siteContent['background.foundationLabel'] || 'Our Foundation'}</span>
+              <h2 className="fw-bold text-dark mb-3">{siteContent['background.foundationTitle'] || 'Welcome to NPC Rwanda'}</h2>
               <p className="text-muted leading-relaxed mb-3">
-                Established on <strong>November 1, 2001</strong> (originally founded as <em>FERHANDIS</em>), the National Paralympic Committee of Rwanda has transitioned from a small advocacy group into a highly structured national movement. Following compliance regulations of the International Paralympic Committee (IPC), the name was updated in 2007 to represent our unified Paralympic focus.
+                {siteContent['background.foundationParagraph1'] || 'Established on November 1, 2001 (originally founded as FERHANDIS), the National Paralympic Committee of Rwanda has transitioned from a small advocacy group into a highly structured national movement. Following compliance regulations of the International Paralympic Committee (IPC), the name was updated in 2007 to represent our unified Paralympic focus.'}
               </p>
               <p className="text-muted leading-relaxed mb-0">
-                In the aftermath of the 1994 genocide against the Tutsi, adapted sports served as a powerful vehicle for rehabilitation, social inclusion, and the empowerment of persons with physical, visual, and intellectual impairments. Today, NPC Rwanda coordinates with sports associations, clubs, and local governments to scout talent and secure global representation.
+                {siteContent['background.foundationParagraph2'] || 'In the aftermath of the 1994 genocide against the Tutsi, adapted sports served as a powerful vehicle for rehabilitation, social inclusion, and the empowerment of persons with physical, visual, and intellectual impairments. Today, NPC Rwanda coordinates with sports associations, clubs, and local governments to scout talent and secure global representation.'}
               </p>
             </div>
             <div className="col-lg-5">
               <div className="p-4 rounded-4" style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.05) 0%, rgba(16,185,129,0.05) 100%)', border: '1px solid rgba(226,232,240,0.8)' }}>
-                <h4 className="fw-bold text-dark mb-3">Core Pillars of Action</h4>
+                <h4 className="fw-bold text-dark mb-3">{siteContent['background.corePillarsTitle'] || 'Core Pillars of Action'}</h4>
                 <div className="d-flex flex-column gap-2">
                   <div className="d-flex align-items-center gap-2 small text-muted"><i className="fas fa-check text-success"></i> Promotion & Sports Variety</div>
                   <div className="d-flex align-items-center gap-2 small text-muted"><i className="fas fa-check text-success"></i> High-Level Athlete Performance</div>
@@ -195,8 +195,8 @@ export default function NpcBackgroundPage() {
         {/* 14 Strategic Objectives Accordion */}
         <section className="mb-5" data-aos="fade-up">
           <div className="text-center mb-4">
-            <h2 className="fw-bold text-dark mb-2">14 Strategic Objectives</h2>
-            <p className="text-muted small">Grouped by our 4 core pillars of intervention under the 2024-2028 Strategic Framework.</p>
+            <h2 className="fw-bold text-dark mb-2">{siteContent['background.pillarsTitle'] || '14 Strategic Objectives'}</h2>
+            <p className="text-muted small">{siteContent['background.pillarsIntro'] || 'Grouped by our 4 core pillars of intervention under the 2024-2028 Strategic Framework.'}</p>
           </div>
 
           <div className="row g-4">
