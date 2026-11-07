@@ -46,6 +46,9 @@ export default function DashboardTopbar({
   const profileRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLDivElement>(null);
 
+  const canViewInbox = hasPermission(profile.role, 'inbox.view');
+  const canViewSystemSettings = hasPermission(profile.role, 'system-settings.view');
+
   // Sync initialProfile if updated from parent
   useEffect(() => {
     if (initialProfile) {
@@ -152,8 +155,6 @@ export default function DashboardTopbar({
     }
   };
 
-  const canViewInbox = hasPermission(profile.role, 'inbox.view');
-  const canViewSystemSettings = hasPermission(profile.role, 'system-settings.view');
   const isSuperAdmin = profile.role === 'SUPER_ADMIN';
   const isAdmin = profile.role === 'ADMIN' || isSuperAdmin;
   const avatarSrc = profile.avatar
