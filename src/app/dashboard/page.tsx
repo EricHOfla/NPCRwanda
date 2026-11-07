@@ -3967,6 +3967,7 @@ uploadMediaFile={uploadMediaFile}
                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>News Articles ({news.filter(n => !isAnnouncementCategory(n.category)).length})</h3>
                         <button
                           hidden={!canCreateContent && !canUpdateContent}
+                          hidden={!canCreateContent && !canUpdateContent}
                           onClick={() => {
                             setEditingNewsId(null);
                             setNewsForm({ title: '', date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), category: 'Sport', status: 'Draft', img: '', desc: '', content: '', slug: '' });
