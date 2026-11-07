@@ -21,8 +21,6 @@ const empty: Data = {
 function CommunityManagementContent() {
   const searchParams = useSearchParams();
 
-  // Sidebar state
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userProfile, setUserProfile] = useState<{ name: string; email: string; role: string }>({ name: 'Admin', email: '', role: 'ADMIN' });
 
   // Data states
