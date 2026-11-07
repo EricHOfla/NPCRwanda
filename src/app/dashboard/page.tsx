@@ -566,6 +566,12 @@ export default function DashboardPage() {
     addDpscoContact, updateDpscoContact, deleteDpscoContact,
   } = useData();
 
+  // Preview metrics mirror the same live, admin-managed records used by the public homepage.
+  const previewDistrictsCount = new Set(dpscoContacts.filter(item => item.active).map(item => item.district.trim().toLowerCase()).filter(Boolean)).size;
+  const previewAthletesCount = athletes.filter(item => item.status === 'Active').length;
+  const previewDisciplinesCount = sports.length;
+  const previewClubsCount = npcClubs.filter(item => item.active).length;
+
   // Today's date helpers — used as default values in add-item forms
   const todayIso = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
   const todayMonthYear = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); // e.g. "Oct 2026"
@@ -2670,19 +2676,19 @@ export default function DashboardPage() {
                       <div className="bg-primary text-white p-3 text-center">
                         <div className="row g-2 justify-content-center">
                           <div className="col-3">
-                            <h4 className="fw-bold mb-0">{siteForm['stats.districts']}</h4>
+                            <h4 className="fw-bold mb-0">{previewDistrictsCount}</h4>
                             <span className="xsmall text-light">Districts</span>
                           </div>
                           <div className="col-3 border-start">
-                            <h4 className="fw-bold mb-0">{siteForm['stats.disciplines']}</h4>
+                            <h4 className="fw-bold mb-0">{previewDisciplinesCount}</h4>
                             <span className="xsmall text-light">Disciplines</span>
                           </div>
                           <div className="col-3 border-start">
-                            <h4 className="fw-bold mb-0">{siteForm['stats.founded']}</h4>
-                            <span className="xsmall text-light">Founded</span>
+                            <h4 className="fw-bold mb-0">{previewAthletesCount}</h4>
+                            <span className="xsmall text-light">Active Athletes</span>
                           </div>
                           <div className="col-3 border-start">
-                            <h4 className="fw-bold mb-0">{siteForm['stats.clubs']}</h4>
+                            <h4 className="fw-bold mb-0">{previewClubsCount}</h4>
                             <span className="xsmall text-light">Member Clubs</span>
                           </div>
                         </div>
