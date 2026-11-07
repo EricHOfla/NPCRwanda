@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
         orderBy: { order: 'asc' },
       }),
       prisma.event.findMany({
+        where: isAdminRequest ? undefined : { status: { not: 'Cancelled' } },
         take: 100,
         orderBy: { date: 'asc' },
       }),
