@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
   const auth = await authorizeRequest(request, 'reports.view');
   if (!auth.authorized) return auth.response;
 
+  const usersAuth = await authorizeRequest(request, 'users.view');
   const requestedDays = Number(request.nextUrl.searchParams.get('days') || 30);
   const days = [7, 30, 90, 365].includes(requestedDays) ? requestedDays : 30;
   const now = new Date();
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       prisma.athlete.count({ where: { status: 'Active' } }),
       prisma.athlete.groupBy({ by: ['sport'], _count: { _all: true }, orderBy: { _count: { sport: 'desc' } } }),
       prisma.partner.count({ where: { active: true } }),
-      prisma.user.count(),
+      usersAuth.authorized ? prisma.user.count() : Promise.resolve(null),
       prisma.newsArticle.count({
         where: { OR: ANNOUNCEMENT_CATEGORIES.map((category) => ({ category: { contains: category, mode: 'insensitive' as const } })) }
       }),
