@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     const [
       athletes, activeAthletes, athleteSports, partners, totalUsers, totalAnnouncements, publishedNews, draftNews,
-      upcomingEvents, totalEvents, trainingPrograms, competitionResults, galleryItems, unreadMessages, totalMessages, volunteers,
+      upcomingEvents, totalEvents, trainingPrograms, unreadMessages, totalMessages, volunteers,
       pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
       allSuccessfulTotals
@@ -41,8 +41,6 @@ export async function GET(request: NextRequest) {
       prisma.event.count({ where: { status: { in: ['Upcoming', 'Ongoing'] } } }),
       prisma.event.count(),
       prisma.trainingProgram.count(),
-      prisma.competitionResult.count(),
-      prisma.galleryItem.count(),
       prisma.contactMessage.count({ where: { read: false } }),
       prisma.contactMessage.count(),
       prisma.volunteerApplication.count(),
@@ -83,7 +81,7 @@ export async function GET(request: NextRequest) {
       generatedAt: now.toISOString(),
       range: { days, from: from.toISOString(), to: now.toISOString() },
       members: { athletes, activeAthletes, partners, totalUsers },
-      content: { totalAnnouncements, publishedNews, draftNews, upcomingEvents, totalEvents, trainingPrograms, competitionResults, galleryItems },
+      content: { totalAnnouncements, publishedNews, draftNews, upcomingEvents, totalEvents, trainingPrograms },
       engagement: {
         unreadMessages, totalMessages, volunteers, pendingJobs,
         eventRegistrations, sponsorInquiries, activeSubscribers,
