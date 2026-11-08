@@ -11,16 +11,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PUBLIC_BUNDLE_QUERY_KEY } from '@/context/DataContext';
 
 type Row = Record<string, any> & { id: string };
-type CommunityTab = 'athleteEnquiries' | 'programmes';
-const validTabs: CommunityTab[] = ['athleteEnquiries', 'programmes'];
+type CommunityTab = 'programmes';
+const validTabs: CommunityTab[] = ['programmes'];
 type Data = {
   programmes: Row[];
-  athleteEnquiries: Row[];
 };
 
 const empty: Data = {
   programmes: [],
-  athleteEnquiries: [],
 };
 
 function CommunityManagementContent() {
@@ -36,9 +34,9 @@ function CommunityManagementContent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Tab navigation — Default to 'athleteEnquiries' because that is where the live public submissions are!
+  // Only training programme management remains available in this section.
   const paramTab = searchParams.get('tab') as CommunityTab | null;
-  const initialTab: CommunityTab = paramTab && validTabs.includes(paramTab) ? paramTab : 'athleteEnquiries';
+  const initialTab: CommunityTab = paramTab && validTabs.includes(paramTab) ? paramTab : 'programmes';
   const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
 
   // Search & Filter state
@@ -52,7 +50,6 @@ function CommunityManagementContent() {
   // Modal states
   const [showProgrammeModal, setShowProgrammeModal] = useState(false);
   const [editingProgrammeId, setEditingProgrammeId] = useState<string | null>(null);
-  const [selectedAthleteEnquiry, setSelectedAthleteEnquiry] = useState<Row | null>(null);
 
   // Form states for Training Programme
   const [programme, setProgramme] = useState({ 
@@ -106,7 +103,6 @@ function CommunityManagementContent() {
       if (!response.ok) throw new Error(payload.error || 'Unable to load sports development data');
       setData({
         programmes: Array.isArray(payload.programmes) ? payload.programmes : [],
-        athleteEnquiries: Array.isArray(payload.athleteEnquiries) ? payload.athleteEnquiries : [],
       });
     } catch (e) { 
       setError(e instanceof Error ? e.message : 'Unable to load data'); 
@@ -507,99 +503,9 @@ function CommunityManagementContent() {
                 </div>
               </div>
 
-              {/* Exact 2 Highlight KPI Summary Cards */}
-              <div className="row g-3 mb-4">
-                <div className="col-12 col-md-6">
-                  <div 
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setActiveTab('athleteEnquiries')}
-                    style={{ 
-                      background: '#FFFFFF', 
-                      borderRadius: '14px', 
-                      border: activeTab === 'athleteEnquiries' ? '2px solid #0B5F9F' : '1.5px solid #CBD5E1', 
-                      padding: '20px', 
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <div className="d-flex align-items-center justify-content-between">
-                      <div>
-                        <div className="small fw-bold text-uppercase text-muted" style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }}>
-                          Public Submissions
-                        </div>
-                        <div className="fw-black my-1" style={{ fontSize: '1.85rem', color: '#0B5F9F' }}>
-                          {data.athleteEnquiries.length}
-                        </div>
-                        <div className="small fw-bold text-dark">
-                          Athlete Talent Scouting Profiles
-                        </div>
-                      </div>
-                      <div 
-                        className="rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: '52px', height: '52px', background: '#EFF6FF', color: '#0B5F9F', fontSize: '1.35rem' }}
-                      >
-                        <i className="fas fa-person-running" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-6">
-                  <div 
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setActiveTab('programmes')}
-                    style={{ 
-                      background: '#FFFFFF', 
-                      borderRadius: '14px', 
-                      border: activeTab === 'programmes' ? '2px solid #059669' : '1.5px solid #CBD5E1', 
-                      padding: '20px', 
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <div className="d-flex align-items-center justify-content-between">
-                      <div>
-                        <div className="small fw-bold text-uppercase text-muted" style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }}>
-                          Public Content
-                        </div>
-                        <div className="fw-black my-1" style={{ fontSize: '1.85rem', color: '#059669' }}>
-                          {data.programmes.length}
-                        </div>
-                        <div className="small fw-bold text-dark">
-                          Published Training Programmes
-                        </div>
-                      </div>
-                      <div 
-                        className="rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: '52px', height: '52px', background: '#ECFDF5', color: '#059669', fontSize: '1.35rem' }}
-                      >
-                        <i className="fas fa-dumbbell" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Tab Selector Bar */}
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                 <div className="nav nav-pills gap-2" role="tablist">
-                  <button
-                    type="button"
-                    className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'athleteEnquiries' ? 'btn-primary' : 'btn-light border text-secondary'}`}
-                    onClick={() => setActiveTab('athleteEnquiries')}
-                    style={{ borderRadius: '8px', padding: '8px 16px', fontSize: '0.85rem', background: activeTab === 'athleteEnquiries' ? '#0B5F9F' : undefined }}
-                  >
-                    <i className="fas fa-person-running" />
-                    <span>Athlete Talent Scouting Profiles</span>
-                    <span className={`badge rounded-pill ${activeTab === 'athleteEnquiries' ? 'bg-white text-primary' : 'bg-secondary text-white'}`} style={{ fontSize: '0.7rem' }}>
-                      {data.athleteEnquiries.length}
-                    </span>
-                  </button>
-
                   <button
                     type="button"
                     className={`btn btn-sm d-flex align-items-center gap-2 fw-semibold ${activeTab === 'programmes' ? 'btn-primary' : 'btn-light border text-secondary'}`}
@@ -627,86 +533,6 @@ function CommunityManagementContent() {
               </div>
 
               {/* Main Content Displays */}
-              {activeTab === 'athleteEnquiries' && (
-                renderTable('Athlete Talent Scouting Submissions', 'athleteEnquiries', [
-                  { 
-                    label: 'Athlete Full Name', 
-                    key: 'fullName', 
-                    format: (val, item) => (
-                      <div>
-                        <span className="text-dark fw-bold d-block">{val}</span>
-                        <span className="badge bg-light text-dark border mt-1" style={{ fontSize: '0.7rem' }}>
-                          {item.ageRange || 'General Category'}
-                        </span>
-                      </div>
-                    )
-                  },
-                  { 
-                    label: 'Sport of Interest', 
-                    key: 'sport', 
-                    format: (val) => (
-                      <span className="badge px-2.5 py-1.5 fw-bold" style={{ background: '#E0F2FE', color: '#075985', fontSize: '0.8rem' }}>
-                        {val}
-                      </span>
-                    )
-                  },
-                  { 
-                    label: 'District', 
-                    key: 'district', 
-                    format: (val) => (
-                      <span className="fw-semibold text-dark">
-                        <i className="fas fa-location-dot me-1 text-danger" />
-                        {val}
-                      </span>
-                    )
-                  },
-                  { 
-                    label: 'Contact Info', 
-                    key: 'email', 
-                    format: (val, item) => (
-                      <div className="small">
-                        <a href={`mailto:${val}`} className="d-block text-primary text-decoration-none fw-semibold">
-                          <i className="fas fa-envelope me-1" />{val}
-                        </a>
-                        {item.phone && (
-                          <a href={`tel:${item.phone}`} className="text-secondary text-decoration-none">
-                            <i className="fas fa-phone me-1" />{item.phone}
-                          </a>
-                        )}
-                      </div>
-                    )
-                  },
-                  { 
-                    label: 'Profile / Details', 
-                    key: 'message', 
-                    format: (val, item) => (
-                      <div>
-                        <span className="small text-dark d-block text-truncate" style={{ maxWidth: '240px' }} title={val}>
-                          {val || '—'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedAthleteEnquiry(item)}
-                          className="btn btn-link btn-sm p-0 fw-bold"
-                          style={{ fontSize: '0.75rem', textDecoration: 'none' }}
-                        >
-                          View Full Profile <i className="fas fa-expand ms-1" />
-                        </button>
-                      </div>
-                    )
-                  },
-                  { 
-                    label: 'Received', 
-                    key: 'createdAt', 
-                    format: (val) => (
-                      <span className="small text-muted">
-                        {val ? new Date(val).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
-                      </span>
-                    )
-                  },
-                ], ['New', 'Contacted', 'Accepted', 'Closed'])
-              )}
-
               {activeTab === 'programmes' && (
                 <>
                   <div className="alert alert-info py-2.5 px-3 small d-flex align-items-center gap-2 mb-3 border-0 shadow-sm" style={{ borderRadius: '10px', background: '#EFF6FF', color: '#1E40AF' }}>
@@ -735,101 +561,6 @@ function CommunityManagementContent() {
           )}
           </div>
         </main>
-
-      {/* ── Modal: View Athlete Talent Scouting Profile ── */}
-      {selectedAthleteEnquiry && (
-        <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(15, 23, 42, 0.65)', zIndex: 1080 }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
-              <div className="modal-header text-white" style={{ background: '#0B5F9F' }}>
-                <div className="d-flex align-items-center gap-2">
-                  <i className="fas fa-id-card" style={{ fontSize: '1.2rem' }} />
-                  <div>
-                    <h5 className="modal-title fw-bold mb-0">Athlete Talent Profile</h5>
-                    <span className="small opacity-75">Submitted via public Sports Development portal</span>
-                  </div>
-                </div>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedAthleteEnquiry(null)} aria-label="Close" />
-              </div>
-              <div className="modal-body p-4">
-                <div className="row g-3 mb-4">
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Full Name</label>
-                    <div className="fs-5 fw-bold text-dark">{selectedAthleteEnquiry.fullName}</div>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Age Category</label>
-                    <div className="fw-semibold text-dark">{selectedAthleteEnquiry.ageRange || 'Not specified'}</div>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Sport of Interest</label>
-                    <span className="badge bg-primary px-2.5 py-1.5" style={{ fontSize: '0.85rem' }}>
-                      {selectedAthleteEnquiry.sport}
-                    </span>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">District</label>
-                    <div className="fw-semibold text-dark">
-                      <i className="fas fa-location-dot me-1 text-danger" />
-                      {selectedAthleteEnquiry.district}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Email Address</label>
-                    <a href={`mailto:${selectedAthleteEnquiry.email}`} className="text-primary fw-semibold text-decoration-none">
-                      <i className="fas fa-envelope me-1" />
-                      {selectedAthleteEnquiry.email}
-                    </a>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-bold text-uppercase d-block mb-1">Phone / WhatsApp</label>
-                    {selectedAthleteEnquiry.phone ? (
-                      <a href={`tel:${selectedAthleteEnquiry.phone}`} className="text-dark fw-semibold text-decoration-none">
-                        <i className="fas fa-phone me-1 text-success" />
-                        {selectedAthleteEnquiry.phone}
-                      </a>
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="text-muted small fw-bold text-uppercase d-block mb-2">Impairment Details &amp; Athletic Background</label>
-                  <div className="p-3 rounded-3" style={{ background: '#F8FAFC', border: '1.5px solid #E2E8F0', fontSize: '0.92rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                    {selectedAthleteEnquiry.message || 'No additional details provided.'}
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center justify-content-between pt-3 border-top">
-                  <div className="d-flex align-items-center gap-2">
-                    <label className="fw-bold small mb-0">Status:</label>
-                    <select
-                      className="form-select form-select-sm"
-                      value={selectedAthleteEnquiry.status}
-                      disabled={busy === selectedAthleteEnquiry.id}
-                      onChange={async (e) => {
-                        const newStatus = e.target.value;
-                        await update('athleteEnquiries', selectedAthleteEnquiry, { status: newStatus });
-                        setSelectedAthleteEnquiry((prev) => prev ? { ...prev, status: newStatus } : null);
-                      }}
-                      style={{ width: '140px', fontSize: '0.82rem' }}
-                    >
-                      <option>New</option>
-                      <option>Contacted</option>
-                      <option>Accepted</option>
-                      <option>Closed</option>
-                    </select>
-                  </div>
-                  <button type="button" className="btn btn-secondary btn-sm px-3" onClick={() => setSelectedAthleteEnquiry(null)}>
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Modal: Redesigned Training Programme Form ── */}
       {showProgrammeModal && (
