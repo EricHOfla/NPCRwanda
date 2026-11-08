@@ -17,7 +17,7 @@ type Analytics = {
   generatedAt: string;
   range: { days: number };
   members: { athletes: number; activeAthletes: number; partners: number; totalUsers: number | null };
-  content: { totalAnnouncements: number; publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number };
+  content: { totalAnnouncements: number; publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number; trainingPrograms: number; competitionResults: number; galleryItems: number };
   engagement: { 
     unreadMessages: number; 
     totalMessages: number; 
@@ -283,6 +283,30 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 <i className="fas fa-user-shield" />
               </div>
             )}
+          </div>
+
+          <div className="live-analytics-kpis" style={{ marginTop: '12px' }}>
+            <div className="live-analytics-kpi blue" role="button" tabIndex={0}
+              onClick={() => handleNav({ url: '/dashboard/community' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open sports development management">
+              <span>Training Programmes</span><strong>{number(data.content.trainingPrograms)}</strong>
+              <small>All programme records</small><i className="fas fa-dumbbell" />
+            </div>
+            <div className="live-analytics-kpi amber" role="button" tabIndex={0}
+              onClick={() => handleNav({ url: '/dashboard/community' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open sports development management">
+              <span>Competition Results</span><strong>{number(data.content.competitionResults)}</strong>
+              <small>All recorded results</small><i className="fas fa-medal" />
+            </div>
+            <div className="live-analytics-kpi violet" role="button" tabIndex={0}
+              onClick={() => handleNav({ url: '/dashboard/community' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open community and media management">
+              <span>Gallery Items</span><strong>{number(data.content.galleryItems)}</strong>
+              <small>All media records</small><i className="fas fa-images" />
+            </div>
           </div>
 
           {/* Explicit Specification Panel for the 21 Pending Work Requests (each tile navigates directly) */}
