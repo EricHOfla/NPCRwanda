@@ -271,9 +271,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 <i className="fas fa-user-shield" />
               </div>
             )}
-          </div>
-
-          <div className="live-analytics-kpis" style={{ marginTop: '12px' }}>
             <div className="live-analytics-kpi blue" role="button" tabIndex={0}
               onClick={() => handleNav({ url: '/dashboard/community' })}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
@@ -282,6 +279,8 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
               <small>All programme records</small><i className="fas fa-dumbbell" />
             </div>
           </div>
+
+
 
           {/* Explicit Specification Panel for the 21 Pending Work Requests (each tile navigates directly) */}
           {showPendingBreakdown && (
