@@ -56,6 +56,17 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showPendingBreakdown, setShowPendingBreakdown] = useState(true);
 
+  // Remove analytics persisted by older releases; current analytics are memory-only.
+  useEffect(() => {
+    try {
+      [7, 30, 90, 365].forEach((range) => {
+        window.localStorage.removeItem(`npc-dashboard-analytics-v1-${range}`);
+      });
+    } catch {
+      // Storage may be unavailable; no analytics are written by this version.
+    }
+  }, []);
+
   const handleNav = (action: AnalyticsNavigateAction) => {
     if (onNavigate) {
       onNavigate(action);
