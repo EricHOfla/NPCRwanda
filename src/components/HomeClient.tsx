@@ -946,7 +946,7 @@ export default function HomeClient() {
                             data-height="500"
                             data-theme="light"
                             data-chrome="noheader nofooter"
-                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npc_rwanda'}
+                            href={getSiteText('media.twitterEmbedUrl', configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://x.com/npc_rwanda')}
                           >
                             Posts by NPC Rwanda
                           </a>
