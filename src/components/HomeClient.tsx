@@ -78,7 +78,7 @@ export default function HomeClient() {
   const configuredSocials = socialLinks && socialLinks.length > 0 ? socialLinks.filter(s => s.active) : [
     { id: '1', platform: 'youtube', url: 'https://www.youtube.com/@npcrwandaofficial1716', icon: 'fa-youtube', active: true, order: 1 },
     { id: '2', platform: 'instagram', url: 'https://www.instagram.com/npc.rwanda/', icon: 'fa-instagram', active: true, order: 2 },
-    { id: '3', platform: 'twitter', url: 'https://twitter.com/npcrwanda', icon: 'fa-twitter', active: true, order: 3 },
+    { id: '3', platform: 'twitter', url: 'https://twitter.com/npc_rwanda', icon: 'fa-twitter', active: true, order: 3 },
     { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
   ];
 
@@ -930,7 +930,7 @@ export default function HomeClient() {
                             <i className="fab fa-x-twitter me-1" aria-hidden="true" /> X / Twitter
                           </span>
                           <a
-                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npcrwanda'}
+                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npc_rwanda'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-outline-dark fw-bold rounded-pill"
@@ -946,7 +946,7 @@ export default function HomeClient() {
                             data-height="500"
                             data-theme="light"
                             data-chrome="noheader nofooter"
-                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npcrwanda'}
+                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npc_rwanda'}
                           >
                             Posts by NPC Rwanda
                           </a>
