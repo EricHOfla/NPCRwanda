@@ -5,7 +5,7 @@ import { authorizeRequest } from '@/lib/rbac-server';
 
 export const dynamic = 'force-dynamic';
 
-const types = ['programmes', 'athleteEnquiries'] as const;
+const types = ['programmes'] as const;
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,11 +14,8 @@ export async function GET(request: NextRequest) {
       return auth.response;
     }
 
-    const [programmes, athleteEnquiries] = await Promise.all([
-      prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.athleteEnquiry.findMany({ orderBy: { createdAt: 'desc' } }),
-    ]);
-    return NextResponse.json({ programmes, athleteEnquiries });
+    const programmes = await prisma.trainingProgram.findMany({ orderBy: { createdAt: 'desc' } });
+    return NextResponse.json({ programmes });
   } catch (error) {
     console.error('Community admin data fetch failed:', error);
     return NextResponse.json({ error: 'Unable to load community management data' }, { status: 500 });
@@ -47,9 +44,6 @@ export async function PATCH(request: NextRequest) {
         if (status && !['Draft', 'Published', 'Archived'].includes(status)) return NextResponse.json({ error: 'Invalid programme status' }, { status: 400 });
         if (!status) return NextResponse.json({ error: 'Status is required' }, { status: 400 });
         updated = await prisma.trainingProgram.update({ where: { id }, data: { status } }); break;
-      case 'athleteEnquiries':
-        if (!status || !['New', 'Contacted', 'Accepted', 'Closed'].includes(status)) return NextResponse.json({ error: 'Invalid enquiry status' }, { status: 400 });
-        updated = await prisma.athleteEnquiry.update({ where: { id }, data: { status } }); break;
     }
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
@@ -71,7 +65,6 @@ export async function DELETE(request: NextRequest) {
     const { type, id } = parsed.data;
     switch (type) {
       case 'programmes': await prisma.trainingProgram.delete({ where: { id } }); break;
-      case 'athleteEnquiries': await prisma.athleteEnquiry.delete({ where: { id } }); break;
     }
     return NextResponse.json({ success: true });
   } catch (error) {
