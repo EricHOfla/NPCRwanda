@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import InstagramEmbed from '@/components/InstagramEmbed';
@@ -81,6 +81,19 @@ export default function HomeClient() {
     { id: '3', platform: 'twitter', url: 'https://twitter.com/npc_rwanda', icon: 'fa-twitter', active: true, order: 3 },
     { id: '4', platform: 'facebook', url: 'https://facebook.com/npcrwanda', icon: 'fa-facebook-f', active: true, order: 4 },
   ];
+
+  const xFeedRef = useRef<HTMLDivElement>(null);
+  const xEmbedUrl = getSiteText(
+    'media.twitterEmbedUrl',
+    configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://x.com/npc_rwanda'
+  );
+
+  useEffect(() => {
+    const xWindow = window as Window & {
+      twttr?: { widgets?: { load: (element?: HTMLElement) => void } };
+    };
+    xWindow.twttr?.widgets?.load(xFeedRef.current || undefined);
+  }, [xEmbedUrl]);
 
   // Public impact counters are derived from current managed records, never manually entered or seeded figures.
   const activeDistricts = new Set(
@@ -940,19 +953,28 @@ export default function HomeClient() {
                           </a>
                         </div>
                         <h3 className="pro-ngo-video-card__title mb-2">Latest Updates on X</h3>
-                        <div style={{ minHeight: '320px', maxHeight: '520px', overflowY: 'auto' }}>
+                        <div ref={xFeedRef} style={{ minHeight: '320px', maxHeight: '520px', overflowY: 'auto' }}>
                           <a
                             className="twitter-timeline"
                             data-height="500"
                             data-theme="light"
                             data-chrome="noheader nofooter"
-                            href={getSiteText('media.twitterEmbedUrl', configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://x.com/npc_rwanda')}
+                            href={xEmbedUrl}
                           >
                             Posts by NPC Rwanda
                           </a>
                         </div>
                       </div>
-                      <Script src="https://platform.twitter.com/widgets.js" strategy="lazyOnload" />
+                      <Script
+                        src="https://platform.x.com/widgets.js"
+                        strategy="afterInteractive"
+                        onReady={() => {
+                          const xWindow = window as Window & {
+                            twttr?: { widgets?: { load: (element?: HTMLElement) => void } };
+                          };
+                          xWindow.twttr?.widgets?.load(xFeedRef.current || undefined);
+                        }}
+                      />
                     </div>
                   </div>
                 );
