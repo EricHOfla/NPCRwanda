@@ -2577,7 +2577,7 @@ export default function DashboardPage() {
                       onClick={() => {
                         const target = activeEditPage || 'home';
                         if (target === 'home') {
-                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl']);
+                          handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramUrl', 'community.eyebrow', 'community.title', 'community.desc', 'community.dpsco.title', 'community.dpsco.desc', 'community.associations.title', 'community.associations.desc', 'community.volunteer.title', 'community.volunteer.desc', 'community.partners.title', 'community.partners.desc']);
                         } else if (target === 'about') {
                           handleSectionSave(['about.pageTitle', 'about.pageIntro', 'about.milestones', 'about.affiliations', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'about.heroImage', 'about.historyImage', 'about.historyParagraph1', 'about.historyParagraph2', 'about.vision', 'about.mission', 'about.value.phrase.Courage', 'about.value.phrase.Determination', 'about.value.phrase.Equality', 'about.value.phrase.Inspiration', 'about.value.phrase.Empowerment', 'about.value.phrase.Intersectionality', 'about.objective.phrase.Athlete Excellence', 'about.objective.phrase.Grassroots Development', 'about.objective.phrase.Safeguarding & Governance', 'about.objective.phrase.Partnership Growth', 'about.objective.outcome.Athlete Excellence', 'about.objective.outcome.Grassroots Development', 'about.objective.outcome.Safeguarding & Governance', 'about.objective.outcome.Partnership Growth']);
                         } else if (target === 'npc-background') {
@@ -3150,6 +3150,28 @@ export default function DashboardPage() {
                         <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fas fa-star me-2" />Hero Banner Section</h4>
                         <div className="row g-3">
                           <div className="col-md-6">
+                            <div className="border-top pt-3 mt-4 mb-3">
+                              <h5 className="fw-bold text-dark">Community Quick Links</h5>
+                              <p className="small text-muted">Edit the section heading and the text shown on each community card.</p>
+                            </div>
+                            {[
+                              ['community.eyebrow', 'Section Eyebrow'],
+                              ['community.title', 'Section Heading'],
+                              ['community.desc', 'Section Description'],
+                              ['community.dpsco.title', 'District Coordinators Title'],
+                              ['community.dpsco.desc', 'District Coordinators Description'],
+                              ['community.associations.title', 'Clubs & Associations Title'],
+                              ['community.associations.desc', 'Clubs & Associations Description'],
+                              ['community.volunteer.title', 'Volunteer Program Title'],
+                              ['community.volunteer.desc', 'Volunteer Program Description'],
+                              ['community.partners.title', 'Partners & Supporters Title'],
+                              ['community.partners.desc', 'Partners & Supporters Description'],
+                            ].map(([key, label]) => (
+                              <div className="mb-3" key={key}>
+                                <label className="form-label small fw-bold">{label}</label>
+                                <textarea className="form-control" rows={key.endsWith('.desc') || key === 'community.desc' ? 2 : 1} value={siteForm[key] || ''} onChange={e => setSiteForm({ ...siteForm, [key]: e.target.value })} />
+                              </div>
+                            ))}
                             <div className="mb-3">
                               <label className="form-label small fw-bold">Hero Kicker</label>
                               <input type="text" className="form-control" value={siteForm['hero.kicker'] || ''} onChange={e => setSiteForm({ ...siteForm, 'hero.kicker': e.target.value })} />
