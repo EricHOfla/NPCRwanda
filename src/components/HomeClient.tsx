@@ -84,11 +84,12 @@ export default function HomeClient() {
   // Public impact counters are derived from current managed records, never manually entered or seeded figures.
   const activeDistricts = new Set(
     dpscoContacts
-      .filter(contact => contact.active)
-      .map(contact => contact.district.trim().toLocaleLowerCase())
+      .filter(contact => contact.active && typeof contact.district === 'string')
+      .map(contact => contact.district.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase())
       .filter(Boolean)
   );
   const districtsCount = String(activeDistricts.size);
+  const hasDistrictCount = activeDistricts.size > 0;
   const athletesCount = String(athletes.length);
   const disciplinesCount = String(sports.length);
   const clubsCount = String(npcClubs.filter(club => club.active).length);
@@ -177,10 +178,12 @@ export default function HomeClient() {
 
               {/* Dynamic Database Metrics */}
               <div className="pro-ngo-hero__kpis">
-                <div className="pro-ngo-hero__kpi-card">
-                  <div className="pro-ngo-hero__kpi-num">{districtsCount}</div>
-                  <div className="pro-ngo-hero__kpi-label">{t('phrase.Districts (DPSCO)')}</div>
-                </div>
+                {hasDistrictCount && (
+                  <div className="pro-ngo-hero__kpi-card">
+                    <div className="pro-ngo-hero__kpi-num">{districtsCount}</div>
+                    <div className="pro-ngo-hero__kpi-label">{t('phrase.Districts (DPSCO)')}</div>
+                  </div>
+                )}
                 {hasAthletesCount && (
                   <div className="pro-ngo-hero__kpi-card">
                     <div className="pro-ngo-hero__kpi-num">{athletesCount}</div>
@@ -280,7 +283,7 @@ export default function HomeClient() {
                     >
                       {getSiteText(
                         'hero.showcaseDesc',
-                        t('phrase.From grassroots talent scouting across 30 districts to continental championships and the Paralympic podium.')
+                        t('phrase.From grassroots talent scouting in communities across Rwanda to continental championships and the Paralympic podium.')
                       )}
                     </p>
 
@@ -331,7 +334,7 @@ export default function HomeClient() {
                   <i className="fas fa-magnifying-glass-chart" aria-hidden="true" />
                 </div>
                 <span className="pro-ngo-tag pro-ngo-tag--gold mb-3">
-                  {districtsCount} {t('phrase.Districts (DPSCO)')}
+                  {hasDistrictCount ? <>{districtsCount} {t('phrase.Districts (DPSCO)')}</> : t('phrase.District Network')}
                 </span>
                 <h3 className="pro-ngo-bento-card__title">
                   {getSiteText('hero.stat1.title', t('phrase.Talent Identification'))}
@@ -439,6 +442,55 @@ export default function HomeClient() {
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* -----------------------------------------------------------
+          4. COMMUNITY & MEMBERSHIP QUICK LINKS
+      ----------------------------------------------------------- */}
+      <section className="py-5" aria-label="Community and membership">
+        <div className="pro-ngo-container">
+          <div className="pro-ngo-section-header pro-ngo-section-header--center mb-4" data-aos="fade-up">
+            <span className="pro-ngo-eyebrow">{t('phrase.Get Involved')}</span>
+            <h2 className="pro-ngo-heading">{t('phrase.Connect with NPC Rwanda')}</h2>
+            <p className="pro-ngo-subhead pro-ngo-subhead--center">
+              {t('phrase.Find your place in Rwanda’s para-sport community, connect with local coordinators, or support inclusive sport.')}
+            </p>
+          </div>
+          <div className="row g-3">
+            <div className="col-md-6 col-lg-3">
+              <Link href="/members/dpsco" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
+                <i className="fas fa-map-location-dot text-primary fs-3 mb-3" aria-hidden="true" />
+                <h3 className="h5 fw-bold text-dark">{t('phrase.District Sports Coordinators')}</h3>
+                <p className="text-muted small flex-grow-1">{t('phrase.Find district para-sport coordinators and local contacts.')}</p>
+                <span className="fw-bold text-primary small">{t('phrase.Find a Coordinator')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link href="/members/associations" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
+                <i className="fas fa-people-group text-primary fs-3 mb-3" aria-hidden="true" />
+                <h3 className="h5 fw-bold text-dark">{t('phrase.Clubs & Member Associations')}</h3>
+                <p className="text-muted small flex-grow-1">{t('phrase.Explore clubs and organizations that make up the NPC Rwanda community.')}</p>
+                <span className="fw-bold text-primary small">{t('phrase.Explore Members')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link href="/volunteer" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
+                <i className="fas fa-hand-holding-heart text-primary fs-3 mb-3" aria-hidden="true" />
+                <h3 className="h5 fw-bold text-dark">{t('phrase.Volunteer Program')}</h3>
+                <p className="text-muted small flex-grow-1">{t('phrase.Contribute your time and skills to inclusive sport in Rwanda.')}</p>
+                <span className="fw-bold text-primary small">{t('phrase.Become a Volunteer')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
+              </Link>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <Link href="/partners" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
+                <i className="fas fa-handshake-angle text-primary fs-3 mb-3" aria-hidden="true" />
+                <h3 className="h5 fw-bold text-dark">{t('phrase.Partners & Supporters')}</h3>
+                <p className="text-muted small flex-grow-1">{t('phrase.Work with NPC Rwanda to strengthen opportunities for para-athletes.')}</p>
+                <span className="fw-bold text-primary small">{t('phrase.Partner With Us')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -733,7 +785,7 @@ export default function HomeClient() {
                 {!displayAnnouncement ? (
                   <div className="pro-ngo-compact-empty">
                     <i className="fas fa-bullhorn" aria-hidden="true" />
-                    <span>No new notices right now.</span>
+                    <span>There are no published announcements at the moment. Please check back for official updates.</span>
                   </div>
                 ) : (
                   <div>
@@ -775,7 +827,7 @@ export default function HomeClient() {
                 {!displayEvent ? (
                   <div className="pro-ngo-compact-empty pro-ngo-compact-empty--dark">
                     <i className="fas fa-calendar-days" aria-hidden="true" />
-                    <span>No upcoming events have been published yet.</span>
+                    <span>There are no upcoming events published at the moment. Visit the event calendar for updates.</span>
                     <Link href="/events">View event calendar <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></Link>
                   </div>
                 ) : (
@@ -1108,7 +1160,7 @@ export default function HomeClient() {
               </div>
               <h3 className="pro-ngo-tier-card__title">Grassroots DPSCO Tournaments</h3>
               <p className="pro-ngo-tier-card__desc">
-                Sponsor district scouting tournaments and grassroots camps across all {districtsCount} districts in Rwanda.
+                Sponsor district scouting tournaments and grassroots camps that expand para-sport opportunities in communities across Rwanda.
               </p>
               <Link href="/volunteer" className="pro-ngo-tier-card__btn pro-ngo-tier-card__btn--primary">
                 {t('phrase.Volunteer')}
