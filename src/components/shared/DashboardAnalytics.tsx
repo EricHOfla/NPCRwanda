@@ -17,7 +17,7 @@ type Analytics = {
   generatedAt: string;
   range: { days: number };
   members: { athletes: number; activeAthletes: number; partners: number; totalUsers: number | null };
-  content: { totalAnnouncements: number; publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number; trainingPrograms: number; competitionResults: number; galleryItems: number };
+  content: { totalAnnouncements: number; publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number; trainingPrograms: number };
   engagement: { 
     unreadMessages: number; 
     totalMessages: number; 
@@ -299,13 +299,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
               style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open sports development management">
               <span>Competition Results</span><strong>{number(data.content.competitionResults)}</strong>
               <small>All recorded results</small><i className="fas fa-medal" />
-            </div>
-            <div className="live-analytics-kpi violet" role="button" tabIndex={0}
-              onClick={() => handleNav({ url: '/dashboard/community' })}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
-              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open community and media management">
-              <span>Gallery Items</span><strong>{number(data.content.galleryItems)}</strong>
-              <small>All media records</small><i className="fas fa-images" />
             </div>
           </div>
 
