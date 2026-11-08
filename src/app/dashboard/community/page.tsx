@@ -486,7 +486,7 @@ function CommunityManagementContent() {
                       Sports Development Desk
                     </h1>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
-                      Manage athlete scouting submissions and grassroots training programmes.
+                      Manage and publish official grassroots training programmes and development camps.
                     </p>
                   </div>
 
