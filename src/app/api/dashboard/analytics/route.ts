@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authorizeRequest } from '@/lib/rbac-server';
+import { ANNOUNCEMENT_CATEGORIES } from '@/lib/newsUtils';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const [
-      athletes, activeAthletes, athleteSports, partners, publishedNews, draftNews,
+      athletes, activeAthletes, athleteSports, partners, totalUsers, totalAnnouncements, publishedNews, draftNews,
       upcomingEvents, totalEvents, unreadMessages, totalMessages, volunteers,
       pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
@@ -30,6 +31,10 @@ export async function GET(request: NextRequest) {
       prisma.athlete.count({ where: { status: 'Active' } }),
       prisma.athlete.groupBy({ by: ['sport'], _count: { _all: true }, orderBy: { _count: { sport: 'desc' } } }),
       prisma.partner.count({ where: { active: true } }),
+      prisma.user.count(),
+      prisma.newsArticle.count({
+        where: { OR: ANNOUNCEMENT_CATEGORIES.map((category) => ({ category: { contains: category, mode: 'insensitive' as const } })) }
+      }),
       prisma.newsArticle.count({ where: { status: 'Published' } }),
       prisma.newsArticle.count({ where: { status: 'Draft' } }),
       prisma.event.count({ where: { status: { in: ['Upcoming', 'Ongoing'] } } }),
@@ -73,8 +78,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       generatedAt: now.toISOString(),
       range: { days, from: from.toISOString(), to: now.toISOString() },
-      members: { athletes, activeAthletes, partners },
-      content: { publishedNews, draftNews, upcomingEvents, totalEvents },
+      members: { athletes, activeAthletes, partners, totalUsers },
+      content: { totalAnnouncements, publishedNews, draftNews, upcomingEvents, totalEvents },
       engagement: {
         unreadMessages, totalMessages, volunteers, pendingJobs,
         eventRegistrations, sponsorInquiries, activeSubscribers,
