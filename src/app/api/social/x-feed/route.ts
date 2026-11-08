@@ -20,6 +20,7 @@ type XTimelineResponse = {
 
 export async function GET() {
   const bearerToken = process.env.X_BEARER_TOKEN;
+  const username = (process.env.X_USERNAME || 'npc_rwanda').replace(/^@/, '').trim();
   if (!bearerToken) {
     return NextResponse.json({ error: 'X feed is not configured' }, { status: 503 });
   }
@@ -27,7 +28,7 @@ export async function GET() {
   const headers = { Authorization: `Bearer ${bearerToken}` };
   try {
     const userResponse = await fetch(
-      'https://api.x.com/2/users/by/username/npc_rwanda',
+      'https://api.x.com/2/users/by/username/' + encodeURIComponent(username),
       { headers, next: { revalidate: 900 } }
     );
     if (!userResponse.ok) {
@@ -62,7 +63,7 @@ export async function GET() {
       id: post.id,
       text: post.text,
       createdAt: post.created_at || null,
-      url: `https://x.com/npc_rwanda/status/${post.id}`,
+      url: `https://x.com/${encodeURIComponent(username)}/status/${post.id}`,
       metrics: post.public_metrics || {},
       media: (post.attachments?.media_keys || [])
         .map((key) => mediaByKey.get(key))
