@@ -452,42 +452,42 @@ export default function HomeClient() {
       <section className="py-5" aria-label="Community and membership">
         <div className="pro-ngo-container">
           <div className="pro-ngo-section-header pro-ngo-section-header--center mb-4" data-aos="fade-up">
-            <span className="pro-ngo-eyebrow">{t('phrase.Get Involved')}</span>
-            <h2 className="pro-ngo-heading">{t('phrase.Connect with NPC Rwanda')}</h2>
+            <span className="pro-ngo-eyebrow">{getSiteText('community.eyebrow', 'Get Involved')}</span>
+            <h2 className="pro-ngo-heading">{getSiteText('community.title', 'Connect with NPC Rwanda')}</h2>
             <p className="pro-ngo-subhead pro-ngo-subhead--center">
-              {t('phrase.Find your place in Rwanda’s para-sport community, connect with local coordinators, or support inclusive sport.')}
+              {getSiteText('community.desc', 'Find your place in Rwanda’s para-sport community, connect with local coordinators, or support inclusive sport.')}
             </p>
           </div>
           <div className="row g-3">
             <div className="col-md-6 col-lg-3">
               <Link href="/members/dpsco" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
                 <i className="fas fa-map-location-dot text-primary fs-3 mb-3" aria-hidden="true" />
-                <h3 className="h5 fw-bold text-dark">{t('phrase.District Sports Coordinators')}</h3>
-                <p className="text-muted small flex-grow-1">{t('phrase.Find district para-sport coordinators and local contacts.')}</p>
+                <h3 className="h5 fw-bold text-dark">{getSiteText('community.dpsco.title', 'District Sports Coordinators')}</h3>
+                <p className="text-muted small flex-grow-1">{getSiteText('community.dpsco.desc', 'Find district para-sport coordinators and local contacts.')}</p>
                 <span className="fw-bold text-primary small">{t('phrase.Find a Coordinator')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
               </Link>
             </div>
             <div className="col-md-6 col-lg-3">
               <Link href="/members/associations" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
                 <i className="fas fa-people-group text-primary fs-3 mb-3" aria-hidden="true" />
-                <h3 className="h5 fw-bold text-dark">{t('phrase.Clubs & Member Associations')}</h3>
-                <p className="text-muted small flex-grow-1">{t('phrase.Explore clubs and organizations that make up the NPC Rwanda community.')}</p>
+                <h3 className="h5 fw-bold text-dark">{getSiteText('community.associations.title', 'Clubs & Member Associations')}</h3>
+                <p className="text-muted small flex-grow-1">{getSiteText('community.associations.desc', 'Explore clubs and organizations that make up the NPC Rwanda community.')}</p>
                 <span className="fw-bold text-primary small">{t('phrase.Explore Members')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
               </Link>
             </div>
             <div className="col-md-6 col-lg-3">
               <Link href="/volunteer" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
                 <i className="fas fa-hand-holding-heart text-primary fs-3 mb-3" aria-hidden="true" />
-                <h3 className="h5 fw-bold text-dark">{t('phrase.Volunteer Program')}</h3>
-                <p className="text-muted small flex-grow-1">{t('phrase.Contribute your time and skills to inclusive sport in Rwanda.')}</p>
+                <h3 className="h5 fw-bold text-dark">{getSiteText('community.volunteer.title', 'Volunteer Program')}</h3>
+                <p className="text-muted small flex-grow-1">{getSiteText('community.volunteer.desc', 'Contribute your time and skills to inclusive sport in Rwanda.')}</p>
                 <span className="fw-bold text-primary small">{t('phrase.Become a Volunteer')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
               </Link>
             </div>
             <div className="col-md-6 col-lg-3">
               <Link href="/partners" className="h-100 d-flex flex-column text-decoration-none p-4 rounded-4 border bg-white shadow-sm">
                 <i className="fas fa-handshake-angle text-primary fs-3 mb-3" aria-hidden="true" />
-                <h3 className="h5 fw-bold text-dark">{t('phrase.Partners & Supporters')}</h3>
-                <p className="text-muted small flex-grow-1">{t('phrase.Work with NPC Rwanda to strengthen opportunities for para-athletes.')}</p>
+                <h3 className="h5 fw-bold text-dark">{getSiteText('community.partners.title', 'Partners & Supporters')}</h3>
+                <p className="text-muted small flex-grow-1">{getSiteText('community.partners.desc', 'Work with NPC Rwanda to strengthen opportunities for para-athletes.')}</p>
                 <span className="fw-bold text-primary small">{t('phrase.Partner With Us')} <i className="fas fa-arrow-right ms-1" aria-hidden="true" /></span>
               </Link>
             </div>
