@@ -40,7 +40,7 @@ const analyticsCacheKey = (days: number) => `npc-dashboard-analytics-v1-${days}`
 function readCachedAnalytics(days: number): Analytics | null {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = window.sessionStorage.getItem(analyticsCacheKey(days));
+    const raw = window.localStorage.getItem(analyticsCacheKey(days));
     return raw ? JSON.parse(raw) as Analytics : null;
   } catch {
     return null;
@@ -89,7 +89,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
       const payload = await response.json();
       setData(payload);
       try {
-        window.sessionStorage.setItem(analyticsCacheKey(days), JSON.stringify(payload));
+        window.localStorage.setItem(analyticsCacheKey(days), JSON.stringify(payload));
       } catch {
         // Analytics remain usable if browser storage is unavailable or full.
       }
