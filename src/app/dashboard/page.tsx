@@ -3346,9 +3346,9 @@ export default function DashboardPage() {
                             <span className="badge text-white mb-1" style={{ background: '#111' }}><i className="fab fa-x-twitter me-1" /> X / Twitter Feed</span>
                           </div>
                           <div className="col-12">
-                            <label className="form-label small fw-bold">X / Twitter URL to Embed</label>
-                            <input type="url" className="form-control" value={siteForm['media.twitterEmbedUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.twitterEmbedUrl': e.target.value })} placeholder="https://x.com/npc_rwanda" />
-                            <div className="form-text">Paste the public X profile URL whose latest posts should appear on the homepage. Example: https://x.com/npc_rwanda</div>
+                            <label className="form-label small fw-bold">X Username or Profile URL</label>
+                            <input type="text" className="form-control" value={siteForm['media.twitterEmbedUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.twitterEmbedUrl': e.target.value })} placeholder="@npc_rwanda or https://x.com/npc_rwanda" />
+                            <div className="form-text">Enter the public X username (with or without @) or paste its profile URL. The homepage will embed the account's recent public posts automatically. No API key or .env configuration is required.</div>
                           </div>
 
                           {/* Instagram Settings */}
