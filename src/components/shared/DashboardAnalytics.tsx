@@ -85,8 +85,11 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
     }
   }, [days]);
 
-  // Load analytics on entry and when the selected date range changes.
-  // Further updates are user-triggered through the Refresh button.
+  // Load once on entry and when the selected date range changes.
+  // There is deliberately no polling; subsequent updates are manual.
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
