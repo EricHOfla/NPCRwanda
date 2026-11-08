@@ -39,6 +39,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'community.volunteer.desc': 'Contribute your time and skills to inclusive sport in Rwanda.',
   'community.partners.title': 'Partners & Supporters',
   'community.partners.desc': 'Work with NPC Rwanda to strengthen opportunities for para-athletes.',
+  'media.twitterEmbedUrl': 'https://x.com/npc_rwanda',
   'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
