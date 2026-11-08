@@ -35,17 +35,6 @@ type Analytics = {
 const number = (value: number) => new Intl.NumberFormat('en-US').format(value || 0);
 const money = (value: number, currency: string) => new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(value || 0);
 
-const analyticsCacheKey = (days: number) => `npc-dashboard-analytics-v1-${days}`;
-
-function readCachedAnalytics(days: number): Analytics | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(analyticsCacheKey(days));
-    return raw ? JSON.parse(raw) as Analytics : null;
-  } catch {
-    return null;
-  }
-}
 
 function Panel({ title, icon, children, action }: { title: string; icon: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
@@ -61,8 +50,8 @@ function Panel({ title, icon, children, action }: { title: string; icon: string;
 
 export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsProps) {
   const [days, setDays] = useState(30);
-  const [data, setData] = useState<Analytics | null>(() => readCachedAnalytics(30));
-  const [loading, setLoading] = useState(() => !readCachedAnalytics(30));
+  const [data, setData] = useState<Analytics | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showPendingBreakdown, setShowPendingBreakdown] = useState(true);
@@ -88,11 +77,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
       if (!response.ok) throw new Error(response.status === 401 ? 'Your session has expired. Please sign in again.' : 'Analytics could not be loaded.');
       const payload = await response.json();
       setData(payload);
-      try {
-        window.localStorage.setItem(analyticsCacheKey(days), JSON.stringify(payload));
-      } catch {
-        // Analytics remain usable if browser storage is unavailable or full.
-      }
       setError('');
       setLastUpdated(new Date());
     } catch (err) {
@@ -102,14 +86,11 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
     }
   }, [days]);
 
-  // Show the last result for this date range immediately, then update it
-  // quietly in the background. No periodic polling is performed.
+  // Fetch fresh, authorized analytics on entry and when the date range changes.
+  // Results remain in component memory only; no browser persistence or polling.
   useEffect(() => {
-    const cached = readCachedAnalytics(days);
-    setData(cached);
-    setLoading(!cached);
-    void refresh(Boolean(cached));
-  }, [days, refresh]);
+    void refresh();
+  }, [refresh]);
 
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
