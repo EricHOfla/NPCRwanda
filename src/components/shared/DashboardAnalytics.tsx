@@ -85,11 +85,8 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
     }
   }, [days]);
 
-  useEffect(() => {
-    refresh();
-    const timer = window.setInterval(() => refresh(true), 30000);
-    return () => window.clearInterval(timer);
-  }, [refresh]);
+  // Load analytics on entry and when the selected date range changes.
+  // Further updates are user-triggered through the Refresh button.
 
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
@@ -105,8 +102,8 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
 
       <div className="live-analytics-toolbar">
         <div>
-          <span className="live-analytics-live-dot" /> <strong>Live database analytics</strong>
-          <small>Auto-refreshes every 30 seconds</small>
+          <span className="live-analytics-live-dot" /> <strong>Database analytics</strong>
+          <small>Updates when you refresh</small>
         </div>
         <div className="live-analytics-controls">
           <select aria-label="Analytics date range" value={days} onChange={(event) => setDays(Number(event.target.value))}>
