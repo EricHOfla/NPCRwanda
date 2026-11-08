@@ -597,89 +597,109 @@ export default function SportsDevelopmentPage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 5: COMMUNITY CONNECTIONS & MEMBER DIRECTORIES
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="py-5" style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0' }}>
+      {/* SECTION 5: COMMUNITY CONNECTIONS & MEMBER DIRECTORIES */}
+      <section className="py-5" style={{ background: '#F8FAFC', borderTop: '1px solid #E2E8F0' }}>
         <div className="container">
-          <div className="text-center mx-auto mb-4" style={{ maxWidth: '700px' }}>
-            <h3 className="fw-bold mb-1" style={{ color: '#000000', fontSize: '1.4rem' }}>
+          <div className="text-center mx-auto mb-5" style={{ maxWidth: '720px' }}>
+            <span
+              className="badge rounded-pill px-3 py-2 mb-3 text-uppercase fw-bold"
+              style={{ background: '#E0F2FE', color: '#075985', fontSize: '0.72rem', letterSpacing: '0.08em' }}
+            >
+              Get Connected
+            </span>
+            <h2 className="fw-bold mb-2" style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', letterSpacing: '-0.02em' }}>
               Connect With Your Local Para-Sports Community
-            </h3>
-            <p className="text-muted small">
-              Explore our nationwide network of recognized federations, district sports coordinators, and registered clubs.
+            </h2>
+            <p className="mb-0" style={{ color: '#64748B', fontSize: '1rem', lineHeight: 1.7 }}>
+              Find the people, clubs, and opportunities that help grow inclusive sport in every part of Rwanda.
             </p>
           </div>
 
-          <div className="row g-3">
-            <div className="col-md-4">
-              <Link
-                href="/members/dpsco"
-                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
-                style={{
-                  background: '#F8FAFC',
-                  border: '1.5px solid #E2E8F0',
-                  color: '#000000',
-                  transition: 'border-color 0.2s ease',
-                }}
-              >
-                <div className="d-flex align-items-center gap-2 mb-1">
-                  <i className="fas fa-map-location-dot text-primary" />
-                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
-                    District Sports Coordinators
-                  </span>
-                </div>
-                <p className="text-muted small mb-0">
-                  Find direct contact details for DPSCO representatives across Rwanda.
-                </p>
-              </Link>
-            </div>
+          <div className="row g-4">
+            {[
+              {
+                href: '/members/dpsco',
+                number: '01',
+                icon: 'fa-map-location-dot',
+                label: 'Nationwide Network',
+                title: 'District Sports Coordinators',
+                description: 'Find direct contact details for DPSCO representatives across Rwanda.',
+                action: 'Find a coordinator',
+                accent: '#0B5F9F',
+                tint: '#EAF4FC',
+              },
+              {
+                href: '/members/associations',
+                number: '02',
+                icon: 'fa-people-group',
+                label: 'Official Membership',
+                title: 'Clubs & Member Associations',
+                description: 'Browse officially affiliated sitting volleyball clubs, para-athletics associations, and basketball teams.',
+                action: 'Browse members',
+                accent: '#087F6E',
+                tint: '#E8F6F2',
+              },
+              {
+                href: '/volunteer',
+                number: '03',
+                icon: 'fa-hands-holding-circle',
+                label: 'Make a Difference',
+                title: 'Volunteer Program',
+                description: 'Support event operations, logistics, athlete assistance, and media coverage nationwide.',
+                action: 'Become a volunteer',
+                accent: '#A65B12',
+                tint: '#FFF3E5',
+              },
+            ].map((item) => (
+              <div className="col-md-6 col-lg-4" key={item.href}>
+                <Link
+                  href={item.href}
+                  className="sports-community-card h-100 d-flex flex-column text-decoration-none"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '18px',
+                    padding: 'clamp(1.35rem, 2.5vw, 1.75rem)',
+                    color: '#0F172A',
+                    boxShadow: '0 5px 18px rgba(15, 23, 42, 0.045)',
+                    transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-between mb-4">
+                    <span
+                      className="d-inline-flex align-items-center justify-content-center rounded-3"
+                      style={{ width: '52px', height: '52px', background: item.tint, color: item.accent, fontSize: '1.25rem' }}
+                    >
+                      <i className={`fas ${item.icon}`} aria-hidden="true" />
+                    </span>
+                    <span className="fw-bold" style={{ color: '#CBD5E1', fontSize: '0.85rem', letterSpacing: '0.08em' }}>
+                      {item.number}
+                    </span>
+                  </div>
 
-            <div className="col-md-4">
-              <Link
-                href="/members/associations"
-                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
-                style={{
-                  background: '#F8FAFC',
-                  border: '1.5px solid #E2E8F0',
-                  color: '#000000',
-                  transition: 'border-color 0.2s ease',
-                }}
-              >
-                <div className="d-flex align-items-center gap-2 mb-1">
-                  <i className="fas fa-users text-primary" />
-                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
-                    Clubs &amp; Member Associations
+                  <span
+                    className="text-uppercase fw-bold mb-2"
+                    style={{ color: item.accent, fontSize: '0.7rem', letterSpacing: '0.09em' }}
+                  >
+                    {item.label}
                   </span>
-                </div>
-                <p className="text-muted small mb-0">
-                  Browse officially affiliated sitting volleyball clubs, para-athletics associations, and basketball teams.
-                </p>
-              </Link>
-            </div>
+                  <h3 className="fw-bold mb-2" style={{ color: '#0F172A', fontSize: '1.18rem', lineHeight: 1.35 }}>
+                    {item.title}
+                  </h3>
+                  <p className="mb-4" style={{ color: '#64748B', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                    {item.description}
+                  </p>
 
-            <div className="col-md-4">
-              <Link
-                href="/volunteer"
-                className="p-3.5 rounded-3 d-block text-decoration-none h-100"
-                style={{
-                  background: '#F8FAFC',
-                  border: '1.5px solid #E2E8F0',
-                  color: '#000000',
-                  transition: 'border-color 0.2s ease',
-                }}
-              >
-                <div className="d-flex align-items-center gap-2 mb-1">
-                  <i className="fas fa-hands-helping text-primary" />
-                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
-                    Volunteer Program
+                  <span
+                    className="mt-auto d-inline-flex align-items-center gap-2 fw-bold"
+                    style={{ color: item.accent, fontSize: '0.88rem' }}
+                  >
+                    {item.action}
+                    <i className="fas fa-arrow-right" aria-hidden="true" />
                   </span>
-                </div>
-                <p className="text-muted small mb-0">
-                  Support event operations, logistics, athlete assistance, and media coverage nationwide.
-                </p>
-              </Link>
-            </div>
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
