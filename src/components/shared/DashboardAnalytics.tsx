@@ -23,7 +23,6 @@ type Analytics = {
     totalMessages: number; 
     volunteers: number; 
     pendingJobs: number; 
-    athleteEnquiries: number; 
     eventRegistrations: number; 
     sponsorInquiries: number; 
     activeSubscribers: number; 
@@ -232,7 +231,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 {[
                   data.engagement.unreadMessages > 0 ? `${data.engagement.unreadMessages} msg` : null,
                   data.engagement.pendingJobs > 0 ? `${data.engagement.pendingJobs} jobs` : null,
-                  data.engagement.athleteEnquiries > 0 ? `${data.engagement.athleteEnquiries} athletes` : null,
                   data.engagement.eventRegistrations > 0 ? `${data.engagement.eventRegistrations} events` : null,
                   data.engagement.sponsorInquiries > 0 ? `${data.engagement.sponsorInquiries} sponsors` : null,
                 ].filter(Boolean).join(' · ') || 'No pending items'}
@@ -365,33 +363,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                   </div>
                 </div>
 
-                {/* 3. Athlete Enquiries -> Navigates to Community Athlete Enquiries */}
-                <div className="col-sm-6 col-md-4 col-lg">
-                  <div 
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' })}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' }); } }}
-                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0D9488'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
-                    title="Open Athlete Intake Enquiries"
-                  >
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0D9488', textTransform: 'uppercase' }}>Athlete Intake</span>
-                        <i className="fas fa-person-running" style={{ color: '#0D9488', fontSize: '0.85rem' }} />
-                      </div>
-                      <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
-                        {number(data.engagement.athleteEnquiries)}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '0.7rem', color: '#0D9488', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>Review Intake</span>
-                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
-                    </div>
-                  </div>
-                </div>
+
               </div>
             </div>
           )}
@@ -600,17 +572,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 >
                   <span><i className="fas fa-briefcase text-purple me-2" style={{ color: '#7C3AED' }} />Pending job applications</span>
                   <strong>{number(data.engagement.pendingJobs)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
-                </div>
-
-                <div 
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleNav({ url: '/dashboard/community?tab=enquiries&sub=athleteEnquiries' })}
-                  style={{ cursor: 'pointer', transition: 'all 0.15s' }}
-                  title="Open Athlete Intake"
-                >
-                  <span><i className="fas fa-person-running text-teal me-2" style={{ color: '#0D9488' }} />Athlete enquiries</span>
-                  <strong>{number(data.engagement.athleteEnquiries)} <i className="fas fa-arrow-right text-muted ms-1" style={{ fontSize: '0.65rem' }} /></strong>
                 </div>
 
                 <div 
