@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import InstagramEmbed from '@/components/InstagramEmbed';
 import { useTranslation } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
@@ -919,6 +920,39 @@ export default function HomeClient() {
                         <h3 className="pro-ngo-video-card__title">{videoTitle}</h3>
                         <p className="pro-ngo-video-card__desc">{videoDesc}</p>
                       </div>
+                    </div>
+
+                    {/* Latest posts from the official X (Twitter) account */}
+                    <div className="pro-ngo-social-card mt-4" style={{ overflow: 'hidden' }}>
+                      <div className="pro-ngo-video-card__body">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <span className="badge text-white px-2 py-1" style={{ background: '#111' }}>
+                            <i className="fab fa-x-twitter me-1" aria-hidden="true" /> X / Twitter
+                          </span>
+                          <a
+                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npcrwanda'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-sm btn-outline-dark fw-bold rounded-pill"
+                          >
+                            <span>View Profile</span>
+                            <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
+                          </a>
+                        </div>
+                        <h3 className="pro-ngo-video-card__title mb-2">Latest Updates on X</h3>
+                        <div style={{ minHeight: '320px', maxHeight: '520px', overflowY: 'auto' }}>
+                          <a
+                            className="twitter-timeline"
+                            data-height="500"
+                            data-theme="light"
+                            data-chrome="noheader nofooter"
+                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npcrwanda'}
+                          >
+                            Posts by NPC Rwanda
+                          </a>
+                        </div>
+                      </div>
+                      <Script src="https://platform.twitter.com/widgets.js" strategy="lazyOnload" />
                     </div>
                   </div>
                 );
