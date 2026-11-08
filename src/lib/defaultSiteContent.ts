@@ -28,6 +28,17 @@ export const DEFAULT_SITE_CONTENT: Record<string, string> = {
   'about.bullet3': 'Inclusive Sports for All Abilities',
   'cta.title': 'Support Inclusive Sports in Rwanda',
   'cta.desc': 'Help us expand access, strengthen athlete pathways, and deliver excellence in para-sport.',
+  'community.eyebrow': 'Get Involved',
+  'community.title': 'Connect with NPC Rwanda',
+  'community.desc': 'Find your place in Rwanda’s para-sport community, connect with local coordinators, or support inclusive sport.',
+  'community.dpsco.title': 'District Sports Coordinators',
+  'community.dpsco.desc': 'Find district para-sport coordinators and local contacts.',
+  'community.associations.title': 'Clubs & Member Associations',
+  'community.associations.desc': 'Explore clubs and organizations that make up the NPC Rwanda community.',
+  'community.volunteer.title': 'Volunteer Program',
+  'community.volunteer.desc': 'Contribute your time and skills to inclusive sport in Rwanda.',
+  'community.partners.title': 'Partners & Supporters',
+  'community.partners.desc': 'Work with NPC Rwanda to strengthen opportunities for para-athletes.',
   'leadership.mandatePeriod': '2024–2028',
 
   // About Us Page
