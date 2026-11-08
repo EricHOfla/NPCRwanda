@@ -469,14 +469,6 @@ export default function SportsDevelopmentPage() {
                 District sports development camps and youth training sessions are scheduled in alignment with national championship calendars.
                 Aspiring athletes are encouraged to register their details below to receive early notifications.
               </p>
-              <a
-                href="#talent-registration"
-                className="btn btn-primary fw-bold px-4 py-2.5 rounded-3 d-inline-flex align-items-center gap-2"
-                style={{ background: '#0B5F9F', borderColor: '#0B5F9F' }}
-              >
-                <span>Register as an Aspiring Athlete</span>
-                <i className="fas fa-arrow-down" />
-              </a>
             </div>
           )}
         </div>
