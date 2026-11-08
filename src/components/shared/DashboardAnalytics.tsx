@@ -16,8 +16,8 @@ interface DashboardAnalyticsProps {
 type Analytics = {
   generatedAt: string;
   range: { days: number };
-  members: { athletes: number; activeAthletes: number; partners: number };
-  content: { publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number };
+  members: { athletes: number; activeAthletes: number; partners: number; totalUsers: number | null };
+  content: { totalAnnouncements: number; publishedNews: number; draftNews: number; upcomingEvents: number; totalEvents: number };
   engagement: { 
     unreadMessages: number; 
     totalMessages: number; 
@@ -250,6 +250,39 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
 
               <i className="fas fa-inbox" />
             </div>
+          </div>
+
+          <div className="live-analytics-kpis" style={{ marginTop: '12px' }}>
+            <div
+              className="live-analytics-kpi blue"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleNav({ tab: 'pages', page: 'news' })}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'pages', page: 'news' }); } }}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              title="Open announcement management"
+            >
+              <span>Announcements</span>
+              <strong>{number(data.content.totalAnnouncements)}</strong>
+              <small>All announcement records</small>
+              <i className="fas fa-bullhorn" />
+            </div>
+            {data.members.totalUsers !== null && (
+              <div
+                className="live-analytics-kpi violet"
+                role="button"
+                tabIndex={0}
+                onClick={() => handleNav({ tab: 'users' })}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'users' }); } }}
+                style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                title="Open user management"
+              >
+                <span>System Users</span>
+                <strong>{number(data.members.totalUsers)}</strong>
+                <small>Registered admin accounts</small>
+                <i className="fas fa-user-shield" />
+              </div>
+            )}
           </div>
 
           {/* Explicit Specification Panel for the 21 Pending Work Requests (each tile navigates directly) */}
