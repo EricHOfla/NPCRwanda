@@ -539,7 +539,7 @@ export default function HomeClient() {
                 </div>
                 <div className="pro-ngo-about__bullet">
                   <i className="fas fa-circle-check" aria-hidden="true" />
-                  <span>{getSiteText('about.bullet2', t('phrase.Presence in all 30 Districts (DPSCO)'))}</span>
+                  <span>{hasDistrictCount ? getSiteText('about.bullet2', t('phrase.District Sports Coordinators support local para-sport development.')) : t('phrase.District Sports Coordinators support local para-sport development.')}</span>
                 </div>
                 <div className="pro-ngo-about__bullet">
                   <i className="fas fa-circle-check" aria-hidden="true" />
