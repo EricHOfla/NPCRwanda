@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const [
       athletes, activeAthletes, athleteSports, partners, publishedNews, draftNews,
       upcomingEvents, totalEvents, unreadMessages, totalMessages, volunteers,
-      pendingJobs, athleteEnquiries, eventRegistrations, sponsorInquiries,
+      pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
       allSuccessfulTotals
     ] = await Promise.all([
@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
       prisma.contactMessage.count(),
       prisma.volunteerApplication.count(),
       prisma.jobApplication.count({ where: { status: 'Pending' } }),
-      prisma.athleteEnquiry.count({ where: { status: { in: ['New', 'Pending'] } } }),
       prisma.eventRegistration.count({ where: { status: { in: ['Pending', 'New'] } } }),
       prisma.sponsorInquiry.count({ where: { status: { in: ['New', 'Pending'] } } }),
       prisma.subscriber.count({ where: { active: true } }),
@@ -79,8 +78,8 @@ export async function GET(request: NextRequest) {
       content: { publishedNews, draftNews, upcomingEvents, totalEvents },
       engagement: {
         unreadMessages, totalMessages, volunteers, pendingJobs,
-        athleteEnquiries, eventRegistrations, sponsorInquiries, activeSubscribers,
-        pendingWork: unreadMessages + pendingJobs + athleteEnquiries + eventRegistrations + sponsorInquiries
+        eventRegistrations, sponsorInquiries, activeSubscribers,
+        pendingWork: unreadMessages + pendingJobs + eventRegistrations + sponsorInquiries
       },
       donations: {
         rangeRwf: successfulPayments.filter((p) => p.currency === 'RWF').reduce((sum, p) => sum + p.amount, 0),
