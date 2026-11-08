@@ -281,13 +281,6 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
               <span>Training Programmes</span><strong>{number(data.content.trainingPrograms)}</strong>
               <small>All programme records</small><i className="fas fa-dumbbell" />
             </div>
-            <div className="live-analytics-kpi amber" role="button" tabIndex={0}
-              onClick={() => handleNav({ url: '/dashboard/community' })}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ url: '/dashboard/community' }); } }}
-              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="Open sports development management">
-              <span>Competition Results</span><strong>{number(data.content.competitionResults)}</strong>
-              <small>All recorded results</small><i className="fas fa-medal" />
-            </div>
           </div>
 
           {/* Explicit Specification Panel for the 21 Pending Work Requests (each tile navigates directly) */}
