@@ -83,10 +83,34 @@ export default function HomeClient() {
   ];
 
   const xFeedRef = useRef<HTMLDivElement>(null);
-  const xEmbedUrl = getSiteText(
-    'media.twitterEmbedUrl',
-    configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://x.com/npc_rwanda'
+
+  // Accept either a username (@npc_rwanda) or a full X/Twitter profile URL from the admin.
+  const formatXProfileUrl = (value: string): string => {
+    const input = (value || '').trim();
+    const fallback = 'https://twitter.com/npc_rwanda';
+    if (!input) return fallback;
+
+    const withoutAt = input.replace(/^@/, '');
+    try {
+      const candidate = /^https?:\/\//i.test(withoutAt) ? withoutAt : `https://twitter.com/${withoutAt}`;
+      const parsed = new URL(candidate);
+      const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+      if (!['x.com', 'twitter.com', 'mobile.twitter.com'].includes(host)) return fallback;
+      const username = parsed.pathname.split('/').filter(Boolean)[0];
+      if (!username || ['home', 'explore', 'search', 'i', 'intent'].includes(username.toLowerCase())) return fallback;
+      return `https://twitter.com/${username}`;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const xProfileUrl = formatXProfileUrl(
+    getSiteText(
+      'media.twitterEmbedUrl',
+      configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || '@npc_rwanda'
+    )
   );
+  const xEmbedUrl = xProfileUrl;
 
   useEffect(() => {
     const xWindow = window as Window & {
@@ -943,7 +967,7 @@ export default function HomeClient() {
                             <i className="fab fa-x-twitter me-1" aria-hidden="true" /> X / Twitter
                           </span>
                           <a
-                            href={configuredSocials.find(s => s.platform === 'twitter' || s.platform === 'x')?.url || 'https://twitter.com/npc_rwanda'}
+                            href={xProfileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-outline-dark fw-bold rounded-pill"
@@ -958,10 +982,12 @@ export default function HomeClient() {
                             className="twitter-timeline"
                             data-height="500"
                             data-theme="light"
-                            data-chrome="noheader nofooter"
+                            data-chrome="noheader nofooter noborders"
+                            data-tweet-limit="5"
+                            data-dnt="true"
                             href={xEmbedUrl}
                           >
-                            Posts by NPC Rwanda
+                            View recent posts from NPC Rwanda on X
                           </a>
                         </div>
                       </div>
