@@ -3320,8 +3320,8 @@ export default function DashboardPage() {
 
                       {/* Social Media Hub Settings */}
                       <div className="custom-card p-4">
-                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fab fa-youtube me-2" /><i className="fab fa-instagram me-2" />Social Media Hub Settings (YouTube & Instagram)</h4>
-                        <p className="small text-muted mb-3">Control the YouTube video embed and Instagram spotlight card shown on the homepage &ldquo;Stay Updated&rdquo; section.</p>
+                        <h4 className="h6 fw-bold mb-3 border-bottom pb-2 text-primary"><i className="fab fa-youtube me-2" /><i className="fab fa-instagram me-2" />Social Media Hub Settings (YouTube, Instagram & X)</h4>
+                        <p className="small text-muted mb-3">Control the YouTube, Instagram, and X embeds shown in the homepage &ldquo;Stay Updated&rdquo; section.</p>
                         <div className="row g-3">
                           {/* YouTube Settings */}
                           <div className="col-12">
@@ -3339,6 +3339,16 @@ export default function DashboardPage() {
                           <div className="col-md-6">
                             <label className="form-label small fw-bold">Video Section Description</label>
                             <input type="text" className="form-control" value={siteForm['media.videoDesc'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.videoDesc': e.target.value })} placeholder="Watch tournament highlights, athlete training diaries, and institutional coverage across all Rwanda para-sport disciplines." />
+                          </div>
+
+                          {/* X / Twitter Settings */}
+                          <div className="col-12 pt-3 border-top">
+                            <span className="badge text-white mb-1" style={{ background: '#111' }}><i className="fab fa-x-twitter me-1" /> X / Twitter Feed</span>
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-bold">X / Twitter URL to Embed</label>
+                            <input type="url" className="form-control" value={siteForm['media.twitterEmbedUrl'] || ''} onChange={e => setSiteForm({ ...siteForm, 'media.twitterEmbedUrl': e.target.value })} placeholder="https://x.com/npc_rwanda" />
+                            <div className="form-text">Paste the public X profile URL whose latest posts should appear on the homepage. Example: https://x.com/npc_rwanda</div>
                           </div>
 
                           {/* Instagram Settings */}
@@ -3374,7 +3384,7 @@ export default function DashboardPage() {
                         <button 
                           type="button" 
                           disabled={pageSaving || !canUpdateContent}
-                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramPostUrl'])}
+                          onClick={() => handleSectionSave(['hero.kicker', 'hero.title1', 'hero.title2', 'hero.lead', 'hero.image', 'hero.showcaseBadge', 'hero.showcaseTitle', 'hero.showcaseDesc', 'hero.stat1.title', 'hero.stat1.desc', 'hero.stat2.title', 'hero.stat2.desc', 'hero.stat3.title', 'hero.stat3.desc', 'hero.stat4.title', 'hero.stat4.desc', 'about.eyebrow', 'about.previewTitle', 'about.previewText', 'about.previewImage', 'about.bullet1', 'about.bullet2', 'about.bullet3', 'cta.title', 'cta.desc', 'media.youtubeUrl', 'media.videoTitle', 'media.videoDesc', 'media.instagramTitle', 'media.instagramSubtitle', 'media.instagramDesc', 'media.instagramPostUrl', 'media.twitterEmbedUrl'])}
                           className="btn btn-primary fw-bold px-4 py-2"
                         >
                           <i className={`fas ${pageSaving ? 'fa-spinner fa-spin' : 'fa-save'} me-2`} /> {pageSaving ? 'Saving...' : 'Save Home Page Content'}
