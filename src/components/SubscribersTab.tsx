@@ -23,7 +23,6 @@ export default function SubscribersTab() {
   const [actionMsg, setActionMsg] = useState('');
   const [actionError, setActionError] = useState('');
   const [pendingSubscriberId, setPendingSubscriberId] = useState<string | null>(null);
-  const [cleaningSpam, setCleaningSpam] = useState(false);
 
   // Search & Filter state
   const [search, setSearch] = useState('');
@@ -95,33 +94,6 @@ export default function SubscribersTab() {
     }
   };
 
-  const handleCleanSpam = async () => {
-    const wipeAll = confirm(
-      'Spam Cleanup Options:\n\n' +
-      'Click OK to remove detected bot/test/disposable subscriber emails from the database.\n' +
-      'Click Cancel to keep all records.'
-    );
-    if (!wipeAll) return;
-
-    try {
-      setCleaningSpam(true);
-      setActionError('');
-      setActionMsg('');
-      const res = await fetch('/api/admin/clean-spam', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: 'subscribers', mode: 'spam' }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to clean spam subscribers');
-      await fetchSubscribers();
-      setActionMsg(`Cleanup completed: ${data.cleaned?.subscribers ?? 0} spam subscriber(s) removed.`);
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Error cleaning subscribers');
-    } finally {
-      setCleaningSpam(false);
-    }
-  };
 
   const fetchSubscribers = useCallback(async () => {
     try {
@@ -364,6 +336,51 @@ export default function SubscribersTab() {
           border-collapse: separate;
           border-spacing: 0;
           font-size: 0.9rem;
+          table-layout: fixed;
+        }
+
+        /* Keep the subscriber table aligned to the full dashboard content area. */
+        .subscribers-page-container,
+        .subscribers-page-container * {
+          box-sizing: border-box;
+        }
+
+        .subscribers-page-container,
+        .subscribers-card,
+        .subscribers-desktop-table {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .subscribers-desktop-table {
+          overflow-x: auto;
+          border: 1px solid #E2E8F0;
+          border-radius: 10px;
+        }
+
+        .subscribers-table {
+          min-width: 820px;
+        }
+
+        .subscribers-table td {
+          overflow-wrap: anywhere;
+        }
+
+        @media (min-width: 1200px) {
+          .subscribers-desktop-table {
+            overflow-x: visible;
+          }
+
+          .subscribers-table {
+            min-width: 0;
+            table-layout: fixed;
+          }
+
+          .subscribers-table .subscribers-col-email { width: 30%; min-width: 0; }
+          .subscribers-table .subscribers-col-status { width: 14%; min-width: 0; }
+          .subscribers-table .subscribers-col-categories { width: 26%; min-width: 0; }
+          .subscribers-table .subscribers-col-date { width: 16%; min-width: 0; }
+          .subscribers-table .subscribers-col-actions { width: 14%; min-width: 0; }
         }
 
         .subscribers-table th {
@@ -659,16 +676,6 @@ export default function SubscribersTab() {
               <p style={{ margin: '3px 0 0', fontSize: '0.86rem', color: '#64748B' }}>Manage subscriber list, inspect engagement, and broadcast official newsletters.</p>
             </div>
             <div className="subscribers-header-actions">
-              <button
-                type="button"
-                onClick={handleCleanSpam}
-                disabled={cleaningSpam || loading}
-                className="btn btn-outline-danger btn-sm fw-bold px-3 py-2 d-inline-flex align-items-center gap-2"
-                title="Detect and clean fake or bot email addresses"
-              >
-                <i className={`fas ${cleaningSpam ? 'fa-spinner fa-spin' : 'fa-broom'}`} />
-                {cleaningSpam ? 'Cleaning…' : 'Clean Spam'}
-              </button>
               <button
                 type="button"
                 onClick={() => setComposeOpen(true)}
