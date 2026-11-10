@@ -1950,7 +1950,7 @@ export default function DashboardPage() {
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>
                       Welcome back, {profile.name || 'Admin'}!
                     </h2>
-                    <p style={{ fontSize: '0.86rem', color: '#64748B', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
+                    <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.88)', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
                       National Paralympic Committee (NPC) Rwanda Management Portal · Today is {currentDateString || 'Loading date...'}.
                     </p>
                   </div>
