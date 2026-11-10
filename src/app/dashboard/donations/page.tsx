@@ -311,7 +311,7 @@ function DonationManagementContent() {
           {/* Hero Banner */}
           <div
             style={{
-              background: 'linear-gradient(135deg, #64748B 0%, #475569 100%)',
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
               borderRadius: '16px',
               padding: '24px 28px',
               color: '#FFFFFF',
