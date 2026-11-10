@@ -166,7 +166,6 @@ export default function AppSidebar({
           ...(canAccessCommunity ? [{ id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports Development', icon: 'fa-chart-line' }] : []),
           ...(canAccessDonations ? [
             { id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' },
-            { id: 'donations-logs', type: 'link' as const, href: '/dashboard/donations/logs', label: 'Payment Logs', icon: 'fa-clipboard-list' },
           ] : []),
           ...(canAccessMembers ? [{ id: 'members', type: 'tab' as const, tabId: 'members', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' }] : []),
           ...(canAccessUsers ? [{ id: 'users', type: 'tab' as const, tabId: 'users', href: '/dashboard?tab=users', label: 'User Management', icon: 'fa-user-shield' }] : []),
