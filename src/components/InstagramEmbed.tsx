@@ -85,7 +85,7 @@ export default function InstagramEmbed({ postUrl }: InstagramEmbedProps) {
       <style jsx>{`
         .instagram-embed-compact {
           width: 100%;
-          height: 480px;
+          height: 520px;
           overflow: hidden;
           border-radius: 12px;
           display: flex;
@@ -100,16 +100,16 @@ export default function InstagramEmbed({ postUrl }: InstagramEmbedProps) {
         }
 
         .instagram-embed-compact :global(iframe) {
-          max-height: 480px !important;
+          max-height: 520px !important;
         }
 
         @media (max-width: 576px) {
           .instagram-embed-compact {
-            height: 440px;
+            height: 480px;
           }
 
           .instagram-embed-compact :global(iframe) {
-            max-height: 440px !important;
+            max-height: 480px !important;
           }
         }
       `}</style>
