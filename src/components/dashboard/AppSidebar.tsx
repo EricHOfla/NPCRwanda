@@ -164,7 +164,10 @@ export default function AppSidebar({
       ? [
           { type: 'header' as const, label: 'MANAGEMENT' },
           ...(canAccessCommunity ? [{ id: 'community-sports', type: 'link' as const, href: '/dashboard/community', label: 'Sports Development', icon: 'fa-chart-line' }] : []),
-          ...(canAccessDonations ? [{ id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' }] : []),
+          ...(canAccessDonations ? [
+            { id: 'donations-payments', type: 'link' as const, href: '/dashboard/donations', label: 'Donation Payments', icon: 'fa-hand-holding-heart' },
+            { id: 'donations-logs', type: 'link' as const, href: '/dashboard/donations/logs', label: 'Payment Logs', icon: 'fa-clipboard-list' },
+          ] : []),
           ...(canAccessMembers ? [{ id: 'members', type: 'tab' as const, tabId: 'members', href: '/dashboard?tab=members', label: 'Members Directory', icon: 'fa-users-cog' }] : []),
           ...(canAccessUsers ? [{ id: 'users', type: 'tab' as const, tabId: 'users', href: '/dashboard?tab=users', label: 'User Management', icon: 'fa-user-shield' }] : []),
           ...(canAccessInbox ? [{ id: 'contacts', type: 'tab' as const, tabId: 'contacts', href: '/dashboard?tab=contacts', label: 'Inbox Messages', icon: 'fa-envelope' }] : []),
