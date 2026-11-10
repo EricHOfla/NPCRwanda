@@ -51,7 +51,7 @@ async function readWebsiteTraffic(from: Date, days: number) {
 
         const [, ip, timestamp, method, rawTarget, statusText, rawReferrer, userAgent] = match;
         if (method !== 'GET' || Number(statusText) < 200 || Number(statusText) >= 400) continue;
-        if (/bot|crawler|spider|slurp|headless|preview|monitor|uptime|curl|wget|python-requests|facebookexternalhit|whatsapp|MSIE [1-8]\\.|Windows 98|AOL/i.test(userAgent)) continue;
+        if (/bot|crawler|spider|slurp|headless|preview|monitor|uptime|curl|wget|python-requests|facebookexternalhit|whatsapp|MSIE [1-8]|Windows 98|AOL/i.test(userAgent)) continue;
         if (rawTarget.includes('_rsc=') || rawTarget.includes('__next')) continue;
 
         const pathname = rawTarget.split('?')[0];
