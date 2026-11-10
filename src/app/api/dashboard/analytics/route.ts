@@ -22,9 +22,17 @@ async function readWebsiteTraffic(from: Date, days: number) {
   const dayMap = new Map<string, TrafficDay>();
   const pageCounts = new Map<string, number>();
   const referrerCounts = new Map<string, number>();
+  const sourceCounts = new Map<string, number>();
+  const deviceCounts = new Map<string, number>();
+  const browserCounts = new Map<string, number>();
+  const osCounts = new Map<string, number>();
+  const visitorDays = new Map<string, Set<string>>();
+  const hourlyCounts = new Map<string, number>();
   const visitorHashes = new Set<string>();
   const visitorHashesByDay = new Map<string, Set<string>>();
   let pageViews = 0;
+  let notFoundPages = 0;
+  let downloads = 0;
 
   for (let index = 0; index < days; index += 1) {
     const date = new Date(from);
@@ -50,16 +58,21 @@ async function readWebsiteTraffic(from: Date, days: number) {
         if (!match) continue;
 
         const [, ip, timestamp, method, rawTarget, statusText, rawReferrer, userAgent] = match;
-        if (method !== 'GET' || Number(statusText) < 200 || Number(statusText) >= 400) continue;
+        if (method !== 'GET') continue;
         if (/bot|crawler|spider|slurp|headless|preview|monitor|uptime|curl|wget|python-requests|facebookexternalhit|whatsapp|MSIE [1-8]|Windows 98|AOL/i.test(userAgent)) continue;
         if (rawTarget.includes('_rsc=') || rawTarget.includes('__next')) continue;
 
         const pathname = rawTarget.split('?')[0];
         if (!pathname.startsWith('/') || pathname.startsWith('/api/') || pathname.startsWith('/_next/')) continue;
-        if (/\.(?:avif|css|csv|gif|ico|jpe?g|js|json|map|pdf|png|svg|txt|webp|woff2?|xml|zip)$/i.test(pathname)) continue;
-
         const parsedDate = new Date(timestamp.replace(/^(\d{2})\/([A-Za-z]{3})\/(\d{4}):/, '$2 $1 $3 '));
         if (Number.isNaN(parsedDate.getTime()) || parsedDate < from) continue;
+        const status = Number(statusText);
+        const isDownload = /\.(?:pdf|docx?|xlsx?|pptx?|zip)$/i.test(pathname);
+        if (status >= 200 && status < 400 && isDownload) downloads += 1;
+        if (status === 404 && !/\.(?:avif|css|csv|gif|ico|jpe?g|js|json|map|png|svg|txt|webp|woff2?|xml)$/i.test(pathname)) notFoundPages += 1;
+        if (status < 200 || status >= 400 || isDownload) continue;
+        if (/\.(?:avif|css|csv|gif|ico|jpe?g|js|json|map|png|svg|txt|webp|woff2?|xml)$/i.test(pathname)) continue;
+
         const day = parsedDate.toISOString().slice(0, 10);
         const bucket = dayMap.get(day);
         if (!bucket) continue;
@@ -74,18 +87,33 @@ async function readWebsiteTraffic(from: Date, days: number) {
           .digest('hex');
         visitorHashes.add(visitorHash);
         visitorHashesByDay.get(day)?.add(visitorHash);
+        const seenDays = visitorDays.get(visitorHash) || new Set<string>();
+        seenDays.add(day);
+        visitorDays.set(visitorHash, seenDays);
 
-        if (rawReferrer && rawReferrer !== '-' ) {
+        const hour = String(parsedDate.getHours()).padStart(2, '0') + ':00';
+        hourlyCounts.set(hour, (hourlyCounts.get(hour) || 0) + 1);
+        const device = /ipad|tablet/i.test(userAgent) ? 'Tablet' : /mobile|android|iphone|ipod/i.test(userAgent) ? 'Mobile' : 'Desktop';
+        deviceCounts.set(device, (deviceCounts.get(device) || 0) + 1);
+        const browser = /edg\//i.test(userAgent) ? 'Edge' : /opr\//i.test(userAgent) ? 'Opera' : /firefox\//i.test(userAgent) ? 'Firefox' : /chrome\//i.test(userAgent) ? 'Chrome' : /safari\//i.test(userAgent) ? 'Safari' : 'Other';
+        browserCounts.set(browser, (browserCounts.get(browser) || 0) + 1);
+        const os = /android/i.test(userAgent) ? 'Android' : /iphone|ipad|ipod/i.test(userAgent) ? 'iOS' : /windows/i.test(userAgent) ? 'Windows' : /mac os/i.test(userAgent) ? 'macOS' : /linux/i.test(userAgent) ? 'Linux' : 'Other';
+        osCounts.set(os, (osCounts.get(os) || 0) + 1);
+
+        let source = 'Direct';
+        if (rawReferrer && rawReferrer !== '-') {
           try {
             const referrerUrl = new URL(rawReferrer);
-            const hostname = referrerUrl.hostname.replace(/^www\./, '');
-            if (hostname && hostname !== 'npcrwanda.org' && hostname !== 'www.npcrwanda.org') {
+            const hostname = referrerUrl.hostname.replace(/^www\./, '').toLowerCase();
+            if (hostname && hostname !== 'npcrwanda.org') {
               referrerCounts.set(hostname, (referrerCounts.get(hostname) || 0) + 1);
+              source = /google\.|bing\.|yahoo\.|duckduckgo\./i.test(hostname) ? 'Search' : /facebook\.|instagram\.|linkedin\.|x\.com|twitter\.|tiktok\.|youtube\./i.test(hostname) ? 'Social' : 'Referral';
             }
           } catch {
             // Ignore malformed referrer values.
           }
         }
+        sourceCounts.set(source, (sourceCounts.get(source) || 0) + 1);
       }
     }
 
@@ -98,12 +126,18 @@ async function readWebsiteTraffic(from: Date, days: number) {
       available: true,
       pageViews,
       uniqueVisitors: visitorHashes.size,
+      returningVisitors: Array.from(visitorDays.values()).filter((seen) => seen.size > 1).length,
+      notFoundPages,
+      downloads,
       daily: Array.from(dayMap.values()),
-      topPages: Array.from(pageCounts, ([page, views]) => ({ page, views }))
-        .sort((a, b) => b.views - a.views).slice(0, 8),
-      referrers: Array.from(referrerCounts, ([source, visits]) => ({ source, visits }))
-        .sort((a, b) => b.visits - a.visits).slice(0, 8),
-      note: 'Traffic is read from the public Nginx access log. Unique visitors are approximate and based on IP addresses; raw IPs are not returned or stored by this report.'
+      hourly: Array.from(hourlyCounts, ([hour, views]) => ({ hour, views })).sort((a, b) => a.hour.localeCompare(b.hour)),
+      devices: Array.from(deviceCounts, ([name, visits]) => ({ name, visits })).sort((a, b) => b.visits - a.visits),
+      browsers: Array.from(browserCounts, ([name, visits]) => ({ name, visits })).sort((a, b) => b.visits - a.visits),
+      operatingSystems: Array.from(osCounts, ([name, visits]) => ({ name, visits })).sort((a, b) => b.visits - a.visits),
+      sources: Array.from(sourceCounts, ([name, visits]) => ({ name, visits })).sort((a, b) => b.visits - a.visits),
+      topPages: Array.from(pageCounts, ([page, views]) => ({ page, views })).sort((a, b) => b.views - a.views).slice(0, 8),
+      referrers: Array.from(referrerCounts, ([source, visits]) => ({ source, visits })).sort((a, b) => b.visits - a.visits).slice(0, 8),
+      note: 'Traffic is read from the public Nginx access log. Visitor counts are approximate and use hashed IP addresses. Device, browser and operating-system details are inferred from browser user-agent strings.'
     };
   } catch (error) {
     console.error('[Dashboard analytics] Website traffic log unavailable:', error);
