@@ -62,6 +62,10 @@ function DonationManagementContent() {
   const debouncedPaymentSearch = useDebounce(paymentSearch, 300);
   const [paymentPage, setPaymentPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [activeTab, setActiveTab] = useState<'payments' | 'logs'>('payments');
+  const [paymentLogs, setPaymentLogs] = useState<Array<{ id: string; txRef: string; event: string; status: string; source: string; message: string; createdAt: string }>>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsError, setLogsError] = useState('');
 
   // Common UI State
   const [loading, setLoading] = useState(true);
@@ -127,6 +131,27 @@ function DonationManagementContent() {
   }, []); // run once on mount
 
   const isAuthorized = hasPermission(userProfile.role, 'donations.view');
+
+  useEffect(() => {
+    if (activeTab !== 'logs' || !isAuthorized) return;
+    let cancelled = false;
+    const loadLogs = async () => {
+      setLogsLoading(true);
+      setLogsError('');
+      try {
+        const response = await fetch('/api/donations/logs?page=1&pageSize=50', { cache: 'no-store' });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || 'Unable to load payment logs.');
+        if (!cancelled) setPaymentLogs(payload.logs || []);
+      } catch (err) {
+        if (!cancelled) setLogsError(err instanceof Error ? err.message : 'Unable to load payment logs.');
+      } finally {
+        if (!cancelled) setLogsLoading(false);
+      }
+    };
+    void loadLogs();
+    return () => { cancelled = true; };
+  }, [activeTab, isAuthorized]);
 
   // Reset payment pagination when filters change.
   useEffect(() => {
@@ -415,6 +440,17 @@ function DonationManagementContent() {
             </div>
           </div>
 
+          <div className="d-flex flex-wrap gap-2 mb-3" role="tablist" aria-label="Donation management sections">
+            <button type="button" role="tab" aria-selected={activeTab === 'payments'} onClick={() => setActiveTab('payments')} className={`btn btn-sm ${activeTab === 'payments' ? 'btn-primary' : 'btn-outline-secondary'}`}>
+              <i className="fas fa-money-bill-transfer me-2" /> Donation Payments
+            </button>
+            <button type="button" role="tab" aria-selected={activeTab === 'logs'} onClick={() => setActiveTab('logs')} className={`btn btn-sm ${activeTab === 'logs' ? 'btn-primary' : 'btn-outline-secondary'}`}>
+              <i className="fas fa-clipboard-list me-2" /> Payment Logs
+            </button>
+          </div>
+
+          {activeTab === 'payments' && (
+          <>
           {/* Online Payment Transactions */}
           <section style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
               {/* Header with Search and Filters */}
@@ -703,6 +739,39 @@ function DonationManagementContent() {
                 </span>
               </div>
           </section>
+          </>
+          )}
+
+          {activeTab === 'logs' && (
+            <section className="card border-0 shadow-sm" style={{ borderRadius: 14, overflow: 'hidden' }}>
+              <div className="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+                <div><h2 className="h6 fw-bold mb-1">Donation Payment Logs</h2><p className="small text-muted mb-0">Checkout, verification, webhook and receipt activity.</p></div>
+                <button type="button" className="btn btn-sm btn-outline-primary" onClick={async () => {
+                  setLogsLoading(true); setLogsError('');
+                  try { const response = await fetch('/api/donations/logs?page=1&pageSize=50', { cache: 'no-store' }); const payload = await response.json().catch(() => ({})); if (!response.ok) throw new Error(payload.error || 'Unable to load payment logs.'); setPaymentLogs(payload.logs || []); }
+                  catch (err) { setLogsError(err instanceof Error ? err.message : 'Unable to load payment logs.'); }
+                  finally { setLogsLoading(false); }
+                }} disabled={logsLoading}><i className={`fas fa-rotate me-1 ${logsLoading ? 'fa-spin' : ''}`} /> Refresh Logs</button>
+              </div>
+              {logsError && <div className="alert alert-danger m-3 mb-0">{logsError}</div>}
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0">
+                  <thead className="table-light"><tr><th>Date &amp; Time</th><th>Event</th><th>Reference</th><th>Status</th><th>Source</th><th>Details</th></tr></thead>
+                  <tbody>
+                    {logsLoading ? <tr><td colSpan={6} className="text-center py-5"><i className="fas fa-spinner fa-spin me-2" />Loading payment logs…</td></tr>
+                    : paymentLogs.length ? paymentLogs.map((log) => <tr key={log.id}>
+                      <td className="small text-nowrap">{new Date(log.createdAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+                      <td className="small fw-semibold">{log.event.replaceAll('_', ' ')}</td>
+                      <td><code className="small">{log.txRef}</code></td>
+                      <td><span className={`badge ${log.status === 'SUCCESSFUL' ? 'bg-success-subtle text-success' : log.status === 'FAILED' ? 'bg-danger-subtle text-danger' : log.status === 'PENDING' ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary'}`}>{log.status}</span></td>
+                      <td className="small">{log.source}</td><td className="small" style={{ minWidth: 220, whiteSpace: 'normal' }}>{log.message}</td>
+                    </tr>) : <tr><td colSpan={6} className="text-center text-muted py-5">No payment logs have been recorded yet.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+              <div className="card-footer bg-white small text-muted">Showing the latest {paymentLogs.length} events. Use Refresh Logs to fetch the latest activity.</div>
+            </section>
+          )}
 
             </>
           )}
