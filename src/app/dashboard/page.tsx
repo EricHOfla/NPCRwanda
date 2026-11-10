@@ -2097,125 +2097,6 @@ export default function DashboardPage() {
                 );
               })()}
 
-              {/* Role-Aware Middle Section */}
-              {!isEditor ? (
-                /* Super Admin / Admin: Live database analytics */
-                <DashboardAnalytics 
-                  onNavigate={(action) => {
-                    if (action.url) {
-                      router.push(action.url);
-                      return;
-                    }
-                    if (action.tab === 'community') {
-                      router.push('/dashboard/community');
-                      return;
-                    }
-                    if (action.tab === 'pages') {
-                      setAdminTab('pages');
-                      if (action.page) setActiveEditPage(action.page);
-                      return;
-                    }
-                    if (action.tab === 'contacts') {
-                      setAdminTab('contacts');
-                      if (action.subtab && ['messages', 'volunteers', 'applications'].includes(action.subtab)) {
-                        setInboxSubTab(action.subtab as any);
-                      }
-                      return;
-                    }
-                    if (action.tab) {
-                      setAdminTab(action.tab as any);
-                      if (action.page) setActiveEditPage(action.page);
-                    }
-                  }}
-                />
-              ) : (
-                /* Editor: Editorial Content Workspace */
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ marginBottom: '14px' }}>
-                    <h3 style={{ margin: 0, color: '#0F172A', fontSize: '1.1rem', fontWeight: 800 }}>Editorial Content Workspace</h3>
-                    <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.82rem' }}>Quick overview of live content and directories you can edit</p>
-                  </div>
-                  <div className="row g-3">
-                    <div className="col-sm-6 col-lg-3">
-                      <div 
-                        onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); }}
-                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>News Room</span>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-newspaper" style={{ fontSize: '0.8rem' }} />
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
-                          {news.filter(n => !isAnnouncementCategory(n.category)).length}
-                        </div>
-                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Published articles</span>
-                      </div>
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
-                      <div 
-                        onClick={() => { setAdminTab('pages'); setActiveEditPage('announcements'); }}
-                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Announcements</span>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FEF3C7', color: '#92400E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-bullhorn" style={{ fontSize: '0.8rem' }} />
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
-                          {news.filter(n => isAnnouncementCategory(n.category)).length}
-                        </div>
-                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Active public notices</span>
-                      </div>
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
-                      <div 
-                        onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); }}
-                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Athletes Directory</span>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-person-running" style={{ fontSize: '0.8rem' }} />
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
-                          {athletes.length}
-                        </div>
-                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Registered profiles</span>
-                      </div>
-                    </div>
-                    <div className="col-sm-6 col-lg-3">
-                      <div 
-                        onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); }}
-                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Upcoming Events</span>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EDE9FE', color: '#6D28D9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <i className="fas fa-calendar-alt" style={{ fontSize: '0.8rem' }} />
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
-                          {upcomingEventsList.length}
-                        </div>
-                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Scheduled competitions</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Two-Column Grid */}
               <div className="row g-4">
                 
@@ -2533,6 +2414,126 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+
+              {/* Role-Aware Middle Section */}
+              {!isEditor ? (
+                /* Super Admin / Admin: Live database analytics */
+                <DashboardAnalytics 
+                  onNavigate={(action) => {
+                    if (action.url) {
+                      router.push(action.url);
+                      return;
+                    }
+                    if (action.tab === 'community') {
+                      router.push('/dashboard/community');
+                      return;
+                    }
+                    if (action.tab === 'pages') {
+                      setAdminTab('pages');
+                      if (action.page) setActiveEditPage(action.page);
+                      return;
+                    }
+                    if (action.tab === 'contacts') {
+                      setAdminTab('contacts');
+                      if (action.subtab && ['messages', 'volunteers', 'applications'].includes(action.subtab)) {
+                        setInboxSubTab(action.subtab as any);
+                      }
+                      return;
+                    }
+                    if (action.tab) {
+                      setAdminTab(action.tab as any);
+                      if (action.page) setActiveEditPage(action.page);
+                    }
+                  }}
+                />
+              ) : (
+                /* Editor: Editorial Content Workspace */
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '14px' }}>
+                    <h3 style={{ margin: 0, color: '#0F172A', fontSize: '1.1rem', fontWeight: 800 }}>Editorial Content Workspace</h3>
+                    <p style={{ margin: '4px 0 0', color: '#64748B', fontSize: '0.82rem' }}>Quick overview of live content and directories you can edit</p>
+                  </div>
+                  <div className="row g-3">
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('news'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>News Room</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-newspaper" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {news.filter(n => !isAnnouncementCategory(n.category)).length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Published articles</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('announcements'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Announcements</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FEF3C7', color: '#92400E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-bullhorn" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {news.filter(n => isAnnouncementCategory(n.category)).length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Active public notices</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Athletes Directory</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E0F2FE', color: '#0369A1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-person-running" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {athletes.length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Registered profiles</span>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div 
+                        onClick={() => { setAdminTab('pages'); setActiveEditPage('events'); }}
+                        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#0072C6'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'none'; }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Upcoming Events</span>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#EDE9FE', color: '#6D28D9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-calendar-alt" style={{ fontSize: '0.8rem' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                          {upcomingEventsList.length}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#64748B' }}>Scheduled competitions</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
 
           {/* ──────────────────────────────
              TAB: PAGES CMS
