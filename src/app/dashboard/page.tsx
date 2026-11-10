@@ -1926,42 +1926,43 @@ export default function DashboardPage() {
               <div 
                 className="dashboard-welcome-banner"
                 style={{ 
-                  background: 'linear-gradient(135deg, #074783 0%, #0b63b6 50%, #083866 100%)',
+                  background: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '16px',
                   padding: '24px 28px',
-                  color: '#ffffff',
+                  color: '#0F172A',
                   marginBottom: '20px',
-                  boxShadow: '0 8px 24px rgba(11, 99, 182, 0.16)',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                <div style={{ position: 'absolute', right: '-15px', bottom: '-35px', opacity: 0.12, fontSize: '9rem', color: '#fff', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', right: '-15px', bottom: '-35px', opacity: 0.06, fontSize: '9rem', color: '#0F172A', pointerEvents: 'none' }}>
                   <i className="fas fa-chart-pie" />
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
                   <div>
                     <div className="d-flex align-items-center gap-2 mb-1">
-                      <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.35)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <span className="badge" style={{ background: '#FFF7E6', color: '#92400E', border: '1px solid #FDE68A', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         {isEditor ? 'Editor Portal' : 'Admin Operations'}
                       </span>
                     </div>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>
                       Welcome back, {profile.name || 'Admin'}!
                     </h2>
-                    <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
+                    <p style={{ fontSize: '0.86rem', color: '#64748B', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
                       National Paralympic Committee (NPC) Rwanda Management Portal · Today is {currentDateString || 'Loading date...'}.
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.12)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid rgba(255, 255, 255, 0.18)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#F8FAFC', backdropFilter: 'none', borderRadius: '20px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #E2E8F0', color: '#334155' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', display: 'inline-block', boxShadow: '0 0 6px #4ADE80' }} />
                     <span>Live Sync {lastSyncTime ? `(${lastSyncTime})` : ''}</span>
                     <button 
                       onClick={refreshRealTimeData}
                       disabled={isRefreshing}
-                      className="btn btn-link btn-sm p-0 text-white"
+                      className="btn btn-link btn-sm p-0 text-primary"
                       title="Sync live data now"
                       style={{ textDecoration: 'none', marginLeft: '6px', opacity: isRefreshing ? 0.5 : 1 }}
                     >
@@ -1970,7 +1971,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-                <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.15)', margin: '18px 0 16px' }} />
+                <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '18px 0 16px' }} />
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', position: 'relative', zIndex: 2 }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -1984,7 +1985,7 @@ export default function DashboardPage() {
                     <button 
                       onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }} hidden={!canCreateContent && !canUpdateContent}
                       className="btn btn-sm"
-                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#ffffff', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      style={{ background: '#FFFFFF', color: '#334155', fontWeight: 600, borderRadius: '8px', border: '1px solid #CBD5E1', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
                       <i className="fas fa-user-plus" /> Add Athlete
                     </button>
@@ -2009,7 +2010,7 @@ export default function DashboardPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-sm"
-                    style={{ background: 'rgba(255, 255, 255, 0.12)', color: '#FFD700', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.35)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
+                    style={{ background: '#FFFFFF', color: '#0B5F9F', fontWeight: 600, borderRadius: '8px', border: '1px solid #CBD5E1', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
                   >
                     View Website <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.75rem' }} />
                   </a>
