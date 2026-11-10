@@ -5901,3 +5901,141 @@ body.accessibility-center-text {
     --bs-gutter-x: 0.75rem;
   }
 }
+
+/* =========================================================
+   NPC RWANDA ADMIN — GLOBAL DESIGN SYSTEM
+   Scoped to the authenticated dashboard; public pages/login
+   retain their existing visual identity.
+   ========================================================= */
+:root {
+  --admin-primary: #1E5A91;
+  --admin-primary-hover: #174875;
+  --admin-navy: #102B49;
+  --admin-navy-deep: #0B2038;
+  --admin-accent: #E5B93F;
+  --admin-page: #F3F6FA;
+  --admin-surface: #FFFFFF;
+  --admin-surface-muted: #F8FAFC;
+  --admin-text: #172B42;
+  --admin-text-secondary: #64748B;
+  --admin-border: #E2E8F0;
+  --admin-success: #16845B;
+  --admin-warning: #B7791F;
+  --admin-danger: #C2414B;
+  --admin-info: #2877B7;
+  --admin-radius: 12px;
+  --admin-shadow: 0 2px 8px rgba(16, 43, 73, .045), 0 1px 2px rgba(16, 43, 73, .035);
+}
+
+.admin-dashboard-root {
+  color: var(--admin-text);
+  background: var(--admin-page) !important;
+  font-family: var(--font-body), Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  line-height: 1.5;
+}
+
+.admin-dashboard-root .dashboard-layout-content {
+  background: var(--admin-page);
+  color: var(--admin-text);
+}
+
+.admin-dashboard-root .dashboard-topbar {
+  background: var(--admin-surface) !important;
+  color: var(--admin-text);
+  border-bottom: 1px solid var(--admin-border) !important;
+  box-shadow: 0 1px 3px rgba(16, 43, 73, .035);
+}
+
+.admin-dashboard-root .dashboard-sidebar {
+  background: var(--admin-navy) !important;
+}
+
+.admin-dashboard-root h1,
+.admin-dashboard-root h2,
+.admin-dashboard-root h3,
+.admin-dashboard-root h4,
+.admin-dashboard-root h5,
+.admin-dashboard-root h6 {
+  color: var(--admin-text);
+  letter-spacing: -0.015em;
+}
+
+.admin-dashboard-root .card,
+.admin-dashboard-root .modal-content,
+.admin-dashboard-root .dropdown-menu,
+.admin-dashboard-root .list-group,
+.admin-dashboard-root .accordion-item {
+  background-color: var(--admin-surface);
+  border-color: var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-dashboard-root .card-header,
+.admin-dashboard-root .modal-header,
+.admin-dashboard-root .modal-footer {
+  background: var(--admin-surface-muted);
+  border-color: var(--admin-border);
+}
+
+.admin-dashboard-root .table {
+  --bs-table-color: var(--admin-text);
+  --bs-table-border-color: var(--admin-border);
+  --bs-table-striped-bg: #F8FAFC;
+  vertical-align: middle;
+}
+
+.admin-dashboard-root .table thead th {
+  color: #52657A;
+  background: #F7F9FC;
+  border-bottom-color: var(--admin-border);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-dashboard-root .form-control,
+.admin-dashboard-root .form-select,
+.admin-dashboard-root input:not([type="checkbox"]):not([type="radio"]),
+.admin-dashboard-root textarea,
+.admin-dashboard-root select {
+  border-color: #D7E0EA;
+  border-radius: 8px;
+  color: var(--admin-text);
+  background-color: var(--admin-surface);
+  box-shadow: none;
+}
+
+.admin-dashboard-root .form-control:focus,
+.admin-dashboard-root .form-select:focus,
+.admin-dashboard-root input:focus,
+.admin-dashboard-root textarea:focus,
+.admin-dashboard-root select:focus {
+  border-color: #77A9D2;
+  box-shadow: 0 0 0 3px rgba(30, 90, 145, .12);
+}
+
+.admin-dashboard-root .btn-primary {
+  background: var(--admin-primary);
+  border-color: var(--admin-primary);
+}
+.admin-dashboard-root .btn-primary:hover,
+.admin-dashboard-root .btn-primary:focus {
+  background: var(--admin-primary-hover);
+  border-color: var(--admin-primary-hover);
+}
+.admin-dashboard-root a { color: var(--admin-primary); }
+.admin-dashboard-root a:hover { color: var(--admin-primary-hover); }
+
+.admin-dashboard-root .text-muted,
+.admin-dashboard-root .text-secondary { color: var(--admin-text-secondary) !important; }
+
+.admin-dashboard-root .dashboard-sidebar a,
+.admin-dashboard-root .dashboard-sidebar button { -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 767.98px) {
+  .admin-dashboard-root .dashboard-layout-content { min-width: 0; }
+  .admin-dashboard-root .card { border-radius: 10px; }
+}
