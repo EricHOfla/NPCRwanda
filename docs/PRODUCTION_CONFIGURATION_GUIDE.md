@@ -277,7 +277,27 @@ Before a production migration, review the migration, back up the database, and a
 
 Some integrations are optional depending on whether the corresponding feature is being used. Flutterwave variables are required for online donation payments; SMTP values are required for outgoing email; Cloudinary credentials are required for media uploads. Keep all configured values accurate even if a feature is temporarily disabled.
 
-## 11. Save, build, and restart the website
+## 11. Create the donation payment logs table
+
+The donation payment history feature stores its events in a new append-only database table. Apply the supplied additive SQL migration once before deploying the new application code.
+
+On the VPS, from the project directory:
+
+```bash
+cd /var/www/NPCRwanda
+set -a
+. ./.env
+set +a
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/manual-migrations/20261110_donation_payment_logs.sql
+```
+
+This migration creates only the `DonationPaymentLog` table and its indexes. It does not alter or delete existing donation records.
+
+If the `psql` command is unavailable, install the PostgreSQL client package for your Ubuntu version or ask the database administrator to run the SQL file against the production database. Do not enable `RUN_PRISMA_MIGRATIONS` just for this table; the project intentionally keeps automatic production migrations disabled by default.
+
+After the migration succeeds, continue with the build and restart steps below.
+
+## 12. Save, build, and restart the website
 
 After editing `.env`, save the file and exit the editor.
 
@@ -306,7 +326,7 @@ pm2 status
 
 If the build fails, do not restart into an unbuilt release. Review the error first and correct the issue.
 
-## 12. Production verification checklist
+## 13. Production verification checklist
 
 After restart, verify each service separately:
 
@@ -342,7 +362,7 @@ After restart, verify each service separately:
 
 Do not use real donor funds for testing. Follow Flutterwave's test-mode instructions.
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 **Website does not start after restart**
 - Check `pm2 status`.
@@ -375,7 +395,7 @@ Do not use real donor funds for testing. Follow Flutterwave's test-mode instruct
 - Confirm the transaction verification request succeeds.
 - Do not manually mark an unverified payment as successful.
 
-## 14. Operational security and maintenance
+## 15. Operational security and maintenance
 
 - Restrict VPS and admin access to authorized staff.
 - Keep production secrets only on the server or in a trusted secret manager.
