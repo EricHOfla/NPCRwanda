@@ -173,7 +173,8 @@ export async function GET(request: NextRequest) {
       pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
       allSuccessfulTotals,
-      websiteTraffic
+      websiteTraffic,
+      trafficConversions
     ] = await Promise.all([
       prisma.athlete.count(),
       prisma.athlete.count({ where: { status: 'Active' } }),
@@ -203,7 +204,16 @@ export async function GET(request: NextRequest) {
       prisma.donationPayment.count({ where: { status: 'PENDING' } }),
       prisma.donationPayment.count({ where: { status: 'FAILED' } }),
       prisma.donationPayment.groupBy({ by: ['currency'], where: { status: 'SUCCESSFUL' }, _sum: { amount: true }, _count: { _all: true } }),
-      readWebsiteTraffic(from, days)
+      readWebsiteTraffic(from, days),
+      Promise.all([
+        prisma.contactMessage.count({ where: { createdAt: { gte: from } } }),
+        prisma.volunteerApplication.count({ where: { createdAt: { gte: from } } }),
+        prisma.jobApplication.count({ where: { createdAt: { gte: from } } }),
+        prisma.eventRegistration.count({ where: { createdAt: { gte: from } } }),
+        prisma.sponsorInquiry.count({ where: { createdAt: { gte: from } } }),
+        prisma.subscriber.count({ where: { createdAt: { gte: from } } }),
+        prisma.donationPayment.count({ where: { status: 'SUCCESSFUL', createdAt: { gte: from } } })
+      ])
     ]);
 
     const buckets = Array.from({ length: days }, (_, index) => {
@@ -246,7 +256,18 @@ export async function GET(request: NextRequest) {
         daily: buckets
       },
       sports: athleteSports.map((item) => ({ sport: item.sport || 'Unspecified', athletes: item._count._all })),
-      websiteTraffic
+      websiteTraffic: {
+        ...websiteTraffic,
+        conversions: {
+          contactMessages: trafficConversions[0],
+          volunteerApplications: trafficConversions[1],
+          jobApplications: trafficConversions[2],
+          eventRegistrations: trafficConversions[3],
+          sponsorInquiries: trafficConversions[4],
+          newsletterSubscriptions: trafficConversions[5],
+          successfulDonations: trafficConversions[6]
+        }
+      }
     }, { headers: noStore });
   } catch (error) {
     console.error('[Dashboard analytics] Failed to aggregate live data:', error);
