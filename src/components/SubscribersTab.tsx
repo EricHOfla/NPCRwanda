@@ -291,15 +291,24 @@ export default function SubscribersTab() {
         }
 
         .subscribers-filter-search {
-          flex: 1 1 320px;
-          max-width: 480px;
+          flex: 1 1 360px;
+          min-width: 0;
+          max-width: none;
           position: relative;
+        }
+
+        .subscribers-filter-search .form-control {
+          width: 100%;
+          min-width: 0;
         }
 
         .subscribers-filter-secondary {
           display: flex;
           gap: 10px;
           align-items: center;
+          flex: 0 0 auto;
+          min-width: 0;
+          margin-left: auto;
         }
 
         .subscribers-filter-select {
@@ -311,8 +320,12 @@ export default function SubscribersTab() {
 
         .subscribers-filter-refresh {
           height: 42px;
+          min-width: 108px;
+          flex: 0 0 auto;
+          justify-content: center;
+          white-space: nowrap;
           border-radius: 8px;
-          padding: 0 18px;
+          padding: 0 14px;
           color: #475569;
           font-weight: 600;
           font-size: 0.85rem;
@@ -515,6 +528,28 @@ export default function SubscribersTab() {
           }
         }
 
+        /* Search and filter controls adapt before the mobile card breakpoint. */
+        @media (max-width: 900px) {
+          .subscribers-filter-row {
+            align-items: stretch;
+          }
+
+          .subscribers-filter-search {
+            flex: 1 1 100%;
+            width: 100%;
+          }
+
+          .subscribers-filter-secondary {
+            width: 100%;
+            margin-left: 0;
+          }
+
+          .subscribers-filter-select {
+            flex: 1 1 auto;
+            min-width: 0;
+          }
+        }
+
         /* ── Mobile & Tablet Media Queries (< 768px) ── */
         @media (max-width: 768px) {
           .subscribers-card {
@@ -647,6 +682,24 @@ export default function SubscribersTab() {
         }
 
         @media (max-width: 480px) {
+          .subscribers-filter-secondary {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 44px;
+            gap: 8px;
+          }
+
+          .subscribers-filter-select {
+            width: 100%;
+            min-width: 0;
+          }
+
+          .subscribers-filter-refresh {
+            width: 44px;
+            min-width: 44px;
+            height: 42px;
+            padding: 0;
+          }
+
           .subscribers-header-actions {
             grid-template-columns: 1fr;
           }
