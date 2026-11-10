@@ -5,6 +5,7 @@ import type { Analytics } from './DashboardAnalytics';
 
 export default function WebsiteTrafficAnalytics() {
   const [data, setData] = useState<Analytics | null>(null);
+  const [days, setDays] = useState<7 | 30 | 90 | 365>(30);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -13,7 +14,7 @@ export default function WebsiteTrafficAnalytics() {
     const load = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/api/dashboard/analytics?days=30', {
+        const response = await fetch(`/api/dashboard/analytics?days=${days}`, {
           cache: 'no-store',
           credentials: 'same-origin',
         });
@@ -33,7 +34,7 @@ export default function WebsiteTrafficAnalytics() {
     };
     void load();
     return () => { active = false; };
-  }, []);
+  }, [days]);
 
   const maxTrafficViews = useMemo(() => Math.max(1, ...(data?.websiteTraffic.daily.map((item) => item.views) || [1])), [data]);
   const maxTrafficHour = useMemo(() => Math.max(1, ...(data?.websiteTraffic.hourly.map((item) => item.views) || [1])), [data]);
@@ -53,10 +54,25 @@ export default function WebsiteTrafficAnalytics() {
         <div className="live-analytics-error" role="alert">{error}</div>
       ) : data ? (
         <>
-        <section className="live-analytics-panel" style={{ marginTop: '18px' }}>
-          <div className="live-analytics-panel-head">
+        <section className="live-analytics-panel" style={{ marginTop: '18px', opacity: loading ? 0.65 : 1, transition: 'opacity 0.2s' }}>
+          <div className="live-analytics-panel-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
             <h3><i className="fas fa-chart-line" />Website analytics</h3>
-            <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Public website · Last 30 days</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <label htmlFor="website-analytics-days" style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>Date range</label>
+              <select
+                id="website-analytics-days"
+                value={days}
+                onChange={(event) => setDays(Number(event.target.value) as 7 | 30 | 90 | 365)}
+                aria-label="Website analytics date range"
+                style={{ border: '1px solid #CBD5E1', borderRadius: '8px', padding: '7px 10px', background: '#fff', color: '#334155', fontSize: '0.78rem', fontWeight: 600 }}
+              >
+                <option value={7}>Last 7 days</option>
+                <option value={30}>Last 30 days</option>
+                <option value={90}>Last 90 days</option>
+                <option value={365}>Last 365 days</option>
+              </select>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Public website</span>
+            </div>
           </div>
           {!data.websiteTraffic.available ? (
             <p className="live-analytics-empty" role="status">{data.websiteTraffic.note}</p>
@@ -89,7 +105,7 @@ export default function WebsiteTrafficAnalytics() {
                     </div>
                   ))}
                 </div>
-                <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Daily totals for the selected period</p>
+                <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Daily totals for the last {days} days</p>
                 </div>
                 <div>
                 <h4 style={{ margin: '0 0 12px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Peak visiting hours</h4>
@@ -135,7 +151,7 @@ export default function WebsiteTrafficAnalytics() {
               </div>
 
               <div style={{ marginTop: '18px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Engagement and conversions · Records created in this period</h4>
+                <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Engagement and conversions · Records created in the last {days} days</h4>
                 <div className="live-analytics-kpis">
                 {[
                   ['Contact messages', data.websiteTraffic.conversions.contactMessages],
@@ -147,7 +163,7 @@ export default function WebsiteTrafficAnalytics() {
                   ['Successful donations', data.websiteTraffic.conversions.successfulDonations]
                 ].map(([label, value]) => (
                   <div className="live-analytics-kpi blue" key={String(label)}>
-                    <span>{label}</span><strong>{number(Number(value))}</strong><small>Created in selected period</small>
+                    <span>{label}</span><strong>{number(Number(value))}</strong><small>Created in last {days} days</small>
                   </div>
                 ))}
                 </div>
