@@ -31,6 +31,15 @@ type Analytics = {
   };
   donations: { rangeRwf: number; rangeUsd: number; rangeCount: number; pendingPayments: number; failedPayments: number; lifetime: { RWF: number; USD: number; count: number }; daily: { date: string; rwf: number; usd: number; count: number }[] };
   sports: { sport: string; athletes: number }[];
+  websiteTraffic: {
+    available: boolean;
+    pageViews: number;
+    uniqueVisitors: number;
+    daily: { date: string; views: number; visitors: number }[];
+    topPages: { page: string; views: number }[];
+    referrers: { source: string; visits: number }[];
+    note: string;
+  };
 };
 
 const number = (value: number) => new Intl.NumberFormat('en-US').format(value || 0);
@@ -94,6 +103,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
 
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
+  const maxTrafficViews = useMemo(() => Math.max(1, ...(data?.websiteTraffic.daily.map((item) => item.views) || [1])), [data]);
 
   return (
     <div className="live-analytics-wrap">
@@ -660,9 +670,69 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
             </Panel>
           </div>
 
-          <div className="live-analytics-footnote">
-            <i className="fas fa-circle-info" /> Website visitor/page-view analytics are not included yet because the current project has no verified traffic-tracking source connected. No visitor figures are estimated or fabricated.
-          </div>
+          <section className="live-analytics-panel" style={{ marginTop: '18px' }}>
+            <div className="live-analytics-panel-head">
+              <h3><i className="fas fa-chart-line" />Website traffic</h3>
+              <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Public website · Last {days} days</span>
+            </div>
+            {!data.websiteTraffic.available ? (
+              <p className="live-analytics-empty" role="status">{data.websiteTraffic.note}</p>
+            ) : (
+              <>
+                <div className="live-analytics-kpis" style={{ marginBottom: '16px' }}>
+                  <div className="live-analytics-kpi blue">
+                    <span>Page views</span>
+                    <strong>{number(data.websiteTraffic.pageViews)}</strong>
+                    <small>Successful public page requests</small>
+                    <i className="fas fa-eye" />
+                  </div>
+                  <div className="live-analytics-kpi green">
+                    <span>Approx. unique visitors</span>
+                    <strong>{number(data.websiteTraffic.uniqueVisitors)}</strong>
+                    <small>Estimated from distinct IP addresses</small>
+                    <i className="fas fa-users" />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 12px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Daily page views</h4>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '132px', padding: '8px 2px 0', borderBottom: '1px solid #E2E8F0' }}>
+                      {data.websiteTraffic.daily.map((item) => (
+                        <div key={item.date} title={`${item.date}: ${number(item.views)} views · ${number(item.visitors)} visitors`} style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
+                          <span style={{ display: 'block', width: '100%', height: `${item.views ? Math.max(3, (item.views / maxTrafficViews) * 100) : 0}%`, background: '#2563EB', borderRadius: '3px 3px 0 0', opacity: item.views ? 0.85 : 0.15 }} />
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Daily totals for the selected period</p>
+                  </div>
+
+                  <div>
+                    <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Top pages</h4>
+                    {data.websiteTraffic.topPages.length ? data.websiteTraffic.topPages.map((item) => (
+                      <div key={item.page} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
+                        <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.page}</span>
+                        <strong style={{ color: '#0F172A', whiteSpace: 'nowrap' }}>{number(item.views)}</strong>
+                      </div>
+                    )) : <p className="live-analytics-empty">No public page views recorded in this period.</p>}
+                  </div>
+
+                  <div>
+                    <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Top referrers</h4>
+                    {data.websiteTraffic.referrers.length ? data.websiteTraffic.referrers.map((item) => (
+                      <div key={item.source} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
+                        <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.source}</span>
+                        <strong style={{ color: '#0F172A', whiteSpace: 'nowrap' }}>{number(item.visits)}</strong>
+                      </div>
+                    )) : <p className="live-analytics-empty">No external referrers recorded.</p>}
+                  </div>
+                </div>
+                <p style={{ margin: '14px 0 0', color: '#64748B', fontSize: '0.72rem', lineHeight: 1.5 }}>
+                  <i className="fas fa-circle-info me-1" />{data.websiteTraffic.note} Next.js internal navigation requests, API calls, static assets and common bots are excluded. Tracking starts when the dedicated Nginx log was enabled; older mixed logs are not included.
+                </p>
+              </>
+            )}
+          </section>
         </>
       )}
     </div>
