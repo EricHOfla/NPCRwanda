@@ -81,15 +81,47 @@ export default function InstagramEmbed({ postUrl }: InstagramEmbedProps) {
   }, [postUrl]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        borderRadius: '12px',
-      }}
-    />
+    <div className="instagram-embed-compact">
+      <style jsx>{`
+        .instagram-embed-compact {
+          width: 100%;
+          height: 440px;
+          overflow: hidden;
+          border-radius: 12px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .instagram-embed-compact :global(blockquote.instagram-media) {
+          width: 100% !important;
+          max-width: 540px !important;
+          min-width: 0 !important;
+          margin: 0 auto !important;
+        }
+
+        .instagram-embed-compact :global(iframe) {
+          max-height: 440px !important;
+        }
+
+        @media (max-width: 576px) {
+          .instagram-embed-compact {
+            height: 400px;
+          }
+
+          .instagram-embed-compact :global(iframe) {
+            max-height: 400px !important;
+          }
+        }
+      `}</style>
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      />
+    </div>
   );
 }
