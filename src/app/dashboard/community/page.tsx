@@ -463,29 +463,30 @@ function CommunityManagementContent() {
               {/* Hero Banner */}
               <div 
                 style={{ 
-                  background: 'linear-gradient(135deg, #074783 0%, #0B5F9F 60%, #032b50 100%)',
+                  background: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '16px',
                   padding: '24px 28px',
-                  color: '#ffffff',
+                  color: '#0F172A',
                   marginBottom: '24px',
-                  boxShadow: '0 8px 24px rgba(11, 95, 159, 0.16)',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                <div style={{ position: 'absolute', right: '-10px', bottom: '-25px', opacity: 0.12, fontSize: '8.5rem', color: '#fff', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', right: '-10px', bottom: '-25px', opacity: 0.06, fontSize: '8.5rem', color: '#0F172A', pointerEvents: 'none' }}>
                   <i className="fas fa-chart-line" />
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
                   <div>
-                    <span className="badge mb-2" style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.35)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <span className="badge mb-2" style={{ background: '#FFF7E6', color: '#92400E', border: '1px solid #FDE68A', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Sports Development Management
                     </span>
                     <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
                       Sports Development Desk
                     </h1>
-                    <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
+                    <p style={{ fontSize: '0.86rem', color: '#64748B', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
                       Manage and publish official grassroots training programmes and development camps.
                     </p>
                   </div>
