@@ -2,11 +2,123 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authorizeRequest } from '@/lib/rbac-server';
 import { ANNOUNCEMENT_CATEGORIES } from '@/lib/newsUtils';
+import { createReadStream } from 'node:fs';
+import { readdir } from 'node:fs/promises';
+import { createGunzip } from 'node:zlib';
+import { createHash } from 'node:crypto';
+import { createInterface } from 'node:readline';
+import path from 'node:path';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const noStore = { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' };
+
+type TrafficDay = { date: string; views: number; visitors: number };
+
+async function readWebsiteTraffic(from: Date, days: number) {
+  const logDirectory = '/var/log/nginx';
+  const logName = 'npcrwanda-access.log';
+  const dayMap = new Map<string, TrafficDay>();
+  const pageCounts = new Map<string, number>();
+  const referrerCounts = new Map<string, number>();
+  const visitorHashes = new Set<string>();
+  const visitorHashesByDay = new Map<string, Set<string>>();
+  let pageViews = 0;
+
+  for (let index = 0; index < days; index += 1) {
+    const date = new Date(from);
+    date.setDate(from.getDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    dayMap.set(key, { date: key, views: 0, visitors: 0 });
+    visitorHashesByDay.set(key, new Set());
+  }
+
+  try {
+    const names = (await readdir(logDirectory))
+      .filter((name) => /^npcrwanda-access\.log(?:\.\d+)?(?:\.gz)?$/.test(name))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+    for (const name of names) {
+      const fullPath = path.join(logDirectory, name);
+      const input = createReadStream(fullPath);
+      const stream = name.endsWith('.gz') ? input.pipe(createGunzip()) : input;
+      const lines = createInterface({ input: stream, crlfDelay: Infinity });
+
+      for await (const line of lines) {
+        const match = line.match(/^([^ ]+) [^ ]+ [^ ]+ \[([^\]]+)\] "([A-Z]+) ([^ "]+) HTTP\/[^"]+" (\d{3}) [^ ]+ "([^"]*)" "([^"]*)"/);
+        if (!match) continue;
+
+        const [, ip, timestamp, method, rawTarget, statusText, rawReferrer, userAgent] = match;
+        if (method !== 'GET' || Number(statusText) < 200 || Number(statusText) >= 400) continue;
+        if (/bot|crawler|spider|slurp|headless|preview|monitor|uptime|curl|wget|python-requests|facebookexternalhit|whatsapp/i.test(userAgent)) continue;
+        if (rawTarget.includes('_rsc=') || rawTarget.includes('__next')) continue;
+
+        const pathname = rawTarget.split('?')[0];
+        if (!pathname.startsWith('/') || pathname.startsWith('/api/') || pathname.startsWith('/_next/')) continue;
+        if (/\.(?:avif|css|csv|gif|ico|jpe?g|js|json|map|pdf|png|svg|txt|webp|woff2?|xml|zip)$/i.test(pathname)) continue;
+
+        const parsedDate = new Date(timestamp.replace(':', ' '));
+        if (Number.isNaN(parsedDate.getTime()) || parsedDate < from) continue;
+        const day = parsedDate.toISOString().slice(0, 10);
+        const bucket = dayMap.get(day);
+        if (!bucket) continue;
+
+        const normalizedPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : '/';
+        bucket.views += 1;
+        pageViews += 1;
+        pageCounts.set(normalizedPath, (pageCounts.get(normalizedPath) || 0) + 1);
+
+        const visitorHash = createHash('sha256')
+          .update(`${process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || 'npcrwanda-local-traffic'}:${ip}`)
+          .digest('hex');
+        visitorHashes.add(visitorHash);
+        visitorHashesByDay.get(day)?.add(visitorHash);
+
+        if (rawReferrer && rawReferrer !== '-' ) {
+          try {
+            const referrerUrl = new URL(rawReferrer);
+            const hostname = referrerUrl.hostname.replace(/^www\./, '');
+            if (hostname && hostname !== 'npcrwanda.org' && hostname !== 'www.npcrwanda.org') {
+              referrerCounts.set(hostname, (referrerCounts.get(hostname) || 0) + 1);
+            }
+          } catch {
+            // Ignore malformed referrer values.
+          }
+        }
+      }
+    }
+
+    for (const [day, visitors] of visitorHashesByDay) {
+      const bucket = dayMap.get(day);
+      if (bucket) bucket.visitors = visitors.size;
+    }
+
+    return {
+      available: true,
+      pageViews,
+      uniqueVisitors: visitorHashes.size,
+      daily: Array.from(dayMap.values()),
+      topPages: Array.from(pageCounts, ([page, views]) => ({ page, views }))
+        .sort((a, b) => b.views - a.views).slice(0, 8),
+      referrers: Array.from(referrerCounts, ([source, visits]) => ({ source, visits }))
+        .sort((a, b) => b.visits - a.visits).slice(0, 8),
+      note: 'Traffic is read from the public Nginx access log. Unique visitors are approximate and based on IP addresses; raw IPs are not returned or stored by this report.'
+    };
+  } catch (error) {
+    console.error('[Dashboard analytics] Website traffic log unavailable:', error);
+    return {
+      available: false,
+      pageViews: 0,
+      uniqueVisitors: 0,
+      daily: Array.from(dayMap.values()),
+      topPages: [],
+      referrers: [],
+      note: 'The public Nginx traffic log is not readable by the application process.'
+    };
+  }
+}
+
 
 export async function GET(request: NextRequest) {
   const auth = await authorizeRequest(request, 'reports.view');
@@ -26,7 +138,8 @@ export async function GET(request: NextRequest) {
       upcomingEvents, totalEvents, trainingPrograms, unreadMessages, totalMessages, volunteers, unreadVolunteers,
       pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
-      allSuccessfulTotals
+      allSuccessfulTotals,
+      websiteTraffic
     ] = await Promise.all([
       prisma.athlete.count(),
       prisma.athlete.count({ where: { status: 'Active' } }),
@@ -55,7 +168,8 @@ export async function GET(request: NextRequest) {
       }),
       prisma.donationPayment.count({ where: { status: 'PENDING' } }),
       prisma.donationPayment.count({ where: { status: 'FAILED' } }),
-      prisma.donationPayment.groupBy({ by: ['currency'], where: { status: 'SUCCESSFUL' }, _sum: { amount: true }, _count: { _all: true } })
+      prisma.donationPayment.groupBy({ by: ['currency'], where: { status: 'SUCCESSFUL' }, _sum: { amount: true }, _count: { _all: true } }),
+      readWebsiteTraffic(from, days)
     ]);
 
     const buckets = Array.from({ length: days }, (_, index) => {
@@ -97,7 +211,8 @@ export async function GET(request: NextRequest) {
         lifetime: totals,
         daily: buckets
       },
-      sports: athleteSports.map((item) => ({ sport: item.sport || 'Unspecified', athletes: item._count._all }))
+      sports: athleteSports.map((item) => ({ sport: item.sport || 'Unspecified', athletes: item._count._all })),
+      websiteTraffic
     }, { headers: noStore });
   } catch (error) {
     console.error('[Dashboard analytics] Failed to aggregate live data:', error);
