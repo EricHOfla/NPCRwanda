@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { verifyDonationPayment } from '@/lib/flutterwave';
+import { logDonationPayment } from '@/lib/donation-payment-logs';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ tx_ref: payment.txRef, status: payment.status, amount: payment.amount, currency: payment.currency, donorAmount: payment.donorAmount ?? payment.amount, donorCurrency: payment.donorCurrency ?? payment.currency, exchangeRate: payment.exchangeRate, exchangeRateDate: payment.exchangeRateDate }, { headers: { 'Cache-Control': 'no-store' } });
     }
 
+    await logDonationPayment({ donationPaymentId: payment.id, txRef: payment.txRef, event: 'VERIFICATION_REQUESTED', status: 'INFO', source: 'VERIFY', message: 'Payment status verification was requested.' });
     const transactionId = parsed.data.transaction_id || payment.providerId?.toString();
     if (!transactionId) {
       return NextResponse.json({ tx_ref: payment.txRef, status: 'PENDING' }, { status: 202, headers: { 'Cache-Control': 'no-store' } });
@@ -38,6 +40,7 @@ export async function POST(request: Request) {
       exchangeRateDate: donation.exchangeRateDate,
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
+    await logDonationPayment({ txRef: parsed.data.tx_ref, event: 'VERIFICATION_ERROR', status: 'FAILED', source: 'VERIFY', message: error instanceof Error ? error.message : 'Payment verification failed.' });
     console.error('[Donation verify] Verification failed:', error);
     return NextResponse.json({ error: 'We are still confirming your payment. Please refresh in a moment.' }, { status: 202 });
   }
