@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     const [
       athletes, activeAthletes, athleteSports, partners, totalUsers, totalAnnouncements, publishedNews, draftNews,
-      upcomingEvents, totalEvents, trainingPrograms, unreadMessages, totalMessages, volunteers,
+      upcomingEvents, totalEvents, trainingPrograms, unreadMessages, totalMessages, volunteers, unreadVolunteers,
       pendingJobs, eventRegistrations, sponsorInquiries,
       activeSubscribers, successfulPayments, pendingPayments, failedPayments,
       allSuccessfulTotals
@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       prisma.contactMessage.count({ where: { read: false } }),
       prisma.contactMessage.count(),
       prisma.volunteerApplication.count(),
+      prisma.volunteerApplication.count({ where: { read: false } }),
       prisma.jobApplication.count({ where: { status: 'Pending' } }),
       prisma.eventRegistration.count({ where: { status: { in: ['Pending', 'New'] } } }),
       prisma.sponsorInquiry.count({ where: { status: { in: ['New', 'Pending'] } } }),
@@ -83,9 +84,9 @@ export async function GET(request: NextRequest) {
       members: { athletes, activeAthletes, partners, totalUsers },
       content: { totalAnnouncements, publishedNews, draftNews, upcomingEvents, totalEvents, trainingPrograms },
       engagement: {
-        unreadMessages, totalMessages, volunteers, pendingJobs,
+        unreadMessages, totalMessages, volunteers, unreadVolunteers, pendingJobs,
         eventRegistrations, sponsorInquiries, activeSubscribers,
-        pendingWork: unreadMessages + pendingJobs + eventRegistrations + sponsorInquiries
+        pendingWork: unreadMessages + unreadVolunteers + pendingJobs + eventRegistrations + sponsorInquiries
       },
       donations: {
         rangeRwf: successfulPayments.filter((p) => p.currency === 'RWF').reduce((sum, p) => sum + p.amount, 0),
