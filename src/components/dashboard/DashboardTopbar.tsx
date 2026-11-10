@@ -147,8 +147,8 @@ export default function DashboardTopbar({
     <header
       className="dashboard-topbar"
       style={{
-        background: '#fff',
-        borderBottom: '1px solid #E2E8F0',
+        background: 'var(--admin-surface)',
+        borderBottom: '1px solid var(--admin-border)',
         padding: '0 24px',
         height: '64px',
         display: 'flex',
