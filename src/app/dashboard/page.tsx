@@ -2537,7 +2537,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {!isEditor && <WebsiteTrafficAnalytics />}
+          {adminTab === 'overview' && !isEditor && <WebsiteTrafficAnalytics />}
 
           {/* ──────────────────────────────
              TAB: PAGES CMS
