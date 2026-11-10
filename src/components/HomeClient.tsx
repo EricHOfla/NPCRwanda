@@ -113,11 +113,23 @@ export default function HomeClient() {
   const xEmbedUrl = xProfileUrl;
 
   useEffect(() => {
-    const xWindow = window as Window & {
-      twttr?: { widgets?: { load: (element?: HTMLElement) => void } };
+    type TwttrWidgets = {
+      createTimeline: (
+        source: { sourceType: string; screenName: string },
+        container: HTMLElement,
+        options: Record<string, unknown>
+      ) => Promise<HTMLElement>;
     };
-    xWindow.twttr?.widgets?.load(xFeedRef.current || undefined);
-  }, [xEmbedUrl]);
+    const xWin = window as Window & { twttr?: { widgets?: TwttrWidgets } };
+    if (!xWin.twttr?.widgets?.createTimeline || !xFeedRef.current) return;
+    const screenName = xProfileUrl.split('/').filter(Boolean).pop() || 'npc_rwanda';
+    xFeedRef.current.innerHTML = '';
+    xWin.twttr.widgets.createTimeline(
+      { sourceType: 'profile', screenName },
+      xFeedRef.current,
+      { height: 520, theme: 'light', chrome: 'noheader nofooter noborders transparent', dnt: true }
+    );
+  }, [xProfileUrl]);
 
   // Public impact counters are derived from current managed records, never manually entered or seeded figures.
   const activeDistricts = new Set(
@@ -493,7 +505,7 @@ export default function HomeClient() {
             <span className="pro-ngo-eyebrow">{getSiteText('community.eyebrow', 'Get Involved')}</span>
             <h2 className="pro-ngo-heading">{getSiteText('community.title', 'Connect with NPC Rwanda')}</h2>
             <p className="pro-ngo-subhead pro-ngo-subhead--center">
-              {getSiteText('community.desc', 'Find your place in Rwandaâ€™s para-sport community, connect with local coordinators, or support inclusive sport.')}
+              {getSiteText('community.desc', 'Find your place in RwandaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s para-sport community, connect with local coordinators, or support inclusive sport.')}
             </p>
           </div>
           <div className="row g-3">
@@ -886,7 +898,7 @@ export default function HomeClient() {
                             <h4 className="pro-ngo-fixture-title">{displayEvent.title}</h4>
                             <span className="pro-ngo-fixture-venue">
                               <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
-                              {displayEvent.location} ï¿½ {displayEvent.category}
+                              {displayEvent.location} ÃƒÂ¯Ã‚Â¿Ã‚Â½ {displayEvent.category}
                             </span>
                           </div>
                         </Link>
@@ -972,39 +984,38 @@ export default function HomeClient() {
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-outline-dark fw-bold rounded-pill"
                           >
-                            <span>View Profile</span>
+                            <span>View Profile on X</span>
                             <i className="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true" />
                           </a>
                         </div>
                         <h3 className="pro-ngo-video-card__title mb-2">Latest Updates on X</h3>
-                        {/* Twitter/X embedded timeline — the widget script converts the <a> tag into a live feed iframe */}
+                        {/* Empty container â€” twttr.widgets.createTimeline() injects the iframe here */}
                         <div
                           ref={xFeedRef}
                           style={{ minHeight: '400px', maxHeight: '540px', overflowY: 'auto', borderRadius: '8px' }}
-                        >
-                          <a
-                            className="twitter-timeline"
-                            data-height="520"
-                            data-theme="light"
-                            data-chrome="noheader nofooter noborders transparent"
-                            data-dnt="true"
-                            href={xEmbedUrl}
-                          >
-                            Loading posts from NPC Rwanda on X…
-                          </a>
-                        </div>
+                        />
                       </div>
                       <Script
                         id="twitter-widgets-js"
                         src="https://platform.x.com/widgets.js"
                         strategy="lazyOnload"
                         onLoad={() => {
-                          const xWindow = window as Window & {
-                            twttr?: { widgets?: { load: (element?: HTMLElement) => void } };
+                          type TwttrWidgets = {
+                            createTimeline: (
+                              source: { sourceType: string; screenName: string },
+                              container: HTMLElement,
+                              options: Record<string, unknown>
+                            ) => Promise<HTMLElement>;
                           };
-                          if (xWindow.twttr?.widgets?.load) {
-                            xWindow.twttr.widgets.load(xFeedRef.current || undefined);
-                          }
+                          const xWin = window as Window & { twttr?: { widgets?: TwttrWidgets } };
+                          if (!xWin.twttr?.widgets?.createTimeline || !xFeedRef.current) return;
+                          const screenName = xProfileUrl.split('/').filter(Boolean).pop() || 'npc_rwanda';
+                          xFeedRef.current.innerHTML = '';
+                          xWin.twttr.widgets.createTimeline(
+                            { sourceType: 'profile', screenName },
+                            xFeedRef.current,
+                            { height: 520, theme: 'light', chrome: 'noheader nofooter noborders transparent', dnt: true }
+                          );
                         }}
                       />
                     </div>
@@ -1026,7 +1037,7 @@ export default function HomeClient() {
                     <div className="pro-ngo-social-card" style={{ padding: hasPost ? '0' : undefined, overflow: 'hidden' }}>
                       {hasPost ? (
                         <>
-                          {/* Real Instagram post embed â€” same pattern as YouTube iframe */}
+                          {/* Real Instagram post embed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â same pattern as YouTube iframe */}
                           <InstagramEmbed postUrl={instaPostUrl} />
                           <div className="pro-ngo-video-card__body" style={{ padding: '12px 16px' }}>
                             <div className="d-flex align-items-center justify-content-between mb-1">
@@ -1050,7 +1061,7 @@ export default function HomeClient() {
                           </div>
                         </>
                       ) : (
-                        /* Fallback â€” no post URL configured: styled gradient card with link */
+                        /* Fallback ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no post URL configured: styled gradient card with link */
                         <>
                           <a
                             href={instaUrl}
