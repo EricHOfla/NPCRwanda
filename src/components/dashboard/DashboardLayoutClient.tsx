@@ -131,6 +131,7 @@ export default function DashboardLayoutClient({
   const activeId = useMemo(() => {
     if (pathname.endsWith('/profile')) return 'profile';
     if (pathname.endsWith('/community')) return 'community-sports';
+    if (pathname.endsWith('/donations/logs')) return 'donations-logs';
     if (pathname.endsWith('/donations')) return 'donations-payments';
     return tab === 'pages' ? `page-${page}` : tab;
   }, [pathname, tab, page]);
