@@ -325,7 +325,7 @@ function DonationManagementContent() {
                   <i className="fas fa-hand-holding-heart text-warning" /> NPC RWANDA FINANCIAL & SUPPORT DESK
                 </div>
                 <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.3px', color: '#FFFFFF' }}>
-                  Donations, Payments & Partnership Desk
+                  Donations & Payment Management
                 </h1>
                 <p style={{ fontSize: '0.84rem', color: '#FFFFFF', margin: '4px 0 0 0', maxWidth: '720px', lineHeight: 1.6 }}>
                   Monitor verified online contributions processed via Flutterwave (MTN MoMo, Airtel Money, Visa/Mastercard).
