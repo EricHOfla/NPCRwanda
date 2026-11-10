@@ -771,7 +771,7 @@ export async function sendApplicationStatusEmail(application: {
 export async function sendContactNotification(contact: { name: string; email: string; subject: string; message: string; date?: string }) {
   try {
     const mailSetup = await getTransporter();
-    if (!mailSetup) return;
+    if (!mailSetup) return { success: false, reason: 'SMTP is not configured.' };
 
     const currentYear = new Date().getFullYear();
 
@@ -1099,7 +1099,9 @@ export async function sendVerifiedDonationReceipt(donation: {
       text: `A donation payment has been verified. Donor: ${donation.name}; Email: ${donation.email}; Donation: ${donorCurrency} ${originalAmount}; Charged: ${donation.currency} ${amount}; Exchange rate: ${donation.exchangeRate || 'N/A'}; Purpose: ${donation.supportType}; Reference: ${donation.txRef}.`,
       replyTo: donation.email,
     });
+    return { success: true };
   } catch (error) {
     console.error('[Donation] Verified payment receipt email failed:', error);
+    return { success: false, reason: error instanceof Error ? error.message : 'Email delivery failed.' };
   }
 }
