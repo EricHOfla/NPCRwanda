@@ -1,6 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 import { sendVerifiedDonationReceipt } from '@/lib/mailer';
+import { logDonationPayment } from '@/lib/donation-payment-logs';
 
 const FLUTTERWAVE_API = 'https://api.flutterwave.com/v3';
 
@@ -41,6 +42,7 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
 
   const donation = await prisma.donationPayment.findUnique({ where: { txRef } });
   if (!donation) throw new Error('Donation reference was not found.');
+  await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'VERIFICATION_RECEIVED', status: 'INFO', source: 'VERIFY', message: 'Flutterwave transaction verification response received.', metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus: transaction.status || 'unknown', amount: Number(transaction.amount), currency: transaction.currency || null } });
   if (donation.status === 'SUCCESSFUL') return donation;
 
   const amount = Number(transaction.amount);
@@ -64,7 +66,9 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
     });
 
     if (transition.count > 0) {
-      await sendVerifiedDonationReceipt({
+      await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_SUCCESSFUL', status: 'SUCCESSFUL', source: 'VERIFY', message: 'Payment was verified successfully with Flutterwave.', metadata: { providerTransactionId: String(transaction.id || transactionId), amount, currency: transaction.currency || null } });
+      try {
+        await sendVerifiedDonationReceipt({
         name: donation.name,
         email: donation.email,
         amount: donation.amount,
@@ -74,7 +78,12 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
         exchangeRate: donation.exchangeRate,
         supportType: donation.supportType,
         txRef: donation.txRef,
-      });
+        });
+        await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_SENT', status: 'SUCCESSFUL', source: 'EMAIL', message: 'Donation receipt email sent after successful payment verification.' });
+      } catch (emailError) {
+        await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_FAILED', status: 'FAILED', source: 'EMAIL', message: emailError instanceof Error ? emailError.message : 'Donation receipt email could not be sent.' });
+        console.error('[Donation receipt] Email delivery failed:', emailError);
+      }
     }
 
     const updated = await prisma.donationPayment.findUnique({ where: { id: donation.id } });
@@ -83,18 +92,21 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
   }
 
   if (providerStatus === 'failed' || providerStatus === 'cancelled') {
+    const failureMessage = transaction.processor_response || 'Payment was not completed.';
+    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_FAILED', status: 'FAILED', source: 'VERIFY', message: failureMessage, metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus } });
     return prisma.donationPayment.update({
       where: { id: donation.id },
       data: {
         status: 'FAILED',
         providerId: BigInt(transaction.id || transactionId),
         providerRef: transaction.flw_ref || null,
-        failureReason: transaction.processor_response || 'Payment was not completed.',
+        failureReason: failureMessage,
         verifiedAt: new Date(),
       },
     });
   }
 
+  await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_PENDING', status: 'PENDING', source: 'VERIFY', message: 'Provider has not reported a final successful or failed payment status.', metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus } });
   return donation;
 }
 
