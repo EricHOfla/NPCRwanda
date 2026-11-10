@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { logDonationPayment } from '@/lib/donation-payment-logs';
 
 export const runtime = 'nodejs';
 
@@ -73,6 +74,8 @@ export async function POST(request: Request) {
       },
     });
 
+    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'CHECKOUT_INITIATED', status: 'PENDING', source: 'CHECKOUT', message: 'Donation checkout record created.', metadata: { amount: chargedAmount, currency: chargedCurrency, paymentMethod: input.paymentMethod, provider: 'FLUTTERWAVE' } });
+
     const payload = input.paymentMethod === 'mobile_money_rwanda'
       ? {
           phone_number: input.phone,
@@ -122,6 +125,7 @@ export async function POST(request: Request) {
         where: { id: donation.id },
         data: { status: 'FAILED', failureReason: String(result.message || 'Payment could not be initiated.').slice(0, 500) },
       });
+      await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'CHECKOUT_FAILED', status: 'FAILED', source: 'CHECKOUT', message: String(result.message || 'Flutterwave rejected the checkout request.').slice(0, 500), metadata: { httpStatus: providerResponse.status, providerStatus: result.status || 'unknown' } });
       return NextResponse.json({ error: result.message || 'We could not start your payment. Please try again.' }, { status: 502 });
     }
 
@@ -137,6 +141,8 @@ export async function POST(request: Request) {
         providerRef: result.data?.flw_ref || null,
       },
     });
+
+    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'CHECKOUT_READY', status: 'PENDING', source: 'CHECKOUT', message: 'Flutterwave accepted the checkout request.', metadata: { providerId: result.data?.id ? String(result.data.id) : null, hasCheckoutUrl: Boolean(checkoutUrl), providerRef: result.data?.flw_ref || null } });
 
     return NextResponse.json({
       success: true,
