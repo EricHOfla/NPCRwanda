@@ -311,37 +311,36 @@ function DonationManagementContent() {
           {/* Hero Banner */}
           <div
             style={{
-              background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
+              background: 'linear-gradient(135deg, #1E3A5F 0%, #315A7D 100%)',
               borderRadius: '16px',
               padding: '24px 28px',
-              color: '#0F172A',
-              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(30, 58, 95, 0.16)',
               marginBottom: '24px',
             }}
           >
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
               <div>
-                <div className="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill small mb-2" style={{ fontSize: '0.72rem', letterSpacing: '0.5px', background: '#F8FAFC', color: '#111827', fontWeight: 700 }}>
+                <div className="d-inline-flex align-items-center gap-2 px-2 py-1 rounded-pill small mb-2" style={{ fontSize: '0.72rem', letterSpacing: '0.5px', background: 'rgba(255, 255, 255, 0.16)', color: '#FFFFFF', border: '1px solid rgba(255, 255, 255, 0.28)', fontWeight: 700 }}>
                   <i className="fas fa-hand-holding-heart text-warning" /> NPC RWANDA FINANCIAL & SUPPORT DESK
                 </div>
-                <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.3px', color: '#0F172A' }}>
+                <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.3px', color: '#FFFFFF' }}>
                   Donations & Payment Management
                 </h1>
-                <p style={{ fontSize: '0.84rem', color: '#64748B', margin: '4px 0 0 0', maxWidth: '720px', lineHeight: 1.6 }}>
+                <p style={{ fontSize: '0.84rem', color: 'rgba(255, 255, 255, 0.88)', margin: '4px 0 0 0', maxWidth: '720px', lineHeight: 1.6 }}>
                   Monitor verified online contributions processed via Flutterwave (MTN MoMo, Airtel Money, Visa/Mastercard).
                 </p>
               </div>
 
               <div className="d-flex align-items-center gap-2 flex-wrap">
-                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Verified Total (RWF)</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A' }}>RWF {money(summary.successfulRwfAmount)}</div>
+                <div style={{ background: 'rgba(255, 255, 255, 0.14)', border: '1px solid rgba(255, 255, 255, 0.22)', borderRadius: '12px', padding: '10px 16px' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.78)', fontWeight: 600, textTransform: 'uppercase' }}>Verified Total (RWF)</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>RWF {money(summary.successfulRwfAmount)}</div>
                 </div>
                 {summary.successfulUsdAmount > 0 && (
                   <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: '12px', padding: '10px 16px', backdropFilter: 'blur(4px)' }}>
                     <div style={{ fontSize: '0.7rem', color: '#93C5FD', fontWeight: 600, textTransform: 'uppercase' }}>USD Direct</div>
-                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A' }}>${money(summary.successfulUsdAmount)}</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>${money(summary.successfulUsdAmount)}</div>
                   </div>
                 )}
               </div>
