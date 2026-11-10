@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (!auth.authorized) return auth.response;
 
   try {
-    const [messageCount, volunteerCount, messages, volunteers] = await Promise.all([
+    const [messageCount, volunteerCount, messages, volunteers, successfulDonations] = await Promise.all([
       prisma.contactMessage.count({ where: { read: false } }),
       prisma.volunteerApplication.count({ where: { read: false } }),
       prisma.contactMessage.findMany({
@@ -30,7 +30,39 @@ export async function GET(request: NextRequest) {
         take: 5,
         select: { id: true, name: true, interest: true, createdAt: true },
       }),
+      prisma.donationPayment.findMany({
+        where: { status: 'SUCCESSFUL', verifiedAt: { not: null } },
+        orderBy: { verifiedAt: 'desc' },
+        take: 5,
+        select: {
+          id: true,
+          name: true,
+          amount: true,
+          currency: true,
+          donorAmount: true,
+          donorCurrency: true,
+          txRef: true,
+          verifiedAt: true,
+        },
+      }),
     ]);
+
+    const donationItems = successfulDonations.map((item) => {
+      const donorCurrency = item.donorCurrency || item.currency;
+      const donorAmount = item.donorAmount ?? item.amount;
+      const formattedAmount = new Intl.NumberFormat('en-RW').format(donorAmount);
+
+      return {
+        id: `donation-${item.id}`,
+        type: 'Successful Donation',
+        sender: item.name || 'Anonymous donor',
+        snippet: `${donorCurrency} ${formattedAmount} received · Ref: ${item.txRef}`,
+        date: item.verifiedAt?.toISOString() || new Date().toISOString(),
+        createdAt: item.verifiedAt?.toISOString() || new Date().toISOString(),
+        color: '#16A34A',
+        href: '/dashboard/donations',
+      };
+    });
 
     const items = [
       ...messages.map((item) => ({
@@ -53,12 +85,12 @@ export async function GET(request: NextRequest) {
         color: '#2e9e57',
         href: '/dashboard?tab=contacts&subtab=volunteers',
       })),
-
+      ...donationItems,
     ].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 12)
       .map(({ createdAt: _createdAt, ...item }) => item);
 
     return NextResponse.json({
-      unreadCount: messageCount + volunteerCount,
+      unreadCount: messageCount + volunteerCount + successfulDonations.length,
       items,
     }, { headers: NO_STORE_HEADERS });
   } catch (error) {
