@@ -5458,9 +5458,16 @@ uploadMediaFile={uploadMediaFile}
               )}
 
               {inboxSubTab === 'volunteers' && (
-                <div className="custom-card">
-                  <div className="table-responsive">
-                    <table className="table table-hover mb-0 align-middle">
+                <div className="custom-card" style={{ width: '100%', minWidth: 0 }}>
+                  <div className="table-responsive" style={{ width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
+                    <table className="table table-hover mb-0 align-middle" style={{ width: '100%', minWidth: '760px', tableLayout: 'fixed' }}>
+                      <colgroup>
+                        <col style={{ width: '19%' }} />
+                        <col style={{ width: '22%' }} />
+                        <col style={{ width: '29%' }} />
+                        <col style={{ width: '14%' }} />
+                        <col style={{ width: '16%' }} />
+                      </colgroup>
                       <thead>
                         <tr>
                           <th>Name</th>
@@ -5473,14 +5480,14 @@ uploadMediaFile={uploadMediaFile}
                       <tbody>
                         {volunteers.length === 0 ? <tr><td colSpan={5} className="text-center text-muted py-4">No volunteer applications have been received yet.</td></tr> : paginate(volunteers, currentPage.volunteers, pageSizes.volunteers).map(v => (
                           <tr key={v.id}>
-                            <td className="fw-semibold small">{v.name}</td>
-                            <td className="small">{v.interest}</td>
-                            <td className="small text-muted">{v.skills}</td>
-                            <td>
+                            <td className="fw-semibold small" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{v.name}</td>
+                            <td className="small" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{v.interest}</td>
+                            <td className="small text-muted" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{v.skills}</td>
+                            <td style={{ whiteSpace: 'nowrap' }}>
                               <span className={`badge ${v.read ? 'bg-light text-dark' : 'bg-primary text-white'}`}>{v.read ? 'Read' : 'Unread'}</span>
                             </td>
                             <td>
-                              <div className="d-flex gap-2">
+                              <div className="d-flex flex-nowrap gap-2">
                                 <button onClick={() => setActiveVolunteer(v)} className="btn btn-sm btn-outline-primary py-0 px-2" title="View volunteer application"><i className="fas fa-eye" /></button>
                                 <button onClick={async () => { if (confirm(`Delete volunteer application from ${v.name}?`)) { await runSubmissionDelete(v.id, deleteVolunteerApplication, 'Volunteer application'); } }} disabled={deletingSubmissionIds.includes(v.id)} className="btn btn-sm btn-outline-danger py-0 px-2" title="Delete application" hidden={!canDeleteInbox}><i className="fas fa-trash" /></button>
                               </div>
