@@ -76,7 +76,7 @@ export default function DashboardTopbar({
     }
   }, [profile.email]);
 
-  // One permission-checked aggregate request replaces three full-list API requests.
+  // Refresh the notification bell on load, while open, and periodically.
   useEffect(() => {
     if (!canViewInbox) {
       setNotifications([]);
@@ -85,27 +85,29 @@ export default function DashboardTopbar({
     }
 
     let active = true;
-    fetch('/api/dashboard/notifications', { cache: 'no-store' })
-      .then(async (response) => {
+    const loadNotifications = async () => {
+      try {
+        const response = await fetch('/api/dashboard/notifications', { cache: 'no-store' });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || 'Unable to load notifications');
-        return payload;
-      })
-      .then((payload) => {
         if (!active) return;
         setNotifications(Array.isArray(payload.items) ? payload.items : []);
         setUnreadCount(Number(payload.unreadCount) || 0);
-      })
-      .catch(() => {
+      } catch {
         if (!active) return;
         setNotifications([]);
         setUnreadCount(0);
-      });
+      }
+    };
+
+    void loadNotifications();
+    const refreshInterval = window.setInterval(loadNotifications, 30000);
 
     return () => {
       active = false;
+      window.clearInterval(refreshInterval);
     };
-  }, [canViewInbox]);
+  }, [canViewInbox, bellOpen]);
 
   // Close dropdowns on outside click
   useEffect(() => {
