@@ -58,7 +58,7 @@ async function readWebsiteTraffic(from: Date, days: number) {
         if (!pathname.startsWith('/') || pathname.startsWith('/api/') || pathname.startsWith('/_next/')) continue;
         if (/\.(?:avif|css|csv|gif|ico|jpe?g|js|json|map|pdf|png|svg|txt|webp|woff2?|xml|zip)$/i.test(pathname)) continue;
 
-        const parsedDate = new Date(timestamp.replace(/^(\\d{2})\\/([A-Za-z]{3})\\/(\\d{4}):/, '$2 $1 $3 '));
+        const parsedDate = new Date(timestamp.replace(/^(\d{2})\/([A-Za-z]{3})\/(\d{4}):/, '$2 $1 $3 '));
         if (Number.isNaN(parsedDate.getTime()) || parsedDate < from) continue;
         const day = parsedDate.toISOString().slice(0, 10);
         const bucket = dayMap.get(day);
