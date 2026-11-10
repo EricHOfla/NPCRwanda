@@ -493,7 +493,7 @@ export default function HomeClient() {
             <span className="pro-ngo-eyebrow">{getSiteText('community.eyebrow', 'Get Involved')}</span>
             <h2 className="pro-ngo-heading">{getSiteText('community.title', 'Connect with NPC Rwanda')}</h2>
             <p className="pro-ngo-subhead pro-ngo-subhead--center">
-              {getSiteText('community.desc', 'Find your place in Rwanda’s para-sport community, connect with local coordinators, or support inclusive sport.')}
+              {getSiteText('community.desc', 'Find your place in Rwandaâ€™s para-sport community, connect with local coordinators, or support inclusive sport.')}
             </p>
           </div>
           <div className="row g-3">
@@ -886,7 +886,7 @@ export default function HomeClient() {
                             <h4 className="pro-ngo-fixture-title">{displayEvent.title}</h4>
                             <span className="pro-ngo-fixture-venue">
                               <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
-                              {displayEvent.location} � {displayEvent.category}
+                              {displayEvent.location} ï¿½ {displayEvent.category}
                             </span>
                           </div>
                         </Link>
@@ -977,28 +977,34 @@ export default function HomeClient() {
                           </a>
                         </div>
                         <h3 className="pro-ngo-video-card__title mb-2">Latest Updates on X</h3>
-                        <div ref={xFeedRef} style={{ minHeight: '320px', maxHeight: '520px', overflowY: 'auto' }}>
+                        {/* Twitter/X embedded timeline — the widget script converts the <a> tag into a live feed iframe */}
+                        <div
+                          ref={xFeedRef}
+                          style={{ minHeight: '400px', maxHeight: '540px', overflowY: 'auto', borderRadius: '8px' }}
+                        >
                           <a
                             className="twitter-timeline"
-                            data-height="500"
+                            data-height="520"
                             data-theme="light"
-                            data-chrome="noheader nofooter noborders"
-                            data-tweet-limit="5"
+                            data-chrome="noheader nofooter noborders transparent"
                             data-dnt="true"
                             href={xEmbedUrl}
                           >
-                            View recent posts from NPC Rwanda on X
+                            Loading posts from NPC Rwanda on X…
                           </a>
                         </div>
                       </div>
                       <Script
+                        id="twitter-widgets-js"
                         src="https://platform.x.com/widgets.js"
-                        strategy="afterInteractive"
-                        onReady={() => {
+                        strategy="lazyOnload"
+                        onLoad={() => {
                           const xWindow = window as Window & {
                             twttr?: { widgets?: { load: (element?: HTMLElement) => void } };
                           };
-                          xWindow.twttr?.widgets?.load(xFeedRef.current || undefined);
+                          if (xWindow.twttr?.widgets?.load) {
+                            xWindow.twttr.widgets.load(xFeedRef.current || undefined);
+                          }
                         }}
                       />
                     </div>
@@ -1020,7 +1026,7 @@ export default function HomeClient() {
                     <div className="pro-ngo-social-card" style={{ padding: hasPost ? '0' : undefined, overflow: 'hidden' }}>
                       {hasPost ? (
                         <>
-                          {/* Real Instagram post embed — same pattern as YouTube iframe */}
+                          {/* Real Instagram post embed â€” same pattern as YouTube iframe */}
                           <InstagramEmbed postUrl={instaPostUrl} />
                           <div className="pro-ngo-video-card__body" style={{ padding: '12px 16px' }}>
                             <div className="d-flex align-items-center justify-content-between mb-1">
@@ -1044,7 +1050,7 @@ export default function HomeClient() {
                           </div>
                         </>
                       ) : (
-                        /* Fallback — no post URL configured: styled gradient card with link */
+                        /* Fallback â€” no post URL configured: styled gradient card with link */
                         <>
                           <a
                             href={instaUrl}
