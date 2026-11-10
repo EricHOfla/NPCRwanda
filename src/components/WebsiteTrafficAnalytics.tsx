@@ -83,7 +83,7 @@ export default function WebsiteTrafficAnalytics() {
                 <div>
                 <h4 style={{ margin: '0 0 12px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Daily page views</h4>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '132px', padding: '8px 2px 0', borderBottom: '1px solid #E2E8F0' }}>
-                  {data.websiteTraffic.daily.filter((_, index) => days <= 30 || index % Math.ceil(days / 30) === 0).map((item) => (
+                  {data.websiteTraffic.daily.map((item) => (
                     <div key={item.date} title={item.date + ': ' + number(item.views) + ' views · ' + number(item.visitors) + ' visitors'} style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
                       <span style={{ display: 'block', width: '100%', height: (item.views ? Math.max(3, (item.views / maxTrafficViews) * 100) : 0) + '%', background: '#2563EB', borderRadius: '3px 3px 0 0', opacity: item.views ? 0.85 : 0.15 }} />
                     </div>
