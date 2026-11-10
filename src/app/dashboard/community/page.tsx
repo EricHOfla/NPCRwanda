@@ -482,7 +482,7 @@ function CommunityManagementContent() {
                     <span className="badge mb-2" style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#FFFFFF', border: '1px solid rgba(255, 255, 255, 0.28)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Sports Development Management
                     </span>
-                    <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
+                    <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.3px', color: '#FFFFFF' }}>
                       Sports Development Desk
                     </h1>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.88)', margin: 0, maxWidth: '680px', lineHeight: '1.45' }}>
