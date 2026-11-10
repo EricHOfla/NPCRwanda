@@ -150,24 +150,7 @@ export default function WebsiteTrafficAnalytics() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '18px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Engagement and conversions · Records created in the last {days} days</h4>
-                <div className="live-analytics-kpis">
-                {[
-                  ['Contact messages', data.websiteTraffic.conversions.contactMessages],
-                  ['Volunteer applications', data.websiteTraffic.conversions.volunteerApplications],
-                  ['Job applications', data.websiteTraffic.conversions.jobApplications],
-                  ['Event registrations', data.websiteTraffic.conversions.eventRegistrations],
-                  ['Sponsor inquiries', data.websiteTraffic.conversions.sponsorInquiries],
-                  ['Newsletter subscriptions', data.websiteTraffic.conversions.newsletterSubscriptions],
-                  ['Successful donations', data.websiteTraffic.conversions.successfulDonations]
-                ].map(([label, value]) => (
-                  <div className="live-analytics-kpi blue" key={String(label)}>
-                    <span>{label}</span><strong>{number(Number(value))}</strong><small>Created in last {days} days</small>
-                  </div>
-                ))}
-                </div>
-              </div>
+
 
               <p style={{ margin: '14px 0 0', color: '#64748B', fontSize: '0.72rem', lineHeight: 1.5 }}>
                 <i className="fas fa-circle-info me-1" />{data.websiteTraffic.note} Returning visitors are repeat IP addresses observed on multiple days, not confirmed individual people. Device and browser details are inferred from user-agent strings. Country and reading-time reports require additional tracking or GeoIP setup.
