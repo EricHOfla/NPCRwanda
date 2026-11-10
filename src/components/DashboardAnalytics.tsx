@@ -121,6 +121,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
   const maxDonation = useMemo(() => Math.max(1, ...(data?.donations.daily.map((d) => d.rwf) || [1])), [data]);
   const sportTotal = useMemo(() => data?.sports.reduce((sum, item) => sum + item.athletes, 0) || 0, [data]);
   const maxTrafficViews = useMemo(() => Math.max(1, ...(data?.websiteTraffic.daily.map((item) => item.views) || [1])), [data]);
+  const maxTrafficHour = useMemo(() => Math.max(1, ...(data?.websiteTraffic.hourly.map((item) => item.views) || [1])), [data]);
 
   return (
     <div className="live-analytics-wrap">
@@ -724,6 +725,20 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                       ))}
                     </div>
                     <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Daily totals for the selected period</p>
+                  </div>
+                  <div>
+                    <h4 style={{ margin: '0 0 12px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Peak visiting hours</h4>
+                    {data.websiteTraffic.hourly.slice().sort((a, b) => b.views - a.views).slice(0, 6).map((item) => (
+                      <div key={item.hour} style={{ display: 'grid', gridTemplateColumns: '48px 1fr 42px', alignItems: 'center', gap: '8px', marginBottom: '9px', fontSize: '0.75rem' }}>
+                        <span style={{ color: '#64748B' }}>{item.hour}</span>
+                        <span style={{ height: '8px', background: '#E2E8F0', borderRadius: '8px', overflow: 'hidden' }}>
+                          <span style={{ display: 'block', width: ((item.views / maxTrafficHour) * 100) + '%', height: '100%', background: '#2563EB', borderRadius: '8px' }} />
+                        </span>
+                        <strong style={{ textAlign: 'right', color: '#0F172A' }}>{number(item.views)}</strong>
+                      </div>
+                    ))}
+                    {!data.websiteTraffic.hourly.length && <p className="live-analytics-empty">No hourly data recorded.</p>}
+                    <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Based on server request timestamps</p>
                   </div>
 
                   {[
