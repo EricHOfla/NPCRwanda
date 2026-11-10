@@ -478,3 +478,20 @@ model GalleryItem {
   @@index([category])
 }
 
+
+
+model DonationPaymentLog {
+  id                 String   @id @default(uuid())
+  donationPaymentId  String?
+  txRef              String
+  event              String
+  status             String
+  source             String
+  message            String   @db.Text
+  metadata           String?  @db.Text
+  createdAt          DateTime @default(now())
+
+  @@index([txRef, createdAt])
+  @@index([event, createdAt])
+  @@index([status, createdAt])
+}
