@@ -35,6 +35,23 @@ type Analytics = {
     available: boolean;
     pageViews: number;
     uniqueVisitors: number;
+    returningVisitors: number;
+    notFoundPages: number;
+    downloads: number;
+    hourly: { hour: string; views: number }[];
+    devices: { name: string; visits: number }[];
+    browsers: { name: string; visits: number }[];
+    operatingSystems: { name: string; visits: number }[];
+    sources: { name: string; visits: number }[];
+    conversions: {
+      contactMessages: number;
+      volunteerApplications: number;
+      jobApplications: number;
+      eventRegistrations: number;
+      sponsorInquiries: number;
+      newsletterSubscriptions: number;
+      successfulDonations: number;
+    };
     daily: { date: string; views: number; visitors: number }[];
     topPages: { page: string; views: number }[];
     referrers: { source: string; visits: number }[];
@@ -672,7 +689,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
 
           <section className="live-analytics-panel" style={{ marginTop: '18px' }}>
             <div className="live-analytics-panel-head">
-              <h3><i className="fas fa-chart-line" />Website traffic</h3>
+              <h3><i className="fas fa-chart-line" />Website analytics</h3>
               <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Public website · Last {days} days</span>
             </div>
             {!data.websiteTraffic.available ? (
@@ -680,55 +697,84 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
             ) : (
               <>
                 <div className="live-analytics-kpis" style={{ marginBottom: '16px' }}>
-                  <div className="live-analytics-kpi blue">
-                    <span>Page views</span>
-                    <strong>{number(data.websiteTraffic.pageViews)}</strong>
-                    <small>Successful public page requests</small>
-                    <i className="fas fa-eye" />
-                  </div>
-                  <div className="live-analytics-kpi green">
-                    <span>Approx. unique visitors</span>
-                    <strong>{number(data.websiteTraffic.uniqueVisitors)}</strong>
-                    <small>Estimated from distinct IP addresses</small>
-                    <i className="fas fa-users" />
-                  </div>
+                  {[
+                    { label: 'Page views', value: data.websiteTraffic.pageViews, hint: 'Successful public page requests', icon: 'fa-eye', tone: 'blue' },
+                    { label: 'Approx. unique visitors', value: data.websiteTraffic.uniqueVisitors, hint: 'Distinct hashed IPs in this period', icon: 'fa-users', tone: 'green' },
+                    { label: 'Returning IPs', value: data.websiteTraffic.returningVisitors, hint: 'Seen on more than one day', icon: 'fa-repeat', tone: 'amber' },
+                    { label: 'Document downloads', value: data.websiteTraffic.downloads, hint: 'PDF, Office and ZIP files', icon: 'fa-download', tone: 'blue' },
+                    { label: 'Page not found', value: data.websiteTraffic.notFoundPages, hint: 'Public page requests returning 404', icon: 'fa-circle-exclamation', tone: 'amber' }
+                  ].map((item) => (
+                    <div className={'live-analytics-kpi ' + item.tone} key={item.label}>
+                      <span>{item.label}</span>
+                      <strong>{number(item.value)}</strong>
+                      <small>{item.hint}</small>
+                      <i className={'fas ' + item.icon} />
+                    </div>
+                  ))}
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
                   <div>
                     <h4 style={{ margin: '0 0 12px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Daily page views</h4>
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '132px', padding: '8px 2px 0', borderBottom: '1px solid #E2E8F0' }}>
-                      {data.websiteTraffic.daily.map((item) => (
-                        <div key={item.date} title={`${item.date}: ${number(item.views)} views · ${number(item.visitors)} visitors`} style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
-                          <span style={{ display: 'block', width: '100%', height: `${item.views ? Math.max(3, (item.views / maxTrafficViews) * 100) : 0}%`, background: '#2563EB', borderRadius: '3px 3px 0 0', opacity: item.views ? 0.85 : 0.15 }} />
+                      {data.websiteTraffic.daily.filter((_, index) => days <= 30 || index % Math.ceil(days / 30) === 0).map((item) => (
+                        <div key={item.date} title={item.date + ': ' + number(item.views) + ' views · ' + number(item.visitors) + ' visitors'} style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
+                          <span style={{ display: 'block', width: '100%', height: (item.views ? Math.max(3, (item.views / maxTrafficViews) * 100) : 0) + '%', background: '#2563EB', borderRadius: '3px 3px 0 0', opacity: item.views ? 0.85 : 0.15 }} />
                         </div>
                       ))}
                     </div>
                     <p style={{ margin: '6px 0 0', color: '#94A3B8', fontSize: '0.68rem' }}>Daily totals for the selected period</p>
                   </div>
 
-                  <div>
-                    <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Top pages</h4>
-                    {data.websiteTraffic.topPages.length ? data.websiteTraffic.topPages.map((item) => (
-                      <div key={item.page} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
-                        <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.page}</span>
-                        <strong style={{ color: '#0F172A', whiteSpace: 'nowrap' }}>{number(item.views)}</strong>
-                      </div>
-                    )) : <p className="live-analytics-empty">No public page views recorded in this period.</p>}
-                  </div>
+                  {[
+                    { title: 'Traffic sources', items: data.websiteTraffic.sources },
+                    { title: 'Visitor devices', items: data.websiteTraffic.devices },
+                    { title: 'Browsers', items: data.websiteTraffic.browsers },
+                    { title: 'Operating systems', items: data.websiteTraffic.operatingSystems },
+                    { title: 'External referrers', items: data.websiteTraffic.referrers.map((item) => ({ name: item.source, visits: item.visits })) }
+                  ].map((group) => (
+                    <div key={group.title}>
+                      <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>{group.title}</h4>
+                      {group.items.length ? group.items.slice(0, 8).map((item) => (
+                        <div key={item.name} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
+                          <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.name}</span>
+                          <strong style={{ color: '#0F172A', whiteSpace: 'nowrap' }}>{number(item.visits)}</strong>
+                        </div>
+                      )) : <p className="live-analytics-empty">No data recorded.</p>}
+                    </div>
+                  ))}
 
                   <div>
-                    <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Top referrers</h4>
-                    {data.websiteTraffic.referrers.length ? data.websiteTraffic.referrers.map((item) => (
-                      <div key={item.source} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
-                        <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.source}</span>
-                        <strong style={{ color: '#0F172A', whiteSpace: 'nowrap' }}>{number(item.visits)}</strong>
+                    <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Most visited pages</h4>
+                    {data.websiteTraffic.topPages.length ? data.websiteTraffic.topPages.map((item) => (
+                      <div key={item.page} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '7px 0', borderBottom: '1px solid #F1F5F9', fontSize: '0.78rem' }}>
+                        <span style={{ color: '#475569', overflowWrap: 'anywhere' }}>{item.page}</span><strong>{number(item.views)}</strong>
                       </div>
-                    )) : <p className="live-analytics-empty">No external referrers recorded.</p>}
+                    )) : <p className="live-analytics-empty">No page data recorded.</p>}
                   </div>
                 </div>
+
+                <div style={{ marginTop: '18px' }}>
+                  <h4 style={{ margin: '0 0 8px', color: '#334155', fontSize: '0.85rem', fontWeight: 700 }}>Engagement and conversions · Records created in this period</h4>
+                  <div className="live-analytics-kpis">
+                    {[
+                      ['Contact messages', data.websiteTraffic.conversions.contactMessages],
+                      ['Volunteer applications', data.websiteTraffic.conversions.volunteerApplications],
+                      ['Job applications', data.websiteTraffic.conversions.jobApplications],
+                      ['Event registrations', data.websiteTraffic.conversions.eventRegistrations],
+                      ['Sponsor inquiries', data.websiteTraffic.conversions.sponsorInquiries],
+                      ['Newsletter subscriptions', data.websiteTraffic.conversions.newsletterSubscriptions],
+                      ['Successful donations', data.websiteTraffic.conversions.successfulDonations]
+                    ].map(([label, value]) => (
+                      <div className="live-analytics-kpi blue" key={String(label)}>
+                        <span>{label}</span><strong>{number(Number(value))}</strong><small>Created in selected period</small>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <p style={{ margin: '14px 0 0', color: '#64748B', fontSize: '0.72rem', lineHeight: 1.5 }}>
-                  <i className="fas fa-circle-info me-1" />{data.websiteTraffic.note} Next.js internal navigation requests, API calls, static assets and common bots are excluded. Tracking starts when the dedicated Nginx log was enabled; older mixed logs are not included.
+                  <i className="fas fa-circle-info me-1" />{data.websiteTraffic.note} Returning visitors are repeat IP addresses observed on multiple days, not confirmed individual people. Device and browser details are inferred from user-agent strings. Country and reading-time reports require additional tracking or GeoIP setup.
                 </p>
               </>
             )}
