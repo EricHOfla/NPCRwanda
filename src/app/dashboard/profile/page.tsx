@@ -91,11 +91,12 @@ export default function ProfileSettingsPage() {
 
   const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!dragRef.current || !cropSource) return;
-    const baseScale = Math.max(300 / cropDimensions.width, 300 / cropDimensions.height) * cropZoom;
+    const viewSize = cropViewportRef.current?.clientWidth || 300;
+    const baseScale = Math.max(viewSize / cropDimensions.width, viewSize / cropDimensions.height) * cropZoom;
     const renderedWidth = cropDimensions.width * baseScale;
     const renderedHeight = cropDimensions.height * baseScale;
-    const maxX = Math.max(0, (renderedWidth - 300) / 2);
-    const maxY = Math.max(0, (renderedHeight - 300) / 2);
+    const maxX = Math.max(0, (renderedWidth - viewSize) / 2);
+    const maxY = Math.max(0, (renderedHeight - viewSize) / 2);
     setCropOffset({
       x: Math.min(maxX, Math.max(-maxX, dragRef.current.offsetX + event.clientX - dragRef.current.x)),
       y: Math.min(maxY, Math.max(-maxY, dragRef.current.offsetY + event.clientY - dragRef.current.y)),
@@ -106,14 +107,15 @@ export default function ProfileSettingsPage() {
     const image = cropImageRef.current;
     if (!image || !image.naturalWidth || !image.naturalHeight) return;
     const size = 512;
-    const baseScale = Math.max(300 / image.naturalWidth, 300 / image.naturalHeight) * cropZoom;
+    const viewSize = cropViewportRef.current?.clientWidth || 300;
+    const baseScale = Math.max(viewSize / image.naturalWidth, viewSize / image.naturalHeight) * cropZoom;
     const renderedWidth = image.naturalWidth * baseScale;
     const renderedHeight = image.naturalHeight * baseScale;
-    const offsetX = (300 - renderedWidth) / 2 + cropOffset.x;
-    const offsetY = (300 - renderedHeight) / 2 + cropOffset.y;
-    const sourceX = Math.max(0, Math.min(image.naturalWidth - 300 / baseScale, -offsetX / baseScale));
-    const sourceY = Math.max(0, Math.min(image.naturalHeight - 300 / baseScale, -offsetY / baseScale));
-    const sourceSize = 300 / baseScale;
+    const offsetX = (viewSize - renderedWidth) / 2 + cropOffset.x;
+    const offsetY = (viewSize - renderedHeight) / 2 + cropOffset.y;
+    const sourceSize = viewSize / baseScale;
+    const sourceX = Math.max(0, Math.min(image.naturalWidth - sourceSize, -offsetX / baseScale));
+    const sourceY = Math.max(0, Math.min(image.naturalHeight - sourceSize, -offsetY / baseScale));
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
