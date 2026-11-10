@@ -68,7 +68,7 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
     if (transition.count > 0) {
       await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_SUCCESSFUL', status: 'SUCCESSFUL', source: 'VERIFY', message: 'Payment was verified successfully with Flutterwave.', metadata: { providerTransactionId: String(transaction.id || transactionId), amount, currency: transaction.currency || null } });
       try {
-        await sendVerifiedDonationReceipt({
+        const receiptResult = await sendVerifiedDonationReceipt({
         name: donation.name,
         email: donation.email,
         amount: donation.amount,
@@ -79,7 +79,11 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
         supportType: donation.supportType,
         txRef: donation.txRef,
         });
-        await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_SENT', status: 'SUCCESSFUL', source: 'EMAIL', message: 'Donation receipt email sent after successful payment verification.' });
+        if (receiptResult?.success) {
+          await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_SENT', status: 'SUCCESSFUL', source: 'EMAIL', message: 'Donor receipt and finance notification emails were sent.' });
+        } else {
+          await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_FAILED', status: 'FAILED', source: 'EMAIL', message: receiptResult?.reason || 'Donation receipt email could not be sent.' });
+        }
       } catch (emailError) {
         await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'RECEIPT_FAILED', status: 'FAILED', source: 'EMAIL', message: emailError instanceof Error ? emailError.message : 'Donation receipt email could not be sent.' });
         console.error('[Donation receipt] Email delivery failed:', emailError);
