@@ -198,7 +198,7 @@ export default function AppSidebar({
         className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open-mobile' : ''}`}
         style={{
           width: sidebarOpen ? '260px' : '72px',
-          background: '#0F172A',
+          background: 'var(--admin-navy)',
           color: '#fff',
           display: 'flex',
           flexDirection: 'column',
@@ -295,7 +295,7 @@ export default function AppSidebar({
               cursor: 'pointer',
               fontSize: '0.86rem',
               fontWeight: isActive ? 600 : 400,
-              borderLeft: isActive ? '4px solid #FFA000' : '4px solid transparent',
+              borderLeft: isActive ? '4px solid #E5B93F' : '4px solid transparent',
               transition: 'all 0.2s ease',
               textAlign: 'left',
               textDecoration: 'none',
@@ -309,7 +309,7 @@ export default function AppSidebar({
                     fontSize: '0.95rem',
                     width: '20px',
                     textAlign: 'center',
-                    color: isActive ? '#FFA000' : 'inherit',
+                    color: isActive ? '#E5B93F' : 'inherit',
                   }}
                 />
                 {sidebarOpen && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
