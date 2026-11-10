@@ -51,7 +51,7 @@ export default function DonationPaymentLogsPage() {
   }, [page, search, event, status]);
 
   useEffect(() => {
-    fetch('/api/auth/profile').then((r) => r.ok ? r.json() : null).then((p) => setRole(p?.role || 'UNKNOWN')).catch(() => setRole('UNKNOWN'));
+    fetch('/api/auth/profile').then((r) => r.ok ? r.json() : null).then((p) => setRole(p?.role || p?.user?.role || 'UNKNOWN')).catch(() => setRole('UNKNOWN'));
   }, []);
   useEffect(() => { if (hasPermission(role, 'donations.view')) void load(); else if (role !== 'UNKNOWN') setLoading(false); }, [role, load]);
 
