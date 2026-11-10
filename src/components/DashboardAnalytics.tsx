@@ -22,6 +22,7 @@ type Analytics = {
     unreadMessages: number; 
     totalMessages: number; 
     volunteers: number; 
+    unreadVolunteers: number;
     pendingJobs: number; 
     eventRegistrations: number; 
     sponsorInquiries: number; 
@@ -231,6 +232,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 {[
                   data.engagement.unreadMessages > 0 ? `${data.engagement.unreadMessages} msg` : null,
                   data.engagement.pendingJobs > 0 ? `${data.engagement.pendingJobs} jobs` : null,
+                  data.engagement.unreadVolunteers > 0 ? `${data.engagement.unreadVolunteers} volunteers` : null,
                   data.engagement.eventRegistrations > 0 ? `${data.engagement.eventRegistrations} events` : null,
                   data.engagement.sponsorInquiries > 0 ? `${data.engagement.sponsorInquiries} sponsors` : null,
                 ].filter(Boolean).join(' · ') || 'No pending items'}
@@ -347,7 +349,7 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                 </div>
               </div>
 
-              {/* 5 Distinct Categories making up the Pending Work */}
+              {/* Pending request categories: messages, job applications, and volunteer applications */}
               <div className="row g-2">
                 {/* 1. Unread Messages -> Navigates to Messages Inbox */}
                 <div className="col-sm-6 col-md-4 col-lg">
@@ -372,6 +374,34 @@ export default function DashboardAnalytics({ onNavigate }: DashboardAnalyticsPro
                     </div>
                     <div style={{ fontSize: '0.7rem', color: '#0369A1', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>Review Messages</span>
+                      <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Volunteer Applications -> Navigates to Volunteer Inbox */}
+                <div className="col-sm-6 col-md-4 col-lg">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleNav({ tab: 'contacts', subtab: 'volunteers' })}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav({ tab: 'contacts', subtab: 'volunteers' }); } }}
+                    style={{ background: '#FFFFFF', border: '1px solid #EDE9FE', borderRadius: '10px', padding: '12px 14px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#059669'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EDE9FE'; e.currentTarget.style.transform = 'none'; }}
+                    title="Review Volunteer Applications"
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#047857', textTransform: 'uppercase' }}>Volunteer Applications</span>
+                        <i className="fas fa-hand-holding-heart" style={{ color: '#059669', fontSize: '0.85rem' }} />
+                      </div>
+                      <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>
+                        {number(data.engagement.unreadVolunteers)}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: '#047857', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>Review Volunteers</span>
                       <i className="fas fa-arrow-right" style={{ fontSize: '0.65rem' }} />
                     </div>
                   </div>
