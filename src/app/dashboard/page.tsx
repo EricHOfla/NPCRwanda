@@ -1947,7 +1947,7 @@ export default function DashboardPage() {
                         {isEditor ? 'Editor Portal' : 'Admin Operations'}
                       </span>
                     </div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.5px' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px 0', letterSpacing: '-0.5px', color: '#FFFFFF' }}>
                       Welcome back, {profile.name || 'Admin'}!
                     </h2>
                     <p style={{ fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.88)', margin: 0, maxWidth: '620px', lineHeight: '1.45' }}>
