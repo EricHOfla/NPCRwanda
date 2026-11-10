@@ -17,6 +17,12 @@ export async function GET(request: NextRequest) {
   const from = params.get('from');
   const to = params.get('to');
 
+  const fromDate = from ? new Date(from) : null;
+  const toDate = to ? new Date(to + 'T23:59:59.999Z') : null;
+  if ((fromDate && !Number.isFinite(fromDate.getTime())) || (toDate && !Number.isFinite(toDate.getTime()))) {
+    return NextResponse.json({ error: 'Invalid date filter.' }, { status: 400 });
+  }
+
   const where = {
     ...(event && event !== 'ALL' ? { event } : {}),
     ...(status && status !== 'ALL' ? { status } : {}),
