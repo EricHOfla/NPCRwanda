@@ -92,8 +92,8 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
   }
 
   if (providerStatus === 'failed' || providerStatus === 'cancelled') {
-    const failureMessage = transaction.processor_response || 'Payment was not completed.';
-    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_FAILED', status: 'FAILED', source: 'VERIFY', message: failureMessage, metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus } });
+    const failureMessage = transaction.processor_response || (providerStatus === 'cancelled' ? 'Payment was cancelled.' : 'Payment was not completed.');
+    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: providerStatus === 'cancelled' ? 'PAYMENT_CANCELLED' : 'PAYMENT_FAILED', status: 'FAILED', source: 'VERIFY', message: failureMessage, metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus } });
     return prisma.donationPayment.update({
       where: { id: donation.id },
       data: {
@@ -104,6 +104,11 @@ export async function verifyDonationPayment(transactionId: string, expectedTxRef
         verifiedAt: new Date(),
       },
     });
+  }
+
+  if (providerStatus === 'successful') {
+    await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_VERIFICATION_REJECTED', status: 'FAILED', source: 'VERIFY', message: 'Flutterwave reported success, but the amount or currency did not match the donation record. The donation was not credited.', metadata: { providerTransactionId: String(transaction.id || transactionId), providerAmount: amount, providerCurrency: transaction.currency || null, expectedAmount: donation.amount, expectedCurrency: donation.currency } });
+    return donation;
   }
 
   await logDonationPayment({ donationPaymentId: donation.id, txRef, event: 'PAYMENT_PENDING', status: 'PENDING', source: 'VERIFY', message: 'Provider has not reported a final successful or failed payment status.', metadata: { providerTransactionId: String(transaction.id || transactionId), providerStatus } });
