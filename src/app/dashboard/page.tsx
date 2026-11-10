@@ -156,7 +156,7 @@ const isImageFilePath = (path: string) => {
 };
 
 const getDocTypeDetails = (path: string) => {
-  if (!path || path === '#') return { icon: 'fa-file-lines', color: '#64748B', bg: '#F1F5F9', label: 'File' };
+  if (!path || path === '#') return { icon: 'fa-file-lines', color: 'rgba(255, 255, 255, 0.88)', bg: '#F1F5F9', label: 'File' };
   const clean = path.split('?')[0].toLowerCase();
   if (clean.endsWith('.pdf')) return { icon: 'fa-file-pdf', color: '#DC2626', bg: '#FEE2E2', label: 'PDF Document' };
   if (clean.endsWith('.doc') || clean.endsWith('.docx')) return { icon: 'fa-file-word', color: '#2563EB', bg: '#DBEAFE', label: 'Word Document' };
@@ -1926,25 +1926,24 @@ export default function DashboardPage() {
               <div 
                 className="dashboard-welcome-banner"
                 style={{ 
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
+                  background: 'linear-gradient(135deg, #1E3A5F 0%, #315A7D 100%)',
                   borderRadius: '16px',
                   padding: '24px 28px',
-                  color: '#0F172A',
+                  color: '#FFFFFF',
                   marginBottom: '20px',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                  boxShadow: '0 8px 24px rgba(30, 58, 95, 0.16)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                <div style={{ position: 'absolute', right: '-15px', bottom: '-35px', opacity: 0.06, fontSize: '9rem', color: '#0F172A', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', right: '-15px', bottom: '-35px', opacity: 0.12, fontSize: '9rem', color: '#FFFFFF', pointerEvents: 'none' }}>
                   <i className="fas fa-chart-pie" />
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', position: 'relative', zIndex: 2 }}>
                   <div>
                     <div className="d-flex align-items-center gap-2 mb-1">
-                      <span className="badge" style={{ background: '#FFF7E6', color: '#92400E', border: '1px solid #FDE68A', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#FFFFFF', border: '1px solid rgba(255, 255, 255, 0.28)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         {isEditor ? 'Editor Portal' : 'Admin Operations'}
                       </span>
                     </div>
@@ -1956,13 +1955,13 @@ export default function DashboardPage() {
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#F8FAFC', backdropFilter: 'none', borderRadius: '20px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #E2E8F0', color: '#334155' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 255, 255, 0.14)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid rgba(255, 255, 255, 0.24)', color: '#FFFFFF' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ADE80', display: 'inline-block', boxShadow: '0 0 6px #4ADE80' }} />
                     <span>Live Sync {lastSyncTime ? `(${lastSyncTime})` : ''}</span>
                     <button 
                       onClick={refreshRealTimeData}
                       disabled={isRefreshing}
-                      className="btn btn-link btn-sm p-0 text-primary"
+                      className="btn btn-link btn-sm p-0 text-white"
                       title="Sync live data now"
                       style={{ textDecoration: 'none', marginLeft: '6px', opacity: isRefreshing ? 0.5 : 1 }}
                     >
@@ -1971,7 +1970,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-                <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '18px 0 16px' }} />
+                <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.2)', margin: '18px 0 16px' }} />
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', position: 'relative', zIndex: 2 }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -1985,7 +1984,7 @@ export default function DashboardPage() {
                     <button 
                       onClick={() => { setAdminTab('pages'); setActiveEditPage('athletes'); setAthleteFormOpen(true); }} hidden={!canCreateContent && !canUpdateContent}
                       className="btn btn-sm"
-                      style={{ background: '#FFFFFF', color: '#334155', fontWeight: 600, borderRadius: '8px', border: '1px solid #CBD5E1', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      style={{ background: 'rgba(255, 255, 255, 0.16)', color: '#FFFFFF', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.28)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
                       <i className="fas fa-user-plus" /> Add Athlete
                     </button>
@@ -2010,7 +2009,7 @@ export default function DashboardPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-sm"
-                    style={{ background: '#FFFFFF', color: '#0B5F9F', fontWeight: 600, borderRadius: '8px', border: '1px solid #CBD5E1', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
+                    style={{ background: 'rgba(255, 255, 255, 0.14)', color: '#FFFFFF', fontWeight: 600, borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.28)', padding: '7px 14px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
                   >
                     View Website <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.75rem' }} />
                   </a>
