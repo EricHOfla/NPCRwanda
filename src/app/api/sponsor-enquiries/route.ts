@@ -13,14 +13,9 @@ const schema = z.object({
   message: z.string().trim().min(10).max(3000),
 });
 
-export async function POST(request: Request) {
-  try {
-    const parsed = schema.safeParse(await request.json());
-    if (!parsed.success) return NextResponse.json({ error: 'Please check the required fields', details: parsed.error.flatten() }, { status: 400 });
-    const item = await prisma.sponsorInquiry.create({ data: parsed.data });
-    return NextResponse.json({ success: true, id: item.id, message: 'Thank you. Your partnership enquiry has been received.' }, { status: 201 });
-  } catch (error) {
-    console.error('Sponsor enquiry failed:', error);
-    return NextResponse.json({ error: 'We could not submit your enquiry. Please try again.' }, { status: 500 });
-  }
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Partnership enquiries are handled through the Contact Us page.' },
+    { status: 410 }
+  );
 }
