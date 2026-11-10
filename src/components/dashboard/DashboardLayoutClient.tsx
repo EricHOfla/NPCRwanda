@@ -151,7 +151,7 @@ export default function DashboardLayoutClient({
   }
 
   return (
-    <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', minHeight: '100vh', background: '#F8FAFC', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
+    <div className="admin-dashboard-root" style={{ display: 'flex', height: '100vh', minHeight: '100vh', background: 'var(--admin-page)', fontFamily: 'var(--font-body), Inter, sans-serif', overflow: 'hidden' }}>
       <AppSidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
