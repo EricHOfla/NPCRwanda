@@ -339,7 +339,7 @@ function DonationManagementContent() {
                 </div>
                 {summary.successfulUsdAmount > 0 && (
                   <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: '12px', padding: '10px 16px', backdropFilter: 'blur(4px)' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#93C5FD', fontWeight: 600, textTransform: 'uppercase' }}>USD Direct</div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.78)', fontWeight: 600, textTransform: 'uppercase' }}>USD Direct</div>
                     <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF' }}>${money(summary.successfulUsdAmount)}</div>
                   </div>
                 )}
