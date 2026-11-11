@@ -898,7 +898,7 @@ export default function HomeClient() {
                             <h4 className="pro-ngo-fixture-title">{displayEvent.title}</h4>
                             <span className="pro-ngo-fixture-venue">
                               <i className="fas fa-location-dot me-1 text-warning" aria-hidden="true" />
-                              {displayEvent.location} ÃƒÂ¯Ã‚Â¿Ã‚Â½ {displayEvent.category}
+                              {displayEvent.location} • {displayEvent.category}
                             </span>
                           </div>
                         </Link>
